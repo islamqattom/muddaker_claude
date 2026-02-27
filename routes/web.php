@@ -77,6 +77,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/unmastered', [Supervisor\RecitationController::class, 'unmastered'])->name('unmastered');
         Route::get('/recitation', [Supervisor\RecitationController::class, 'recitation'])->name('recitation');
         Route::get('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil');
+        Route::post('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil.post');
         Route::post('/save', [Supervisor\RecitationController::class, 'saveSession'])->name('save');
         Route::post('/calculate-color', [Supervisor\RecitationController::class, 'calculateColor'])->name('calculate-color');
         Route::post('/get-pages', [Supervisor\RecitationController::class, 'getPages'])->name('get-pages');

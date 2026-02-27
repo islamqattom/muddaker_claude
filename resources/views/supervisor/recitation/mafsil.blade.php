@@ -31,17 +31,112 @@
                     <i class="fas fa-star me-2"></i>مفصل {{ $mafsilType }}
                 </span>
                 <div class="mt-2">
-                    <strong>علامة البداية: </strong>
-                    <span class="badge bg-danger fs-5">0% (راسب)</span>
+                    <strong>علامة الرسوب أقل من: </strong>
+                    <span class="badge bg-danger fs-5">{{ $passingPercentage }}%</span>
                 </div>
+                @if(!$selectionMode)
                 <div class="mt-1">
                     <strong>العلامة الحالية: </strong>
-                    <span class="badge bg-primary fs-5" id="currentScore">0%</span>
+                    <span class="badge bg-primary fs-5" id="currentScore">100%</span>
                 </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
+
+<!-- Part Selection Mode -->
+@if($selectionMode)
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h6 class="mb-0"><i class="fas fa-hand-pointer me-2"></i>اختر الأجزاء</h6>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info d-flex gap-3 align-items-start">
+            <i class="fas fa-info-circle fa-lg mt-1"></i>
+            <div>
+                <strong>اختر {{ $partsCount }} أجزاء</strong> من أجزاء القرآن الكريم التي تريد اختبارها
+            </div>
+        </div>
+
+        <form id="partSelectionForm" method="POST" action="{{ route('supervisor.recitation.mafsil.post') }}">
+            @csrf
+            <input type="hidden" name="student_id" value="{{ $student->id }}">
+            <input type="hidden" name="mafsil_type" value="{{ $mafsilType }}">
+
+            <div class="row g-3 mb-3">
+                @foreach($allParts as $part)
+                <div class="col-md-4 col-sm-6">
+                    <div class="form-check card h-100 part-checkbox-card">
+                        <input class="form-check-input part-checkbox" type="checkbox"
+                               name="selected_parts[]"
+                               value="{{ $part->part_number }}"
+                               id="part-{{ $part->part_number }}">
+                        <label class="form-check-label w-100" for="part-{{ $part->part_number }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>الجزء {{ $part->part_number }}</strong>
+                                <small class="text-muted">{{ $part->start_page }} - {{ $part->end_page }}</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <div class="alert alert-warning d-none" id="selectionWarning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="selectionCount">0</span> / {{ $partsCount }} أجزاء محددة
+            </div>
+
+            <div class="d-flex gap-3 justify-content-between mt-4">
+                <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-arrow-right me-2"></i>رجوع
+                </a>
+                <button type="submit" class="btn btn-primary btn-lg px-5" id="confirmPartsBtn" disabled>
+                    <i class="fas fa-check me-2"></i>
+                    تأكيد الأجزاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+const requiredParts = {{ $partsCount }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.part-checkbox');
+    const warningEl = document.getElementById('selectionWarning');
+    const countEl = document.getElementById('selectionCount');
+    const btn = document.getElementById('confirmPartsBtn');
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const checkedCount = document.querySelectorAll('.part-checkbox:checked').length;
+
+            countEl.textContent = checkedCount;
+
+            if (checkedCount > 0 && checkedCount < requiredParts) {
+                warningEl.classList.remove('d-none');
+                warningEl.className = 'alert alert-warning';
+                btn.disabled = true;
+            } else if (checkedCount === requiredParts) {
+                warningEl.classList.add('d-none');
+                btn.disabled = false;
+            } else {
+                warningEl.classList.remove('d-none');
+                warningEl.className = 'alert alert-danger';
+                btn.disabled = true;
+            }
+        });
+    });
+});
+</script>
+@endpush
+
+@else
+<!-- Scoring Mode -->
 
 <!-- Scoring Rules -->
 <div class="alert alert-info d-flex gap-3 align-items-start">
@@ -145,6 +240,8 @@
     </div>
 </form>
 
+@endif
+
 </div>
 </div>
 @endsection
@@ -157,8 +254,8 @@ let hasInputBeenMade = false;
 
 // Initialize with 0% (starting grade is failed)
 document.addEventListener('DOMContentLoaded', function() {
-    // Initially show 0% (failed) - no inputs made yet
-    document.getElementById('currentScore').textContent = '0%';
+    // Initially show 100% - no inputs made yet
+    document.getElementById('currentScore').textContent = '100%';
 });
 
 function adjustMafsil(id, delta, index) {
@@ -205,12 +302,12 @@ function updateTotals() {
     document.getElementById('total-hesitations').textContent = totalHesitations;
     document.getElementById('total-deduction').textContent = '-' + totalDeduction;
 
-    // If no input has been made yet, show 0% (failed) as starting grade
+    // If no input has been made yet, show passing percentage (failed) for final-score, 100% for currentScore
     if (!hasInputBeenMade) {
-        document.getElementById('final-score').textContent = '0%';
-        document.getElementById('currentScore').textContent = '0%';
+        document.getElementById('final-score').textContent = passingPercentage + '% (راسب)';
+        document.getElementById('currentScore').textContent = '100%';
         document.getElementById('final-score').className = 'badge bg-danger fs-5';
-        document.getElementById('currentScore').className = 'badge bg-danger fs-5';
+        document.getElementById('currentScore').className = 'badge bg-primary fs-5';
         return;
     }
 

@@ -188,7 +188,7 @@
                                 <input type="radio" class="btn-check" name="mafsil_type" id="mt-{{ $num }}" value="{{ $num }}">
                                 <label class="btn btn-outline-danger w-100 py-2" for="mt-{{ $num }}">
                                     <div class="fw-bold">{{ $num }}</div>
-                                    <small>{{ $score }}</small>
+                                    <small>علامة الرسوب أقل من: {{ $score }}</small>
                                 </label>
                             </div>
                             @endforeach
@@ -243,9 +243,9 @@
                 <div class="mt-3 p-3 bg-light rounded">
                     <h6 class="text-primary">المفاصل وعلاماتها:</h6>
                     <table class="table table-sm mb-0">
-                        <tr><td><strong>مفصل 3 و6</strong></td><td>علامة البداية: <span class="badge bg-success">90%</span></td></tr>
-                        <tr><td><strong>مفصل 10 و15</strong></td><td>علامة البداية: <span class="badge bg-warning text-dark">80%</span></td></tr>
-                        <tr><td><strong>مفصل 20 و25 و30</strong></td><td>علامة البداية: <span class="badge bg-danger">75%</span></td></tr>
+                        <tr><td><strong>مفصل 3 و6</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-success">90%</span></td></tr>
+                        <tr><td><strong>مفصل 10 و15</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-warning text-dark">80%</span></td></tr>
+                        <tr><td><strong>مفصل 20 و25 و30</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-danger">75%</span></td></tr>
                     </table>
                     <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
                 </div>

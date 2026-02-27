@@ -195,12 +195,38 @@ class RecitationController extends Controller
         $mafsilType = $request->mafsil_type;
         $maxScore = 100; // Always use 100
         $passingPercentage = RecitationSession::getMafsilPassingPercentage($mafsilType);
-
-        // Determine how many parts are in this mafsil
         $partsCount = $mafsilType;
-        $parts = QuranPart::where('part_number', '<=', $partsCount)->orderBy('part_number')->get();
 
-        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage'));
+        // Get all 30 parts for selection
+        $allParts = QuranPart::orderBy('part_number')->get();
+
+        // Check if parts have been selected (POST request)
+        if ($request->isMethod('post') || $request->has('selected_parts')) {
+            $selectedParts = $request->input('selected_parts', []);
+
+            // Validate selected parts count
+            if (count($selectedParts) != $partsCount) {
+                return back()->withErrors(['selected_parts' => 'يجب اختيار exactly ' . $partsCount . ' أجزاء']);
+            }
+
+            // Validate selected parts exist
+            $parts = QuranPart::whereIn('part_number', $selectedParts)
+                ->orderByRaw("FIELD(part_number, " . implode(',', $selectedParts) . ")")
+                ->get();
+
+            if ($parts->count() != $partsCount) {
+                return back()->withErrors(['selected_parts' => 'الأجزاء المختارة غير صالحة']);
+            }
+
+            // Parts selected - show scoring form
+            $selectionMode = false; // Show scoring form
+            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode'));
+        }
+
+        // No parts selected yet - show selection UI
+        $parts = collect(); // Empty collection for now
+        $selectionMode = true; // Show part selection UI
+        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode'));
     }
 
     /**
