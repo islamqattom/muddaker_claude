@@ -80,51 +80,54 @@
                     <!-- Dynamic Options -->
                     <div id="options-new_memorization" class="d-none session-options">
                         <div class="row g-2">
-                            <div class="col-6">
+                            <div class="col-8">
                                 <label class="form-label">الجزء</label>
-                                <select name="part_id_new" class="form-select">
+                                <select name="part_id_new" class="form-select" onchange="updatePartInfo('new', this.value)">
                                     @foreach($parts as $part)
-                                        <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">رقم الصفحة الأولى</label>
-                                <input type="number" name="start_page_new" class="form-control" min="1" max="604" value="1">
+                            <div class="col-4">
+                                <label class="form-label">رقم الصفحة</label>
+                                <select name="page_number_new" class="form-select" id="page_number_new" required>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div id="options-review" class="d-none session-options">
                         <div class="row g-2">
-                            <div class="col-6">
+                            <div class="col-8">
                                 <label class="form-label">الجزء</label>
-                                <select name="part_id_review" class="form-select">
+                                <select name="part_id_review" class="form-select" onchange="updatePartInfo('review', this.value)">
                                     @foreach($parts as $part)
-                                        <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">رقم الصفحة الأولى</label>
-                                <input type="number" name="start_page_review" class="form-control" min="1" max="604" value="1">
+                            <div class="col-4">
+                                <label class="form-label">رقم الصفحة</label>
+                                <select name="page_number_review" class="form-select" id="page_number_review" required>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div id="options-unmastered" class="d-none session-options">
                         <div class="row g-2">
-                            <div class="col-6">
+                            <div class="col-8">
                                 <label class="form-label">الجزء</label>
-                                <select name="part_id_unmastered" class="form-select">
+                                <select name="part_id_unmastered" class="form-select" onchange="updatePartInfo('unmastered', this.value)">
                                     @foreach($parts as $part)
-                                        <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">رقم الصفحة الأولى</label>
-                                <input type="number" name="start_page_unmastered" class="form-control" min="1" max="604" value="1">
+                            <div class="col-4">
+                                <label class="form-label">رقم الصفحة</label>
+                                <select name="page_number_unmastered" class="form-select" id="page_number_unmastered" required>
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">عدد الصفحات</label>
@@ -143,7 +146,7 @@
                             <label class="form-label">اختر الجزء للسرد</label>
                             <select name="part_id_recitation" class="form-select">
                                 @foreach($parts as $part)
-                                    <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                    <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -266,6 +269,43 @@
 
 @push('scripts')
 <script>
+// تهيئة حقول أرقام الصفحات عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // تهيئة حقول الصفحات لكل نوع
+    ['new', 'review', 'unmastered'].forEach(function(type) {
+        const select = document.querySelector(`select[name="part_id_${type}"]`);
+        if (select) {
+            updatePartInfo(type, select.value);
+        }
+    });
+});
+
+function updatePartInfo(type, partId) {
+    const partSelect = document.querySelector(`select[name="part_id_${type}"]`);
+    const pageSelect = document.getElementById(`page_number_${type}`);
+
+    if (!partSelect || !pageSelect) return;
+
+    const selectedOption = partSelect.options[partSelect.selectedIndex];
+    const startPage = parseInt(selectedOption.dataset.startPage);
+    const endPage = parseInt(selectedOption.dataset.endPage);
+
+    // مسح الخيارات الحالية
+    pageSelect.innerHTML = '';
+
+    // إنشاء خيارات الصفحات
+    for (let page = startPage; page <= endPage; page++) {
+        const option = document.createElement('option');
+        option.value = page;
+        option.textContent = 'صفحة ' + page;
+        pageSelect.appendChild(option);
+    }
+
+    // تعيين الخاصية min و max للتحقق
+    pageSelect.dataset.minPage = startPage;
+    pageSelect.dataset.maxPage = endPage;
+}
+
 function loadStudentInfo() {
     const select = document.getElementById('studentSelect');
     const option = select.options[select.selectedIndex];
@@ -284,7 +324,17 @@ function loadStudentInfo() {
 function showTypeOptions(type) {
     document.querySelectorAll('.session-options').forEach(el => el.classList.add('d-none'));
     const opt = document.getElementById('options-' + type);
-    if (opt) opt.classList.remove('d-none');
+    if (opt) {
+        opt.classList.remove('d-none');
+        // تهيئة أرقام الصفحات عند إظهار الخيارات
+        if (type === 'new_memorization') {
+            updatePartInfo('new', document.querySelector('select[name="part_id_new"]').value);
+        } else if (type === 'review') {
+            updatePartInfo('review', document.querySelector('select[name="part_id_review"]').value);
+        } else if (type === 'unmastered') {
+            updatePartInfo('unmastered', document.querySelector('select[name="part_id_unmastered"]').value);
+        }
+    }
 }
 
 function startSession() {
@@ -305,17 +355,47 @@ function startSession() {
 
     if (type === 'new_memorization') {
         const partId = document.querySelector('select[name="part_id_new"]').value;
-        const startPage = document.querySelector('input[name="start_page_new"]').value;
-        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&start_page=${startPage}`;
+        const pageNumber = document.getElementById('page_number_new').value;
+        // التحقق من نطاق الصفحة
+        const pageSelect = document.getElementById('page_number_new');
+        const minPage = parseInt(pageSelect.dataset.minPage);
+        const maxPage = parseInt(pageSelect.dataset.maxPage);
+        const page = parseInt(pageNumber);
+
+        if (page < minPage || page > maxPage) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+            return;
+        }
+        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}`;
     } else if (type === 'review') {
         const partId = document.querySelector('select[name="part_id_review"]').value;
-        const startPage = document.querySelector('input[name="start_page_review"]').value;
-        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&start_page=${startPage}`;
+        const pageNumber = document.getElementById('page_number_review').value;
+        // التحقق من نطاق الصفحة
+        const pageSelect = document.getElementById('page_number_review');
+        const minPage = parseInt(pageSelect.dataset.minPage);
+        const maxPage = parseInt(pageSelect.dataset.maxPage);
+        const page = parseInt(pageNumber);
+
+        if (page < minPage || page > maxPage) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+            return;
+        }
+        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}`;
     } else if (type === 'unmastered') {
         const partId = document.querySelector('select[name="part_id_unmastered"]').value;
-        const startPage = document.querySelector('input[name="start_page_unmastered"]').value;
+        const pageNumber = document.getElementById('page_number_unmastered').value;
         const count = document.querySelector('input[name="unmastered_count"]:checked')?.value || 5;
-        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&start_page=${startPage}&pages_count=${count}`;
+        // التحقق من نطاق الصفحة
+        const pageSelect = document.getElementById('page_number_unmastered');
+        const minPage = parseInt(pageSelect.dataset.minPage);
+        const maxPage = parseInt(pageSelect.dataset.maxPage);
+        const page = parseInt(pageNumber);
+
+        if (page < minPage || page > maxPage) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+            return;
+        }
+        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}`;
     } else if (type === 'recitation') {
         const partId = document.querySelector('select[name="part_id_recitation"]').value;
         url = `{{ route('supervisor.recitation.recitation') }}?student_id=${studentId}&part_id=${partId}`;

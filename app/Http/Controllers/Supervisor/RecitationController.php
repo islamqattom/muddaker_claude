@@ -40,17 +40,24 @@ class RecitationController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'part_id' => 'required|exists:quran_parts,id',
-            'start_page' => 'required|integer|min:1',
+            'page_number' => 'required|integer|min:1',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
+
+        // Validate page number is within part range
+        if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+        }
+
+        $startPage = $request->page_number;
         $pagesCount = $student->level->new_memorization_pages;
 
         // Get pages for this session
         $pages = [];
         for ($i = 0; $i < $pagesCount; $i++) {
-            $pageNum = $request->start_page + $i;
+            $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
                 $pages[] = $pageNum;
             }
@@ -67,16 +74,23 @@ class RecitationController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'part_id' => 'required|exists:quran_parts,id',
-            'start_page' => 'required|integer|min:1',
+            'page_number' => 'required|integer|min:1',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
+
+        // Validate page number is within part range
+        if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+        }
+
+        $startPage = $request->page_number;
         $pagesCount = $student->level->review_pages;
 
         $pages = [];
         for ($i = 0; $i < $pagesCount; $i++) {
-            $pageNum = $request->start_page + $i;
+            $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
                 $pages[] = $pageNum;
             }
@@ -93,17 +107,24 @@ class RecitationController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'part_id' => 'required|exists:quran_parts,id',
-            'start_page' => 'required|integer|min:1',
             'pages_count' => 'required|in:5,10,15,20',
+            'page_number' => 'required|integer|min:1',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
+
+        // Validate page number is within part range
+        if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+        }
+
+        $startPage = $request->page_number;
         $pagesCount = $request->pages_count;
 
         $pages = [];
         for ($i = 0; $i < $pagesCount; $i++) {
-            $pageNum = $request->start_page + $i;
+            $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
                 $pages[] = $pageNum;
             }
@@ -189,7 +210,7 @@ class RecitationController extends Controller
             // Check overall pass/fail
             $failedPages = 0;
             foreach ($request->pages as $page) {
-                $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations']);
+                $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
                 if (!$colorResult['passed']) {
                     $failedPages++;
                 }
@@ -224,7 +245,7 @@ class RecitationController extends Controller
 
             // Save each page
             foreach ($request->pages as $pageData) {
-                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations']);
+                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
 
                 $pageScore = null;
                 if ($request->type === 'mafsil') {
@@ -257,9 +278,10 @@ class RecitationController extends Controller
         $request->validate([
             'errors' => 'required|integer|min:0',
             'hesitations' => 'required|integer|min:0',
+            'type' => 'nullable|string',
         ]);
 
-        $result = RecitationSession::calculatePageColor($request->errors, $request->hesitations);
+        $result = RecitationSession::calculatePageColor($request->errors, $request->hesitations, $request->type);
 
         return response()->json($result);
     }
