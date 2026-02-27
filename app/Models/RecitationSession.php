@@ -124,13 +124,24 @@ class RecitationSession extends Model
     public static function calculateMafsilScore(float $maxScore, int $errors, int $hesitations): float
     {
         $deduction = ($errors * 3) + (floor($hesitations / 3) * 1);
-        return max(0, $maxScore - $deduction);
+        return max(0, 100 - $deduction);
     }
 
     /**
      * Get max score for mafsil type
      */
     public static function getMafsilMaxScore(int $mafsilType): float
+    {
+        if (in_array($mafsilType, [3, 6])) return 90;
+        if (in_array($mafsilType, [10, 15])) return 80;
+        if (in_array($mafsilType, [20, 25, 30])) return 75;
+        return 90;
+    }
+
+    /**
+     * Get passing score percentage for mafsil type
+     */
+    public static function getMafsilPassingPercentage(int $mafsilType): float
     {
         if (in_array($mafsilType, [3, 6])) return 90;
         if (in_array($mafsilType, [10, 15])) return 80;

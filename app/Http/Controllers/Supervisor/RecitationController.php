@@ -193,13 +193,14 @@ class RecitationController extends Controller
 
         $student = Student::with('level')->findOrFail($request->student_id);
         $mafsilType = $request->mafsil_type;
-        $maxScore = RecitationSession::getMafsilMaxScore($mafsilType);
+        $maxScore = 100; // Always use 100
+        $passingPercentage = RecitationSession::getMafsilPassingPercentage($mafsilType);
 
         // Determine how many parts are in this mafsil
         $partsCount = $mafsilType;
         $parts = QuranPart::where('part_number', '<=', $partsCount)->orderBy('part_number')->get();
 
-        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount'));
+        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage'));
     }
 
     /**
@@ -231,9 +232,9 @@ class RecitationController extends Controller
                 $totalHesitations += $page['hesitations'];
             }
 
-            // For mafsil, calculate score
+            // For mafsil, calculate score (always from 100)
             if ($request->type === 'mafsil') {
-                $maxScore = RecitationSession::getMafsilMaxScore($request->mafsil_type);
+                $maxScore = 100;
                 $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
             }
 
@@ -246,7 +247,16 @@ class RecitationController extends Controller
                 }
             }
 
-            if ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 5)) {
+            // For mafsil ONLY: check passing percentage
+            // - مفصل 3,6: إذا حصل على أقل من 90% → راسب
+            // - مفصل 10,15: إذا حصل على أقل من 80% → راسب
+            // - مفصل 20,25,30: إذا حصل على أقل من 75% → راسب
+            if ($request->type === 'mafsil') {
+                $passingPercentage = RecitationSession::getMafsilPassingPercentage($request->mafsil_type);
+                if ($finalScore < $passingPercentage) {
+                    $sessionStatus = 'failed';
+                }
+            } elseif ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 5)) {
                 $sessionStatus = 'failed';
             }
 
