@@ -1,0 +1,20 @@
+{
+  "name": "quran-system",
+  "version": "1.0.0",
+  "description": "نظام إلكتروني متكامل لمتابعة وتسميع القرآن الكريم للطلاب الحفظة.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

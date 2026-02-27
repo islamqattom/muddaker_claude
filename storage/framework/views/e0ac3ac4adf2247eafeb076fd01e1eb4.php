@@ -1,0 +1,283 @@
+<?php $__env->startSection('title', 'تسميع - حفظ جديد'); ?>
+<?php $__env->startSection('page-title', 'جلسة تسميع - حفظ جديد'); ?>
+<?php $__env->startSection('role-label', 'مشرف'); ?>
+<?php $__env->startSection('sidebar-menu'); ?>
+    <?php echo $__env->make('supervisor.partials.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="row justify-content-center">
+<div class="col-lg-9">
+
+<!-- Session Header -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:50px;height:50px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold;">
+                        <?php echo e(mb_substr($student->user->name, 0, 1)); ?>
+
+                    </div>
+                    <div>
+                        <h5 class="mb-0"><?php echo e($student->user->name); ?></h5>
+                        <small class="text-muted"><?php echo e($student->level->name); ?> | <?php echo e($student->student_number); ?></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <span class="badge bg-primary fs-6 px-3 py-2">
+                    <i class="fas fa-book-open me-2"></i>حفظ جديد
+                </span>
+                <span class="badge bg-secondary fs-6 px-3 py-2 me-2">
+                    الجزء <?php echo e($part->part_number); ?> | <?php echo e($pagesCount); ?> صفحات
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recitation Form -->
+<form id="recitationForm">
+    <?php echo csrf_field(); ?>
+    <input type="hidden" name="student_id" value="<?php echo e($student->id); ?>">
+    <input type="hidden" name="type" value="new_memorization">
+    <input type="hidden" name="part_id" value="<?php echo e($part->id); ?>">
+    <input type="hidden" name="session_date" value="<?php echo e(date('Y-m-d')); ?>">
+
+    <!-- Pages -->
+    <?php $__currentLoopData = $pages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $pageNum): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <div class="card mb-3 page-card" id="page-card-<?php echo e($index); ?>">
+        <div class="card-header d-flex justify-content-between align-items-center" id="page-header-<?php echo e($index); ?>">
+            <div class="d-flex align-items-center gap-3">
+                <div class="page-color-indicator" id="color-indicator-<?php echo e($index); ?>"
+                     style="width:30px;height:30px;border-radius:50%;background:#dee2e6;border:2px solid #adb5bd;transition:all 0.3s;"></div>
+                <h6 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>
+                    صفحة رقم <strong><?php echo e($pageNum); ?></strong>
+                    <small class="text-muted">(<?php echo e($index + 1); ?> من <?php echo e(count($pages)); ?>)</small>
+                </h6>
+            </div>
+            <div class="color-badge" id="color-badge-<?php echo e($index); ?>">
+                <span class="badge bg-secondary">في الانتظار</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <input type="hidden" name="pages[<?php echo e($index); ?>][page_number]" value="<?php echo e($pageNum); ?>">
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-times-circle text-danger me-1"></i>
+                        عدد الأخطاء
+                    </label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-danger" onclick="adjustValue('errors-<?php echo e($index); ?>', -1)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number"
+                               name="pages[<?php echo e($index); ?>][errors]"
+                               id="errors-<?php echo e($index); ?>"
+                               class="form-control text-center fw-bold fs-4"
+                               value="0" min="0" max="20"
+                               oninput="updatePageColor(<?php echo e($index); ?>)">
+                        <button type="button" class="btn btn-outline-danger" onclick="adjustValue('errors-<?php echo e($index); ?>', 1)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">
+                        <i class="fas fa-question-circle text-warning me-1"></i>
+                        عدد الترددات
+                    </label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-warning" onclick="adjustValue('hesitations-<?php echo e($index); ?>', -1)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number"
+                               name="pages[<?php echo e($index); ?>][hesitations]"
+                               id="hesitations-<?php echo e($index); ?>"
+                               class="form-control text-center fw-bold fs-4"
+                               value="0" min="0" max="50"
+                               oninput="updatePageColor(<?php echo e($index); ?>)">
+                        <button type="button" class="btn btn-outline-warning" onclick="adjustValue('hesitations-<?php echo e($index); ?>', 1)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-2 rounded text-center fw-bold" id="result-box-<?php echo e($index); ?>" style="min-height:50px;display:flex;align-items:center;justify-content:center;background:#f0f4f8;font-size:13px;transition:all 0.3s;">
+                        —
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+    <!-- Summary Card -->
+    <div class="card mb-4" id="summaryCard" style="display:none;">
+        <div class="card-header">
+            <h6><i class="fas fa-chart-bar me-2"></i>ملخص الجلسة</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 text-center">
+                <div class="col-3">
+                    <div class="text-danger fw-bold fs-3" id="sum-errors">0</div>
+                    <small>إجمالي الأخطاء</small>
+                </div>
+                <div class="col-3">
+                    <div class="text-warning fw-bold fs-3" id="sum-hesitations">0</div>
+                    <small>إجمالي الترددات</small>
+                </div>
+                <div class="col-3">
+                    <div class="text-success fw-bold fs-3" id="sum-passed">0</div>
+                    <small>صفحات ناجحة</small>
+                </div>
+                <div class="col-3">
+                    <div class="text-dark fw-bold fs-3" id="sum-failed">0</div>
+                    <small>صفحات راسبة</small>
+                </div>
+            </div>
+            <div class="mt-3 p-3 rounded text-center fw-bold fs-5" id="overall-result">
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">ملاحظات (اختياري)</label>
+        <textarea name="notes" class="form-control" rows="2" placeholder="أي ملاحظات حول الجلسة..."></textarea>
+    </div>
+
+    <div class="d-flex gap-3 justify-content-between">
+        <a href="<?php echo e(route('supervisor.recitation.index')); ?>" class="btn btn-outline-secondary btn-lg px-4">
+            <i class="fas fa-arrow-right me-2"></i>رجوع
+        </a>
+        <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitSession()">
+            <i class="fas fa-save me-2"></i>
+            حفظ الجلسة
+        </button>
+    </div>
+</form>
+
+</div>
+</div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startPush('scripts'); ?>
+<script>
+const pageCount = <?php echo e(count($pages)); ?>;
+
+function adjustValue(id, delta) {
+    const input = document.getElementById(id);
+    let val = parseInt(input.value) + delta;
+    val = Math.max(parseInt(input.min), Math.min(parseInt(input.max || 999), val));
+    input.value = val;
+    // Extract index from id
+    const idx = id.split('-').pop();
+    updatePageColor(idx);
+}
+
+function updatePageColor(index) {
+    const errors = parseInt(document.getElementById('errors-' + index).value) || 0;
+    const hesitations = parseInt(document.getElementById('hesitations-' + index).value) || 0;
+
+    let color, label, bgColor, passed;
+
+    if (errors === 0 && hesitations <= 2) {
+        color = '#27ae60'; label = 'ممتاز 🟢'; bgColor = '#d5f5e3'; passed = true;
+    } else if (errors === 1 || (hesitations >= 3 && hesitations <= 5)) {
+        color = '#f39c12'; label = 'جيد 🟠'; bgColor = '#fef9e7'; passed = true;
+    } else if (errors === 2 && hesitations === 0) {
+        color = '#e74c3c'; label = 'ضعيف 🔴'; bgColor = '#fadbd8'; passed = true;
+    } else if ((errors >= 2 && hesitations >= 1) || errors >= 3) {
+        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
+    } else {
+        color = '#dee2e6'; label = '—'; bgColor = '#f0f4f8'; passed = true;
+    }
+
+    document.getElementById('color-indicator-' + index).style.background = color;
+    document.getElementById('color-indicator-' + index).style.borderColor = color;
+
+    const badge = document.getElementById('color-badge-' + index);
+    badge.innerHTML = `<span class="badge" style="background:${color};color:${color === '#f39c12' ? '#000' : '#fff'}">${label}</span>`;
+
+    const resultBox = document.getElementById('result-box-' + index);
+    resultBox.style.background = bgColor;
+    resultBox.style.color = color;
+    resultBox.textContent = label;
+
+    updateSummary();
+}
+
+function updateSummary() {
+    let totalErrors = 0, totalHesitations = 0, passed = 0, failed = 0;
+
+    for (let i = 0; i < pageCount; i++) {
+        const errors = parseInt(document.getElementById('errors-' + i)?.value) || 0;
+        const hesitations = parseInt(document.getElementById('hesitations-' + i)?.value) || 0;
+        totalErrors += errors;
+        totalHesitations += hesitations;
+
+        if (errors >= 2 && hesitations >= 1 || errors >= 3) failed++;
+        else passed++;
+    }
+
+    document.getElementById('sum-errors').textContent = totalErrors;
+    document.getElementById('sum-hesitations').textContent = totalHesitations;
+    document.getElementById('sum-passed').textContent = passed;
+    document.getElementById('sum-failed').textContent = failed;
+    document.getElementById('summaryCard').style.display = 'block';
+
+    const overallResult = document.getElementById('overall-result');
+    if (failed === 0) {
+        overallResult.className = 'mt-3 p-3 rounded text-center fw-bold fs-5 bg-success text-white';
+        overallResult.textContent = '✅ ناجح في الجلسة';
+    } else {
+        overallResult.className = 'mt-3 p-3 rounded text-center fw-bold fs-5 bg-danger text-white';
+        overallResult.textContent = `❌ راسب - ${failed} صفحة راسبة`;
+    }
+}
+
+function submitSession() {
+    const form = document.getElementById('recitationForm');
+    const data = new FormData(form);
+
+    // Validate all pages have been entered
+    let allFilled = true;
+    for (let i = 0; i < pageCount; i++) {
+        const errors = document.getElementById('errors-' + i)?.value;
+        if (errors === null || errors === '') { allFilled = false; break; }
+    }
+
+    if (!allFilled) {
+        toastr.warning('يرجى ملء بيانات جميع الصفحات');
+        return;
+    }
+
+    $.ajax({
+        url: '<?php echo e(route('supervisor.recitation.save')); ?>',
+        method: 'POST',
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            toastr.success('تم حفظ جلسة التسميع بنجاح');
+            setTimeout(() => window.location.href = '<?php echo e(route('supervisor.recitation.index')); ?>', 1500);
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON?.errors) {
+                const errors = Object.values(xhr.responseJSON.errors).flat().join('\n');
+                toastr.error(errors);
+            } else {
+                // If validation passes but redirect happens
+                window.location.href = '<?php echo e(route('supervisor.recitation.index')); ?>';
+            }
+        }
+    });
+}
+</script>
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\quran-system\resources\views/supervisor/recitation/review.blade.php ENDPATH**/ ?>

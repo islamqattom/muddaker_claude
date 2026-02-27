@@ -1,0 +1,291 @@
+<?php
+
+namespace App\Http\Controllers\Supervisor;
+
+use App\Http\Controllers\Controller;
+use App\Models\{RecitationSession, RecitationPage, Student, QuranPart, QuranPage};
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class RecitationController extends Controller
+{
+    public function index()
+    {
+        $supervisorId = Auth::id();
+        $students = Student::where('supervisor_id', $supervisorId)->with('user', 'level')->get();
+        $parts = QuranPart::orderBy('part_number')->get();
+
+        return view('supervisor.recitation.index', compact('students', 'parts'));
+    }
+
+    public function startSession(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $parts = QuranPart::orderBy('part_number')->get();
+
+        return view('supervisor.recitation.session', compact('student', 'parts'));
+    }
+
+    /**
+     * New Memorization Session (حفظ جديد)
+     */
+    public function newMemorization(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'part_id' => 'required|exists:quran_parts,id',
+            'start_page' => 'required|integer|min:1',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $part = QuranPart::findOrFail($request->part_id);
+        $pagesCount = $student->level->new_memorization_pages;
+
+        // Get pages for this session
+        $pages = [];
+        for ($i = 0; $i < $pagesCount; $i++) {
+            $pageNum = $request->start_page + $i;
+            if ($pageNum <= $part->end_page) {
+                $pages[] = $pageNum;
+            }
+        }
+
+        return view('supervisor.recitation.new-memorization', compact('student', 'part', 'pages', 'pagesCount'));
+    }
+
+    /**
+     * Review Session (مراجعة)
+     */
+    public function review(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'part_id' => 'required|exists:quran_parts,id',
+            'start_page' => 'required|integer|min:1',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $part = QuranPart::findOrFail($request->part_id);
+        $pagesCount = $student->level->review_pages;
+
+        $pages = [];
+        for ($i = 0; $i < $pagesCount; $i++) {
+            $pageNum = $request->start_page + $i;
+            if ($pageNum <= $part->end_page) {
+                $pages[] = $pageNum;
+            }
+        }
+
+        return view('supervisor.recitation.review', compact('student', 'part', 'pages', 'pagesCount'));
+    }
+
+    /**
+     * Unmastered Memorization (حفظ غير متقن)
+     */
+    public function unmastered(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'part_id' => 'required|exists:quran_parts,id',
+            'start_page' => 'required|integer|min:1',
+            'pages_count' => 'required|in:5,10,15,20',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $part = QuranPart::findOrFail($request->part_id);
+        $pagesCount = $request->pages_count;
+
+        $pages = [];
+        for ($i = 0; $i < $pagesCount; $i++) {
+            $pageNum = $request->start_page + $i;
+            if ($pageNum <= $part->end_page) {
+                $pages[] = $pageNum;
+            }
+        }
+
+        return view('supervisor.recitation.unmastered', compact('student', 'part', 'pages', 'pagesCount'));
+    }
+
+    /**
+     * Full Recitation / Sard (سرد)
+     */
+    public function recitation(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'part_id' => 'required|exists:quran_parts,id',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $part = QuranPart::with('pages')->findOrFail($request->part_id);
+
+        $pages = range($part->start_page, $part->end_page);
+
+        return view('supervisor.recitation.recitation', compact('student', 'part', 'pages'));
+    }
+
+    /**
+     * Mafsil Session (مفصل)
+     */
+    public function mafsil(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'mafsil_type' => 'required|in:3,6,10,15,20,25,30',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $mafsilType = $request->mafsil_type;
+        $maxScore = RecitationSession::getMafsilMaxScore($mafsilType);
+
+        // Determine how many parts are in this mafsil
+        $partsCount = $mafsilType;
+        $parts = QuranPart::where('part_number', '<=', $partsCount)->orderBy('part_number')->get();
+
+        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount'));
+    }
+
+    /**
+     * Save Session (API-like endpoint)
+     */
+    public function saveSession(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+            'part_id' => 'nullable|exists:quran_parts,id',
+            'session_date' => 'required|date',
+            'pages' => 'required|array',
+            'pages.*.page_number' => 'required|integer',
+            'pages.*.errors' => 'required|integer|min:0',
+            'pages.*.hesitations' => 'required|integer|min:0',
+        ]);
+
+        DB::transaction(function() use ($request) {
+            $totalErrors = 0;
+            $totalHesitations = 0;
+            $sessionStatus = 'passed';
+            $finalScore = null;
+            $maxScore = null;
+
+            // Calculate totals
+            foreach ($request->pages as $page) {
+                $totalErrors += $page['errors'];
+                $totalHesitations += $page['hesitations'];
+            }
+
+            // For mafsil, calculate score
+            if ($request->type === 'mafsil') {
+                $maxScore = RecitationSession::getMafsilMaxScore($request->mafsil_type);
+                $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
+            }
+
+            // Check overall pass/fail
+            $failedPages = 0;
+            foreach ($request->pages as $page) {
+                $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations']);
+                if (!$colorResult['passed']) {
+                    $failedPages++;
+                }
+            }
+
+            if ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 5)) {
+                $sessionStatus = 'failed';
+            }
+
+            if ($request->stopped) {
+                $sessionStatus = 'stopped';
+            }
+
+            $session = RecitationSession::create([
+                'student_id' => $request->student_id,
+                'supervisor_id' => Auth::id(),
+                'type' => $request->type,
+                'part_id' => $request->part_id,
+                'start_page' => $request->pages[0]['page_number'] ?? null,
+                'end_page' => end($request->pages)['page_number'] ?? null,
+                'total_pages' => count($request->pages),
+                'total_errors' => $totalErrors,
+                'total_hesitations' => $totalHesitations,
+                'status' => $sessionStatus,
+                'mafsil_type' => $request->mafsil_type ?? null,
+                'max_score' => $maxScore,
+                'final_score' => $finalScore,
+                'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
+                'session_date' => $request->session_date,
+                'notes' => $request->notes,
+            ]);
+
+            // Save each page
+            foreach ($request->pages as $pageData) {
+                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations']);
+
+                $pageScore = null;
+                if ($request->type === 'mafsil') {
+                    $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                }
+
+                RecitationPage::create([
+                    'session_id' => $session->id,
+                    'page_number' => $pageData['page_number'],
+                    'errors' => $pageData['errors'],
+                    'hesitations' => $pageData['hesitations'],
+                    'color_status' => $colorResult['color'],
+                    'is_passed' => $colorResult['passed'],
+                    'page_score' => $pageScore,
+                ]);
+            }
+
+            return $session;
+        });
+
+        return redirect()->route('supervisor.recitation.index')
+            ->with('success', 'تم حفظ جلسة التسميع بنجاح');
+    }
+
+    /**
+     * Calculate page color via AJAX
+     */
+    public function calculateColor(Request $request)
+    {
+        $request->validate([
+            'errors' => 'required|integer|min:0',
+            'hesitations' => 'required|integer|min:0',
+        ]);
+
+        $result = RecitationSession::calculatePageColor($request->errors, $request->hesitations);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Get pages for a part starting from page number
+     */
+    public function getPages(Request $request)
+    {
+        $request->validate([
+            'part_id' => 'required|exists:quran_parts,id',
+            'start_page' => 'required|integer|min:1',
+            'count' => 'required|integer|min:1',
+        ]);
+
+        $part = QuranPart::findOrFail($request->part_id);
+        $pages = [];
+
+        for ($i = 0; $i < $request->count; $i++) {
+            $pageNum = $request->start_page + $i;
+            if ($pageNum <= $part->end_page) {
+                $pages[] = $pageNum;
+            }
+        }
+
+        return response()->json(['pages' => $pages, 'part' => $part]);
+    }
+}
+// history method added via seeding
