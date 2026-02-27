@@ -41,6 +41,7 @@ class RecitationController extends Controller
             'student_id' => 'required|exists:students,id',
             'part_id' => 'required|exists:quran_parts,id',
             'page_number' => 'required|integer|min:1',
+            'continuation_part_id' => 'nullable|exists:quran_parts,id',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
@@ -56,6 +57,8 @@ class RecitationController extends Controller
 
         // Get pages for this session
         $pages = [];
+        $continuationPart = null;
+
         for ($i = 0; $i < $pagesCount; $i++) {
             $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
@@ -63,7 +66,19 @@ class RecitationController extends Controller
             }
         }
 
-        return view('supervisor.recitation.new-memorization', compact('student', 'part', 'pages', 'pagesCount'));
+        // If we need more pages and continuation part is provided
+        $remainingNeeded = $pagesCount - count($pages);
+        if ($remainingNeeded > 0 && $request->continuation_part_id) {
+            $continuationPart = QuranPart::findOrFail($request->continuation_part_id);
+            for ($i = 0; $i < $remainingNeeded; $i++) {
+                $pageNum = $continuationPart->start_page + $i;
+                if ($pageNum <= $continuationPart->end_page) {
+                    $pages[] = $pageNum;
+                }
+            }
+        }
+
+        return view('supervisor.recitation.new-memorization', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
 
     /**
@@ -75,6 +90,7 @@ class RecitationController extends Controller
             'student_id' => 'required|exists:students,id',
             'part_id' => 'required|exists:quran_parts,id',
             'page_number' => 'required|integer|min:1',
+            'continuation_part_id' => 'nullable|exists:quran_parts,id',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
@@ -89,6 +105,8 @@ class RecitationController extends Controller
         $pagesCount = $student->level->review_pages;
 
         $pages = [];
+        $continuationPart = null;
+
         for ($i = 0; $i < $pagesCount; $i++) {
             $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
@@ -96,7 +114,19 @@ class RecitationController extends Controller
             }
         }
 
-        return view('supervisor.recitation.review', compact('student', 'part', 'pages', 'pagesCount'));
+        // If we need more pages and continuation part is provided
+        $remainingNeeded = $pagesCount - count($pages);
+        if ($remainingNeeded > 0 && $request->continuation_part_id) {
+            $continuationPart = QuranPart::findOrFail($request->continuation_part_id);
+            for ($i = 0; $i < $remainingNeeded; $i++) {
+                $pageNum = $continuationPart->start_page + $i;
+                if ($pageNum <= $continuationPart->end_page) {
+                    $pages[] = $pageNum;
+                }
+            }
+        }
+
+        return view('supervisor.recitation.review', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
 
     /**

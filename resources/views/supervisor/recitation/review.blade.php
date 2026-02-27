@@ -27,11 +27,14 @@
                 </div>
             </div>
             <div class="col-md-6 text-md-end">
-                <span class="badge bg-primary fs-6 px-3 py-2">
-                    <i class="fas fa-book-open me-2"></i>حفظ جديد
+                <span class="badge bg-success fs-6 px-3 py-2">
+                    <i class="fas fa-redo me-2"></i>مراجعة
                 </span>
                 <span class="badge bg-secondary fs-6 px-3 py-2 me-2">
                     الجزء {{ $part->part_number }} | {{ $pagesCount }} صفحات
+                    @if($continuationPart)
+                        <span class="text-info"> + الجزء {{ $continuationPart->part_number }}</span>
+                    @endif
                 </span>
             </div>
         </div>
@@ -42,7 +45,7 @@
 <form id="recitationForm">
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->id }}">
-    <input type="hidden" name="type" value="new_memorization">
+    <input type="hidden" name="type" value="review">
     <input type="hidden" name="part_id" value="{{ $part->id }}">
     <input type="hidden" name="session_date" value="{{ date('Y-m-d') }}">
 

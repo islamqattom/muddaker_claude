@@ -32,6 +32,9 @@
                 </span>
                 <span class="badge bg-secondary fs-6 px-3 py-2 me-2">
                     الجزء {{ $part->part_number }} | {{ $pagesCount }} صفحات
+                    @if($continuationPart)
+                        <span class="text-info"> + الجزء {{ $continuationPart->part_number }}</span>
+                    @endif
                 </span>
             </div>
         </div>

@@ -90,7 +90,19 @@
                             </div>
                             <div class="col-4">
                                 <label class="form-label">رقم الصفحة</label>
-                                <select name="page_number_new" class="form-select" id="page_number_new" required>
+                                <select name="page_number_new" class="form-select" id="page_number_new" required onchange="checkRemainingPages('new')">
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Continuation Part (hidden by default) -->
+                        <div id="continuation_part_new_wrapper" class="row g-2 mt-2 d-none">
+                            <div class="col-12">
+                                <label class="form-label text-info">الجزء المكمل (لإكمال الصفحات المتبقية)</label>
+                                <select name="continuation_part_new" class="form-select" id="continuation_part_new">
+                                    <option value="">-- اختر الجزء المكمل --</option>
+                                    @foreach($parts as $part)
+                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -108,7 +120,19 @@
                             </div>
                             <div class="col-4">
                                 <label class="form-label">رقم الصفحة</label>
-                                <select name="page_number_review" class="form-select" id="page_number_review" required>
+                                <select name="page_number_review" class="form-select" id="page_number_review" required onchange="checkRemainingPages('review')">
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Continuation Part (hidden by default) -->
+                        <div id="continuation_part_review_wrapper" class="row g-2 mt-2 d-none">
+                            <div class="col-12">
+                                <label class="form-label text-info">الجزء المكمل (لإكمال الصفحات المتبقية)</label>
+                                <select name="continuation_part_review" class="form-select" id="continuation_part_review">
+                                    <option value="">-- اختر الجزء المكمل --</option>
+                                    @foreach($parts as $part)
+                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -304,6 +328,48 @@ function updatePartInfo(type, partId) {
     // تعيين الخاصية min و max للتحقق
     pageSelect.dataset.minPage = startPage;
     pageSelect.dataset.maxPage = endPage;
+
+    // التحقق من الصفحات المتبقية بعد تحديث الصفحة
+    checkRemainingPages(type);
+}
+
+function checkRemainingPages(type) {
+    const studentSelect = document.getElementById('studentSelect');
+    const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+
+    if (!studentSelect.value) return;
+
+    // الحصول على عدد الصفحات المطلوبة حسب النوع
+    let requiredPages = 0;
+    if (type === 'new') {
+        requiredPages = parseInt(selectedOption.dataset.memorization) || 3;
+    } else if (type === 'review') {
+        requiredPages = parseInt(selectedOption.dataset.review) || 6;
+    }
+
+    // الحصول على معلومات الجزء المحدد
+    const partSelect = document.querySelector(`select[name="part_id_${type}"]`);
+    const pageSelect = document.getElementById(`page_number_${type}`);
+    const continuationWrapper = document.getElementById(`continuation_part_${type}_wrapper`);
+
+    if (!partSelect || !pageSelect || !continuationWrapper) return;
+
+    const selectedPartOption = partSelect.options[partSelect.selectedIndex];
+    const endPage = parseInt(selectedPartOption.dataset.endPage);
+    const selectedPage = parseInt(pageSelect.value);
+
+    // حساب الصفحات المتبقية في الجزء الحالي
+    const remainingPages = endPage - selectedPage + 1;
+
+    // إذا كانت الصفحات المتبقية أقل من المطلوبة، إظهار اختيار الجزء المكمل
+    if (remainingPages < requiredPages) {
+        continuationWrapper.classList.remove('d-none');
+    } else {
+        continuationWrapper.classList.add('d-none');
+        // إعادة تعيين القيمة
+        const continuationSelect = document.getElementById(`continuation_part_${type}`);
+        if (continuationSelect) continuationSelect.value = '';
+    }
 }
 
 function loadStudentInfo() {
@@ -366,7 +432,13 @@ function startSession() {
             toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
             return;
         }
-        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}`;
+        // التحقق من الجزء المكمل
+        const continuationPart = document.querySelector('select[name="continuation_part_new"]')?.value;
+        let continuationParam = '';
+        if (continuationPart) {
+            continuationParam = `&continuation_part_id=${continuationPart}`;
+        }
+        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}${continuationParam}`;
     } else if (type === 'review') {
         const partId = document.querySelector('select[name="part_id_review"]').value;
         const pageNumber = document.getElementById('page_number_review').value;
@@ -380,7 +452,13 @@ function startSession() {
             toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
             return;
         }
-        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}`;
+        // التحقق من الجزء المكمل
+        const continuationPartReview = document.querySelector('select[name="continuation_part_review"]')?.value;
+        let continuationParamReview = '';
+        if (continuationPartReview) {
+            continuationParamReview = `&continuation_part_id=${continuationPartReview}`;
+        }
+        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}${continuationParamReview}`;
     } else if (type === 'unmastered') {
         const partId = document.querySelector('select[name="part_id_unmastered"]').value;
         const pageNumber = document.getElementById('page_number_unmastered').value;

@@ -82,11 +82,11 @@ const colors = { green:'#27ae60', orange:'#f39c12', red:'#e74c3c', black:'#2c3e5
 
 function updateSardColor(index) {
     const errors = parseInt(document.getElementById('e-'+index).value)||0;
-    const hesitations = parseInt(document.getElementById('h-'+index).value)||0;
+    // For recitation (sard), hesitations are ignored - only errors count
     let color;
-    if(errors===0&&hesitations<=2) color='green';
-    else if(errors===1||(hesitations>=3&&hesitations<=5)) color='orange';
-    else if(errors===2&&hesitations===0) color='red';
+    if(errors === 0) color='green';
+    else if(errors === 1) color='orange';
+    else if(errors === 2) color='red';
     else color='black';
     document.getElementById('page-'+index).style.borderColor = colors[color];
     document.getElementById('page-'+index).style.background = colors[color]+'22';

@@ -32,11 +32,11 @@
                 </span>
                 <div class="mt-2">
                     <strong>علامة البداية: </strong>
-                    <span class="badge bg-success fs-5">{{ $maxScore }}%</span>
+                    <span class="badge bg-danger fs-5">0% (راسب)</span>
                 </div>
                 <div class="mt-1">
                     <strong>العلامة الحالية: </strong>
-                    <span class="badge bg-primary fs-5" id="currentScore">{{ $maxScore }}%</span>
+                    <span class="badge bg-primary fs-5" id="currentScore">0%</span>
                 </div>
             </div>
         </div>
@@ -107,10 +107,10 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-danger" id="deduction-{{ $index }}">-0</span>
+                                <span class="badge bg-secondary" id="deduction-{{ $index }}">-0</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-success fs-6" id="part-score-{{ $index }}">{{ $maxScore }}%</span>
+                                <span class="badge bg-danger fs-6" id="part-score-{{ $index }}">0%</span>
                             </td>
                         </tr>
                         @endforeach
@@ -120,8 +120,8 @@
                             <td colspan="2"><strong>المجموع</strong></td>
                             <td><span class="badge bg-danger" id="total-errors">0</span></td>
                             <td><span class="badge bg-warning text-dark" id="total-hesitations">0</span></td>
-                            <td><span class="badge bg-danger" id="total-deduction">-0</span></td>
-                            <td><span class="badge bg-primary fs-5" id="final-score">{{ $maxScore }}%</span></td>
+                            <td><span class="badge bg-secondary" id="total-deduction">-0</span></td>
+                            <td><span class="badge bg-danger fs-5" id="final-score">0%</span></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -153,18 +153,28 @@
 <script>
 const maxScore = {{ $maxScore }};
 const partsCount = {{ $partsCount }};
+let hasInputBeenMade = false;
+
+// Initialize with 0% (starting grade is failed)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initially show 0% (failed) - no inputs made yet
+    document.getElementById('currentScore').textContent = '0%';
+});
 
 function adjustMafsil(id, delta, index) {
     const input = document.getElementById(id);
     let val = parseInt(input.value) + delta;
     val = Math.max(0, val);
     input.value = val;
+    hasInputBeenMade = true;
     calcMafsilRow(index);
 }
 
 function calcMafsilRow(index) {
     const errors = parseInt(document.getElementById('errors-' + index).value) || 0;
     const hesitations = parseInt(document.getElementById('hesitations-' + index).value) || 0;
+
+    hasInputBeenMade = true;
 
     const errorDeduction = errors * 3;
     const hesitationDeduction = Math.floor(hesitations / 3);
@@ -188,19 +198,39 @@ function updateTotals() {
         totalDeduction += (errors * 3) + Math.floor(hesitations / 3);
     }
 
+    // Calculate final score: maxScore - deductions
     const finalScore = Math.max(0, maxScore - totalDeduction);
 
     document.getElementById('total-errors').textContent = totalErrors;
     document.getElementById('total-hesitations').textContent = totalHesitations;
     document.getElementById('total-deduction').textContent = '-' + totalDeduction;
+
+    // If no input has been made yet, show 0% (failed) as starting grade
+    if (!hasInputBeenMade) {
+        document.getElementById('final-score').textContent = '0%';
+        document.getElementById('currentScore').textContent = '0%';
+        document.getElementById('final-score').className = 'badge bg-danger fs-5';
+        document.getElementById('currentScore').className = 'badge bg-danger fs-5';
+        return;
+    }
+
     document.getElementById('final-score').textContent = finalScore.toFixed(1) + '%';
     document.getElementById('currentScore').textContent = finalScore.toFixed(1) + '%';
 
-    // Color the final score
+    // Color the final score based on the calculated score
     const scoreEl = document.getElementById('final-score');
-    if (finalScore >= maxScore * 0.8) scoreEl.className = 'badge bg-success fs-5';
-    else if (finalScore >= maxScore * 0.6) scoreEl.className = 'badge bg-warning text-dark fs-5';
-    else scoreEl.className = 'badge bg-danger fs-5';
+    const currentScoreEl = document.getElementById('currentScore');
+
+    if (finalScore >= maxScore * 0.8) {
+        scoreEl.className = 'badge bg-success fs-5';
+        currentScoreEl.className = 'badge bg-success fs-5';
+    } else if (finalScore >= maxScore * 0.6) {
+        scoreEl.className = 'badge bg-warning text-dark fs-5';
+        currentScoreEl.className = 'badge bg-warning text-dark fs-5';
+    } else {
+        scoreEl.className = 'badge bg-danger fs-5';
+        currentScoreEl.className = 'badge bg-danger fs-5';
+    }
 }
 
 function submitMafsil() {
