@@ -118,13 +118,12 @@ class RecitationSession extends Model
         }
     }
 
-    /**
-     * Calculate mafsil score based on errors and hesitations
-     */
     public static function calculateMafsilScore(float $maxScore, int $errors, int $hesitations): float
     {
-        $deduction = ($errors * 3) + (floor($hesitations / 3) * 1);
-        return max(0, 100 - $deduction);
+        $errorDeduction = $errors * 3;
+        $hesitationDeduction = round(floor($hesitations / 3) + (($hesitations % 3) * 0.33), 2);
+        $totalDeduction = $errorDeduction + $hesitationDeduction;
+        return max(0, 100 - $totalDeduction);
     }
 
     /**
