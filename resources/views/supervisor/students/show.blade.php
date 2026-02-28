@@ -270,10 +270,42 @@
                     <a href="{{ route('supervisor.reports.student', $student->id) }}" class="btn btn-success">
                         <i class="fas fa-chart-bar me-2"></i>عرض التقارير
                     </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash me-2"></i>حذف الطالب
+                    </button>
                     <a href="{{ route('supervisor.students.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">حذف الطالب</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف الطالب <strong>{{ $student->user->name }}</strong>؟</p>
+                <p class="text-danger small">سيتم حذف جميع بيانات الطالب بما في ذلك:</p>
+                <ul class="text-danger small">
+                    <li>سجلات الحضور والغياب</li>
+                    <li>جلسات التسميع</li>
+                    <li>الإنذارات</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form action="{{ route('supervisor.students.destroy', $student->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">حذف</button>
+                </form>
             </div>
         </div>
     </div>

@@ -480,4 +480,17 @@ class RecitationController extends Controller
 
         return view('supervisor.recitation.history', compact('sessions', 'students', 'fromDate', 'toDate', 'studentId'));
     }
+
+    public function destroy(RecitationSession $recitation)
+    {
+        // Ensure the recitation belongs to a student of this supervisor
+        if ($recitation->student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $recitation->delete();
+
+        return redirect()->back()
+            ->with('success', 'تم حذف جلسة التسميع بنجاح');
+    }
 }

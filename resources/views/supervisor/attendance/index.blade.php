@@ -54,6 +54,9 @@
             سجل حضور يوم {{ $date->translatedFormat('l d/m/Y') }}
         </h6>
         <div class="d-flex gap-2">
+            <a href="{{ route('supervisor.attendance.history') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-history me-1"></i>سجل الحضور
+            </a>
             <button type="button" class="btn btn-sm btn-outline-success" onclick="markAll('present')">
                 <i class="fas fa-check me-1"></i>تحديد الكل حاضر
             </button>

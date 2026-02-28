@@ -114,6 +114,19 @@ class WarningController extends Controller
         return view('supervisor.warnings.show', compact('warning'));
     }
 
+    public function destroy(Warning $warning)
+    {
+        // Ensure the warning was issued by this supervisor
+        if ($warning->issued_by !== Auth::id()) {
+            abort(403);
+        }
+
+        $warning->delete();
+
+        return redirect()->route('supervisor.warnings.index')
+            ->with('success', 'تم حذف الإنذار بنجاح');
+    }
+
     public function print(Warning $warning)
     {
         $warning->load(['student.user', 'issuedBy', 'student.level', 'student.supervisor']);

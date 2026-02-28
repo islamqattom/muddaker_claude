@@ -81,4 +81,17 @@ class AttendanceController extends Controller
 
         return view('supervisor.attendance.history', compact('attendances', 'students', 'fromDate', 'toDate', 'studentId'));
     }
+
+    public function destroy(Attendance $attendance)
+    {
+        // Ensure the attendance belongs to this supervisor
+        if ($attendance->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $attendance->delete();
+
+        return redirect()->back()
+            ->with('success', 'تم حذف سجل الحضور بنجاح');
+    }
 }

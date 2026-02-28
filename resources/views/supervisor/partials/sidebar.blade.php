@@ -14,6 +14,9 @@
         <span class="badge bg-warning text-dark">{{ $unrecorded }}</span>
     @endif
 </a>
+<a href="{{ route('supervisor.attendance.history') }}" class="nav-link {{ request()->routeIs('supervisor.attendance.history') ? 'active' : '' }}">
+    <i class="fas fa-history"></i> سجل الحضور
+</a>
 
 <span class="nav-section-title mt-2">التسميع</span>
 <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.index') ? 'active' : '' }}">

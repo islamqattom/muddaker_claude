@@ -210,4 +210,20 @@ class StudentController extends Controller {
         $student->load(['user','level','attendances'=>fn($q)=>$q->latest()->take(30),'recitationSessions'=>fn($q)=>$q->with('part')->latest()->take(20),'warnings'=>fn($q)=>$q->latest()]);
         return view('supervisor.students.show', compact('student'));
     }
+
+    public function destroy(Student $student)
+    {
+        // Ensure the student belongs to this supervisor
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+
+        DB::transaction(function() use ($student) {
+            $student->user->delete();
+            $student->delete();
+        });
+
+        return redirect()->route('supervisor.students.index')
+            ->with('success', 'تم حذف الطالب بنجاح');
+    }
 }

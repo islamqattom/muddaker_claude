@@ -70,6 +70,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/', [Supervisor\AttendanceController::class, 'index'])->name('index');
         Route::post('/', [Supervisor\AttendanceController::class, 'store'])->name('store');
         Route::get('/history', [Supervisor\AttendanceController::class, 'history'])->name('history');
+        Route::delete('/{attendance}', [Supervisor\AttendanceController::class, 'destroy'])->name('destroy');
     });
 
     // Recitation
@@ -87,6 +88,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::post('/calculate-color', [Supervisor\RecitationController::class, 'calculateColor'])->name('calculate-color');
         Route::post('/get-pages', [Supervisor\RecitationController::class, 'getPages'])->name('get-pages');
         Route::get('/history', [Supervisor\RecitationController::class, 'history'])->name('history');
+        Route::delete('/{recitation}', [Supervisor\RecitationController::class, 'destroy'])->name('destroy');
     });
 
     // Reports
@@ -108,6 +110,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/students/{student}/edit', [Supervisor\StudentController::class, 'edit'])->name('students.edit');
     Route::put('/students/{student}', [Supervisor\StudentController::class, 'update'])->name('students.update');
     Route::get('/students/{student}', [Supervisor\StudentController::class, 'show'])->name('students.show');
+    Route::delete('/students/{student}', [Supervisor\StudentController::class, 'destroy'])->name('students.destroy');
 
     // Notifications
     Route::get('/notifications/mark-read', [Supervisor\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');

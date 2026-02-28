@@ -69,6 +69,7 @@
                         <th class="text-center">العلامة</th>
                         <th class="text-center">الحالة</th>
                         <th>التاريخ</th>
+                        <th width="80">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,10 +128,39 @@
                             <td>
                                 <small class="text-muted">{{ $session->session_date->format('Y/m/d') }}</small>
                             </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="حذف" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $session->id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ $session->id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">حذف جلسة التسميع</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>هل أنت متأكد من حذف جلسة التسميع للطالب <strong>{{ $session->student->user->name }}</strong>؟</p>
+                                                <p class="text-muted small">بتاريخ: {{ $session->session_date->format('Y/m/d') }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                                <form action="{{ route('supervisor.recitation.destroy', $session->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">حذف</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center py-4 text-muted">
+                            <td colspan="11" class="text-center py-4 text-muted">
                                 <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                 لا توجد جلسات في الفترة المحددة
                             </td>
