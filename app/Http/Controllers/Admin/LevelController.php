@@ -5,7 +5,7 @@ use App\Models\Level;
 use Illuminate\Http\Request;
 
 class LevelController extends Controller {
-    public function index() { $levels = Level::withCount('students')->orderBy('level_number')->get(); return view('admin.levels.index', compact('levels')); }
+    public function index() { $levels = Level::withCount('students')->orderBy('level_number')->paginate(15); return view('admin.levels.index', compact('levels')); }
     public function create() { return view('admin.levels.create'); }
     public function store(Request $request) {
         $request->validate(['name'=>'required','level_number'=>'required|integer','new_memorization_pages'=>'required|integer|min:1','review_pages'=>'required|integer|min:1']);
