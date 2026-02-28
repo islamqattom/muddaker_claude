@@ -211,6 +211,7 @@ class WarningController extends Controller
             $pdf->Cell(0, 8, 'إحصائيات الحضور والغياب', 0, 1, 'R', 1);
             $pdf->Ln(3);
 
+            $pdf->SetTextColor(0, 0, 0);
             $present = $warning->total_days - $warning->absent_days - $warning->late_days;
             $statsHtml = '
             <table border="1" cellpadding="5">
@@ -232,6 +233,7 @@ class WarningController extends Controller
             $pdf->Cell(0, 8, 'إحصائيات التسميع', 0, 1, 'R', 1);
             $pdf->Ln(3);
 
+            $pdf->SetTextColor(0, 0, 0);
             $passed = $warning->total_sessions - $warning->failed_sessions;
             $failRate = $warning->total_sessions > 0 ? round(($warning->failed_sessions / $warning->total_sessions) * 100) : 0;
             $statsHtml = '
