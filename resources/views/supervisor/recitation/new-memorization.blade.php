@@ -198,12 +198,17 @@ function updatePageColor(index) {
     } else if (totalEquivalent < 2) {
         // من 1 إلى أقل من 2 = برتقالي
         color = '#f39c12'; label = 'جيد 🟠'; bgColor = '#fef9e7'; passed = true;
-    } else if (totalEquivalent < 3) {
-        // من 2 إلى أقل من 3 = أحمر
+    } else if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
+        // أحمر: 2 خطأ بدون تردد فقط
         color = '#e74c3c'; label = 'ضعيف 🔴'; bgColor = '#fadbd8'; passed = true;
-    } else {
-        // 3 أو أكثر = أسود
+    } else if (totalEquivalent === 2 && hesitations >= 1) {
+        // أسود: 2 خطأ + 1 تردد أو أكثر
         color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
+    } else if (totalEquivalent >= 3) {
+        // 3 خطأ equivalent أو أكثر = أسود
+        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
+    } else {
+        color = '#27ae60'; label = 'ممتاز 🟢'; bgColor = '#d5f5e3'; passed = true;
     }
 
     document.getElementById('color-indicator-' + index).style.background = color;
@@ -232,8 +237,8 @@ function updateSummary() {
         // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ
         const totalEquivalent = errors + Math.floor(hesitations / 3);
 
-        // إذا كان 3 خطأ equivalent أو أكثر = راسب
-        if (totalEquivalent >= 3) failed++;
+        // الأسود: 2 خطأ + 1 تردد أو أكثر، أو 3+ أخطاء
+        if ((errors === 2 && hesitations > 0) || errors >= 3) failed++;
         else passed++;
     }
 
