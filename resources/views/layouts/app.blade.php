@@ -23,6 +23,7 @@
             --success: #27ae60;
             --danger: #c0392b;
             --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
             --header-height: 65px;
         }
 
@@ -44,9 +45,57 @@
             height: 100vh;
             background: linear-gradient(180deg, var(--primary) 0%, #0d3349 100%);
             z-index: 1000;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             overflow-y: auto;
             box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar.collapsed .sidebar-logo h6,
+        .sidebar.collapsed .sidebar-logo small,
+        .sidebar.collapsed .nav-section-title,
+        .sidebar.collapsed .nav-link .badge {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sidebar.collapsed .sidebar-logo {
+            padding: 20px 10px;
+        }
+
+        .sidebar.collapsed .sidebar-nav .nav-link {
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .sidebar.collapsed .sidebar-nav .nav-link i {
+            margin: 0;
+        }
+
+        /* Sidebar Toggle Button */
+        #sidebarToggle {
+            background: #f8f9fa;
+            border: none;
+            color: var(--primary);
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        #sidebarToggle:hover {
+            background: var(--primary);
+            color: #fff;
         }
 
         .sidebar-logo {
@@ -121,6 +170,11 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: margin-right 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-right: var(--sidebar-collapsed-width);
         }
 
         /* Header */
@@ -312,9 +366,18 @@
 
         /* Mobile */
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-right: 0; }
+            .sidebar {
+                transform: translateX(100%);
+                width: var(--sidebar-width) !important;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .sidebar.collapsed { transform: translateX(100%); }
+            .main-content { margin-right: 0 !important; }
+        }
+
+        /* Tablet and above - sidebar toggle */
+        @media (min-width: 769px) {
+            #mobileMenuBtn { display: none; }
         }
 
         /* Scrollbar */
@@ -340,9 +403,7 @@
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div style="width:60px;height:60px;background:var(--secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
-                <i class="fas fa-quran" style="color:#fff;font-size:28px;"></i>
-            </div>
+            <img src="{{ asset('images/muddaker-logo.jpeg') }}" alt="Logo" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">
             <h6>جمعية المحافظة على القرآن</h6>
             <small>نظام التسميع الإلكتروني</small>
         </div>
@@ -363,7 +424,13 @@
 
         <!-- Header -->
         <header class="top-header">
-            <button class="btn btn-sm d-md-none" onclick="toggleSidebar()">
+            <!-- Mobile menu toggle -->
+            <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Desktop sidebar collapse toggle -->
+            <button class="btn btn-sm d-none d-lg-flex" id="sidebarToggle" onclick="toggleSidebar()" title="إظهار/إخفاء القائمة الجانبية">
                 <i class="fas fa-bars"></i>
             </button>
 
@@ -466,7 +533,7 @@
 
         <!-- Footer -->
         <footer style="padding: 15px 25px; background: #fff; border-top: 1px solid #eee; text-align: center; color: #7f8c8d; font-size: 12px;">
-            جميع الحقوق محفوظة &copy; {{ date('Y') }} - جمعية المحافظة على القرآن الكريم
+            جميع الحقوق محفوظة &copy; {{ date('Y') }} - مشروع مدكر القرآني
         </footer>
     </div>
 
@@ -480,9 +547,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
+        // Desktop sidebar collapse (tablet and above)
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+
+            // Save state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar_collapsed', isCollapsed);
         }
+
+        // Mobile sidebar toggle (slides in/out)
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
+        // Restore sidebar state on page load (desktop only)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only apply desktop collapse state on larger screens
+            if (window.innerWidth >= 769) {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.querySelector('.main-content');
+                const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+
+                if (isCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('sidebar-collapsed');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            if (window.innerWidth < 769) {
+                // Mobile: remove collapse classes, ensure proper state
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+            }
+        });
 
         // Toastr config
         toastr.options = {
