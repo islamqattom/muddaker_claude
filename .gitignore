@@ -6,6 +6,8 @@
 .env
 .env.backup
 .env.production
+.env.local
+.env.*.local
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -15,3 +17,15 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/cache/*
+/storage/logs/*
+/bootstrap/cache/*
+/.phpunit.cache/
+/.claude/
+/.serena/
+/test-results/
+/playwright-report/
+/.playwright-mcp/
+playwright.config.js
