@@ -99,6 +99,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
 
     // Students (view only)
     Route::get('/students', [Supervisor\StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/create', [Supervisor\StudentController::class, 'create'])->name('students.create');
+    Route::post('/students', [Supervisor\StudentController::class, 'store'])->name('students.store');
+    Route::get('/students/{student}/edit', [Supervisor\StudentController::class, 'edit'])->name('students.edit');
+    Route::put('/students/{student}', [Supervisor\StudentController::class, 'update'])->name('students.update');
     Route::get('/students/{student}', [Supervisor\StudentController::class, 'show'])->name('students.show');
 
     // Notifications

@@ -64,7 +64,7 @@ class Student extends Model
     public function getAttendanceRateAttribute(): float
     {
         $total = $this->attendances()->count();
-        if ($total === 0) return 100;
+        if ($total === 0) return 0;
         $present = $this->attendances()->whereIn('status', ['present', 'late'])->count();
         return round(($present / $total) * 100, 1);
     }
@@ -77,7 +77,7 @@ class Student extends Model
     public function getPassRateAttribute(): float
     {
         $total = $this->recitationSessions()->whereIn('status', ['passed', 'failed'])->count();
-        if ($total === 0) return 100;
+        if ($total === 0) return 0;
         $passed = $this->recitationSessions()->where('status', 'passed')->count();
         return round(($passed / $total) * 100, 1);
     }
