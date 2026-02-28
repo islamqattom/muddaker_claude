@@ -19,3 +19,7 @@
 <a href="{{ route('student.memorization') }}" class="nav-link {{ request()->routeIs('student.memorization') ? 'active' : '' }}">
     <i class="fas fa-book-open"></i> طرق الحفظ
 </a>
+<span class="nav-section-title mt-2">الإعدادات</span>
+<a href="{{ route('student.profile.index') }}" class="nav-link {{ request()->routeIs('student.profile.*') ? 'active' : '' }}">
+    <i class="fas fa-user-cog"></i> ملفي الشخصي
+</a>

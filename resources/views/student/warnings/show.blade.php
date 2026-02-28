@@ -3,6 +3,10 @@
 @section('page-title', 'تفاصيل الإنذار')
 @section('role-label', 'طالب')
 
+@section('sidebar-menu')
+    @include('student.partials.sidebar')
+@endsection
+
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('student.dashboard') }}">الرئيسية</a></li>
     <li class="breadcrumb-item"><a href="{{ route('student.warnings.index') }}">الإنذارات</a></li>
