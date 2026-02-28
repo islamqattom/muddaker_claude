@@ -108,8 +108,8 @@ class RecitationSession extends Model
         // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ دائماً
         // - الأخضر: أقل من 1 خطأ equivalent
         // - البرتقالي: من 1 إلى أقل من 2 خطأ equivalent
-        // - الأحمر: من 2 إلى أقل من 3 خطأ equivalent
-        // - الأسود: 3 خطأ equivalent أو أكثر
+        // - الأحمر: 2 خطأ equivalent بالضبط (2 خطأ بدون تردد، أو 6 تردد، أو 1 خطأ+3 تردد)
+        // - الأسود: 2 خطأ + 1 تردد أو أكثر، أو 3+ أخطاء
 
         $totalEquivalent = $errors + floor($hesitations / 3);
 
@@ -117,10 +117,17 @@ class RecitationSession extends Model
             return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
         } elseif ($totalEquivalent < 2) {
             return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
-        } elseif ($totalEquivalent < 3) {
+        } elseif ($totalEquivalent == 2 && $hesitations === 0) {
+            // أحمر: 2 خطأ بدون تردد فقط
             return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
-        } else {
+        } elseif ($totalEquivalent == 2 && $hesitations > 0) {
+            // أسود: 2 خطأ + 1 تردد أو أكثر
             return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
+        } elseif ($totalEquivalent >= 3) {
+            // 3 خطأ equivalent أو أكثر
+            return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
+        } else {
+            return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
         }
     }
 

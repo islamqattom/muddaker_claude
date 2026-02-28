@@ -236,9 +236,11 @@ function updateSummary() {
 
         // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ
         const totalEquivalent = errors + Math.floor(hesitations / 3);
-
-        // الأسود: 2 خطأ + 1 تردد أو أكثر، أو 3+ أخطاء
-        if ((errors === 2 && hesitations > 0) || errors >= 3) failed++;
+        if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
+            passed++;
+        }
+        // الأسود: 2 خطأ + 1 ترديد أو أكثر (معادل >= 2 مع ترديدات)، أو 3+ أخطاء معادلة
+        else if ((totalEquivalent === 2 && hesitations >= 1) || totalEquivalent >= 3) failed++;
         else passed++;
     }
 

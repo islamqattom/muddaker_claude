@@ -151,7 +151,7 @@ class RecitationController extends Controller
         }
 
         $startPage = $request->page_number;
-        $pagesCount = $pages_count;
+        $pagesCount = $request->pages_count;
 
         $pages = [];
         for ($i = 0; $i < $pagesCount; $i++) {
