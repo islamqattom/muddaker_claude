@@ -6,7 +6,7 @@
 <div class="alert alert-info">
     <i class="fas fa-info-circle me-2"></i>
     <strong>السرد:</strong> تسميع الجزء {{ $part->part_number }} كاملاً ({{ count($pages) }} صفحة)
-    | في حال وصل الطالب لـ <strong>5 أخطاء</strong> يظهر تنبيه للإكمال أو التوقف
+    | في حال وصل الطالب لـ <strong>6 أخطاء</strong> يظهر تنبيه للإكمال أو التوقف
 </div>
 <div class="card mb-3">
     <div class="card-body d-flex align-items-center gap-3">
@@ -16,7 +16,7 @@
         <div>
             <h5 class="mb-0">{{ $student->user->name }}</h5>
             <span class="badge bg-info text-dark">سرد | الجزء {{ $part->part_number }}</span>
-            <span class="badge bg-secondary ms-1" id="error-counter">الأخطاء: 0 / 5</span>
+            <span class="badge bg-secondary ms-1" id="error-counter">الأخطاء: 0 / 6</span>
         </div>
     </div>
 </div>
@@ -64,7 +64,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white"><h5 class="modal-title">⚠️ تحذير - وصل للحد الأقصى من الأخطاء</h5></div>
-            <div class="modal-body text-center"><p class="fs-5">وصل الطالب إلى <strong>5 أخطاء</strong> في السرد</p><p>هل تريد الإكمال أم الإيقاف؟</p></div>
+            <div class="modal-body text-center"><p class="fs-5">وصل الطالب إلى <strong>6 أخطاء</strong> في السرد</p><p>هل تريد الإكمال أم الإيقاف؟</p></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" onclick="stopSardNow()"><i class="fas fa-stop me-2"></i>إيقاف</button>
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fas fa-play me-2"></i>إكمال</button>
@@ -98,9 +98,9 @@ function updateTotalErrors() {
     for(let i=0;i<pageCount;i++) total += parseInt(document.getElementById('e-'+i)?.value)||0;
     totalErrors = total;
     const counter = document.getElementById('error-counter');
-    counter.textContent = `الأخطاء: ${total} / 5`;
-    counter.className = total >= 5 ? 'badge bg-danger ms-1' : 'badge bg-secondary ms-1';
-    if(total >= 5 && !maxErrorsShown) { maxErrorsShown=true; new bootstrap.Modal(document.getElementById('maxErrorsModal')).show(); }
+    counter.textContent = `الأخطاء: ${total} / 6`;
+    counter.className = total >= 6 ? 'badge bg-danger ms-1' : 'badge bg-secondary ms-1';
+    if(total >= 6 && !maxErrorsShown) { maxErrorsShown=true; new bootstrap.Modal(document.getElementById('maxErrorsModal')).show(); }
 }
 
 function stopSard() { document.getElementById('stoppedFlag').value='1'; submitSard(); }

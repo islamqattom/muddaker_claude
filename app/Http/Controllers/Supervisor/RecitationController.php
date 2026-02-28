@@ -284,12 +284,12 @@ class RecitationController extends Controller
                 if ($finalScore < $passingPercentage) {
                     $sessionStatus = 'failed';
                 }
-            } elseif ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 5)) {
+            } elseif ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 6)) {
                 $sessionStatus = 'failed';
             }
 
             if ($request->stopped) {
-                $sessionStatus = 'stopped';
+                $sessionStatus = 'failed';
             }
 
             $session = RecitationSession::create([
