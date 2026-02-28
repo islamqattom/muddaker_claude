@@ -82,9 +82,7 @@
                             <td>{{ $students->firstItem() + $index }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="student-avatar" style="width:36px;height:36px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
-                                        {{ mb_substr($student->user->name, 0, 1) }}
-                                    </div>
+                                    <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">
                                     <div>
                                         <div class="fw-semibold">{{ $student->user->name }}</div>
                                         <small class="text-muted">{{ $student->national_id }}</small>

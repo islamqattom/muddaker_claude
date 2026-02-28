@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-<form action="{{ route('supervisor.students.store') }}" method="POST">
+<form action="{{ route('supervisor.students.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="row">
         <div class="col-lg-8">
@@ -26,6 +26,14 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">صورة الطالب</label>
+                            <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                            <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp (الحد الأقصى 2MB)</small>
+                            @error('image')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="col-md-6">
                             <label class="form-label">اسم الطالب <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>

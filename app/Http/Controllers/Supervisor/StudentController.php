@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller {
     public function index() {
@@ -43,15 +44,53 @@ class StudentController extends Controller {
             'birth_date' => 'nullable|date',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
+            'image' => 'nullable|file|max:2048',
         ]);
 
-        DB::transaction(function() use ($request) {
+        // Debug: Log file info
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            Log::info('File info: ' . json_encode([
+                'name' => $file->getClientOriginalName(),
+                'extension' => $file->getClientOriginalExtension(),
+                'mime' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'isValid' => $file->isValid(),
+            ]));
+        }
+
+        $uploadError = null;
+        $avatarPath = null;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            try {
+                $filename = uniqid('avatar_') . '.' . $file->getClientOriginalExtension();
+                $destinationPath = storage_path('app/public/avatars');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0777, true);
+                }
+                $file->move($destinationPath, $filename);
+                $avatarPath = 'avatars/' . $filename;
+                Log::info('Storage result: ' . $avatarPath);
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage() . ' | File: ' . $file->getClientOriginalName());
+                $uploadError = 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.';
+            }
+        }
+
+        if ($uploadError) {
+            return back()->withInput()->with('error', $uploadError);
+        }
+
+        DB::transaction(function() use ($request, $avatarPath) {
             $user = User::create([
                 'name' => $request->name,
                 'phone' => $request->phone,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'student',
+                'avatar' => $avatarPath,
             ]);
 
             $studentNumber = 'STU-' . date('Y') . '-' . str_pad(Student::count() + 1, 4, '0', STR_PAD_LEFT);
@@ -95,14 +134,51 @@ class StudentController extends Controller {
             'phone' => 'required|string|unique:users,phone,' . $student->user_id,
             'email' => 'nullable|email|unique:users,email,' . $student->user_id,
             'level_id' => 'required|exists:levels,id',
+            'image' => 'nullable|file|max:2048',
         ]);
 
-        DB::transaction(function() use ($request, $student) {
-            $student->user->update([
+        $newAvatarPath = null;
+
+        if ($request->hasFile('image')) {
+            // Delete old avatar if exists
+            if ($student->user->avatar) {
+                try {
+                    $oldPath = storage_path('app/public/' . $student->user->avatar);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to delete old avatar: ' . $e->getMessage());
+                }
+            }
+            try {
+                $file = $request->file('image');
+                $filename = uniqid('avatar_') . '.' . $file->getClientOriginalExtension();
+                $destinationPath = storage_path('app/public/avatars');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0777, true);
+                }
+                $file->move($destinationPath, $filename);
+                $newAvatarPath = 'avatars/' . $filename;
+                Log::info('New avatar uploaded: ' . $newAvatarPath);
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+                return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        DB::transaction(function() use ($request, $student, $newAvatarPath) {
+            $userData = [
                 'name' => $request->name,
                 'phone' => $request->phone,
                 'email' => $request->email,
-            ]);
+            ];
+
+            if ($newAvatarPath) {
+                $userData['avatar'] = $newAvatarPath;
+            }
+
+            $student->user->update($userData);
 
             if ($request->password) {
                 $student->user->update(['password' => Hash::make($request->password)]);

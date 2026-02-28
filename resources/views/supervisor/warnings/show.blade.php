@@ -60,9 +60,7 @@
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <div class="student-avatar" style="width:60px;height:60px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:24px;">
-                            {{ mb_substr($warning->student->user->name, 0, 1) }}
-                        </div>
+                        <img src="{{ $warning->student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:60px;height:60px;object-fit:cover;">
                     </div>
                     <div class="col">
                         <h5 class="mb-1">{{ $warning->student->user->name }}</h5>

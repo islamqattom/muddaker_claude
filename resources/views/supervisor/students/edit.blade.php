@@ -16,7 +16,7 @@
 @endsection
 
 @section('content')
-<form action="{{ route('supervisor.students.update', $student->id) }}" method="POST">
+<form action="{{ route('supervisor.students.update', $student->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
     <div class="row">
@@ -114,11 +114,18 @@
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <div class="student-avatar mx-auto mb-2" style="width:70px;height:70px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:28px;">
-                            {{ mb_substr($student->user->name, 0, 1) }}
-                        </div>
+                        <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle mb-2" style="width:70px;height:70px;object-fit:cover;">
                         <h5>{{ $student->user->name }}</h5>
                         <p class="text-muted mb-1">{{ $student->student_number }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">تغيير الصورة</label>
+                        <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                        <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <hr>

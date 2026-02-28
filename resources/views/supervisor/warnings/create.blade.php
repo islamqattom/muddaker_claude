@@ -162,9 +162,7 @@
                 <div class="card-body">
                     @if($student)
                         <div class="text-center mb-4">
-                            <div class="student-avatar mx-auto mb-2" style="width:60px;height:60px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:24px;">
-                                {{ mb_substr($student->user->name, 0, 1) }}
-                            </div>
+                            <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
                             <h5>{{ $student->user->name }}</h5>
                             <p class="text-muted mb-1">{{ $student->student_number }}</p>
                             <span class="badge bg-light text-dark">{{ $student->level->name ?? '-' }}</span>
