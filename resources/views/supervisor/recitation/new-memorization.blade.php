@@ -187,18 +187,23 @@ function updatePageColor(index) {
     const errors = parseInt(document.getElementById('errors-' + index).value) || 0;
     const hesitations = parseInt(document.getElementById('hesitations-' + index).value) || 0;
 
+    // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ دائماً
+    const totalEquivalent = errors + Math.floor(hesitations / 3);
+
     let color, label, bgColor, passed;
 
-    if (errors === 0 && hesitations <= 2) {
+    if (totalEquivalent < 1) {
+        // أقل من 1 خطأ equivalent = أخضر
         color = '#27ae60'; label = 'ممتاز 🟢'; bgColor = '#d5f5e3'; passed = true;
-    } else if (errors === 1 || (hesitations >= 3 && hesitations <= 5)) {
+    } else if (totalEquivalent < 2) {
+        // من 1 إلى أقل من 2 = برتقالي
         color = '#f39c12'; label = 'جيد 🟠'; bgColor = '#fef9e7'; passed = true;
-    } else if (errors === 2 && hesitations === 0) {
+    } else if (totalEquivalent < 3) {
+        // من 2 إلى أقل من 3 = أحمر
         color = '#e74c3c'; label = 'ضعيف 🔴'; bgColor = '#fadbd8'; passed = true;
-    } else if ((errors >= 2 && hesitations >= 1) || errors >= 3) {
-        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
     } else {
-        color = '#dee2e6'; label = '—'; bgColor = '#f0f4f8'; passed = true;
+        // 3 أو أكثر = أسود
+        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
     }
 
     document.getElementById('color-indicator-' + index).style.background = color;
@@ -224,7 +229,11 @@ function updateSummary() {
         totalErrors += errors;
         totalHesitations += hesitations;
 
-        if (errors >= 2 && hesitations >= 1 || errors >= 3) failed++;
+        // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ
+        const totalEquivalent = errors + Math.floor(hesitations / 3);
+
+        // إذا كان 3 خطأ equivalent أو أكثر = راسب
+        if (totalEquivalent >= 3) failed++;
         else passed++;
     }
 

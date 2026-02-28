@@ -104,18 +104,22 @@ class RecitationSession extends Model
             }
         }
 
-        // For other types: convert hesitations to error equivalents: 3 hesitations = 1 error equivalent
-        $hesitationEquivalent = floor($hesitations / 3);
-        $totalEquivalent = $errors + $hesitationEquivalent;
+        // For all other types (new_memorization, review, unmastered, mafsil):
+        // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ دائماً
+        // - الأخضر: أقل من 1 خطأ equivalent
+        // - البرتقالي: من 1 إلى أقل من 2 خطأ equivalent
+        // - الأحمر: من 2 إلى أقل من 3 خطأ equivalent
+        // - الأسود: 3 خطأ equivalent أو أكثر
 
-        if ($errors === 0 && $hesitations <= 2) {
+        $totalEquivalent = $errors + floor($hesitations / 3);
+
+        if ($totalEquivalent < 1) {
             return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
-        } elseif ($errors === 1 || ($hesitations >= 3 && $hesitations <= 5)) {
+        } elseif ($totalEquivalent < 2) {
             return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
-        } elseif ($errors === 2 && $hesitations === 0) {
+        } elseif ($totalEquivalent < 3) {
             return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
         } else {
-            // errors >= 2 with any hesitation, or errors >= 3
             return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
         }
     }
