@@ -9,11 +9,20 @@ class LevelController extends Controller {
     public function create() { return view('admin.levels.create'); }
     public function store(Request $request) {
         $request->validate(['name'=>'required','level_number'=>'required|integer','new_memorization_pages'=>'required|integer|min:1','review_pages'=>'required|integer|min:1']);
-        Level::create($request->all());
+        Level::create($request->only(['name', 'level_number', 'new_memorization_pages', 'review_pages', 'description']));
         return redirect()->route('admin.levels.index')->with('success','تم إضافة المستوى');
     }
     public function show(Level $level) { return view('admin.levels.show', compact('level')); }
     public function edit(Level $level) { return view('admin.levels.edit', compact('level')); }
-    public function update(Request $request, Level $level) { $level->update($request->all()); return redirect()->route('admin.levels.index')->with('success','تم التحديث'); }
+    public function update(Request $request, Level $level) {
+        $request->validate([
+            'name' => 'required',
+            'level_number' => 'required|integer',
+            'new_memorization_pages' => 'required|integer|min:1',
+            'review_pages' => 'required|integer|min:1',
+        ]);
+        $level->update($request->only(['name', 'level_number', 'new_memorization_pages', 'review_pages', 'description']));
+        return redirect()->route('admin.levels.index')->with('success','تم التحديث');
+    }
     public function destroy(Level $level) { $level->delete(); return redirect()->route('admin.levels.index')->with('success','تم الحذف'); }
 }

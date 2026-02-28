@@ -42,6 +42,10 @@ class ParentController extends Controller {
             $parent->update(['password' => Hash::make($request->password)]);
         }
 
+        if ($parent->parentProfile && $request->relationship) {
+            $parent->parentProfile->update(['relationship' => $request->relationship]);
+        }
+
         return redirect()->route('admin.parents.index')->with('success', 'تم التحديث');
     }
     public function destroy($id) { User::findOrFail($id)->delete(); return redirect()->route('admin.parents.index')->with('success','تم الحذف'); }

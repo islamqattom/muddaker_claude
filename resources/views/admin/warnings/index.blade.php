@@ -3,6 +3,10 @@
 @section('page-title', 'الإنذارات')
 @section('role-label', 'مدير')
 
+@section('sidebar-menu')
+@include('admin.partials.sidebar')
+@endsection
+
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">الرئيسية</a></li>
     <li class="breadcrumb-item active">الإنذارات</li>

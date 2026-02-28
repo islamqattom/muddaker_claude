@@ -68,7 +68,9 @@ class StudentController extends Controller
                 'role' => 'student',
             ]);
 
-            $studentNumber = 'STU-' . date('Y') . '-' . str_pad(Student::count() + 1, 4, '0', STR_PAD_LEFT);
+            $lastStudent = Student::orderBy('id', 'desc')->first();
+            $nextNumber = $lastStudent ? (int)substr($lastStudent->student_number, -4) + 1 : 1;
+            $studentNumber = 'STU-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
             Student::create([
                 'user_id' => $user->id,

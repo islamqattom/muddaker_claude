@@ -47,7 +47,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Settings
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
 
     // Notifications
     Route::get('/notifications/mark-read', [Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');

@@ -40,9 +40,13 @@ class SupervisorController extends Controller
                 'password' => Hash::make($request->password),
                 'role' => 'supervisor',
             ]);
+
+            $lastSupervisor = Supervisor::orderBy('id', 'desc')->first();
+            $nextNumber = $lastSupervisor ? (int)substr($lastSupervisor->employee_number, -3) + 1 : 1;
+
             Supervisor::create([
                 'user_id' => $user->id,
-                'employee_number' => 'EMP-' . str_pad(Supervisor::count() + 1, 3, '0', STR_PAD_LEFT),
+                'employee_number' => 'EMP-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT),
                 'specialization' => $request->specialization,
                 'hire_date' => $request->hire_date ?? today(),
             ]);
@@ -73,6 +77,13 @@ class SupervisorController extends Controller
 
         if ($request->password) {
             $supervisor->update(['password' => Hash::make($request->password)]);
+        }
+
+        // Update supervisor profile if exists
+        if ($supervisor->supervisor) {
+            $supervisor->supervisor->update([
+                'specialization' => $request->specialization,
+            ]);
         }
 
         return redirect()->route('admin.supervisors.index')->with('success', 'تم التحديث');
