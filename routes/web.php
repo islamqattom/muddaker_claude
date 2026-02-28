@@ -79,6 +79,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil');
         Route::post('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil.post');
         Route::post('/save', [Supervisor\RecitationController::class, 'saveSession'])->name('save');
+        Route::post('/save-failed-continue', [Supervisor\RecitationController::class, 'saveFailedContinue'])->name('saveFailedContinue');
         Route::post('/calculate-color', [Supervisor\RecitationController::class, 'calculateColor'])->name('calculate-color');
         Route::post('/get-pages', [Supervisor\RecitationController::class, 'getPages'])->name('get-pages');
         Route::get('/history', [Supervisor\RecitationController::class, 'history'])->name('history');

@@ -150,7 +150,7 @@ class RecitationController extends Controller
         }
 
         $startPage = $request->page_number;
-        $pagesCount = $request->pages_count;
+        $pagesCount = $pages_count;
 
         $pages = [];
         for ($i = 0; $i < $pagesCount; $i++) {
@@ -246,6 +246,7 @@ class RecitationController extends Controller
         ]);
 
         DB::transaction(function() use ($request) {
+            $pages = $request->input('pages');
             $totalErrors = 0;
             $totalHesitations = 0;
             $sessionStatus = 'passed';
@@ -253,7 +254,7 @@ class RecitationController extends Controller
             $maxScore = null;
 
             // Calculate totals
-            foreach ($request->pages as $page) {
+            foreach ($pages as $page) {
                 $totalErrors += $page['errors'];
                 $totalHesitations += $page['hesitations'];
             }
@@ -266,7 +267,7 @@ class RecitationController extends Controller
 
             // Check overall pass/fail
             $failedPages = 0;
-            foreach ($request->pages as $page) {
+            foreach ($pages as $page) {
                 $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
                 if (!$colorResult['passed']) {
                     $failedPages++;
@@ -295,9 +296,9 @@ class RecitationController extends Controller
                 'supervisor_id' => Auth::id(),
                 'type' => $request->type,
                 'part_id' => $request->part_id,
-                'start_page' => $request->pages[0]['page_number'] ?? null,
-                'end_page' => end($request->pages)['page_number'] ?? null,
-                'total_pages' => count($request->pages),
+                'start_page' => $pages[0]['page_number'] ?? null,
+                'end_page' => end($pages)['page_number'] ?? null,
+                'total_pages' => count($pages),
                 'total_errors' => $totalErrors,
                 'total_hesitations' => $totalHesitations,
                 'status' => $sessionStatus,
@@ -310,7 +311,7 @@ class RecitationController extends Controller
             ]);
 
             // Save each page
-            foreach ($request->pages as $pageData) {
+            foreach ($pages as $pageData) {
                 $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
 
                 $pageScore = null;
@@ -375,5 +376,107 @@ class RecitationController extends Controller
 
         return response()->json(['pages' => $pages, 'part' => $part]);
     }
+
+    /**
+     * Save failed continue session - called when supervisor continues after failure
+     */
+    public function saveFailedContinue(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+            'part_id' => 'nullable|exists:quran_parts,id',
+            'session_date' => 'required|date',
+            'pages' => 'required|array',
+            'pages.*.page_number' => 'required|integer',
+            'pages.*.errors' => 'required|integer|min:0',
+            'pages.*.hesitations' => 'required|integer|min:0',
+        ]);
+
+        DB::transaction(function() use ($request) {
+            $pages = $request->input('pages');
+            $totalErrors = 0;
+            $totalHesitations = 0;
+            $maxScore = 100;
+
+            // Calculate totals
+            foreach ($pages as $page) {
+                $totalErrors += $page['errors'];
+                $totalHesitations += $page['hesitations'];
+            }
+
+            // Calculate score
+            $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
+
+            // For failed_continued, we use 'failed' status but add note indicating continued
+            $sessionStatus = 'failed';
+
+            $session = RecitationSession::create([
+                'student_id' => $request->student_id,
+                'supervisor_id' => Auth::id(),
+                'type' => $request->type,
+                'part_id' => $request->part_id,
+                'start_page' => $pages[0]['page_number'] ?? null,
+                'end_page' => end($pages)['page_number'] ?? null,
+                'total_pages' => count($pages),
+                'total_errors' => $totalErrors,
+                'total_hesitations' => $totalHesitations,
+                'status' => $sessionStatus,
+                'mafsil_type' => $request->mafsil_type ?? null,
+                'max_score' => $maxScore,
+                'final_score' => $finalScore,
+                'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
+                'session_date' => $request->session_date,
+                'notes' => ($request->notes ?? '') . ' [راسب ومكمل - أكمل بعد الرسوب]',
+            ]);
+
+            // Save each page
+            foreach ($pages as $pageData) {
+                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
+
+                $pageScore = null;
+                if ($request->type === 'mafsil') {
+                    $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                }
+
+                RecitationPage::create([
+                    'session_id' => $session->id,
+                    'page_number' => $pageData['page_number'],
+                    'errors' => $pageData['errors'],
+                    'hesitations' => $pageData['hesitations'],
+                    'color_status' => $colorResult['color'],
+                    'is_passed' => $colorResult['passed'],
+                    'page_score' => $pageScore,
+                ]);
+            }
+
+            return $session;
+        });
+
+        return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
+    }
+
+    /**
+     * History - display recitation history
+     */
+    public function history(Request $request)
+    {
+        $supervisorId = Auth::id();
+        $studentId = $request->student_id;
+        $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
+        $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
+
+        $query = RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
+            ->with(['student.user', 'part'])
+            ->whereBetween('session_date', [$fromDate, $toDate]);
+
+        if ($studentId) {
+            $query->where('student_id', $studentId);
+        }
+
+        $sessions = $query->orderBy('session_date', 'desc')->paginate(30);
+        $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
+
+        return view('supervisor.recitation.history', compact('sessions', 'students', 'fromDate', 'toDate'));
+    }
 }
-// history method added via seeding

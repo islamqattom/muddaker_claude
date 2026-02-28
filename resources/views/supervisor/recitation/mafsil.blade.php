@@ -144,8 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <div>
         <strong>نظام الخصم:</strong>
         كل خطأ = <span class="badge bg-danger">-3 علامات</span>
-        | كل 3 ترددات = <span class="badge bg-warning text-dark">-1 علامة</span>
-        | العلامة النهائية لا تقل عن <span class="badge bg-secondary">0</span>
+        | كل تردد = <span class="badge bg-warning text-dark">-0.33 علامة</span> (يُجبر عند 3+)
+        | العلامة النهائية لا تقل عن <span class="badge bg-secondary">{{ $passingPercentage }}</span>
     </div>
 </div>
 
@@ -240,6 +240,29 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </form>
 
+<!-- Failure Modal -->
+<div class="modal fade" id="failureModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">⚠️ تحذير - الطالب راسب</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="fs-5">علامة الطالب أقل من <strong>{{ $passingPercentage }}%</strong></p>
+                <p>هل تريد الإكمال أم الإيقاف؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="stopForFailure()">
+                    <i class="fas fa-stop me-2"></i>إيقاف
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="continueAfterFailure()">
+                    <i class="fas fa-play me-2"></i>إكمال
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endif
 
 </div>
@@ -250,7 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 const maxScore = {{ $maxScore }};
 const partsCount = {{ $partsCount }};
+const passingPercentage = {{ $passingPercentage }};
 let hasInputBeenMade = false;
+let failureShown = false;
+let failedButContinuing = false;
+let initialFailedRecordSaved = false;
 
 // Initialize with 0% (starting grade is failed)
 document.addEventListener('DOMContentLoaded', function() {
@@ -274,7 +301,7 @@ function calcMafsilRow(index) {
     hasInputBeenMade = true;
 
     const errorDeduction = errors * 3;
-    const hesitationDeduction = Math.floor(hesitations / 3);
+    const hesitationDeduction = Math.floor(hesitations / 3) + ((hesitations % 3) * 0.33);
     const totalDeduction = errorDeduction + hesitationDeduction;
     const rowScore = Math.max(0, maxScore - totalDeduction);
 
@@ -292,7 +319,7 @@ function updateTotals() {
         const hesitations = parseInt(document.getElementById('hesitations-' + i)?.value) || 0;
         totalErrors += errors;
         totalHesitations += hesitations;
-        totalDeduction += (errors * 3) + Math.floor(hesitations / 3);
+        totalDeduction += (errors * 3) + Math.floor(hesitations / 3) + ((hesitations % 3) * 0.33);
     }
 
     // Calculate final score: maxScore - deductions
@@ -328,11 +355,22 @@ function updateTotals() {
         scoreEl.className = 'badge bg-danger fs-5';
         currentScoreEl.className = 'badge bg-danger fs-5';
     }
+
+    // Check if score falls below passing threshold and show failure modal
+    if (finalScore < passingPercentage && !failureShown && !failedButContinuing && hasInputBeenMade) {
+        failureShown = true;
+        new bootstrap.Modal(document.getElementById('failureModal')).show();
+    }
 }
 
 function submitMafsil() {
     const form = document.getElementById('mafsilForm');
     const data = new FormData(form);
+
+    // If already saved an initial failed record, we need to indicate this is the final submission
+    if (failedButContinuing && initialFailedRecordSaved) {
+        data.append('is_final_submission', '1');
+    }
 
     $.ajax({
         url: '{{ route('supervisor.recitation.save') }}',
@@ -346,6 +384,47 @@ function submitMafsil() {
         },
         error: function() {
             window.location.href = '{{ route('supervisor.recitation.index') }}';
+        }
+    });
+}
+
+function stopForFailure() {
+    const form = document.getElementById('mafsilForm');
+
+    // Add hidden input to indicate stopped due to failure
+    let stoppedInput = form.querySelector('input[name="stopped"]');
+    if (!stoppedInput) {
+        stoppedInput = document.createElement('input');
+        stoppedInput.type = 'hidden';
+        stoppedInput.name = 'stopped';
+        form.appendChild(stoppedInput);
+    }
+    stoppedInput.value = '1';
+
+    bootstrap.Modal.getInstance(document.getElementById('failureModal')).hide();
+    submitMafsil();
+}
+
+function continueAfterFailure() {
+    const form = document.getElementById('mafsilForm');
+    const data = new FormData(form);
+    data.append('failed_continued', '1');
+
+    failedButContinuing = true;
+
+    // Save the initial failed record via AJAX
+    $.ajax({
+        url: '{{ route('supervisor.recitation.saveFailedContinue') }}',
+        method: 'POST',
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function() {
+            initialFailedRecordSaved = true;
+            toastr.info('تم تسجيل أن الطالب راسب وسيكمل');
+        },
+        error: function() {
+            toastr.error('حدث خطأ في حفظ السجل');
         }
     });
 }
