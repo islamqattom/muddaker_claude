@@ -11,11 +11,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class WarningController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $supervisorId = Auth::id();
         $warnings = Warning::where('issued_by', $supervisorId)
             ->with(['student.user'])
+            ->when($request->student_id, function($query) use ($request) {
+                return $query->where('student_id', $request->student_id);
+            })
+            ->when($request->type, function($query) use ($request) {
+                return $query->where('type', $request->type);
+            })
             ->latest()
             ->paginate(20);
 

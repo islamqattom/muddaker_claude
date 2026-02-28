@@ -128,6 +128,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
     // View own warnings
     Route::get('/warnings', [Student\WarningController::class, 'index'])->name('warnings.index');
+    Route::get('/warnings/{warning}', [Student\WarningController::class, 'show'])->name('warnings.show');
 
     // Profile
     Route::get('/profile', [Student\ProfileController::class, 'index'])->name('profile.index');
