@@ -18,10 +18,10 @@ test.describe('Supervisor Students List', () => {
   });
 
   test('should navigate to student detail', async ({ page }) => {
-    // Look for a student link and click it
-    const studentLink = page.locator('a[href*="/supervisor/students/"]').first();
-    if (await studentLink.isVisible()) {
-      await studentLink.click();
+    // Look for a student detail link (fa-eye icon) and click it
+    const studentLink = page.locator('a[title="عرض"]');
+    if (await studentLink.first().isVisible()) {
+      await studentLink.first().click();
       // Should navigate to student detail page
       await expect(page).toHaveURL(/supervisor\/students\/\d+/);
     }

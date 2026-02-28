@@ -157,7 +157,7 @@ class WarningController extends Controller
         // Header
         $pdf->SetFontSize(20);
         $pdf->SetTextColor(26, 82, 118);
-        $pdf->Cell(0, 8, 'جمعية المحافظة على القرآن الكريم', 0, true, 'C', 0);
+        $pdf->Cell(0, 8, 'مشروع مدكر القرآني', 0, true, 'C', 0);
         $pdf->SetFontSize(16);
         $pdf->SetTextColor(201, 162, 39);
         $pdf->Cell(0, 8, 'إنذار رسمي', 0, true, 'C', 0);
@@ -302,7 +302,7 @@ class WarningController extends Controller
         // Footer
         $pdf->SetFontSize(9);
         $pdf->SetTextColor(102, 102, 102);
-        $pdf->Cell(0, 5, 'جمعية المحافظة على القرآن الكريم | نظام التسميع الإلكتروني | ' . $warning->issue_date->format('Y'), 0, 1, 'C', 0);
+        $pdf->Cell(0, 5, 'مشروع مدكر القرآني | نظام التسميع الإلكتروني | ' . $warning->issue_date->format('Y'), 0, 1, 'C', 0);
 
         // Output PDF
         return response()->make($pdf->Output('warning.pdf', 'S'), 200, [

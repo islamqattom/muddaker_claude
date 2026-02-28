@@ -1,7 +1,7 @@
 {
     "name": "quran-society/memorization-system",
     "type": "project",
-    "description": "نظام متابعة وتسميع القرآن الكريم - جمعية المحافظة على القرآن الكريم",
+    "description": "نظام متابعة وتسميع القرآن الكريم - مشروع مدكر القرآني",
     "keywords": ["quran", "memorization", "laravel"],
     "license": "MIT",
     "require": {
