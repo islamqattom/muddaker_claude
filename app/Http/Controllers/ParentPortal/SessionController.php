@@ -8,7 +8,12 @@ class SessionController extends Controller {
     public function index() {
         $parent = Auth::user()->parentProfile()->with('students')->first();
         $studentIds = $parent->students->pluck('id');
-        $sessions = RecitationSession::whereIn('student_id',$studentIds)->with('student.user','part')->latest()->paginate(20);
+
+        $sessions = RecitationSession::whereIn('student_id', $studentIds)
+            ->with('student.user', 'part')
+            ->latest()
+            ->paginate(20);
+
         return view('parent.sessions.index', compact('sessions'));
     }
 }

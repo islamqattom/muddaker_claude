@@ -174,4 +174,5 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
 
     // Profile
     Route::get('/profile', [ParentPortal\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ParentPortal\ProfileController::class, 'update'])->name('profile.update');
 });
