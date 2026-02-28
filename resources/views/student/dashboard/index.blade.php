@@ -35,15 +35,14 @@
 @section('content')
 <!-- Welcome Banner -->
 <div class="card mb-4" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: #fff; border:none;">
-    <div class="card-body py-4 px-4">
+    <div class="card-body py-3 px-3">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h4 class="mb-1">مرحباً {{ $student->user->name }} 👋</h4>
-                <p class="mb-0 opacity-75">{{ $student->level->name ?? '' }} | {{ $student->student_number }}</p>
-                <small class="opacity-75">المشرف: {{ $student->supervisor->name ?? 'غير محدد' }}</small>
+            <div class="col-8">
+                <h5 class="mb-1">مرحباً {{ $student->user->name }}</h5>
+                <p class="mb-0 opacity-75" style="font-size:13px;">{{ $student->level->name ?? '' }}</p>
             </div>
-            <div class="col-md-4 text-md-end">
-                <div style="font-size: 3rem; opacity: 0.3;"><i class="fas fa-quran"></i></div>
+            <div class="col-4 text-end">
+                <div style="font-size: 2rem; opacity: 0.3;"><i class="fas fa-quran"></i></div>
             </div>
         </div>
     </div>
@@ -51,28 +50,28 @@
 
 <!-- Stats -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="card text-center p-3">
-            <div class="text-success fw-bold" style="font-size:2rem;">{{ $attendanceStats['present'] }}</div>
-            <small class="text-muted">حضور هذا الشهر</small>
+            <div class="text-success fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['present'] }}</div>
+            <small class="text-muted">حضور</small>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="card text-center p-3">
-            <div class="text-danger fw-bold" style="font-size:2rem;">{{ $attendanceStats['absent'] }}</div>
-            <small class="text-muted">غياب هذا الشهر</small>
+            <div class="text-danger fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['absent'] }}</div>
+            <small class="text-muted">غياب</small>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="card text-center p-3">
-            <div class="text-primary fw-bold" style="font-size:2rem;">{{ $sessionStats['total'] }}</div>
-            <small class="text-muted">جلسات التسميع</small>
+            <div class="text-primary fw-bold" style="font-size:1.5rem;">{{ $sessionStats['total'] }}</div>
+            <small class="text-muted">جلسات</small>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="card text-center p-3">
-            <div class="text-warning fw-bold" style="font-size:2rem;">{{ $sessionStats['new_memorization'] }}</div>
-            <small class="text-muted">صفحات جديدة</small>
+            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['new_memorization'] }}</div>
+            <small class="text-muted">صفحات</small>
         </div>
     </div>
 </div>

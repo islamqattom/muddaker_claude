@@ -28,23 +28,23 @@
 @foreach($studentsData as $data)
 @php $student = $data['student']; @endphp
 <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-3">
-            <div style="width:45px;height:45px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:bold;">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <div style="width:40px;height:40px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:bold;">
                 {{ mb_substr($student->user->name, 0, 1) }}
             </div>
             <div>
-                <h5 class="mb-0">{{ $student->user->name }}</h5>
-                <small class="text-muted">{{ $student->level->name ?? '' }} | المشرف: {{ $student->supervisor->name ?? 'غير محدد' }}</small>
+                <h6 class="mb-0">{{ $student->user->name }}</h6>
+                <small class="text-muted">{{ $student->level->name ?? '' }}</small>
             </div>
         </div>
         <a href="{{ route('parent.student.detail', $student->id) }}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-eye me-1"></i>تفاصيل كاملة
+            <i class="fas fa-eye me-1"></i>التفاصيل
         </a>
     </div>
     <div class="card-body">
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12">
                 <h6 class="text-muted mb-2"><i class="fas fa-calendar me-1"></i>الحضور هذا الشهر</h6>
                 <div class="row g-2 text-center">
                     <div class="col-3"><div class="p-2 rounded bg-success text-white"><div class="fw-bold fs-5">{{ $data['attendance']['present'] }}</div><small>حاضر</small></div></div>
@@ -53,13 +53,13 @@
                     <div class="col-3"><div class="p-2 rounded bg-secondary text-white"><div class="fw-bold fs-5">{{ $data['attendance']['total'] }}</div><small>إجمالي</small></div></div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-12">
                 <h6 class="text-muted mb-2"><i class="fas fa-microphone me-1"></i>التسميع هذا الشهر</h6>
                 <div class="row g-2 text-center">
                     <div class="col-3"><div class="p-2 rounded bg-primary text-white"><div class="fw-bold fs-5">{{ $data['sessions']['total'] }}</div><small>جلسات</small></div></div>
                     <div class="col-3"><div class="p-2 rounded bg-success text-white"><div class="fw-bold fs-5">{{ $data['sessions']['passed'] }}</div><small>ناجح</small></div></div>
                     <div class="col-3"><div class="p-2 rounded bg-danger text-white"><div class="fw-bold fs-5">{{ $data['sessions']['failed'] }}</div><small>راسب</small></div></div>
-                    <div class="col-3"><div class="p-2 rounded bg-light text-dark"><div class="fw-bold fs-5">{{ $data['sessions']['total'] > 0 ? round($data['sessions']['passed']/$data['sessions']['total']*100) : 100 }}%</div><small>النجاح</small></div></div>
+                    <div class="col-3"><div class="p-2 rounded bg-light text-dark"><div class="fw-bold fs-5">{{ $data['sessions']['total'] > 0 ? round($data['sessions']['passed']/$data['sessions']['total']*100) : 100 }}%</div><small>نسبة</small></div></div>
                 </div>
             </div>
         </div>

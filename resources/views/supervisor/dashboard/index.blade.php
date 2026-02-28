@@ -36,30 +36,30 @@
 @endsection
 
 @section('content')
-<div class="row g-4">
+<div class="row g-3">
     <!-- Stats Row -->
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="stat-card" style="background: linear-gradient(135deg, #1a5276, #2980b9);">
             <i class="fas fa-users icon"></i>
             <div class="number">{{ $stats['total_students'] }}</div>
             <div class="label">إجمالي الطلاب</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
             <i class="fas fa-user-check icon"></i>
             <div class="number">{{ $stats['today_present'] }}</div>
             <div class="label">حاضر اليوم</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="stat-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
             <i class="fas fa-user-times icon"></i>
             <div class="number">{{ $stats['today_absent'] }}</div>
             <div class="label">غائب اليوم</div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-6 col-lg-3">
         <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
             <i class="fas fa-microphone icon"></i>
             <div class="number">{{ $stats['today_sessions'] }}</div>
@@ -89,19 +89,27 @@
                 <h6><i class="fas fa-bolt me-2"></i>الإجراءات السريعة</h6>
             </div>
             <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a href="{{ route('supervisor.attendance.index') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-calendar-check me-2"></i>تسجيل الحضور والغياب
-                    </a>
-                    <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-primary">
-                        <i class="fas fa-microphone me-2"></i>بدء جلسة تسميع
-                    </a>
-                    <a href="{{ route('supervisor.warnings.create') }}" class="btn btn-outline-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>إصدار إنذار
-                    </a>
-                    <a href="{{ route('supervisor.reports.index') }}" class="btn btn-outline-info">
-                        <i class="fas fa-chart-bar me-2"></i>التقارير
-                    </a>
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('supervisor.attendance.index') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-calendar-check me-2"></i>تسجيل الحضور والغياب
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-microphone me-2"></i>بدء جلسة تسميع
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('supervisor.warnings.create') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-exclamation-triangle me-2"></i>إصدار إنذار
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('supervisor.reports.index') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar me-2"></i>التقارير
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

@@ -159,15 +159,45 @@
             font-size: 16px;
             line-height: 2;
         }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            .login-card {
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
+            .logo-circle {
+                width: 70px;
+                height: 70px;
+            }
+            .logo-circle i { font-size: 30px; }
+            .login-logo img {
+                width: 140px !important;
+                height: 90px !important;
+            }
+            .login-logo h4 { font-size: 18px; }
+            .login-logo p { font-size: 12px; }
+            .form-control {
+                padding: 14px 15px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            .btn-login {
+                padding: 15px;
+                font-size: 15px;
+            }
+            .quran-verse {
+                font-size: 14px;
+                margin-top: 20px;
+                padding-top: 15px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="login-card">
         <div class="login-logo">
-            <div class="logo-circle">
-                <i class="fas fa-quran"></i>
-            </div>
-            <h4>جمعية المحافظة على القرآن الكريم</h4>
+            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo" style="width:180px;height:120px;">
             <p>نظام متابعة وتسميع القرآن الكريم</p>
         </div>
 
@@ -233,15 +263,8 @@
             </button>
         </form>
 
-        <div class="role-badges">
-            <span class="role-badge bg-primary text-white"><i class="fas fa-user-shield me-1"></i>إدارة</span>
-            <span class="role-badge bg-success text-white"><i class="fas fa-user-tie me-1"></i>مشرف</span>
-            <span class="role-badge bg-info text-white"><i class="fas fa-user-graduate me-1"></i>طالب</span>
-            <span class="role-badge bg-warning text-dark"><i class="fas fa-users me-1"></i>ولي أمر</span>
-        </div>
-
         <div class="quran-verse">
-            ﴿ وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا ﴾
+            ﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِنْ مُدَّكِرٍ ﴾
         </div>
     </div>
 

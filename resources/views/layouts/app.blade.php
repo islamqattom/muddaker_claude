@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'نظام تسميع القرآن الكريم') - جمعية المحافظة على القرآن</title>
+    <title>@yield('title', 'نظام تسميع القرآن الكريم') - مشروع مدكر القرآني</title>
 
     <!-- Bootstrap RTL -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
@@ -107,7 +107,6 @@
         .sidebar-logo img {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
         }
 
         .sidebar-logo h6 {
@@ -364,6 +363,11 @@
         .breadcrumb { font-size: 13px; }
         .breadcrumb-item.active { color: var(--primary); font-weight: 600; }
 
+        /* Mobile sidebar backdrop - hidden by default */
+        .sidebar-backdrop {
+            display: none;
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             .sidebar {
@@ -373,7 +377,77 @@
             .sidebar.mobile-open { transform: translateX(0); }
             .sidebar.collapsed { transform: translateX(100%); }
             .main-content { margin-right: 0 !important; }
+
+            /* Mobile sidebar backdrop */
+            .sidebar-backdrop {
+                display: block;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            .sidebar-backdrop.show {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* Mobile header optimizations */
+            .top-header { padding: 0 15px; height: 55px; }
+            .page-title { font-size: 16px; }
+            .user-info { display: none; }
+            .user-avatar-btn { padding: 5px; }
+            .user-avatar-btn img { width: 32px; height: 32px; }
+            .notification-bell { width: 44px; height: 44px; }
+
+            /* Mobile page content padding */
+            .page-content { padding: 15px; }
+
+            /* Mobile card padding */
+            .card-body { padding: 15px; }
+
+            /* Mobile button sizes - touch friendly */
+            .btn { min-height: 44px; padding: 10px 16px; }
+            .btn-sm { min-height: 36px; padding: 8px 12px; }
+
+            /* Mobile stat cards */
+            .stat-card .number { font-size: 1.5rem; }
+            .stat-card .label { font-size: 11px; }
+            .stat-card .icon { font-size: 1.8rem; }
+            .stat-card { padding: 15px; }
+
+            /* Mobile table adjustments */
+            .table { font-size: 13px; }
         }
+
+        /* Mobile close button for sidebar */
+        @media (max-width: 768px) {
+            .sidebar-close-btn {
+                display: flex;
+            }
+        }
+        .sidebar-close-btn {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sidebar-close-btn:hover { background: rgba(255,255,255,0.2); }
 
         /* Tablet and above - sidebar toggle */
         @media (min-width: 769px) {
@@ -400,11 +474,17 @@
 </head>
 <body>
 
+    <!-- Sidebar Backdrop (Mobile) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
+        <button class="sidebar-close-btn" onclick="closeMobileSidebar()" title="إغلاق">
+            <i class="fas fa-times"></i>
+        </button>
         <div class="sidebar-logo">
-            <img src="{{ asset('images/muddaker-logo.jpeg') }}" alt="Logo" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">
-            <h6>جمعية المحافظة على القرآن</h6>
+            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo" style="width:140px;height:100px;">
+            <h6></h6>
             <small>نظام التسميع الإلكتروني</small>
         </div>
 
@@ -562,8 +642,51 @@
         // Mobile sidebar toggle (slides in/out)
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
             sidebar.classList.toggle('mobile-open');
+            backdrop.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
         }
+
+        // Close mobile sidebar
+        function closeMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Swipe to close sidebar (touch support)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const sidebar = document.getElementById('sidebar');
+            // Swipe left to close (in RTL, sidebar slides from right)
+            if (touchStartX - touchEndX > 50 && sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            }
+        }
+
+        // Close sidebar on Escape key (accessibility)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('mobile-open')) {
+                    closeMobileSidebar();
+                }
+            }
+        });
 
         // Restore sidebar state on page load (desktop only)
         document.addEventListener('DOMContentLoaded', function() {
