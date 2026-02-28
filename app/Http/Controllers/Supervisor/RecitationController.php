@@ -478,6 +478,6 @@ class RecitationController extends Controller
         $sessions = $query->orderBy('session_date', 'desc')->paginate(30);
         $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
 
-        return view('supervisor.recitation.history', compact('sessions', 'students', 'fromDate', 'toDate'));
+        return view('supervisor.recitation.history', compact('sessions', 'students', 'fromDate', 'toDate', 'studentId'));
     }
 }
