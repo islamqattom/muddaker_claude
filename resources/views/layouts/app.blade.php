@@ -408,7 +408,7 @@
                         <img src="{{ auth()->user()->avatar_url }}" alt="avatar">
                     </button>
                     <ul class="dropdown-menu dropdown-menu-start">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>الملف الشخصي</a></li>
+                        <li><a class="dropdown-item" href="{{ route(auth()->user()->role . '.profile.index') }}"><i class="fas fa-user me-2"></i>الملف الشخصي</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">

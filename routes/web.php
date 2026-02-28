@@ -51,6 +51,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Notifications
     Route::get('/notifications/mark-read', [Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
+
+    // Profile
+    Route::get('/profile', [Admin\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [Admin\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // ============================
@@ -107,6 +111,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
 
     // Notifications
     Route::get('/notifications/mark-read', [Supervisor\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
+
+    // Profile
+    Route::get('/profile', [Supervisor\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [Supervisor\ProfileController::class, 'update'])->name('profile.update');
 });
 
 // ============================
