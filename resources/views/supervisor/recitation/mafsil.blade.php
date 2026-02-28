@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'تسميع - مفصل')
-@section('page-title', 'جلسة مفصل {{ $mafsilType }}')
+@section('page-title', 'جلسة مفصل'.' - '.$mafsilType)
 @section('role-label', 'مشرف')
 @section('sidebar-menu')
     @include('supervisor.partials.sidebar')

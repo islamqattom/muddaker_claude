@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title','تسميع - سرد')
-@section('page-title','جلسة سرد - الجزء {{ $part->part_number }}')
+@section('page-title','جلسة سرد - الجزء '.$part->part_number)
 @section('sidebar-menu') @include('supervisor.partials.sidebar') @endsection
 @section('content')
 <div class="alert alert-info">
