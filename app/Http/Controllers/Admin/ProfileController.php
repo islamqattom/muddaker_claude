@@ -15,11 +15,13 @@ class ProfileController extends Controller {
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $user->id,
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         ]);
 
         $user->update([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
         ]);
 

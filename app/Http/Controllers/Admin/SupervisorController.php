@@ -25,6 +25,7 @@ class SupervisorController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
             'phone' => 'required|string|unique:users,phone',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
@@ -33,6 +34,7 @@ class SupervisorController extends Controller
         DB::transaction(function() use ($request) {
             $user = User::create([
                 'name' => $request->name,
+                'username' => $request->username,
                 'phone' => $request->phone,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
@@ -51,6 +53,29 @@ class SupervisorController extends Controller
 
     public function show($id) { $supervisor = User::where('role','supervisor')->with('supervisor','supervisedStudents.user')->findOrFail($id); return view('admin.supervisors.show', compact('supervisor')); }
     public function edit($id) { $supervisor = User::where('role','supervisor')->with('supervisor')->findOrFail($id); return view('admin.supervisors.edit', compact('supervisor')); }
-    public function update(Request $request, $id) { return redirect()->route('admin.supervisors.index')->with('success','تم التحديث'); }
+    public function update(Request $request, $id)
+    {
+        $supervisor = User::where('role', 'supervisor')->findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $supervisor->id,
+            'phone' => 'required|string|unique:users,phone,' . $supervisor->id,
+            'email' => 'nullable|email|unique:users,email,' . $supervisor->id,
+        ]);
+
+        $supervisor->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'phone' => $request->phone,
+            'email' => $request->email,
+        ]);
+
+        if ($request->password) {
+            $supervisor->update(['password' => Hash::make($request->password)]);
+        }
+
+        return redirect()->route('admin.supervisors.index')->with('success', 'تم التحديث');
+    }
     public function destroy($id) { User::findOrFail($id)->delete(); return redirect()->route('admin.supervisors.index')->with('success','تم الحذف'); }
 }

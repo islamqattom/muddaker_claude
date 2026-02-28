@@ -190,12 +190,12 @@
             <div class="mb-3">
                 <label class="form-label">
                     <i class="fas fa-user me-1"></i>
-                    البريد الإلكتروني أو رقم الهاتف
+                    اسم المستخدم أو البريد الإلكتروني أو رقم الهاتف
                 </label>
                 <input type="text"
                        name="login"
                        class="form-control @error('login') is-invalid @enderror"
-                       placeholder="أدخل بريدك أو رقم هاتفك"
+                       placeholder="أدخل اسم المستخدم أو بريدك أو رقم هاتفك"
                        value="{{ old('login') }}"
                        required
                        autofocus>

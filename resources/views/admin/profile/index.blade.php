@@ -23,6 +23,14 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label">اسم المستخدم</label>
+                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ $user->username }}" placeholder="أرقام إنجليزية وحروف">
+                        @error('username')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">البريد الإلكتروني</label>
                         <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
                     </div>

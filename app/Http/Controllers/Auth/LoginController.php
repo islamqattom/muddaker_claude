@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,11 +23,11 @@ class LoginController extends Controller
             'login' => 'required|string',
             'password' => 'required|string',
         ], [
-            'login.required' => 'يرجى إدخال البريد الإلكتروني أو رقم الهاتف',
+            'login.required' => 'يرجى إدخال اسم المستخدم أو البريد الإلكتروني أو رقم الهاتف',
             'password.required' => 'يرجى إدخال كلمة المرور',
         ]);
 
-        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        $loginField = $this->determineLoginField($request->login);
         $credentials = [$loginField => $request->login, 'password' => $request->password];
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -55,6 +56,23 @@ class LoginController extends Controller
             'parent' => redirect()->route('parent.dashboard'),
             default => redirect('/'),
         };
+    }
+
+    private function determineLoginField(string $input): string
+    {
+        // Check if username exists in users table FIRST
+        // This prevents usernames that look like emails from being misidentified
+        if (User::where('username', $input)->exists()) {
+            return 'username';
+        }
+
+        // Check if it's a valid email
+        if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
+            return 'email';
+        }
+
+        // Otherwise, treat as phone
+        return 'phone';
     }
 
     public function logout(Request $request)
