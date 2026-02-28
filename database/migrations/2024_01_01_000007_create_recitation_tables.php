@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('total_pages')->nullable();
             $table->integer('total_errors')->default(0);
             $table->integer('total_hesitations')->default(0);
-            $table->enum('status', ['in_progress', 'passed', 'failed', 'stopped'])->default('in_progress');
+            $table->enum('status', ['in_progress', 'passed', 'failed'])->default('in_progress');
             // للمفصل
             $table->integer('mafsil_type')->nullable(); // 3,6,10,15,20,25,30
             $table->decimal('max_score', 5, 2)->nullable(); // 90, 80, 75

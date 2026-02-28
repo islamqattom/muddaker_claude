@@ -99,8 +99,8 @@ class RecitationSessionTest extends TestCase
         $session = RecitationSession::factory()->create(['status' => 'in_progress']);
         $this->assertEquals('جارٍ', $session->status_label);
 
-        $session = RecitationSession::factory()->create(['status' => 'stopped']);
-        $this->assertEquals('موقوف', $session->status_label);
+        $session = RecitationSession::factory()->create(['status' => 'failed']);
+        $this->assertEquals('راسب', $session->status_label);
     }
 
     public function test_recitation_session_status_color_returns_correct_colors(): void
@@ -113,9 +113,6 @@ class RecitationSessionTest extends TestCase
 
         $session = RecitationSession::factory()->create(['status' => 'in_progress']);
         $this->assertEquals('warning', $session->status_color);
-
-        $session = RecitationSession::factory()->create(['status' => 'stopped']);
-        $this->assertEquals('secondary', $session->status_color);
     }
 
     public function test_calculate_page_color_returns_green_for_excellent(): void

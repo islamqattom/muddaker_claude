@@ -24,7 +24,7 @@ class RecitationSessionFactory extends Factory
             'total_pages' => fake()->numberBetween(1, 20),
             'total_errors' => fake()->numberBetween(0, 10),
             'total_hesitations' => fake()->numberBetween(0, 20),
-            'status' => fake()->randomElement(['passed', 'failed', 'in_progress', 'stopped']),
+            'status' => fake()->randomElement(['passed', 'failed', 'in_progress']),
             'mafsil_type' => fake()->optional()->numberBetween(1, 30),
             'max_score' => fake()->randomFloat(2, 70, 100),
             'final_score' => fake()->randomFloat(2, 0, 100),

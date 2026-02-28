@@ -391,15 +391,15 @@ function submitMafsil() {
 function stopForFailure() {
     const form = document.getElementById('mafsilForm');
 
-    // Add hidden input to indicate stopped due to failure
-    let stoppedInput = form.querySelector('input[name="stopped"]');
-    if (!stoppedInput) {
-        stoppedInput = document.createElement('input');
-        stoppedInput.type = 'hidden';
-        stoppedInput.name = 'stopped';
-        form.appendChild(stoppedInput);
+    // Add hidden input to indicate failed due to failure
+    let failedInput = form.querySelector('input[name="failed"]');
+    if (!failedInput) {
+        failedInput = document.createElement('input');
+        failedInput.type = 'hidden';
+        failedInput.name = 'failed';
+        form.appendChild(failedInput);
     }
-    stoppedInput.value = '1';
+    failedInput.value = '1';
 
     bootstrap.Modal.getInstance(document.getElementById('failureModal')).hide();
     submitMafsil();

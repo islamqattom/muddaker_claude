@@ -288,7 +288,7 @@ class RecitationController extends Controller
                 $sessionStatus = 'failed';
             }
 
-            if ($request->stopped) {
+            if ($request->failed) {
                 $sessionStatus = 'failed';
             }
 
