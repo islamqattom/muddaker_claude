@@ -146,7 +146,7 @@
                                        class="form-control form-control-sm arrival-time"
                                        id="arrival-{{ $student->id }}"
                                        style="{{ $currentStatus === 'late' ? '' : 'display:none;' }}"
-                                       value="{{ optional($student->attendances->first())->arrival_time }}">
+                                       value="{{ optional($student->attendances->first())->arrival_time ? \Carbon\Carbon::parse(optional($student->attendances->first())->arrival_time)->format('H:i') : '' }}">
                             </td>
                             <td>
                                 <input type="text"
