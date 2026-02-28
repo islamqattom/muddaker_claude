@@ -6,12 +6,12 @@
     @include('student.partials.sidebar')
 @endsection
 @section('content')
-<div class="card mb-4" style="background: linear-gradient(135deg, #1a5276 0%, #0d3349 100%); color: #fff;">
+<div class="card mb-4" style="background: linear-gradient(135deg, #182B48 0%, #0D1829 100%); color: #fff;">
     <div class="card-body p-4 text-center">
         <i class="fas fa-book-open fa-3x mb-3" style="opacity:0.7;"></i>
         <h4 class="mb-2">طريقة الحفظ للوصول إلى الإتقان</h4>
-        <p class="mb-0" style="opacity:0.8; font-size:16px;">﴿ وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا ﴾</p>
-        <div class="mt-3 p-2 rounded d-inline-block" style="background:rgba(201,162,39,0.3);">
+        <p class="mb-0" style="opacity:0.8; font-size:16px;">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِنْ مُدَّكِرٍ ﴾</p>
+        <div class="mt-3 p-2 rounded d-inline-block" style="background:rgba(180,128,44,0.3);">
             <i class="fas fa-clock me-2"></i>
             <strong>مدة حفظ الصفحة الواحدة: من 45 دقيقة إلى ساعة</strong>
         </div>
@@ -63,7 +63,7 @@
         <div class="card mb-3">
             <div class="card-header"><h6><i class="fas fa-stopwatch me-2"></i>مؤقت الحفظ</h6></div>
             <div class="card-body text-center">
-                <div id="timerDisplay" style="font-size:3rem;font-weight:bold;color:#1a5276;font-family:monospace;">00:00:00</div>
+                <div id="timerDisplay" style="font-size:3rem;font-weight:bold;color:#182B48;font-family:monospace;">00:00:00</div>
                 <div class="text-muted mb-3">الهدف: 45-60 دقيقة للصفحة</div>
                 <div class="progress mb-3" style="height:10px;">
                     <div class="progress-bar bg-info" id="timerProgress" style="width:0%;transition:width 0.5s;"></div>
@@ -94,7 +94,7 @@
                 </div>
             </div>
         </div>
-        <div class="card" style="background:linear-gradient(135deg,#1a5276,#2980b9);color:#fff;">
+        <div class="card" style="background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
             <div class="card-body p-4">
                 <h6 class="mb-3"><i class="fas fa-star me-2"></i>نقاط مهمة</h6>
                 <ul class="mb-0" style="font-size:13px;line-height:2.2;padding-right:20px;">

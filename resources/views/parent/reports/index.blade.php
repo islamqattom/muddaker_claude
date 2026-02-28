@@ -151,7 +151,7 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
+                                    <div style="width:36px;height:36px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
                                         {{ mb_substr($data['student']->user->name, 0, 1) }}
                                     </div>
                                     <span class="fw-semibold">{{ $data['student']->user->name }}</span>

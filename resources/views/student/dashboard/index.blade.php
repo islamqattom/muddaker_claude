@@ -34,7 +34,7 @@
 
 @section('content')
 <!-- Welcome Banner -->
-<div class="card mb-4" style="background: linear-gradient(135deg, #1a5276, #2980b9); color: #fff; border:none;">
+<div class="card mb-4" style="background: linear-gradient(135deg, #182B48, #2A4570); color: #fff; border:none;">
     <div class="card-body py-3 px-3">
         <div class="row align-items-center">
             <div class="col-8">

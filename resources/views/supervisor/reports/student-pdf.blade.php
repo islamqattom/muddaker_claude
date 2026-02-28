@@ -7,26 +7,26 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Tahoma', 'Segoe UI', sans-serif; font-size: 12px; line-height: 1.6; color: #333; }
         .container { max-width: 100%; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a5276; padding-bottom: 15px; }
-        .header h1 { color: #1a5276; font-size: 24px; margin-bottom: 5px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #182B48; padding-bottom: 15px; }
+        .header h1 { color: #182B48; font-size: 24px; margin-bottom: 5px; }
         .header p { color: #666; font-size: 14px; }
         .student-info { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
         .student-info-row { display: flex; justify-content: space-around; margin-bottom: 10px; }
         .student-info-item { text-align: center; }
         .stats-section { margin-bottom: 20px; }
-        .stats-section h3 { color: #1a5276; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .stats-section h3 { color: #182B48; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
         .stats-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .stat-box { flex: 1; min-width: 80px; padding: 8px; text-align: center; border-radius: 5px; }
         .stat-box.success { background: #28a745; color: white; }
         .stat-box.danger { background: #dc3545; color: white; }
         .stat-box.warning { background: #ffc107; color: #333; }
         .stat-box.info { background: #17a2b8; color: white; }
-        .stat-box.primary { background: #1a5276; color: white; }
+        .stat-box.primary { background: #182B48; color: white; }
         .stat-value { font-size: 18px; font-weight: bold; }
         .stat-label { font-size: 10px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 6px; text-align: center; font-size: 10px; }
-        th { background: #1a5276; color: white; font-weight: bold; }
+        th { background: #182B48; color: white; font-weight: bold; }
         tr:nth-child(even) { background: #f8f9fa; }
         .badge { padding: 2px 6px; border-radius: 3px; font-size: 9px; }
         .badge-success { background: #28a745; color: white; }

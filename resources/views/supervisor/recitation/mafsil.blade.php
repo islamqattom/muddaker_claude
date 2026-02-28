@@ -17,7 +17,7 @@
         <div class="row align-items-center">
             <div class="col-md-6">
                 <div class="d-flex align-items-center gap-3">
-                    <div style="width:50px;height:50px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold;">
+                    <div style="width:50px;height:50px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold;">
                         {{ mb_substr($student->user->name, 0, 1) }}
                     </div>
                     <div>

@@ -31,7 +31,7 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100">
             <div class="card-body text-center">
-                <div style="width:120px;height:120px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;font-weight:bold;margin:0 auto;">
+                <div style="width:120px;height:120px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;font-weight:bold;margin:0 auto;">
                     {{ mb_substr($parent->user->name, 0, 1) }}
                 </div>
                 <h4 class="mt-3 mb-1">{{ $parent->user->name }}</h4>
@@ -141,7 +141,7 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
-                                            <div style="width:36px;height:36px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
+                                            <div style="width:36px;height:36px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
                                                 {{ mb_substr($student->user->name, 0, 1) }}
                                             </div>
                                             <span class="fw-semibold">{{ $student->user->name }}</span>

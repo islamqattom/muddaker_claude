@@ -10,7 +10,7 @@
 </div>
 <div class="card mb-3">
     <div class="card-body d-flex align-items-center gap-3">
-        <div style="width:50px;height:50px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:20px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:20px;">
             {{ mb_substr($student->user->name,0,1) }}
         </div>
         <div>

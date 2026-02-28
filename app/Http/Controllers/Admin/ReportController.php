@@ -89,7 +89,7 @@ class ReportController extends Controller {
         // Table header
         $html = '
         <table border="1" cellpadding="4">
-            <tr bgcolor="#1a5276" color="white">
+            <tr bgcolor="#182B48" color="white">
                 <th align="center">#</th>
                 <th align="center">الطالب</th>
                 <th align="center">المشرف</th>

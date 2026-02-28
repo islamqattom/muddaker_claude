@@ -18,7 +18,7 @@
 <a href="{{ route('parent.reports.index') }}" class="nav-link"><i class="fas fa-chart-bar"></i> التقارير</a>
 @endsection
 @section('content')
-<div class="card mb-4" style="background:linear-gradient(135deg,#1a5276,#0d3349);color:#fff;">
+<div class="card mb-4" style="background:linear-gradient(135deg,#182B48,#0D1829);color:#fff;">
     <div class="card-body py-4 px-4">
         <h4 class="mb-1">أهلاً {{ auth()->user()->name }}</h4>
         <p class="mb-0 opacity-75">تابع تقدم أبنائك في حفظ القرآن الكريم</p>
@@ -30,7 +30,7 @@
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="d-flex align-items-center gap-2">
-            <div style="width:40px;height:40px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:bold;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:bold;">
                 {{ mb_substr($student->user->name, 0, 1) }}
             </div>
             <div>

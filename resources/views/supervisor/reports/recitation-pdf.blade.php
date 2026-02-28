@@ -7,12 +7,12 @@
         * { margin: 0; padding: 0; box-sizing: border body { font-family-box; }
        : 'Tahoma', 'Segoe UI', sans-serif; font-size: 12px; line-height: 1.6; color: #333; }
         .container { max-width: 100%; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a5276; padding-bottom: 15px; }
-        .header h1 { color: #1a5276; font-size: 24px; margin-bottom: 5px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #182B48; padding-bottom: 15px; }
+        .header h1 { color: #182B48; font-size: 24px; margin-bottom: 5px; }
         .header p { color: #666; font-size: 14px; }
         .stats-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
         .stat-box { flex: 1; min-width: 100px; padding: 10px; text-align: center; border-radius: 5px; }
-        .stat-box.primary { background: #1a5276; color: white; }
+        .stat-box.primary { background: #182B48; color: white; }
         .stat-box.success { background: #28a745; color: white; }
         .stat-box.danger { background: #dc3545; color: white; }
         .stat-box.warning { background: #ffc107; color: #333; }
@@ -22,7 +22,7 @@
         .stat-label { font-size: 11px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 11px; }
-        th { background: #1a5276; color: white; font-weight: bold; }
+        th { background: #182B48; color: white; font-weight: bold; }
         tr:nth-child(even) { background: #f8f9fa; }
         .badge { padding: 3px 8px; border-radius: 3px; font-size: 10px; }
         .badge-success { background: #28a745; color: white; }

@@ -19,12 +19,12 @@
         .page { max-width: 210mm; margin: 0 auto; }
         .header {
             text-align: center;
-            border-bottom: 3px solid #1a5276;
+            border-bottom: 3px solid #182B48;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
-        .header h2 { color: #1a5276; font-size: 22px; margin-bottom: 5px; }
-        .header h3 { color: #c9a227; font-size: 18px; font-weight: bold; }
+        .header h2 { color: #182B48; font-size: 22px; margin-bottom: 5px; }
+        .header h3 { color: #B4802C; font-size: 18px; font-weight: bold; }
         .header p { color: #666; font-size: 12px; }
 
         .warning-meta {
@@ -38,11 +38,11 @@
         }
         .meta-item { text-align: center; }
         .meta-label { color: #666; font-size: 11px; }
-        .meta-value { font-weight: bold; color: #1a5276; font-size: 14px; }
+        .meta-value { font-weight: bold; color: #182B48; font-size: 14px; }
 
         .section { margin-bottom: 20px; }
         .section-title {
-            background: #1a5276;
+            background: #182B48;
             color: #fff;
             padding: 8px 15px;
             font-weight: bold;
@@ -61,7 +61,7 @@
             padding: 8px 12px;
             text-align: right;
         }
-        th { background: #e8f4fd; color: #1a5276; font-weight: bold; }
+        th { background: #e8f4fd; color: #182B48; font-weight: bold; }
         tr:nth-child(even) { background: #f8f9fa; }
 
         .content-box {
@@ -85,7 +85,7 @@
             border-radius: 6px;
             border: 1px solid #dee2e6;
         }
-        .stat-box .num { font-size: 24px; font-weight: bold; color: #1a5276; }
+        .stat-box .num { font-size: 24px; font-weight: bold; color: #182B48; }
         .stat-box .lbl { font-size: 11px; color: #666; }
 
         .signature-section {
@@ -121,7 +121,7 @@
 <div class="page">
     <!-- Header -->
     <div class="header">
-        <h2>جمعية المحافظة على القرآن الكريم</h2>
+        <h2>مشروع مدكر القرآني</h2>
         <h3>⚠️ إنذار رسمي ⚠️</h3>
         <p>تعمل هذه الجمعية على المحافظة على كتاب الله وتعليم حفاظه</p>
     </div>
@@ -252,7 +252,7 @@
     </div>
 
     <div class="footer">
-        جمعية المحافظة على القرآن الكريم | نظام التسميع الإلكتروني | {{ $warning->issue_date->format('Y') }}
+        مشروع مدكر القرآني | نظام التسميع الإلكتروني | {{ $warning->issue_date->format('Y') }}
     </div>
 </div>
 </body>

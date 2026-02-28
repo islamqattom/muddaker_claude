@@ -10,7 +10,7 @@
     <style>
         body {
             font-family: 'Tajawal', sans-serif;
-            background: linear-gradient(135deg, #1a5276 0%, #0d3349 40%, #1a5276 100%);
+            background: linear-gradient(135deg, #182B48 0%, #0D1829 40%, #182B48 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,7 +25,7 @@
             width: 400px;
             height: 400px;
             border-radius: 50%;
-            background: rgba(201,162,39,0.1);
+            background: rgba(180,128,44,0.1);
             top: -100px;
             right: -100px;
         }
@@ -60,19 +60,19 @@
         .logo-circle {
             width: 90px;
             height: 90px;
-            background: linear-gradient(135deg, #1a5276, #2980b9);
+            background: linear-gradient(135deg, #182B48, #2A4570);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 15px;
-            box-shadow: 0 10px 25px rgba(26,82,118,0.3);
+            box-shadow: 0 10px 25px rgba(24,43,72,0.3);
         }
 
         .logo-circle i { color: #fff; font-size: 40px; }
 
         .login-logo h4 {
-            color: #1a5276;
+            color: #182B48;
             font-weight: 800;
             font-size: 20px;
             margin-bottom: 5px;
@@ -100,8 +100,8 @@
         }
 
         .form-control:focus {
-            border-color: #1a5276;
-            box-shadow: 0 0 0 0.2rem rgba(26,82,118,0.15);
+            border-color: #182B48;
+            box-shadow: 0 0 0 0.2rem rgba(24,43,72,0.15);
         }
 
         .input-group-text {
@@ -109,11 +109,11 @@
             border: 2px solid #e9ecef;
             border-left: none;
             border-radius: 0 10px 10px 0;
-            color: #1a5276;
+            color: #182B48;
         }
 
         .btn-login {
-            background: linear-gradient(135deg, #1a5276, #2980b9);
+            background: linear-gradient(135deg, #182B48, #2A4570);
             border: none;
             border-radius: 10px;
             padding: 13px;
@@ -127,9 +127,9 @@
         }
 
         .btn-login:hover {
-            background: linear-gradient(135deg, #0d3349, #1a5276);
+            background: linear-gradient(135deg, #0D1829, #182B48);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(26,82,118,0.35);
+            box-shadow: 0 8px 20px rgba(24,43,72,0.35);
             color: #fff;
         }
 
@@ -155,7 +155,7 @@
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #eee;
-            color: #1a5276;
+            color: #182B48;
             font-size: 16px;
             line-height: 2;
         }

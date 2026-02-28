@@ -36,7 +36,7 @@
 @section('content')
 <div class="row g-4">
     <div class="col-6 col-md-3">
-        <div class="stat-card" style="background:linear-gradient(135deg,#1a5276,#2980b9);">
+        <div class="stat-card" style="background:linear-gradient(135deg,#182B48,#2A4570);">
             <i class="fas fa-user-graduate icon"></i>
             <div class="number">{{ $stats['total_students'] }}</div>
             <div class="label">إجمالي الطلاب</div>

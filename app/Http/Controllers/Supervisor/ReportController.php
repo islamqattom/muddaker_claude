@@ -131,7 +131,7 @@ class ReportController extends Controller
         // Table header
         $html = '
         <table border="1" cellpadding="4">
-            <tr bgcolor="#1a5276" color="white">
+            <tr bgcolor="#182B48" color="white">
                 <th align="center">#</th>
                 <th align="center">الطالب</th>
                 <th align="center">النوع</th>
@@ -450,7 +450,7 @@ class ReportController extends Controller
             $pdf->Cell(0, 10, 'جلسات التسميع', 0, true, 'R', 0);
             $html = '
             <table border="1" cellpadding="4">
-                <tr bgcolor="#1a5276" color="white">
+                <tr bgcolor="#182B48" color="white">
                     <th align="center">النوع</th>
                     <th align="center">الجزء</th>
                     <th align="center">الصفحات</th>

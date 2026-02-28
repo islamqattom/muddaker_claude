@@ -17,9 +17,10 @@
 
     <style>
         :root {
-            --primary: #1a5276;
-            --primary-light: #2980b9;
-            --secondary: #c9a227;
+            --primary: #182B48;
+            --primary-light: #2A4570;
+            --secondary: #B4802C;
+            --accent: #B1C2E0;
             --success: #27ae60;
             --danger: #c0392b;
             --sidebar-width: 260px;
@@ -43,11 +44,11 @@
             right: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: linear-gradient(180deg, var(--primary) 0%, #0d3349 100%);
+            background: #fff;
             z-index: 1000;
             transition: all 0.3s ease;
             overflow-y: auto;
-            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
         }
 
         .sidebar.collapsed {
@@ -101,7 +102,7 @@
         .sidebar-logo {
             padding: 20px 15px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e9ecef;
         }
 
         .sidebar-logo img {
@@ -110,14 +111,14 @@
         }
 
         .sidebar-logo h6 {
-            color: #fff;
+            color: #182B48;
             font-size: 14px;
             margin: 8px 0 0;
             font-weight: 600;
         }
 
         .sidebar-logo small {
-            color: var(--secondary);
+            color: #B4802C;
             font-size: 11px;
         }
 
@@ -126,7 +127,7 @@
         }
 
         .nav-section-title {
-            color: rgba(255,255,255,0.4);
+            color: #182B48;
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -135,7 +136,7 @@
         }
 
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.75);
+            color: #182B48;
             padding: 10px 20px;
             display: flex;
             align-items: center;
@@ -147,9 +148,9 @@
 
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            color: #fff;
-            background: rgba(255,255,255,0.12);
-            border-right: 3px solid var(--secondary);
+            color: #182B48;
+            background: #f0f4f8;
+            border-right: 3px solid #B4802C;
         }
 
         .sidebar .nav-link i {
@@ -344,7 +345,7 @@
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 0.2rem rgba(26,82,118,0.15);
+            box-shadow: 0 0 0 0.2rem rgba(24,43,72,0.15);
         }
 
         .form-label { font-weight: 600; color: #495057; font-size: 14px; }
@@ -439,15 +440,15 @@
             width: 36px;
             height: 36px;
             border: none;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
+            background: #f0f0f0;
+            color: #182B48;
             border-radius: 50%;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .sidebar-close-btn:hover { background: rgba(255,255,255,0.2); }
+        .sidebar-close-btn:hover { background: #e0e0e0; }
 
         /* Tablet and above - sidebar toggle */
         @media (min-width: 769px) {
@@ -492,8 +493,8 @@
             @yield('sidebar-menu')
         </div>
 
-        <div style="padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-            <div style="color: rgba(255,255,255,0.5); font-size: 11px; text-align: center;">
+        <div style="padding: 15px 20px; border-top: 1px solid #e9ecef; margin-top: auto;">
+            <div style="color: #6c757d; font-size: 11px; text-align: center;">
                 النسخة 1.0.0 | {{ date('Y') }}
             </div>
         </div>

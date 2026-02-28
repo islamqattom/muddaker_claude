@@ -39,7 +39,7 @@
 <div class="row g-3">
     <!-- Stats Row -->
     <div class="col-6 col-lg-3">
-        <div class="stat-card" style="background: linear-gradient(135deg, #1a5276, #2980b9);">
+        <div class="stat-card" style="background: linear-gradient(135deg, #182B48, #2A4570);">
             <i class="fas fa-users icon"></i>
             <div class="number">{{ $stats['total_students'] }}</div>
             <div class="label">إجمالي الطلاب</div>
@@ -143,7 +143,7 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div style="width:32px;height:32px;border-radius:50%;background:#1a5276;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
                                             {{ mb_substr($student->user->name, 0, 1) }}
                                         </div>
                                         {{ $student->user->name }}
