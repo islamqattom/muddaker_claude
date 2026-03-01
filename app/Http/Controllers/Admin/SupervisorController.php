@@ -137,9 +137,15 @@ class SupervisorController extends Controller
 
         // Update supervisor profile if exists
         if ($supervisor->supervisor) {
-            $supervisor->supervisor->update([
+            $supervisorData = [
                 'specialization' => $request->specialization,
-            ]);
+            ];
+
+            if ($request->hire_date) {
+                $supervisorData['hire_date'] = $request->hire_date;
+            }
+
+            $supervisor->supervisor->update($supervisorData);
         }
 
         return redirect()->route('admin.supervisors.index')->with('success', 'تم التحديث');

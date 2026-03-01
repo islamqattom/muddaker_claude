@@ -143,7 +143,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">تاريخ التعيين</label>
-                                <input type="text" class="form-control" value="{{ $supervisor->supervisor->hire_date?->format('d/m/Y') }}" disabled>
+                                <input type="date" name="hire_date" class="form-control" value="{{ old('hire_date', $supervisor->supervisor->hire_date?->format('Y-m-d')) }}">
                             </div>
                         </div>
                     </div>
