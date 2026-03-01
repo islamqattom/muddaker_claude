@@ -119,8 +119,12 @@ class RecitationSession extends Model
             // أحمر: 2 خطأ بدون تردد فقط
             return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
         } elseif ($totalEquivalent == 2 && $hesitations > 0) {
-            // أسود: 2 خطأ + 1 تردد أو أكثر
-            return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
+            // أسود: 2 خطأ equivalent مع وجود خطأ حقيقي + 1 تردد أو أكثر
+            // إذا كان الخطأ الحقيقي = 0، يكون أحمر (ضعيف) وناجح
+            if ($errors > 0) {
+                return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
+            }
+            return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
         } elseif ($totalEquivalent >= 3) {
             // 3 خطأ equivalent أو أكثر
             return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
