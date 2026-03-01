@@ -26,6 +26,64 @@
 @endsection
 
 @section('content')
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('parent.sessions.index') }}" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">الطالب</label>
+                <select name="student_id" class="form-select">
+                    <option value="">كل الطلاب</option>
+                    @foreach($students as $student)
+                        <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
+                            {{ $student->user->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">نوع الجلسة</label>
+                <select name="type" class="form-select">
+                    <option value="all" {{ request('type', 'all') == 'all' ? 'selected' : '' }}>الكل</option>
+                    <option value="new_memorization" {{ request('type') == 'new_memorization' ? 'selected' : '' }}>حفظ جديد</option>
+                    <option value="review" {{ request('type') == 'review' ? 'selected' : '' }}>مراجعة</option>
+                    <option value="unmastered" {{ request('type') == 'unmastered' ? 'selected' : '' }}>غير متقن</option>
+                    <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>تلاوة</option>
+                    <option value="mafsil" {{ request('type') == 'mafsil' ? 'selected' : '' }}>مفصل</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">الفترة</label>
+                <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">
+                    <option value="all" {{ request('period', 'all') == 'all' ? 'selected' : '' }}>الكل</option>
+                    <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>اليوم</option>
+                    <option value="week" {{ request('period') == 'week' ? 'selected' : '' }}>الأسبوع</option>
+                    <option value="month" {{ request('period') == 'month' ? 'selected' : '' }}>الشهر</option>
+                    <option value="custom" {{ request('period') == 'custom' ? 'selected' : '' }}>مخصص</option>
+                </select>
+            </div>
+            <div class="col-md-2 custom-date-range" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
+                <label class="form-label">من تاريخ</label>
+                <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
+            </div>
+            <div class="col-md-2 custom-date-range" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
+                <label class="form-label">إلى تاريخ</label>
+                <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <a href="{{ route('parent.sessions.index') }}" class="btn btn-outline-secondary w-100" title="إعادة تعيين">
+                    <i class="fas fa-redo"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">
@@ -144,4 +202,23 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+function handlePeriodChange() {
+    var period = document.getElementById('periodSelect').value;
+    var customDateFields = document.querySelectorAll('.custom-date-range');
+
+    if (period === 'custom') {
+        customDateFields.forEach(function(field) {
+            field.style.display = 'block';
+        });
+    } else {
+        customDateFields.forEach(function(field) {
+            field.style.display = 'none';
+        });
+    }
+}
+</script>
+@endpush
 @endsection

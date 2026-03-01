@@ -10,25 +10,51 @@ class ReportController extends Controller {
         $parent = Auth::user()->parentProfile()->with('students.user', 'students.level', 'students.supervisor')->first();
         $students = $parent->students;
 
-        // Date range filtering
-        $fromDate = request('from_date') ? Carbon::parse(request('from_date')) : Carbon::now()->startOfMonth();
-        $toDate = request('to_date') ? Carbon::parse(request('to_date')) : Carbon::now()->endOfDay();
+        // Handle period filter
+        $period = request('period', 'month');
+        switch ($period) {
+            case 'today':
+                $fromDate = Carbon::now()->startOfDay();
+                $toDate = Carbon::now()->endOfDay();
+                break;
+            case 'week':
+                $fromDate = Carbon::now()->startOfWeek();
+                $toDate = Carbon::now()->endOfWeek();
+                break;
+            case 'month':
+                $fromDate = Carbon::now()->startOfMonth();
+                $toDate = Carbon::now()->endOfMonth();
+                break;
+            case 'custom':
+                $fromDate = Carbon::parse(request('from_date', Carbon::now()->startOfMonth()));
+                $toDate = Carbon::parse(request('to_date', Carbon::now()));
+                break;
+            case 'all':
+            default:
+                $fromDate = null;
+                $toDate = null;
+                break;
+        }
 
         $studentIds = $students->pluck('id');
 
         // Get sessions statistics
-        $sessions = RecitationSession::whereIn('student_id', $studentIds)
-            ->whereBetween('session_date', [$fromDate, $toDate])
-            ->get();
+        $sessionsQuery = RecitationSession::whereIn('student_id', $studentIds);
+        if ($fromDate && $toDate) {
+            $sessionsQuery->whereBetween('session_date', [$fromDate, $toDate]);
+        }
+        $sessions = $sessionsQuery->get();
 
         $totalSessions = $sessions->count();
         $passedSessions = $sessions->where('status', 'passed')->count();
         $failedSessions = $sessions->whereIn('status', ['failed', 'failed_continued'])->count();
 
         // Get attendance statistics
-        $attendances = Attendance::whereIn('student_id', $studentIds)
-            ->whereBetween('date', [$fromDate, $toDate])
-            ->get();
+        $attendancesQuery = Attendance::whereIn('student_id', $studentIds);
+        if ($fromDate && $toDate) {
+            $attendancesQuery->whereBetween('date', [$fromDate, $toDate]);
+        }
+        $attendances = $attendancesQuery->get();
 
         $totalAttendances = $attendances->count();
         $presentCount = $attendances->where('status', 'present')->count();

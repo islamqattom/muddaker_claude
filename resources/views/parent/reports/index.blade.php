@@ -30,13 +30,23 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('parent.reports.index') }}" class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">من تاريخ</label>
-                <input type="date" name="from_date" class="form-control" value="{{ $fromDate->format('Y-m-d') }}">
+            <div class="col-md-2">
+                <label class="form-label">الفترة</label>
+                <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">
+                    <option value="all" {{ request('period', 'month') == 'all' ? 'selected' : '' }}>الكل</option>
+                    <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>اليوم</option>
+                    <option value="week" {{ request('period') == 'week' ? 'selected' : '' }}>الأسبوع</option>
+                    <option value="month" {{ request('period', 'month') == 'month' ? 'selected' : '' }}>الشهر</option>
+                    <option value="custom" {{ request('period') == 'custom' ? 'selected' : '' }}>مخصص</option>
+                </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3 custom-date-range" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
+                <label class="form-label">من تاريخ</label>
+                <input type="date" name="from_date" class="form-control" value="{{ optional($fromDate)->format('Y-m-d') }}">
+            </div>
+            <div class="col-md-3 custom-date-range" style="display: {{ request('period') == 'custom' ? 'block' : 'none' }};">
                 <label class="form-label">إلى تاريخ</label>
-                <input type="date" name="to_date" class="form-control" value="{{ $toDate->format('Y-m-d') }}">
+                <input type="date" name="to_date" class="form-control" value="{{ optional($toDate)->format('Y-m-d') }}">
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">
@@ -292,4 +302,23 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function handlePeriodChange() {
+    var period = document.getElementById('periodSelect').value;
+    var customDateFields = document.querySelectorAll('.custom-date-range');
+
+    if (period === 'custom') {
+        customDateFields.forEach(function(field) {
+            field.style.display = 'block';
+        });
+    } else {
+        customDateFields.forEach(function(field) {
+            field.style.display = 'none';
+        });
+    }
+}
+</script>
+@endpush
 @endsection
