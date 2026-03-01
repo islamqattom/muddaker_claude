@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ParentController extends Controller {
-    public function index() { $parents = User::where('role','parent')->with('parentProfile')->paginate(20); return view('admin.parents.index', compact('parents')); }
+    public function index() { $parents = User::where('role','parent')->with('parentProfile.students')->paginate(20); return view('admin.parents.index', compact('parents')); }
     public function create() { $students = Student::with('user')->get(); return view('admin.parents.create', compact('students')); }
     public function store(Request $request) {
         $request->validate([

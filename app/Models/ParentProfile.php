@@ -32,4 +32,13 @@ class ParentProfile extends Model
             default => $this->relationship,
         };
     }
+
+    public function getStudentsCountAttribute(): int
+    {
+        // Use loaded relationship count if already eager loaded, otherwise query
+        if ($this->relationLoaded('students')) {
+            return $this->students->count();
+        }
+        return $this->students()->count();
+    }
 }
