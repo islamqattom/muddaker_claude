@@ -19,7 +19,7 @@
         <form method="GET" action="{{ route('admin.sessions.index') }}" class="row g-3 align-items-end">
             <div class="col-md-2">
                 <label class="form-label">المشرف</label>
-                <select name="supervisor_id" class="form-select">
+                <select name="supervisor_id" class="form-select" id="supervisorSelect" onchange="filterStudents()">
                     <option value="">-- جميع المشرفين --</option>
                     @foreach($supervisors as $supervisor)
                         <option value="{{ $supervisor->id }}" {{ request('supervisor_id') == $supervisor->id ? 'selected' : '' }}>
@@ -30,10 +30,12 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label">الطالب</label>
-                <select name="student_id" class="form-select">
+                <select name="student_id" class="form-select" id="studentSelect">
                     <option value="">-- جميع الطلاب --</option>
                     @foreach($students as $student)
-                        <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
+                        <option value="{{ $student->id }}"
+                                data-supervisor-id="{{ $student->supervisor_id }}"
+                                {{ request('student_id') == $student->id ? 'selected' : '' }}>
                             {{ $student->user->name }}
                         </option>
                     @endforeach
@@ -198,5 +200,33 @@ function handlePeriodChange() {
         toDateCol.style.display = 'none';
     }
 }
+
+function filterStudents() {
+    const supervisorSelect = document.getElementById('supervisorSelect');
+    const studentSelect = document.getElementById('studentSelect');
+    const selectedSupervisorId = supervisorSelect.value;
+
+    const studentOptions = studentSelect.querySelectorAll('option');
+
+    studentOptions.forEach(option => {
+        if (option.value === '') return; // Skip the default option
+
+        const studentSupervisorId = option.getAttribute('data-supervisor-id');
+
+        if (!selectedSupervisorId || studentSupervisorId === selectedSupervisorId) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+
+    // Reset student selection when supervisor changes
+    studentSelect.value = '';
+}
+
+// Initialize student filter on page load
+document.addEventListener('DOMContentLoaded', function() {
+    filterStudents();
+});
 </script>
 @endpush
