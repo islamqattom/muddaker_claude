@@ -45,20 +45,8 @@ class StudentController extends Controller {
             'birth_date' => 'nullable|date',
             'address' => 'nullable|string',
             'notes' => 'nullable|string',
-            'image' => 'nullable|file|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
-
-        // Debug: Log file info
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            Log::info('File info: ' . json_encode([
-                'name' => $file->getClientOriginalName(),
-                'extension' => $file->getClientOriginalExtension(),
-                'mime' => $file->getMimeType(),
-                'size' => $file->getSize(),
-                'isValid' => $file->isValid(),
-            ]));
-        }
 
         $uploadError = null;
         $avatarPath = null;
@@ -66,14 +54,13 @@ class StudentController extends Controller {
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             try {
-                $filename = uniqid('avatar_') . '.' . $file->getClientOriginalExtension();
+                $filename = uniqid('avatar_') . '.' . $file->extension();
                 $destinationPath = storage_path('app/public/avatars');
                 if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0777, true);
+                    mkdir($destinationPath, 0755, true);
                 }
                 $file->move($destinationPath, $filename);
                 $avatarPath = 'avatars/' . $filename;
-                Log::info('Storage result: ' . $avatarPath);
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage() . ' | File: ' . $file->getClientOriginalName());
                 $uploadError = 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.';
@@ -137,7 +124,7 @@ class StudentController extends Controller {
             'phone' => 'nullable|string|unique:users,phone,' . $student->user_id,
             'email' => 'nullable|email|unique:users,email,' . $student->user_id,
             'level_id' => 'required|exists:levels,id',
-            'image' => 'nullable|file|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
         $newAvatarPath = null;
@@ -156,14 +143,13 @@ class StudentController extends Controller {
             }
             try {
                 $file = $request->file('image');
-                $filename = uniqid('avatar_') . '.' . $file->getClientOriginalExtension();
+                $filename = uniqid('avatar_') . '.' . $file->extension();
                 $destinationPath = storage_path('app/public/avatars');
                 if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0777, true);
+                    mkdir($destinationPath, 0755, true);
                 }
                 $file->move($destinationPath, $filename);
                 $newAvatarPath = 'avatars/' . $filename;
-                Log::info('New avatar uploaded: ' . $newAvatarPath);
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage());
                 return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');

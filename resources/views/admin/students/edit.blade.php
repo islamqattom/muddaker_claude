@@ -38,9 +38,23 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.students.update', $student->id) }}">
+                <form method="POST" action="{{ route('admin.students.update', $student->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">صورة الملف الشخصي</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:70px;height:70px;object-fit:cover;">
+                            <div>
+                                <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                                <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
+                            </div>
+                        </div>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <h6 class="border-bottom pb-2 mb-3 text-primary">
                         <i class="fas fa-user me-1"></i>معلومات الحساب

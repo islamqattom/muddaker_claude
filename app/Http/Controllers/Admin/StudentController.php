@@ -7,6 +7,7 @@ use App\Models\{Student, User, Level, Supervisor};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -56,9 +57,27 @@ class StudentController extends Controller
             'address' => 'nullable|string',
             'enrollment_date' => 'nullable|date',
             'notes' => 'nullable|string',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
-        DB::transaction(function() use ($request) {
+        $avatarPath = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            try {
+                $filename = uniqid('avatar_') . '.' . $file->extension();
+                $destinationPath = storage_path('app/public/avatars');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                $file->move($destinationPath, $filename);
+                $avatarPath = 'avatars/' . $filename;
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+                return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        DB::transaction(function() use ($request, $avatarPath) {
             $user = User::create([
                 'name' => $request->name,
                 'username' => $request->username,
@@ -66,6 +85,7 @@ class StudentController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'student',
+                'avatar' => $avatarPath,
             ]);
 
             $lastStudent = Student::orderBy('id', 'desc')->first();
@@ -125,15 +145,51 @@ class StudentController extends Controller
             'email' => 'nullable|email|unique:users,email,' . $student->user_id,
             'level_id' => 'required|exists:levels,id',
             'supervisor_id' => 'required|exists:users,id',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
-        DB::transaction(function() use ($request, $student) {
-            $student->user->update([
+        $newAvatarPath = null;
+
+        if ($request->hasFile('image')) {
+            // Delete old avatar if exists
+            if ($student->user->avatar) {
+                try {
+                    $oldPath = storage_path('app/public/' . $student->user->avatar);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to delete old avatar: ' . $e->getMessage());
+                }
+            }
+            try {
+                $file = $request->file('image');
+                $filename = uniqid('avatar_') . '.' . $file->extension();
+                $destinationPath = storage_path('app/public/avatars');
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+                $file->move($destinationPath, $filename);
+                $newAvatarPath = 'avatars/' . $filename;
+            } catch (\Exception $e) {
+                Log::error('Image upload failed: ' . $e->getMessage());
+                return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        DB::transaction(function() use ($request, $student, $newAvatarPath) {
+            $userData = [
                 'name' => $request->name,
                 'username' => $request->username,
                 'phone' => $request->phone,
                 'email' => $request->email,
-            ]);
+            ];
+
+            if ($newAvatarPath) {
+                $userData['avatar'] = $newAvatarPath;
+            }
+
+            $student->user->update($userData);
 
             if ($request->password) {
                 $student->user->update(['password' => Hash::make($request->password)]);

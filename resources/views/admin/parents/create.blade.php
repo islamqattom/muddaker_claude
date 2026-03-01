@@ -38,8 +38,17 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.parents.store') }}">
+                <form method="POST" action="{{ route('admin.parents.store') }}" enctype="multipart/form-data">
                     @csrf
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">صورة الملف الشخصي</label>
+                        <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                        <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp (الحد الأقصى 10MB)</small>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">اسم ولي الأمر <span class="text-danger">*</span></label>

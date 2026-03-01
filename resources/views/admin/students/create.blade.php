@@ -38,12 +38,21 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.students.store') }}">
+                <form method="POST" action="{{ route('admin.students.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <h6 class="border-bottom pb-2 mb-3 text-primary">
                         <i class="fas fa-user me-1"></i>معلومات الحساب
                     </h6>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">صورة الملف الشخصي</label>
+                        <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                        <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp (الحد الأقصى 10MB)</small>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="row">
                         <div class="col-md-6">

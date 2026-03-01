@@ -13,9 +13,23 @@
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.profile.update') }}">
+                <form method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">صورة الملف الشخصي</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ $user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">
+                            <div>
+                                <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                                <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
+                            </div>
+                        </div>
+                        @error('image')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">الاسم</label>

@@ -29,7 +29,7 @@
                         <div class="col-12 mb-3">
                             <label class="form-label">صورة الطالب</label>
                             <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
-                            <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp (الحد الأقصى 2MB)</small>
+                            <small class="text-muted">الصيغ المدعومة: jpeg, png, jpg, gif, webp (الحد الأقصى 10MB)</small>
                             @error('image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
