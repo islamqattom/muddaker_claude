@@ -84,13 +84,14 @@ class DashboardController extends Controller
             ->unique()
             ->values();
 
-        // Get distinct part numbers from recitation sessions
+        // Get distinct part_ids from recitation sessions (join to quran_pages to get part_id)
         $recitationParts = DB::table('recitation_sessions')
             ->join('recitation_pages', 'recitation_sessions.id', '=', 'recitation_pages.session_id')
+            ->join('quran_pages', 'recitation_pages.page_id', '=', 'quran_pages.id')
             ->where('recitation_sessions.student_id', $studentId)
             ->where('recitation_sessions.type', 'recitation')
             ->distinct()
-            ->pluck('recitation_pages.page_number')
+            ->pluck('quran_pages.part_id')
             ->filter()
             ->unique()
             ->values();
