@@ -15,15 +15,23 @@
 @section('content')
 <div class="card mb-4">
     <div class="card-body">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label">نوع الإنذار</label>
-                <select class="form-select" onchange="window.location='{{ route('admin.warnings.index') }}?type='+this.value">
-                    <option value="">جميع الأنواع</option>
-                    <option value="attendance" {{ request('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
-                    <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>إنذار تسميع</option>
-                    <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>إنذار عام</option>
-                </select>
+        <div class="d-flex justify-content-between align-items-end">
+            <div class="row g-3 align-items-end flex-grow-1">
+                <div class="col-md-3">
+                    <label class="form-label">نوع الإنذار</label>
+                    <select class="form-select" onchange="window.location='{{ route('admin.warnings.index') }}?type='+this.value">
+                        <option value="">جميع الأنواع</option>
+                        <option value="attendance" {{ request('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
+                        <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>إنذار تسميع</option>
+                        <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>إنذار عام</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <a href="{{ route('admin.warnings.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    إضافة إنذار
+                </a>
             </div>
         </div>
     </div>
