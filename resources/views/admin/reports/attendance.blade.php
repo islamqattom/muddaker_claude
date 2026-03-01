@@ -78,9 +78,9 @@
                                 </div>
                             </td>
                             <td>{{ $attendance->supervisor->name ?? '-' }}</td>
-                            <td>{{ $attendance->date?->format('d/m/Y') }}</td>
-                            <td>{{ $attendance->arrival_time?->format('H:i') ?? '-' }}</td>
-                            <td>{{ $attendance->departure_time?->format('H:i') ?? '-' }}</td>
+                            <td>{{ $attendance->date ?? '-' }}</td>
+                            <td>{{ $attendance->arrival_time ?? '-' }}</td>
+                            <td>{{ $attendance->departure_time ?? '-' }}</td>
                             <td>
                                 @if($attendance->status === 'present')
                                     <span class="badge bg-success">حاضر</span>
