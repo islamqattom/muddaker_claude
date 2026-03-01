@@ -61,11 +61,33 @@
                                 <span class="badge bg-info">{{ $session->type_label }}</span>
                             </td>
                             <td>
-                                @if($session->part)
-                                    <span class="fw-semibold">جزء {{ $session->part->part_number }}</span>
+                                @if($session->type === 'mafsil')
+                                    {{-- mafsil sessions: show all parts from pages --}}
+                                    @php
+                                        $partNumbers = $session->pages->pluck('page_number')->toArray();
+                                    @endphp
+                                    @if(count($partNumbers) > 0)
+                                        <span class="fw-semibold">أجزاء {{ implode(', ', $partNumbers) }}</span>
+                                    @elseif($session->part)
+                                        <span class="fw-semibold">جزء {{ $session->part->part_number }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
+                                    {{-- unmastered, review, new_memorization: show pages --}}
+                                    @if($session->start_page === $session->end_page)
+                                        <span>صفحة {{ $session->start_page }}</span>
+                                    @else
+                                        <span>{{ $session->start_page }} - {{ $session->end_page }}</span>
+                                    @endif
                                 @else
-                                    <span>{{ $session->start_page }} - {{ $session->end_page }}</span>
-                                    <span class="text-muted">(صفحات)</span>
+                                    {{-- recitation and other types: show part if exists, otherwise pages --}}
+                                    @if($session->part)
+                                        <span class="fw-semibold">جزء {{ $session->part->part_number }}</span>
+                                    @else
+                                        <span>{{ $session->start_page }} - {{ $session->end_page }}</span>
+                                        <span class="text-muted">(صفحات)</span>
+                                    @endif
                                 @endif
                             </td>
                             <td>

@@ -10,7 +10,7 @@ class SessionController extends Controller {
         $studentIds = $parent->students->pluck('id');
 
         $sessions = RecitationSession::whereIn('student_id', $studentIds)
-            ->with('student.user', 'part')
+            ->with('student.user', 'part', 'pages')
             ->latest()
             ->paginate(20);
 

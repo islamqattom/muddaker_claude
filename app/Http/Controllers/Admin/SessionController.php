@@ -38,7 +38,7 @@ class SessionController extends Controller {
                 break;
         }
 
-        $query = RecitationSession::with('student.user', 'part', 'supervisor');
+        $query = RecitationSession::with('student.user', 'part', 'pages', 'supervisor');
 
         // Filter by supervisor (supervisor_id is now the user_id of the supervisor)
         if ($request->supervisor_id) {

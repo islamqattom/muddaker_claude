@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <input type="hidden" name="type" value="mafsil">
     <input type="hidden" name="mafsil_type" value="{{ $mafsilType }}">
     <input type="hidden" name="session_date" value="{{ date('Y-m-d') }}">
+    <input type="hidden" name="part_id" value="{{ $parts->first()->id ?? '' }}">
 
     <div class="card">
         <div class="card-header">
