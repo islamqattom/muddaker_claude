@@ -61,6 +61,7 @@
 
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
+            background: #fafbfc;
         }
 
         .sidebar.collapsed .sidebar-logo h6,
@@ -73,19 +74,61 @@
         .sidebar.collapsed .sidebar-logo img {
             width: 40px;
             height: 40px;
+            object-fit: contain;
         }
 
         .sidebar.collapsed .sidebar-logo {
-            padding: 20px 10px;
+            padding: 15px 10px;
+            border-bottom: none;
+        }
+
+        .sidebar.collapsed .sidebar-footer {
+            display: none;
         }
 
         .sidebar.collapsed .sidebar-nav .nav-link {
             justify-content: center;
             padding: 12px;
+            position: relative;
+            font-size: 0;
         }
 
         .sidebar.collapsed .sidebar-nav .nav-link i {
             margin: 0;
+            font-size: 18px;
+        }
+
+        .sidebar.collapsed .sidebar-nav .nav-link .badge {
+            font-size: 10px;
+        }
+
+        /* Tooltip for collapsed sidebar */
+        .sidebar.collapsed .nav-link[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            white-space: nowrap;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            font-weight: 500;
+        }
+
+        .sidebar.collapsed .nav-link[data-tooltip]:hover::before {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 7px solid transparent;
+            border-right-color: var(--primary);
+            z-index: 1001;
         }
 
         /* Sidebar Toggle Button */
@@ -116,6 +159,7 @@
         .sidebar-logo img {
             width: 60px;
             height: 60px;
+            object-fit: contain;
         }
 
         .sidebar-logo h6 {
@@ -492,7 +536,7 @@
             <i class="fas fa-times"></i>
         </button>
         <div class="sidebar-logo">
-            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo" style="width:140px;height:100px;">
+            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo">
             <h6></h6>
             <small>نظام التسميع الإلكتروني</small>
         </div>
@@ -501,7 +545,7 @@
             @yield('sidebar-menu')
         </div>
 
-        <div style="padding: 15px 20px; border-top: 1px solid #e9ecef; margin-top: auto;">
+        <div class="sidebar-footer" style="padding: 15px 20px; border-top: 1px solid #e9ecef; margin-top: auto;">
             <div style="color: #6c757d; font-size: 11px; text-align: center;">
                 النسخة 1.0.0 | {{ date('Y') }}
             </div>
@@ -646,6 +690,27 @@
             // Save state to localStorage
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebar_collapsed', isCollapsed);
+
+            // Update nav link titles for collapsed state
+            updateNavTooltips();
+        }
+
+        // Add tooltips to collapsed sidebar nav items
+        function updateNavTooltips() {
+            const sidebar = document.getElementById('sidebar');
+            const navLinks = sidebar.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (sidebar.classList.contains('collapsed')) {
+                    // Get the text content from the link (excluding the icon)
+                    const text = link.cloneNode(true);
+                    text.querySelector('i')?.remove();
+                    const title = text.textContent.trim();
+                    link.setAttribute('data-tooltip', title);
+                } else {
+                    link.removeAttribute('data-tooltip');
+                }
+            });
         }
 
         // Mobile sidebar toggle (slides in/out)
@@ -708,6 +773,7 @@
                 if (isCollapsed) {
                     sidebar.classList.add('collapsed');
                     mainContent.classList.add('sidebar-collapsed');
+                    updateNavTooltips();
                 }
             }
         });
