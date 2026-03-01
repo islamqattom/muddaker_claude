@@ -48,34 +48,6 @@
     </div>
 </div>
 
-<!-- Stats -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-success fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['present'] }}</div>
-            <small class="text-muted">حضور</small>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-danger fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['absent'] }}</div>
-            <small class="text-muted">غياب</small>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-primary fw-bold" style="font-size:1.5rem;">{{ $sessionStats['total'] }}</div>
-            <small class="text-muted">جلسات</small>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['new_memorization'] }}</div>
-            <small class="text-muted">صفحات</small>
-        </div>
-    </div>
-</div>
-
 <!-- Color Guide -->
 <div class="row g-4 mb-4">
     <div class="col-12">
@@ -120,6 +92,34 @@
                     <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card text-center p-3">
+            <div class="text-success fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['present'] }}</div>
+            <small class="text-muted">حضور</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card text-center p-3">
+            <div class="text-danger fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['absent'] }}</div>
+            <small class="text-muted">غياب</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card text-center p-3">
+            <div class="text-primary fw-bold" style="font-size:1.5rem;">{{ $sessionStats['total'] }}</div>
+            <small class="text-muted">جلسات</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card text-center p-3">
+            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['new_memorization'] }}</div>
+            <small class="text-muted">صفحات</small>
         </div>
     </div>
 </div>
