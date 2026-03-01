@@ -44,8 +44,20 @@ class ReportController extends Controller {
             ->unique()
             ->values();
 
-        // Get distinct part_ids from recitation sessions (join to quran_pages to get part_id)
-        $recitationParts = DB::table('recitation_sessions')
+        // Get distinct part_ids from recitation sessions:
+        // 1. From part_id field in recitation_sessions table
+        $recitationFromPartId = DB::table('recitation_sessions')
+            ->where('student_id', $studentId)
+            ->where('type', 'recitation')
+            ->whereNotNull('part_id')
+            ->distinct()
+            ->pluck('part_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        // 2. From recitation_pages with page_id joined to quran_pages
+        $recitationFromPages = DB::table('recitation_sessions')
             ->join('recitation_pages', 'recitation_sessions.id', '=', 'recitation_pages.session_id')
             ->join('quran_pages', 'recitation_pages.page_id', '=', 'quran_pages.id')
             ->where('recitation_sessions.student_id', $studentId)
@@ -55,6 +67,9 @@ class ReportController extends Controller {
             ->filter()
             ->unique()
             ->values();
+
+        // Combine both sources for recitation parts
+        $recitationParts = $recitationFromPartId->merge($recitationFromPages)->unique()->values();
 
         // Return: mafsil parts + recitation parts (excluding those in mafsil)
         return $mafselParts->count() + $recitationParts->diff($mafselParts)->count();
