@@ -1,10 +1,15 @@
 <?php
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
-use App\Models\{Student, Attendance, RecitationSession, User};
+use App\Models\{Student, Supervisor, Attendance, RecitationSession, User};
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use TCPDF;
+
+// Define PDF_UNIT if not already defined
+if (!defined('PDF_UNIT')) {
+    define('PDF_UNIT', 'mm');
+}
 
 class ReportController extends Controller {
     public function index() {
@@ -17,17 +22,68 @@ class ReportController extends Controller {
         return view('admin.reports.index', compact('stats'));
     }
     public function recitation(Request $request) {
-        $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
-        $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
-        $sessions = RecitationSession::with(['student.user','supervisor','part'])->whereBetween('session_date',[$fromDate,$toDate])->latest()->paginate(30);
-        $supervisors = User::where('role','supervisor')->get();
+        $period = $request->period ?? 'all';
+        switch ($period) {
+            case 'today':
+                $fromDate = Carbon::now()->startOfDay();
+                $toDate = Carbon::now()->endOfDay();
+                break;
+            case 'week':
+                $fromDate = Carbon::now()->startOfWeek();
+                $toDate = Carbon::now()->endOfWeek();
+                break;
+            case 'month':
+                $fromDate = Carbon::now()->startOfMonth();
+                $toDate = Carbon::now()->endOfMonth();
+                break;
+            case 'custom':
+                $fromDate = Carbon::parse($request->from_date ?? Carbon::now()->startOfMonth());
+                $toDate = Carbon::parse($request->to_date ?? Carbon::now());
+                break;
+            default:
+                $fromDate = null;
+                $toDate = null;
+                break;
+        }
+
+        $query = RecitationSession::with(['student.user','supervisor','part']);
+
+        // Filter by supervisor
+        if ($request->supervisor_id) {
+            $query->whereHas('student', fn($q) => $q->where('supervisor_id', $request->supervisor_id));
+        }
+
+        // Filter by student
+        if ($request->student_id) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        // Filter by date period
+        if ($fromDate && $toDate) {
+            $query->whereBetween('session_date', [$fromDate, $toDate]);
+        }
+
+        $sessions = $query->latest()->paginate(30);
+
+        // Get data for dropdowns
+        $supervisors = Supervisor::with('user')->get();
         $students = Student::with('user')->get();
         if ($request->export === 'pdf') {
-            // Get all sessions for PDF (not paginated)
-            $allSessions = RecitationSession::with(['student.user','supervisor','part'])
-                ->whereBetween('session_date',[$fromDate,$toDate])
-                ->orderBy('session_date', 'desc')
-                ->get();
+            // Get all sessions for PDF (not paginated) - apply same filters
+            $pdfQuery = RecitationSession::with(['student.user','supervisor','part']);
+
+            // Apply same filters as main query
+            if ($request->supervisor_id) {
+                $pdfQuery->whereHas('student', fn($q) => $q->where('supervisor_id', $request->supervisor_id));
+            }
+            if ($request->student_id) {
+                $pdfQuery->where('student_id', $request->student_id);
+            }
+            if ($fromDate && $toDate) {
+                $pdfQuery->whereBetween('session_date', [$fromDate, $toDate]);
+            }
+
+            $allSessions = $pdfQuery->orderBy('session_date', 'desc')->get();
 
             $stats = [
                 'total' => $allSessions->count(),
@@ -70,7 +126,10 @@ class ReportController extends Controller {
         $pdf->SetFontSize(18);
         $pdf->Cell(0, 10, 'تقرير جلسات التسميع', 0, true, 'C', 0);
         $pdf->SetFontSize(12);
-        $pdf->Cell(0, 8, 'الفترة: ' . $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d'), 0, true, 'C', 0);
+        $dateRange = ($fromDate && $toDate)
+            ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d')
+            : 'الكل';
+        $pdf->Cell(0, 8, 'الفترة: ' . $dateRange, 0, true, 'C', 0);
         $pdf->Ln(5);
 
         // Stats row
@@ -141,12 +200,59 @@ class ReportController extends Controller {
         $pdf->Cell(0, 10, 'نظام تسميع القرآن الكريم - تم إنشاء التقرير في ' . now()->format('Y/m/d H:i'), 0, true, 'C', 0);
 
         // Output
-        return $pdf->Output('تقرير-التسميع-' . $fromDate->format('Y-m-d') . '.pdf', 'D');
+        $filename = $fromDate
+            ? 'تقرير-التسميع-' . $fromDate->format('Y-m-d') . '.pdf'
+            : 'تقرير-التسميع-الكل.pdf';
+        return $pdf->Output($filename, 'D');
     }
     public function attendance(Request $request) {
-        $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
-        $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
-        $attendances = Attendance::with(['student.user','supervisor'])->whereBetween('date',[$fromDate,$toDate])->latest('date')->paginate(30);
-        return view('admin.reports.attendance', compact('attendances','fromDate','toDate'));
+        $period = $request->period ?? 'all';
+        switch ($period) {
+            case 'today':
+                $fromDate = Carbon::now()->startOfDay();
+                $toDate = Carbon::now()->endOfDay();
+                break;
+            case 'week':
+                $fromDate = Carbon::now()->startOfWeek();
+                $toDate = Carbon::now()->endOfWeek();
+                break;
+            case 'month':
+                $fromDate = Carbon::now()->startOfMonth();
+                $toDate = Carbon::now()->endOfMonth();
+                break;
+            case 'custom':
+                $fromDate = Carbon::parse($request->from_date ?? Carbon::now()->startOfMonth());
+                $toDate = Carbon::parse($request->to_date ?? Carbon::now());
+                break;
+            default:
+                $fromDate = null;
+                $toDate = null;
+                break;
+        }
+
+        $query = Attendance::with(['student.user','supervisor']);
+
+        // Filter by supervisor
+        if ($request->supervisor_id) {
+            $query->whereHas('student', fn($q) => $q->where('supervisor_id', $request->supervisor_id));
+        }
+
+        // Filter by student
+        if ($request->student_id) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        // Filter by date period
+        if ($fromDate && $toDate) {
+            $query->whereBetween('date', [$fromDate, $toDate]);
+        }
+
+        $attendances = $query->latest('date')->paginate(30);
+
+        // Get data for dropdowns
+        $supervisors = Supervisor::with('user')->get();
+        $students = Student::with('user')->get();
+
+        return view('admin.reports.attendance', compact('attendances','supervisors','students','fromDate','toDate'));
     }
 }
