@@ -42,7 +42,7 @@
 <form id="recitationForm">
     @csrf
     <input type="hidden" name="student_id" value="{{ $student->id }}">
-    <input type="hidden" name="type" value="new_memorization">
+    <input type="hidden" name="type" value="unmastered">
     <input type="hidden" name="part_id" value="{{ $part->id }}">
     <input type="hidden" name="session_date" value="{{ date('Y-m-d') }}">
 
