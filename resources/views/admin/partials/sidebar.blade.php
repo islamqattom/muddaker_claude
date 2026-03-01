@@ -20,7 +20,7 @@
     <i class="fas fa-cog"></i> إعدادات النظام
 </a>
 <span class="nav-section-title mt-2">التقارير والإنذارات</span>
-<a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
+<a href="{{ route('admin.sessions.index') }}" class="nav-link {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
     <i class="fas fa-microphone"></i> جلسات التسميع
 </a>
 <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">

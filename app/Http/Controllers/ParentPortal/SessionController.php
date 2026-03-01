@@ -16,4 +16,10 @@ class SessionController extends Controller {
 
         return view('parent.sessions.index', compact('sessions'));
     }
+
+    public function show(RecitationSession $session) {
+        $session->load(['student.user', 'part', 'pages', 'supervisor']);
+
+        return view('parent.sessions.show', compact('session'));
+    }
 }

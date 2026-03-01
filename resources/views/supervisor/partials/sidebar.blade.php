@@ -19,7 +19,7 @@
 </a>
 
 <span class="nav-section-title mt-2">التسميع</span>
-<a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
+<a href="{{ route('supervisor.sessions.index') }}" class="nav-link {{ request()->routeIs('supervisor.sessions.*') ? 'active' : '' }}">
     <i class="fas fa-microphone"></i> جلسات التسميع
 </a>
 <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.index') ? 'active' : '' }}">

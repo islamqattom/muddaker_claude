@@ -55,6 +55,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Profile
     Route::get('/profile', [Admin\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Sessions
+    Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');
+    Route::get('/sessions/{session}', [Admin\SessionController::class, 'show'])->name('sessions.show');
 });
 
 // ============================
@@ -118,12 +122,16 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Profile
     Route::get('/profile', [Supervisor\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [Supervisor\ProfileController::class, 'update'])->name('profile.update');
+
+    // Sessions
+    Route::get('/sessions', [Supervisor\SessionController::class, 'index'])->name('sessions.index');
+    Route::get('/sessions/{session}', [Supervisor\SessionController::class, 'show'])->name('sessions.show');
 });
 
 // ============================
 // STUDENT ROUTES
 // ============================
-Route::prefix('student')->name('student.')->middleware(['auth', 'role:student,parent,supervisor,admin'])->group(function () {
+Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [Student\DashboardController::class, 'index'])->name('dashboard');
@@ -161,6 +169,7 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
 
     // View child's sessions
     Route::get('/sessions', [ParentPortal\SessionController::class, 'index'])->name('sessions.index');
+    Route::get('/sessions/{session}', [ParentPortal\SessionController::class, 'show'])->name('sessions.show');
 
     // View child's attendance
     Route::get('/attendance', [ParentPortal\AttendanceController::class, 'index'])->name('attendance.index');
