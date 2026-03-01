@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#182B48">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مدكر">
+    <link rel="manifest" href="/manifest.json">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'نظام تسميع القرآن الكريم') - مشروع مدكر القرآني</title>
 
@@ -729,6 +737,21 @@
         $.ajaxSetup({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
         });
+    </script>
+
+    <!-- PWA Service Worker -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('SW registered:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('SW registration failed:', error);
+                });
+        });
+    }
     </script>
 
     @stack('scripts')

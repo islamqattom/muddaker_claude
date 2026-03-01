@@ -1,0 +1,24 @@
+{
+    "name": "مشروع مدكر القرآني",
+    "short_name": "مدكر",
+    "description": "نظام تسميع القرآن الكريم الإلكتروني",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#182B48",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/images/muddaker-logo-main-nobg.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/muddaker-logo-main-nobg.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "lang": "ar",
+    "dir": "rtl"
+}
