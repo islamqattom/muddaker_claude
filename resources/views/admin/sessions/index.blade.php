@@ -14,6 +14,69 @@
 @endsection
 
 @section('content')
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.sessions.index') }}" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">المشرف</label>
+                <select name="supervisor_id" class="form-select">
+                    <option value="">-- جميع المشرفين --</option>
+                    @foreach($supervisors as $supervisor)
+                        <option value="{{ $supervisor->id }}" {{ request('supervisor_id') == $supervisor->id ? 'selected' : '' }}>
+                            {{ $supervisor->user->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">الطالب</label>
+                <select name="student_id" class="form-select">
+                    <option value="">-- جميع الطلاب --</option>
+                    @foreach($students as $student)
+                        <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
+                            {{ $student->user->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">نوع التسميع</label>
+                <select name="type" class="form-select">
+                    <option value="all" {{ request('type', 'all') == 'all' ? 'selected' : '' }}>الكل</option>
+                    <option value="new_memorization" {{ request('type') == 'new_memorization' ? 'selected' : '' }}>حفظ جديد</option>
+                    <option value="review" {{ request('type') == 'review' ? 'selected' : '' }}>مراجعة</option>
+                    <option value="unmastered" {{ request('type') == 'unmastered' ? 'selected' : '' }}>حفظ غير متقن</option>
+                    <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>سرد</option>
+                    <option value="mafsil" {{ request('type') == 'mafsil' ? 'selected' : '' }}>مفصل</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">الفترة</label>
+                <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">
+                    <option value="all" {{ request('period') == 'all' ? 'selected' : '' }}>الكل</option>
+                    <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>اليوم</option>
+                    <option value="week" {{ request('period') == 'week' ? 'selected' : '' }}>أسبوع</option>
+                    <option value="month" {{ request('period') == 'month' ? 'selected' : '' }}>شهر</option>
+                    <option value="custom" {{ request('period') == 'custom' ? 'selected' : '' }}>مخصص</option>
+                </select>
+            </div>
+            <div class="col-md-2" id="fromDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
+                <label class="form-label">من تاريخ</label>
+                <input type="date" name="from_date" class="form-control" value="{{ request('from_date', now()->startOfMonth()->toDateString()) }}">
+            </div>
+            <div class="col-md-2" id="toDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
+                <label class="form-label">إلى تاريخ</label>
+                <input type="date" name="to_date" class="form-control" value="{{ request('to_date', now()->toDateString()) }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">
@@ -119,3 +182,21 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function handlePeriodChange() {
+    const period = document.getElementById('periodSelect').value;
+    const fromDateCol = document.getElementById('fromDateCol');
+    const toDateCol = document.getElementById('toDateCol');
+
+    if (period === 'custom') {
+        fromDateCol.style.display = '';
+        toDateCol.style.display = '';
+    } else {
+        fromDateCol.style.display = 'none';
+        toDateCol.style.display = 'none';
+    }
+}
+</script>
+@endpush
