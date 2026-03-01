@@ -103,7 +103,9 @@
                                     <td>
                                         <div class="fw-semibold">{{ $session->type_label }}</div>
                                         <small class="text-muted">
-                                            @if($session->part)
+                                            @if($session->type === 'mafsil')
+                                                {{ $session->pages->pluck('page.part_id')->filter()->unique()->map(fn($id) => 'الجزء '.$id)->join('، ') }}
+                                            @elseif($session->part)
                                                 جزء {{ $session->part->part_number }}
                                             @else
                                                 ص {{ $session->start_page }} - {{ $session->end_page }}

@@ -142,8 +142,14 @@
                             @forelse($recentSessions as $session)
                             <tr>
                                 <td><span class="badge bg-info text-dark">{{ $session->type_label }}</span></td>
-                                <td>{{ $session->part ? 'الجزء '.$session->part->part_number : '-' }}</td>
-                                <td>{{ $session->total_pages }}</td>
+                                <td>
+                                    @if($session->type === 'mafsil')
+                                        {{ $session->pages->pluck('page.part_id')->filter()->unique()->map(fn($id) => 'الجزء '.$id)->join('، ') }}
+                                    @else
+                                        {{ $session->part ? 'الجزء '.$session->part->part_number : '-' }}
+                                    @endif
+                                </td>
+                                <td>{{ $session->type === 'mafsil' ? '' : $session->total_pages }}</td>
                                 <td>
                                     <span class="text-danger">{{ $session->total_errors }}</span>
                                     <small class="text-muted">/ {{ $session->total_hesitations }}ت</small>
