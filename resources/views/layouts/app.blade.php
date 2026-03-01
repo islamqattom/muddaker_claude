@@ -516,6 +516,38 @@
         /* Quran Font */
         .quran-text { font-family: 'Amiri', serif; font-size: 18px; line-height: 2; }
 
+        /* Pagination */
+        .pagination {
+            margin: 0;
+            gap: 4px;
+        }
+        .pagination .page-link {
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .pagination .page-item .page-link {
+            color: var(--primary);
+            border-color: #dee2e6;
+        }
+        .pagination .page-item .page-link:hover {
+            background: #f0f4f8;
+            border-color: #dee2e6;
+        }
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+        .pagination .page-link[aria-hidden="true"] {
+            font-size: 16px;
+            line-height: 1;
+        }
+
         /* Print */
         @media print {
             .sidebar, .top-header, .no-print { display: none !important; }
