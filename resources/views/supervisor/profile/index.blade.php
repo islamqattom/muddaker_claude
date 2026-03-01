@@ -1,6 +1,17 @@
 @extends('layouts.app')
 @section('title', 'الملف الشخصي')
 @section('page-title', 'الملف الشخصي')
+@section('role-label', 'مشرف')
+
+@section('sidebar-menu')
+    @include('supervisor.partials.sidebar')
+@endsection
+
+@section('breadcrumb')
+    <li class="breadcrumb-item"><a href="{{ route('supervisor.dashboard') }}">الرئيسية</a></li>
+    <li class="breadcrumb-item active">الملف الشخصي</li>
+@endsection
+
 @section('content')
 <div class="row">
     <div class="col-md-8 mx-auto">
