@@ -39,6 +39,8 @@ class ReportController extends Controller {
                 break;
         }
 
+        $studentIds = $students->pluck('id');
+
         // Filter by student if selected
         $filteredStudentIds = $studentIds;
         if ($studentId && $students->contains('id', $studentId)) {
