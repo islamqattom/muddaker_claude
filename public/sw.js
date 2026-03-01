@@ -1,7 +1,5 @@
-const CACHE_NAME = 'quran-pwa-v1';
+const CACHE_NAME = 'quran-pwa-v2';
 const urlsToCache = [
-    '/',
-    '/dashboard',
     '/images/muddaker-logo-main-nobg.png',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
@@ -48,8 +46,22 @@ self.addEventListener('activate', event => {
 // Fetch event - different strategies for different resources
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
+    const isNavigation = event.request.mode === 'navigate';
 
-    // Stale-while-revalidate for CDN resources
+    // For navigation requests (page loads), always go to network
+    // This ensures auth redirects work properly
+    if (isNavigation) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    // Skip caching for HTML documents
+    if (event.request.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    // Stale-while-revalidate for CDN resources (CSS, JS, fonts)
     if (url.hostname.includes('cdn.') || url.hostname.includes('fonts.') || url.hostname.includes('jquery')) {
         event.respondWith(
             caches.open(CACHE_NAME).then(cache => {
@@ -60,7 +72,7 @@ self.addEventListener('fetch', event => {
                             cache.put(event.request, response.clone());
                         }
                         return response;
-                    }).catch(() => cached); // Return cached if network fails
+                    }).catch(() => cached || fetch(event.request));
                     return cached || fetchPromise;
                 });
             })
@@ -68,30 +80,17 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Cache-first for local resources
+    // Network-first for local static resources (fall back to cache)
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                if (response) {
-                    return response;
-                }
-
-                return fetch(event.request).then(response => {
-                    if (!response || response.status !== 200) {
-                        return response;
-                    }
-
+                if (response && response.status === 200) {
                     const responseToCache = response.clone();
                     caches.open(CACHE_NAME)
                         .then(cache => cache.put(event.request, responseToCache));
-
-                    return response;
-                }).catch(() => {
-                    // Return offline fallback for navigation requests
-                    if (event.request.mode === 'navigate') {
-                        return caches.match('/');
-                    }
-                });
+                }
+                return response;
             })
+            .catch(() => caches.match(event.request))
     );
 });

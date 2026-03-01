@@ -2,7 +2,7 @@
     "name": "مشروع مدكر القرآني",
     "short_name": "مدكر",
     "description": "نظام تسميع القرآن الكريم الإلكتروني",
-    "start_url": "/dashboard",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#182B48",
