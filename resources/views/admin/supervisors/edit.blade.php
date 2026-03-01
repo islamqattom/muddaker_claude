@@ -134,6 +134,14 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label class="form-label">التخصص</label>
+                                <input type="text" name="specialization" class="form-control" value="{{ old('specialization', $supervisor->supervisor->specialization) }}" placeholder="مثال: حفظ القرآن الكريم">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label class="form-label">تاريخ التعيين</label>
                                 <input type="text" class="form-control" value="{{ $supervisor->supervisor->hire_date?->format('d/m/Y') }}" disabled>
                             </div>
