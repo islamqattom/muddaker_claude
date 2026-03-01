@@ -22,7 +22,7 @@
                 <select name="supervisor_id" class="form-select" id="supervisorSelect" onchange="filterStudents()">
                     <option value="">-- جميع المشرفين --</option>
                     @foreach($supervisors as $supervisor)
-                        <option value="{{ $supervisor->id }}" {{ request('supervisor_id') == $supervisor->id ? 'selected' : '' }}>
+                        <option value="{{ $supervisor->user_id }}" {{ request('supervisor_id') == $supervisor->user_id ? 'selected' : '' }}>
                             {{ $supervisor->user->name }}
                         </option>
                     @endforeach

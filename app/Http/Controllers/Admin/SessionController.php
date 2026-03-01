@@ -9,7 +9,7 @@ class SessionController extends Controller {
     public function index(Request $request) {
         $request->validate([
             'student_id' => 'nullable|exists:students,id',
-            'supervisor_id' => 'nullable|exists:supervisors,id',
+            'supervisor_id' => 'nullable|exists:supervisors,user_id',
             'type' => 'nullable|in:new_memorization,review,unmastered,recitation,mafsil,all',
         ]);
 
@@ -40,12 +40,9 @@ class SessionController extends Controller {
 
         $query = RecitationSession::with('student.user', 'part', 'supervisor');
 
-        // Filter by supervisor
+        // Filter by supervisor (supervisor_id is now the user_id of the supervisor)
         if ($request->supervisor_id) {
-            $supervisor = Supervisor::find($request->supervisor_id);
-            if ($supervisor) {
-                $query->whereHas('student', fn($q) => $q->where('supervisor_id', $supervisor->user_id));
-            }
+            $query->whereHas('student', fn($q) => $q->where('supervisor_id', $request->supervisor_id));
         }
 
         // Filter by student
