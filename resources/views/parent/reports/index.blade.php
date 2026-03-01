@@ -25,6 +25,7 @@
     <li class="breadcrumb-item active">التقارير</li>
 @endsection
 
+@section('content')
 <!-- Per-Student Statistics -->
 <div class="card mb-4">
     <div class="card-header">
@@ -96,7 +97,6 @@
     </div>
 </div>
 
-@section('content')
 <!-- Date Filter -->
 <div class="card mb-4">
     <div class="card-body">
