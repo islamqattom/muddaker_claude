@@ -157,8 +157,8 @@
         }
 
         .sidebar-logo img {
-            width: 60px;
-            height: 60px;
+            width: 140px;
+            height: 100px;
             object-fit: contain;
         }
 
