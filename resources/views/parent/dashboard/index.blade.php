@@ -8,7 +8,7 @@
     <i class="fas fa-home"></i> الصفحة الرئيسية
 </a>
 <span class="nav-section-title mt-2">المتابعة</span>
-<a href="{{ route('parent.sessions.index') }}" class="nav-link"><i class="fas fa-microphone"></i> جلسات التسميع</a>
+<a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}"><i class="fas fa-microphone"></i> جلسات التسميع</a>
 <a href="{{ route('parent.attendance.index') }}" class="nav-link"><i class="fas fa-calendar-check"></i> سجل الحضور</a>
 <a href="{{ route('parent.warnings.index') }}" class="nav-link">
     <i class="fas fa-exclamation-triangle"></i> الإنذارات

@@ -123,7 +123,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
 // ============================
 // STUDENT ROUTES
 // ============================
-Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])->group(function () {
+Route::prefix('student')->name('student.')->middleware(['auth', 'role:student,parent,supervisor,admin'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [Student\DashboardController::class, 'index'])->name('dashboard');
