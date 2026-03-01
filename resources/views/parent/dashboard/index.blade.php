@@ -94,7 +94,10 @@
                     <div class="col-3"><div class="p-2 rounded bg-success text-white"><div class="fw-bold fs-5">{{ $data['attendance']['present'] }}</div><small>حاضر</small></div></div>
                     <div class="col-3"><div class="p-2 rounded bg-danger text-white"><div class="fw-bold fs-5">{{ $data['attendance']['absent'] }}</div><small>غائب</small></div></div>
                     <div class="col-3"><div class="p-2 rounded bg-warning text-dark"><div class="fw-bold fs-5">{{ $data['attendance']['late'] }}</div><small>متأخر</small></div></div>
-                    <div class="col-3"><div class="p-2 rounded bg-secondary text-white"><div class="fw-bold fs-5">{{ $data['attendance']['total'] }}</div><small>إجمالي</small></div></div>
+                    <div class="col-3"><div class="p-2 rounded bg-info text-white"><div class="fw-bold fs-5">{{ $data['attendance']['excused'] }}</div><small>بعذر</small></div></div>
+                </div>
+                <div class="row g-2 text-center mt-2">
+                    <div class="col-12"><div class="p-2 rounded bg-secondary text-white"><div class="fw-bold fs-5">{{ $data['attendance']['total'] }}</div><small>إجمالي</small></div></div>
                 </div>
             </div>
             <div class="col-12">

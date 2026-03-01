@@ -29,6 +29,7 @@ class DashboardController extends Controller
                     'present' => $thisMonthAttendance->where('status', 'present')->count(),
                     'absent' => $thisMonthAttendance->where('status', 'absent')->count(),
                     'late' => $thisMonthAttendance->where('status', 'late')->count(),
+                    'excused' => $thisMonthAttendance->where('status', 'excused')->count(),
                     'total' => $thisMonthAttendance->count(),
                 ],
                 'sessions' => [
