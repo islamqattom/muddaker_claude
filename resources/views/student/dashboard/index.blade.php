@@ -118,8 +118,8 @@
     </div>
     <div class="col-6 col-lg-3">
         <div class="card text-center p-3">
-            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['new_memorization'] }}</div>
-            <small class="text-muted">صفحات</small>
+            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['saved_parts'] }}</div>
+            <small class="text-muted">الأجزاء المحفوظة</small>
         </div>
     </div>
 </div>
