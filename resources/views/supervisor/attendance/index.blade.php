@@ -37,6 +37,10 @@
                         <div class="fw-bold fs-4">{{ $stats['late'] }}</div>
                         <small>متأخر</small>
                     </div>
+                    <div class="text-center p-2 rounded bg-info text-white flex-fill">
+                        <div class="fw-bold fs-4">{{ $stats['excused'] }}</div>
+                        <small>بعذر</small>
+                    </div>
                     <div class="text-center p-2 rounded bg-secondary text-white flex-fill">
                         <div class="fw-bold fs-4">{{ $stats['total'] - $stats['present'] - $stats['absent'] - $stats['late'] - $stats['excused'] }}</div>
                         <small>غير مسجل</small>
