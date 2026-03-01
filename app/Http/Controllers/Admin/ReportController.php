@@ -6,11 +6,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use TCPDF;
 
-// Define PDF_UNIT if not already defined
-if (!defined('PDF_UNIT')) {
-    define('PDF_UNIT', 'mm');
-}
-
 class ReportController extends Controller {
     public function index() {
         $stats = [
