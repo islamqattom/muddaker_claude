@@ -58,8 +58,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">اسم المستخدم</label>
-                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $supervisor->username) }}">
+                                <label class="form-label">اسم المستخدم <span class="text-danger">*</span></label>
+                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $supervisor->username) }}" required>
                                 @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -70,8 +70,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">رقم الهاتف <span class="text-danger">*</span></label>
-                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $supervisor->phone) }}" required>
+                                <label class="form-label">رقم الهاتف</label>
+                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $supervisor->phone) }}">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

@@ -10,7 +10,7 @@ class ParentController extends Controller {
     public function index() { $parents = User::where('role','parent')->with('parentProfile')->paginate(20); return view('admin.parents.index', compact('parents')); }
     public function create() { $students = Student::with('user')->get(); return view('admin.parents.create', compact('students')); }
     public function store(Request $request) {
-        $request->validate(['name'=>'required','username'=>'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username','phone'=>'required|unique:users,phone','password'=>'required|min:8|confirmed']);
+        $request->validate(['name'=>'required','username'=>'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username','phone'=>'nullable|unique:users,phone','password'=>'required|min:8|confirmed']);
         DB::transaction(function() use ($request) {
             $user = User::create(['name'=>$request->name,'username'=>$request->username,'phone'=>$request->phone,'email'=>$request->email,'password'=>Hash::make($request->password),'role'=>'parent']);
             $parent = ParentProfile::create(['user_id'=>$user->id,'relationship'=>$request->relationship??'father']);
@@ -26,8 +26,8 @@ class ParentController extends Controller {
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $parent->id,
-            'phone' => 'required|string|unique:users,phone,' . $parent->id,
+            'username' => 'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $parent->id,
+            'phone' => 'nullable|string|unique:users,phone,' . $parent->id,
             'email' => 'nullable|email|unique:users,email,' . $parent->id,
         ]);
 

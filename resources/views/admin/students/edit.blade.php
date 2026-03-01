@@ -58,8 +58,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">اسم المستخدم</label>
-                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $student->user->username) }}">
+                                <label class="form-label">اسم المستخدم <span class="text-danger">*</span></label>
+                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $student->user->username) }}" required>
                                 @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -70,8 +70,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">رقم الهاتف <span class="text-danger">*</span></label>
-                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $student->user->phone) }}" required>
+                                <label class="form-label">رقم الهاتف</label>
+                                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $student->user->phone) }}">
                                 @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -127,8 +127,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">المشرف</label>
-                                <select name="supervisor_id" class="form-select @error('supervisor_id') is-invalid @enderror">
+                                <label class="form-label">المشرف <span class="text-danger">*</span></label>
+                                <select name="supervisor_id" class="form-select @error('supervisor_id') is-invalid @enderror" required>
                                     <option value="">اختر المشرف</option>
                                     @foreach($supervisors as $supervisor)
                                         <option value="{{ $supervisor->id }}" {{ old('supervisor_id', $student->supervisor_id) == $supervisor->id ? 'selected' : '' }}>{{ $supervisor->name }}</option>
@@ -165,8 +165,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">رقم الطالب</label>
-                                <input type="text" class="form-control" value="{{ $student->student_number }}" disabled>
+                                <label class="form-label">تاريخ التسجيل</label>
+                                <input type="date" name="enrollment_date" class="form-control" value="{{ old('enrollment_date', $student->enrollment_date?->format('Y-m-d')) }}">
                             </div>
                         </div>
                     </div>

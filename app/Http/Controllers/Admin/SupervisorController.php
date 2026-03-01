@@ -25,8 +25,8 @@ class SupervisorController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
-            'phone' => 'required|string|unique:users,phone',
+            'username' => 'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
+            'phone' => 'nullable|string|unique:users,phone',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -63,8 +63,8 @@ class SupervisorController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $supervisor->id,
-            'phone' => 'required|string|unique:users,phone,' . $supervisor->id,
+            'username' => 'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $supervisor->id,
+            'phone' => 'nullable|string|unique:users,phone,' . $supervisor->id,
             'email' => 'nullable|email|unique:users,email,' . $supervisor->id,
         ]);
 

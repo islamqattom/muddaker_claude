@@ -36,15 +36,15 @@
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">اسم المستخدم</label>
-                            <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $student->user->username) }}" placeholder="أرقام إنجليزية وحروف">
+                            <label class="form-label">اسم المستخدم <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $student->user->username) }}" placeholder="أرقام إنجليزية وحروف" required>
                             @error('username')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">رقم الهاتف <span class="text-danger">*</span></label>
-                            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $student->phone) }}" required>
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $student->phone) }}">
                             @error('phone')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -97,8 +97,8 @@
                             <input type="date" name="birth_date" class="form-control" value="{{ old('birth_date', $student->birth_date?->format('Y-m-d')) }}">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">رقم الطالب</label>
-                            <input type="text" class="form-control" value="{{ $student->student_number }}" readonly>
+                            <label class="form-label">تاريخ التسجيل</label>
+                            <input type="date" name="enrollment_date" class="form-control" value="{{ old('enrollment_date', $student->enrollment_date?->format('Y-m-d')) }}">
                         </div>
                         <div class="col-12">
                             <label class="form-label">العنوان</label>

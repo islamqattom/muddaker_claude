@@ -45,12 +45,12 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
-            'phone' => 'required|string|unique:users,phone',
+            'username' => 'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
+            'phone' => 'nullable|string|unique:users,phone',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'level_id' => 'required|exists:levels,id',
-            'supervisor_id' => 'nullable|exists:users,id',
+            'supervisor_id' => 'required|exists:users,id',
             'national_id' => 'nullable|string',
             'birth_date' => 'nullable|date',
             'address' => 'nullable|string',
@@ -120,11 +120,11 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'nullable|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $student->user_id,
+            'username' => 'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username,' . $student->user_id,
             'phone' => 'required|string|unique:users,phone,' . $student->user_id,
             'email' => 'nullable|email|unique:users,email,' . $student->user_id,
             'level_id' => 'required|exists:levels,id',
-            'supervisor_id' => 'nullable|exists:users,id',
+            'supervisor_id' => 'required|exists:users,id',
         ]);
 
         DB::transaction(function() use ($request, $student) {
@@ -145,6 +145,7 @@ class StudentController extends Controller
                 'national_id' => $request->national_id,
                 'birth_date' => $request->birth_date,
                 'address' => $request->address,
+                'enrollment_date' => $request->enrollment_date,
                 'notes' => $request->notes,
                 'is_active' => $request->boolean('is_active'),
             ]);
