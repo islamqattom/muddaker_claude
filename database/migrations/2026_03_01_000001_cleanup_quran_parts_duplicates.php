@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Disable foreign key checks temporarily
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+
         // Clean up duplicate entries using a temp table approach for MySQL compatibility
         DB::statement('CREATE TEMPORARY TABLE quran_parts_min_ids AS
             SELECT MIN(id) as min_id FROM quran_parts GROUP BY part_number');
@@ -22,6 +25,9 @@ return new class extends Migration
         )');
 
         DB::statement('DROP TEMPORARY TABLE IF EXISTS quran_parts_min_ids');
+
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
 
         // Add unique constraint on part_number
         Schema::table('quran_parts', function (Blueprint $table) {
