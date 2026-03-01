@@ -547,6 +547,10 @@
             font-size: 16px;
             line-height: 1;
         }
+        .pagination .page-item span.page-link {
+            font-size: 14px;
+            padding: 6px 10px;
+        }
 
         /* Print */
         @media print {
