@@ -35,6 +35,9 @@ class LoginController extends Controller
             $user = Auth::user();
 
             if (!$user->is_active) {
+                // Invalidate the remember token to prevent re-login via remember cookie
+                $user->remember_token = null;
+                $user->save();
                 Auth::logout();
                 return back()->withErrors(['login' => 'حسابك موقوف. يرجى التواصل مع الإدارة.']);
             }
