@@ -23,6 +23,11 @@ class RecitationPage extends Model
         return $this->belongsTo(RecitationSession::class, 'session_id');
     }
 
+    public function page()
+    {
+        return $this->belongsTo(QuranPage::class, 'page_id');
+    }
+
     public function getColorLabelAttribute(): string
     {
         return match($this->color_status) {
