@@ -25,6 +25,77 @@
     <li class="breadcrumb-item active">التقارير</li>
 @endsection
 
+<!-- Per-Student Statistics -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            إحصائيات كل طالب
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        @if(empty($studentsData))
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-users fa-3x mb-3 d-block"></i>
+                <p>لا يوجد طلاب مرتبطون بحسابك</p>
+            </div>
+        @else
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>الطالب</th>
+                            <th>المستوى</th>
+                            <th>الجلسات</th>
+                            <th>ناجح</th>
+                            <th>راسب</th>
+                            <th>حاضر</th>
+                            <th>غائب</th>
+                            <th>متأخر</th>
+                            <th>نسبة الحضور</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($studentsData as $data)
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width:36px;height:36px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
+                                        {{ mb_substr($data['student']->user->name, 0, 1) }}
+                                    </div>
+                                    <span class="fw-semibold">{{ $data['student']->user->name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if($data['student']->level)
+                                    <span class="badge bg-secondary">{{ $data['student']->level->name }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="fw-semibold">{{ $data['sessions']['total'] }}</td>
+                            <td><span class="text-success fw-semibold">{{ $data['sessions']['passed'] }}</span></td>
+                            <td><span class="text-danger fw-semibold">{{ $data['sessions']['failed'] }}</span></td>
+                            <td><span class="text-success">{{ $data['attendance']['present'] }}</span></td>
+                            <td><span class="text-danger">{{ $data['attendance']['absent'] }}</span></td>
+                            <td><span class="text-warning">{{ $data['attendance']['late'] }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height:8px;">
+                                        <div class="progress-bar bg-success" style="width:{{ $data['attendance']['rate'] }}%"></div>
+                                    </div>
+                                    <span class="fw-semibold small">{{ $data['attendance']['rate'] }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+</div>
+
 @section('content')
 <!-- Date Filter -->
 <div class="card mb-4">
@@ -137,77 +208,6 @@
     </div>
 </div>
 
-<!-- Per-Student Statistics -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h6 class="mb-0">
-            <i class="fas fa-users me-2"></i>
-            إحصائيات كل طالب
-        </h6>
-    </div>
-    <div class="card-body p-0">
-        @if(empty($studentsData))
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-users fa-3x mb-3 d-block"></i>
-                <p>لا يوجد طلاب مرتبطون بحسابك</p>
-            </div>
-        @else
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>الطالب</th>
-                            <th>المستوى</th>
-                            <th>الجلسات</th>
-                            <th>ناجح</th>
-                            <th>راسب</th>
-                            <th>حاضر</th>
-                            <th>غائب</th>
-                            <th>متأخر</th>
-                            <th>نسبة الحضور</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($studentsData as $data)
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div style="width:36px;height:36px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;">
-                                        {{ mb_substr($data['student']->user->name, 0, 1) }}
-                                    </div>
-                                    <span class="fw-semibold">{{ $data['student']->user->name }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                @if($data['student']->level)
-                                    <span class="badge bg-secondary">{{ $data['student']->level->name }}</span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
-                            </td>
-                            <td class="fw-semibold">{{ $data['sessions']['total'] }}</td>
-                            <td><span class="text-success fw-semibold">{{ $data['sessions']['passed'] }}</span></td>
-                            <td><span class="text-danger fw-semibold">{{ $data['sessions']['failed'] }}</span></td>
-                            <td><span class="text-success">{{ $data['attendance']['present'] }}</span></td>
-                            <td><span class="text-danger">{{ $data['attendance']['absent'] }}</span></td>
-                            <td><span class="text-warning">{{ $data['attendance']['late'] }}</span></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="progress flex-grow-1" style="height:8px;">
-                                        <div class="progress-bar bg-success" style="width:{{ $data['attendance']['rate'] }}%"></div>
-                                    </div>
-                                    <span class="fw-semibold small">{{ $data['attendance']['rate'] }}%</span>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </div>
-</div>
-
 <!-- Attendance Summary -->
 <div class="row">
     <div class="col-md-6 mb-4">
@@ -254,6 +254,17 @@
                         <div class="progress mb-3" style="height:20px;">
                             <div class="progress-bar bg-warning" style="width:{{ round($lateCount/$totalAttendances*100) }}%">
                                 {{ round($lateCount/$totalAttendances*100) }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>بعذر</span>
+                            <span class="fw-semibold">{{ $excusedCount }}</span>
+                        </div>
+                        <div class="progress mb-3" style="height:20px;">
+                            <div class="progress-bar bg-info" style="width:{{ round($excusedCount/$totalAttendances*100) }}%">
+                                {{ round($excusedCount/$totalAttendances*100) }}%
                             </div>
                         </div>
                     </div>
