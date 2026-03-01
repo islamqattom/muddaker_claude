@@ -104,7 +104,10 @@
                                         <div class="fw-semibold">{{ $session->type_label }}</div>
                                         <small class="text-muted">
                                             @if($session->type === 'mafsil')
-                                                {{ $session->pages->pluck('page.part_id')->filter()->unique()->map(fn($id) => 'الجزء '.$id)->join('، ') }}
+                                                @php
+                                                    $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values();
+                                                @endphp
+                                                {{ $partNumbers->isNotEmpty() ? $partNumbers->map(fn($num) => 'الجزء '.$num)->join('، ') : '-' }}
                                             @elseif($session->part)
                                                 جزء {{ $session->part->part_number }}
                                             @else

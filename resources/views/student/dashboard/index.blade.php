@@ -144,7 +144,10 @@
                                 <td><span class="badge bg-info text-dark">{{ $session->type_label }}</span></td>
                                 <td>
                                     @if($session->type === 'mafsil')
-                                        {{ $session->pages->pluck('page.part_id')->filter()->unique()->map(fn($id) => 'الجزء '.$id)->join('، ') }}
+                                        @php
+                                            $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values();
+                                        @endphp
+                                        {{ $partNumbers->isNotEmpty() ? $partNumbers->map(fn($num) => 'الجزء '.$num)->join('، ') : '-' }}
                                     @else
                                         {{ $session->part ? 'الجزء '.$session->part->part_number : '-' }}
                                     @endif

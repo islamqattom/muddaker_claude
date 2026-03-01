@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $student = $user->student()->with(['level', 'supervisor'])->firstOrFail();
 
         $recentSessions = RecitationSession::where('student_id', $student->id)
-            ->with(['part', 'pages.page'])
+            ->with(['part', 'pages'])
             ->latest('session_date')
             ->take(10)
             ->get();
@@ -73,32 +73,30 @@ class DashboardController extends Controller
 
     private function getSavedPartsCount(int $studentId): int
     {
-        // Get distinct part_ids from mafsil sessions via pages (using join)
-        $mafselPartIds = DB::table('recitation_sessions')
+        // Get distinct part numbers from mafsil sessions (page_number stores part number 1-30)
+        $mafselParts = DB::table('recitation_sessions')
             ->join('recitation_pages', 'recitation_sessions.id', '=', 'recitation_pages.session_id')
-            ->join('quran_pages', 'recitation_pages.page_id', '=', 'quran_pages.id')
             ->where('recitation_sessions.student_id', $studentId)
             ->where('recitation_sessions.type', 'mafsil')
             ->distinct()
-            ->pluck('quran_pages.part_id')
+            ->pluck('recitation_pages.page_number')
             ->filter()
             ->unique()
             ->values();
 
-        // Get distinct part_ids from recitation sessions via pages (using join)
-        $recitationPartIds = DB::table('recitation_sessions')
+        // Get distinct part numbers from recitation sessions
+        $recitationParts = DB::table('recitation_sessions')
             ->join('recitation_pages', 'recitation_sessions.id', '=', 'recitation_pages.session_id')
-            ->join('quran_pages', 'recitation_pages.page_id', '=', 'quran_pages.id')
             ->where('recitation_sessions.student_id', $studentId)
             ->where('recitation_sessions.type', 'recitation')
             ->distinct()
-            ->pluck('quran_pages.part_id')
+            ->pluck('recitation_pages.page_number')
             ->filter()
             ->unique()
             ->values();
 
         // Return: mafsil parts + recitation parts (excluding those in mafsil)
-        return $mafselPartIds->count() + $recitationPartIds->diff($mafselPartIds)->count();
+        return $mafselParts->count() + $recitationParts->diff($mafselParts)->count();
     }
 
     public function memorization()
