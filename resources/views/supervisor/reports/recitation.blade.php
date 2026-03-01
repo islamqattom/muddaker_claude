@@ -144,6 +144,7 @@
                         <th class="text-center">العلامة</th>
                         <th class="text-center">الحالة</th>
                         <th>التاريخ</th>
+                        <th>اليوم</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -204,6 +205,7 @@
                             <td>
                                 <small class="text-muted">{{ $session->session_date->format('Y/m/d') }}</small>
                             </td>
+                            <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                         </tr>
                     @empty
                         <tr>

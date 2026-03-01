@@ -103,6 +103,7 @@
                             <th>الجزء</th>
                             <th>الصفحات</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الحالة</th>
                         </tr>
                     </thead>
@@ -120,6 +121,7 @@
                             <td>{{ $session->part->name ?? '-' }}</td>
                             <td>{{ $session->start_page ?? '-' }} - {{ $session->end_page ?? '-' }}</td>
                             <td>{{ $session->session_date?->format('d/m/Y') }}</td>
+                            <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                             <td>
                                 @if($session->status === 'passed')
                                     <span class="badge bg-success">ناجح</span>
