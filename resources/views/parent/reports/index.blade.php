@@ -30,6 +30,17 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('parent.reports.index') }}" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">الطالب</label>
+                <select name="student_id" class="form-select">
+                    <option value="">كل الطلاب</option>
+                    @foreach($students as $student)
+                        <option value="{{ $student->id }}" {{ $studentId == $student->id ? 'selected' : '' }}>
+                            {{ $student->user->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <div class="col-md-2">
                 <label class="form-label">الفترة</label>
                 <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">

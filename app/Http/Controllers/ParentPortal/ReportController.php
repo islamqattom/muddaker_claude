@@ -10,6 +10,9 @@ class ReportController extends Controller {
         $parent = Auth::user()->parentProfile()->with('students.user', 'students.level', 'students.supervisor')->first();
         $students = $parent->students;
 
+        // Get filter parameters
+        $studentId = request('student_id');
+
         // Handle period filter
         $period = request('period', 'month');
         switch ($period) {
@@ -36,10 +39,14 @@ class ReportController extends Controller {
                 break;
         }
 
-        $studentIds = $students->pluck('id');
+        // Filter by student if selected
+        $filteredStudentIds = $studentIds;
+        if ($studentId && $students->contains('id', $studentId)) {
+            $filteredStudentIds = collect([$studentId]);
+        }
 
         // Get sessions statistics
-        $sessionsQuery = RecitationSession::whereIn('student_id', $studentIds);
+        $sessionsQuery = RecitationSession::whereIn('student_id', $filteredStudentIds);
         if ($fromDate && $toDate) {
             $sessionsQuery->whereBetween('session_date', [$fromDate, $toDate]);
         }
@@ -50,7 +57,7 @@ class ReportController extends Controller {
         $failedSessions = $sessions->whereIn('status', ['failed', 'failed_continued'])->count();
 
         // Get attendance statistics
-        $attendancesQuery = Attendance::whereIn('student_id', $studentIds);
+        $attendancesQuery = Attendance::whereIn('student_id', $filteredStudentIds);
         if ($fromDate && $toDate) {
             $attendancesQuery->whereBetween('date', [$fromDate, $toDate]);
         }
@@ -88,7 +95,7 @@ class ReportController extends Controller {
         }
 
         return view('parent.reports.index', compact(
-            'parent', 'students', 'studentsData',
+            'parent', 'students', 'studentsData', 'studentId',
             'fromDate', 'toDate',
             'totalSessions', 'passedSessions', 'failedSessions',
             'totalAttendances', 'presentCount', 'absentCount', 'lateCount', 'attendanceRate'
