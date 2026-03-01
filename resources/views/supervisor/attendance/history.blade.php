@@ -75,6 +75,7 @@
                         <th class="text-center" style="width:60px">#</th>
                         <th>الطالب</th>
                         <th>التاريخ</th>
+                        <th>اليوم</th>
                         <th>الحالة</th>
                         <th>وقت الحضور</th>
                         <th>ملاحظات</th>
@@ -93,7 +94,9 @@
                             </td>
                             <td>
                                 <small class="text-muted">{{ $attendance->date->format('Y/m/d') }}</small>
-                                <div class="text-muted small">{{ $attendance->date->format('l') }}</div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ $attendance->day }}</span>
                             </td>
                             <td class="text-center">
                                 @switch($attendance->status)

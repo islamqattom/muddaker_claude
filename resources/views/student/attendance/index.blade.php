@@ -84,6 +84,7 @@
                         <tr>
                             <th>#</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الحالة</th>
                             <th>وقت الوصول</th>
                             <th>ملاحظات</th>
@@ -94,6 +95,7 @@
                         <tr>
                             <td>{{ $attendances->firstItem() + $index }}</td>
                             <td class="fw-semibold">{{ $attendance->date->format('Y/m/d') }}</td>
+                            <td><span class="badge bg-secondary">{{ $attendance->day }}</span></td>
                             <td>
                                 <span class="badge bg-{{ $attendance->status_color }}">{{ $attendance->status_label }}</span>
                             </td>

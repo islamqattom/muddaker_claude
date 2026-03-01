@@ -34,6 +34,7 @@
                         <tr>
                             <th>#</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الطالب</th>
                             <th>نوع الجلسة</th>
                             <th>الجزء/الصفحات</th>
@@ -49,6 +50,7 @@
                         <tr>
                             <td>{{ $sessions->firstItem() + $index }}</td>
                             <td class="fw-semibold">{{ $session->session_date->format('Y/m/d') }}</td>
+                            <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div style="width:32px;height:32px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:bold;">

@@ -48,6 +48,7 @@
                             <th>نوع الإنذار</th>
                             <th>العنوان</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الرقم</th>
                             <th>الحالة</th>
                             <th>الإجراءات</th>
@@ -84,6 +85,7 @@
                             </td>
                             <td>{{ $warning->title }}</td>
                             <td>{{ $warning->issue_date->format('d/m/Y') }}</td>
+                            <td><span class="badge bg-secondary">{{ $warning->issue_day }}</span></td>
                             <td><code class="small">{{ $warning->warning_number }}</code></td>
                             <td>
                                 @if($warning->is_read_by_parent)

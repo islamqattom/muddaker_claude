@@ -158,6 +158,7 @@
                         <tr>
                             <th>#</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الطالب</th>
                             <th>الحالة</th>
                             <th>وقت الوصول</th>
@@ -169,6 +170,7 @@
                         <tr>
                             <td>{{ $attendances->firstItem() + $index }}</td>
                             <td class="fw-semibold">{{ $attendance->date->format('Y/m/d') }}</td>
+                            <td><span class="badge bg-secondary">{{ $attendance->day }}</span></td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div style="width:32px;height:32px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:bold;">

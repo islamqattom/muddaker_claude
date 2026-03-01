@@ -35,6 +35,7 @@
                             <th>نوع الإنذار</th>
                             <th>العنوان</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>الرقم</th>
                             <th>الإجراءات</th>
                         </tr>
@@ -60,6 +61,7 @@
                             </td>
                             <td>{{ $warning->title }}</td>
                             <td>{{ $warning->issue_date->format('d/m/Y') }}</td>
+                            <td><span class="badge bg-secondary">{{ $warning->issue_day }}</span></td>
                             <td><code class="small">{{ $warning->warning_number }}</code></td>
                             <td>
                                 <a href="{{ route('student.warnings.show', $warning->id) }}" class="btn btn-sm btn-outline-primary">

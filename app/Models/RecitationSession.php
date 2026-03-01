@@ -14,7 +14,7 @@ class RecitationSession extends Model
         'start_page', 'end_page', 'total_pages',
         'total_errors', 'total_hesitations', 'status',
         'mafsil_type', 'max_score', 'final_score',
-        'unmastered_pages_count', 'session_date', 'notes'
+        'unmastered_pages_count', 'session_date', 'day', 'notes'
     ];
 
     protected $casts = [
@@ -22,6 +22,27 @@ class RecitationSession extends Model
         'max_score' => 'float',
         'final_score' => 'float',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            if ($model->session_date && $model->session_date !== '') {
+                $model->day = self::getArabicDay($model->session_date);
+            }
+        });
+    }
+
+    /**
+     * Get Arabic day name from date
+     */
+    public static function getArabicDay($date): string
+    {
+        $days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+        return $days[$dateObj->dayOfWeek];
+    }
 
     public function student()
     {

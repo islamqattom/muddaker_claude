@@ -40,6 +40,7 @@
                             <th>الدرجة</th>
                             <th>الحالة</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -106,6 +107,7 @@
                                 <span class="badge bg-{{ $session->status_color }}">{{ $session->status_label }}</span>
                             </td>
                             <td>{{ $session->session_date->format('Y/m/d') }}</td>
+                            <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                             <td>
                                 <a href="{{ route('student.sessions.show', $session->id) }}" class="btn btn-sm btn-outline-primary" title="عرض التفاصيل">
                                     <i class="fas fa-eye"></i>

@@ -11,7 +11,7 @@ class Warning extends Model
 
     protected $fillable = [
         'student_id', 'issued_by', 'warning_number', 'type', 'title',
-        'content', 'issue_date', 'from_date', 'to_date',
+        'content', 'issue_date', 'issue_day', 'from_date', 'from_day', 'to_date', 'to_day',
         'absent_days', 'late_days', 'total_days',
         'failed_sessions', 'total_sessions',
         'additional_notes', 'is_read_by_parent'
@@ -23,6 +23,33 @@ class Warning extends Model
         'to_date' => 'date',
         'is_read_by_parent' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            if ($model->issue_date && $model->issue_date !== '') {
+                $model->issue_day = self::getArabicDay($model->issue_date);
+            }
+            if ($model->from_date && $model->from_date !== '') {
+                $model->from_day = self::getArabicDay($model->from_date);
+            }
+            if ($model->to_date && $model->to_date !== '') {
+                $model->to_day = self::getArabicDay($model->to_date);
+            }
+        });
+    }
+
+    /**
+     * Get Arabic day name from date
+     */
+    public static function getArabicDay($date): string
+    {
+        $days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+        return $days[$dateObj->dayOfWeek];
+    }
 
     public function student()
     {

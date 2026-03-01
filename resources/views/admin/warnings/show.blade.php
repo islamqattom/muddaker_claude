@@ -35,12 +35,12 @@
                     </tr>
                     <tr>
                         <th>تاريخ الإصدار</th>
-                        <td>{{ $warning->issue_date->format('d/m/Y') }}</td>
+                        <td>{{ $warning->issue_date->format('d/m/Y') }} <span class="badge bg-secondary ms-1">{{ $warning->issue_day }}</span></td>
                     </tr>
                     @if($warning->from_date && $warning->to_date)
                     <tr>
                         <th>الفترة المعنية</th>
-                        <td>من {{ $warning->from_date->format('d/m/Y') }} إلى {{ $warning->to_date->format('d/m/Y') }}</td>
+                        <td>من {{ $warning->from_date->format('d/m/Y') }} <span class="badge bg-secondary">{{ $warning->from_day }}</span> إلى {{ $warning->to_date->format('d/m/Y') }} <span class="badge bg-secondary">{{ $warning->to_day }}</span></td>
                     </tr>
                     @endif
                     <tr>

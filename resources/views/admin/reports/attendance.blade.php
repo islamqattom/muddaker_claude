@@ -98,6 +98,7 @@
                             <th>اسم الطالب</th>
                             <th>المشرف</th>
                             <th>التاريخ</th>
+                            <th>اليوم</th>
                             <th>وقت الحضور</th>
                             <th>وقت الانصراف</th>
                             <th>الحالة</th>
@@ -115,6 +116,7 @@
                             </td>
                             <td>{{ $attendance->supervisor->name ?? '-' }}</td>
                             <td>{{ $attendance->date ?? '-' }}</td>
+                            <td><span class="badge bg-secondary">{{ $attendance->day }}</span></td>
                             <td>{{ $attendance->arrival_time ?? '-' }}</td>
                             <td>{{ $attendance->departure_time ?? '-' }}</td>
                             <td>

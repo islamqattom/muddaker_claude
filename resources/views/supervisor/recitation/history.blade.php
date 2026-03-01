@@ -69,6 +69,7 @@
                         <th class="text-center">العلامة</th>
                         <th class="text-center">الحالة</th>
                         <th>التاريخ</th>
+                        <th>اليوم</th>
                         <th width="120">الإجراءات</th>
                     </tr>
                 </thead>
@@ -128,6 +129,7 @@
                             <td>
                                 <small class="text-muted">{{ $session->session_date->format('Y/m/d') }}</small>
                             </td>
+                            <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                             <td>
                                 <a href="{{ route('supervisor.sessions.show', $session->id) }}" class="btn btn-sm btn-outline-primary" title="عرض">
                                     <i class="fas fa-eye"></i>
