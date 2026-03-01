@@ -10,7 +10,7 @@
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('supervisor.dashboard') }}">الرئيسية</a></li>
-    <li class="breadcrumb-item"><a href="{{ route('supervisor.sessions.index') }}">جلسات التسميع</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('supervisor.recitation.history') }}">سجل الجلسات</a></li>
     <li class="breadcrumb-item active">تفاصيل الجلسة</li>
 @endsection
 

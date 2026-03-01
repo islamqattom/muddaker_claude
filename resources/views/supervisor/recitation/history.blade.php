@@ -69,7 +69,7 @@
                         <th class="text-center">العلامة</th>
                         <th class="text-center">الحالة</th>
                         <th>التاريخ</th>
-                        <th width="80">الإجراءات</th>
+                        <th width="120">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,6 +129,9 @@
                                 <small class="text-muted">{{ $session->session_date->format('Y/m/d') }}</small>
                             </td>
                             <td>
+                                <a href="{{ route('supervisor.sessions.show', $session->id) }}" class="btn btn-sm btn-outline-primary" title="عرض">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                                 <button type="button" class="btn btn-sm btn-outline-danger" title="حذف" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $session->id }}">
                                     <i class="fas fa-trash"></i>
                                 </button>
