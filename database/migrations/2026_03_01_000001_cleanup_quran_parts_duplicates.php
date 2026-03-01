@@ -13,10 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Clean up duplicate entries - keep only the first record per part_number
+        // Clean up duplicate entries using a temp table approach for MySQL compatibility
+        DB::statement('CREATE TEMPORARY TABLE quran_parts_min_ids AS
+            SELECT MIN(id) as min_id FROM quran_parts GROUP BY part_number');
+
         DB::statement('DELETE FROM quran_parts WHERE id NOT IN (
-            SELECT MIN(id) FROM quran_parts GROUP BY part_number
+            SELECT min_id FROM quran_parts_min_ids
         )');
+
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS quran_parts_min_ids');
 
         // Add unique constraint on part_number
         Schema::table('quran_parts', function (Blueprint $table) {
