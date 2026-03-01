@@ -76,6 +76,54 @@
     </div>
 </div>
 
+<!-- Color Guide -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle me-2"></i>نظام الألوان والتقييم</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="p-3 rounded text-white" style="background:#27ae60;">
+                            <div class="fw-bold fs-5 mb-1">🟢 أخضر - ممتاز</div>
+                            <div style="font-size:13px;">لم يخطئ الطالب أو تردد بحد أقصى ترددين</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="p-3 rounded text-dark" style="background:#f39c12;">
+                            <div class="fw-bold fs-5 mb-1">🟠 برتقالي - جيد</div>
+                            <div style="font-size:13px;">خطأ واحد أو من 3 إلى 5 ترددات</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="p-3 rounded text-white" style="background:#c0392b;">
+                            <div class="fw-bold fs-5 mb-1">🔴 أحمر - ضعيف</div>
+                            <div style="font-size:13px;">خطآن أو ما يعادلهما من الترددات</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="p-3 rounded text-white" style="background:#2c3e50;">
+                            <div class="fw-bold fs-5 mb-1">⚫ أسود - راسب</div>
+                            <div style="font-size:13px;">خطآن + تردد واحد أو أكثر = رسوب</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <h6 class="text-primary">المفاصل وعلاماتها:</h6>
+                    <table class="table table-sm mb-0">
+                        <tr><td><strong>مفصل 3 و6</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-success">90%</span></td></tr>
+                        <tr><td><strong>مفصل 10 و15</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-warning text-dark">80%</span></td></tr>
+                        <tr><td><strong>مفصل 20 و25 و30</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-danger">75%</span></td></tr>
+                    </table>
+                    <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
     <!-- Recent Sessions -->
     <div class="col-lg-8">
