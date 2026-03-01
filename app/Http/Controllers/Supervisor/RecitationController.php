@@ -212,6 +212,7 @@ class RecitationController extends Controller
 
             // Validate selected parts exist
             $parts = QuranPart::whereIn('part_number', $selectedParts)
+                ->distinct()
                 ->orderByRaw("FIELD(part_number, " . implode(',', $selectedParts) . ")")
                 ->get();
 
