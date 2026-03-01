@@ -64,6 +64,13 @@
                     <i class="fas fa-search"></i>
                 </button>
             </div>
+            @if($attendances->isNotEmpty())
+            <div class="col-md-2">
+                <a href="{{ route('admin.reports.attendance', array_merge(request()->except('export'), ['export' => 'pdf'])) }}" class="btn btn-outline-danger w-100" target="_blank">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+            </div>
+            @endif
         </form>
     </div>
 </div>

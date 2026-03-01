@@ -253,6 +253,135 @@ class ReportController extends Controller {
         $supervisors = Supervisor::with('user')->get();
         $students = Student::with('user')->get();
 
+        if ($request->export === 'pdf') {
+            // Get all attendances for PDF (not paginated) - apply same filters
+            $pdfQuery = Attendance::with(['student.user','supervisor']);
+
+            // Apply same filters as main query
+            if ($request->supervisor_id) {
+                $pdfQuery->whereHas('student', fn($q) => $q->where('supervisor_id', $request->supervisor_id));
+            }
+            if ($request->student_id) {
+                $pdfQuery->where('student_id', $request->student_id);
+            }
+            if ($fromDate && $toDate) {
+                $pdfQuery->whereBetween('date', [$fromDate, $toDate]);
+            }
+
+            $allAttendances = $pdfQuery->orderBy('date', 'desc')->get();
+
+            $stats = [
+                'total' => $allAttendances->count(),
+                'present' => $allAttendances->where('status', 'present')->count(),
+                'absent' => $allAttendances->where('status', 'absent')->count(),
+                'late' => $allAttendances->where('status', 'late')->count(),
+                'excused' => $allAttendances->where('status', 'excused')->count(),
+            ];
+
+            return $this->generateAttendancePdf($allAttendances, $stats, $fromDate, $toDate);
+        }
+
         return view('admin.reports.attendance', compact('attendances','supervisors','students','fromDate','toDate'));
+    }
+
+    private function generateAttendancePdf($attendances, $stats, $fromDate, $toDate)
+    {
+        $percentage = $stats['total'] > 0 ? round(($stats['present'] / $stats['total']) * 100) : 0;
+
+        // Create new PDF document with RTL support
+        $pdf = new TCPDF('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
+        $pdf->setRTL(true);
+
+        $pdf->SetCreator('Quran System');
+        $pdf->SetAuthor('نظام تسميع القرآن الكريم');
+        $pdf->SetTitle('تقرير الحضور والغياب');
+
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 10);
+        $pdf->AddPage();
+
+        $pdf->SetFont('aealarabiya', '', 12);
+
+        // Title
+        $pdf->SetFontSize(18);
+        $pdf->Cell(0, 10, 'تقرير الحضور والغياب', 0, true, 'C', 0);
+        $pdf->SetFontSize(12);
+        $dateRange = ($fromDate && $toDate)
+            ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d')
+            : 'الكل';
+        $pdf->Cell(0, 8, 'الفترة: ' . $dateRange, 0, true, 'C', 0);
+        $pdf->Ln(5);
+
+        // Stats
+        $statsHtml = '
+        <table border="1" cellpadding="5" bgcolor="#f0f0f0">
+            <tr>
+                <td align="center"><b>إجمالي السجلات</b><br>' . $stats['total'] . '</td>
+                <td align="center" bgcolor="#28a745" color="white"><b>حاضر</b><br>' . $stats['present'] . '</td>
+                <td align="center" bgcolor="#dc3545" color="white"><b>غائب</b><br>' . $stats['absent'] . '</td>
+                <td align="center" bgcolor="#ffc107"><b>متأخر</b><br>' . $stats['late'] . '</td>
+                <td align="center" bgcolor="#17a2b8" color="white"><b>بعذر</b><br>' . $stats['excused'] . '</td>
+                <td align="center" bgcolor="#6c757d" color="white"><b>نسبة الحضور</b><br>' . $percentage . '%</td>
+            </tr>
+        </table>';
+        $pdf->writeHTML($statsHtml, true, false, false, false, 'C');
+        $pdf->Ln(10);
+
+        // Table
+        $html = '
+        <table border="1" cellpadding="4">
+            <tr bgcolor="#182B48" color="white">
+                <th align="center">#</th>
+                <th align="center">اسم الطالب</th>
+                <th align="center">المشرف</th>
+                <th align="center">التاريخ</th>
+                <th align="center">وقت الحضور</th>
+                <th align="center">وقت الانصراف</th>
+                <th align="center">الحالة</th>
+            </tr>';
+
+        $i = 1;
+        foreach ($attendances as $attendance) {
+            $statusLabel = match($attendance->status) {
+                'present' => 'حاضر',
+                'absent' => 'غائب',
+                'late' => 'متأخر',
+                'excused' => 'معذور',
+                default => 'غير محدد'
+            };
+            $statusColor = match($attendance->status) {
+                'present' => '#28a745',
+                'absent' => '#dc3545',
+                'late' => '#ffc107',
+                'excused' => '#17a2b8',
+                default => '#6c757d'
+            };
+
+            $html .= '
+            <tr>
+                <td align="center">' . $i . '</td>
+                <td>' . ($attendance->student->user->name ?? '-') . '</td>
+                <td>' . ($attendance->supervisor->name ?? '-') . '</td>
+                <td align="center">' . ($attendance->date ?? '-') . '</td>
+                <td align="center">' . ($attendance->arrival_time ?? '-') . '</td>
+                <td align="center">' . ($attendance->departure_time ?? '-') . '</td>
+                <td align="center" color="' . $statusColor . '"><b>' . $statusLabel . '</b></td>
+            </tr>';
+            $i++;
+        }
+
+        $html .= '</table>';
+        $pdf->writeHTML($html, true, false, false, false, '');
+
+        $pdf->Ln(10);
+        $pdf->SetFontSize(10);
+        $pdf->Cell(0, 10, 'نظام تسميع القرآن الكريم - تم إنشاء التقرير في ' . now()->format('Y/m/d H:i'), 0, true, 'C', 0);
+
+        $filename = $fromDate
+            ? 'تقرير-الحضور-' . $fromDate->format('Y-m-d') . '.pdf'
+            : 'تقرير-الحضور-الكل.pdf';
+        return $pdf->Output($filename, 'D');
     }
 }
