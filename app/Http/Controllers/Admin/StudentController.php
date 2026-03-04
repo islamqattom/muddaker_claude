@@ -88,9 +88,12 @@ class StudentController extends Controller
                 'avatar' => $avatarPath,
             ]);
 
-            $lastStudent = Student::orderBy('id', 'desc')->first();
-            $nextNumber = $lastStudent ? (int)substr($lastStudent->student_number, -4) + 1 : 1;
-            $studentNumber = 'STU-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $currentYear = date('Y');
+            $lastStudentThisYear = Student::where('student_number', 'like', "STU-{$currentYear}-%")
+                ->orderBy('student_number', 'desc')
+                ->first();
+            $nextNumber = $lastStudentThisYear ? (int)substr($lastStudentThisYear->student_number, -4) + 1 : 1;
+            $studentNumber = 'STU-' . $currentYear . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
             Student::create([
                 'user_id' => $user->id,
