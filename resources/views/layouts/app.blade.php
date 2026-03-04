@@ -478,6 +478,38 @@
             .table { font-size: 13px; }
         }
 
+        /* PWA Install Button - Base Styles */
+        .pwa-install-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #182B48 0%, #2d4a7c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(24, 43, 72, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .pwa-install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(24, 43, 72, 0.5);
+        }
+
+        .pwa-install-btn i {
+            font-size: 16px;
+        }
+
         /* Mobile close button for sidebar */
         @media (max-width: 768px) {
             .sidebar-close-btn {
@@ -562,6 +594,12 @@
     @stack('styles')
 </head>
 <body>
+
+    <!-- PWA Install Button -->
+    <button id="pwa-install-btn" class="pwa-install-btn" style="display: none;">
+        <i class="fas fa-download"></i>
+        <span>تثبيت التطبيق</span>
+    </button>
 
     <!-- Sidebar Backdrop (Mobile) -->
     <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
@@ -854,6 +892,45 @@
                 });
         });
     }
+
+    // PWA Install Prompt Handler
+    let deferredPrompt;
+    const installButton = document.getElementById('pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later
+        deferredPrompt = e;
+        // Show the install button if it exists
+        if (installButton) {
+            installButton.style.display = 'flex';
+        }
+    });
+
+    // Handle install button click
+    if (installButton) {
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            // Show the prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('User response to install prompt:', outcome);
+            // Reset the deferred prompt
+            deferredPrompt = null;
+            // Hide the button
+            installButton.style.display = 'none';
+        });
+    }
+
+    // Handle successful install
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('PWA installed successfully');
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+    });
     </script>
 
     @stack('scripts')
