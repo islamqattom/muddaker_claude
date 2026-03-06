@@ -82,11 +82,13 @@ const colors = { green:'#27ae60', orange:'#f39c12', red:'#e74c3c', black:'#2c3e5
 
 function updateSardColor(index) {
     const errors = parseInt(document.getElementById('e-'+index).value)||0;
-    // For recitation (sard), hesitations are ignored - only errors count
+    const hesitations = parseInt(document.getElementById('h-'+index).value)||0;
+    // For recitation (sard): 3 hesitations = 1 equivalent error (per page)
+    const totalErrors = errors + Math.floor(hesitations / 3);
     let color;
-    if(errors === 0) color='green';
-    else if(errors === 1) color='orange';
-    else if(errors === 2) color='red';
+    if(totalErrors === 0) color='green';
+    else if(totalErrors === 1) color='orange';
+    else if(totalErrors === 2) color='red';
     else color='black';
     document.getElementById('page-'+index).style.borderColor = colors[color];
     document.getElementById('page-'+index).style.background = colors[color]+'22';
@@ -95,7 +97,12 @@ function updateSardColor(index) {
 
 function updateTotalErrors() {
     let total = 0;
-    for(let i=0;i<pageCount;i++) total += parseInt(document.getElementById('e-'+i)?.value)||0;
+    for(let i=0;i<pageCount;i++) {
+        const errors = parseInt(document.getElementById('e-'+i)?.value)||0;
+        const hesitations = parseInt(document.getElementById('h-'+i)?.value)||0;
+        // For recitation (sard): 3 hesitations = 1 equivalent error per page
+        total += errors + Math.floor(hesitations / 3);
+    }
     totalErrors = total;
     const counter = document.getElementById('error-counter');
     counter.textContent = `الأخطاء: ${total} / 6`;

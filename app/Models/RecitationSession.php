@@ -109,16 +109,17 @@ class RecitationSession extends Model
      */
     public static function calculatePageColor(int $errors, int $hesitations, ?string $type = null): array
     {
-        // For 'recitation' (سرد) type, ignore hesitations completely - only errors count
+        // For 'recitation' (سرد) type: 3 hesitations = 1 equivalent error per page
         if ($type === 'recitation') {
-            if ($errors === 0) {
+            $equivalentErrors = $errors + floor($hesitations / 3);
+            if ($equivalentErrors === 0) {
                 return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
-            } elseif ($errors === 1) {
+            } elseif ($equivalentErrors === 1) {
                 return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
-            } elseif ($errors === 2) {
+            } elseif ($equivalentErrors === 2) {
                 return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
             } else {
-                // errors >= 3
+                // equivalentErrors >= 3
                 return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
             }
         }
