@@ -95,7 +95,12 @@ function updateSardColor(index) {
 
 function updateTotalErrors() {
     let total = 0;
-    for(let i=0;i<pageCount;i++) total += parseInt(document.getElementById('e-'+i)?.value)||0;
+    for(let i=0;i<pageCount;i++) {
+        const errors = parseInt(document.getElementById('e-'+i)?.value)||0;
+        const hesitations = parseInt(document.getElementById('h-'+i)?.value)||0;
+        // For recitation (sard): 3 hesitations = 1 error
+        total += errors + Math.floor(hesitations / 3);
+    }
     totalErrors = total;
     const counter = document.getElementById('error-counter');
     counter.textContent = `الأخطاء: ${total} / 6`;

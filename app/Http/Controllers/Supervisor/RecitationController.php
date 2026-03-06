@@ -257,8 +257,13 @@ class RecitationController extends Controller
 
             // Calculate totals
             foreach ($pages as $page) {
-                $totalErrors += $page['errors'];
                 $totalHesitations += $page['hesitations'];
+                // For recitation type: 3 hesitations = 1 error
+                if ($request->type === 'recitation') {
+                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                } else {
+                    $totalErrors += $page['errors'];
+                }
             }
 
             // For mafsil, calculate score (always from 100)
@@ -285,7 +290,7 @@ class RecitationController extends Controller
                 if ($finalScore < $passingPercentage) {
                     $sessionStatus = 'failed';
                 }
-            } elseif ($failedPages > 0 || ($request->type === 'recitation' && $totalErrors >= 6)) {
+            } elseif ($request->type === 'recitation' && $totalErrors >= 6) {
                 $sessionStatus = 'failed';
             }
 
@@ -403,8 +408,13 @@ class RecitationController extends Controller
 
             // Calculate totals
             foreach ($pages as $page) {
-                $totalErrors += $page['errors'];
                 $totalHesitations += $page['hesitations'];
+                // For recitation type: 3 hesitations = 1 error
+                if ($request->type === 'recitation') {
+                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                } else {
+                    $totalErrors += $page['errors'];
+                }
             }
 
             // Calculate score
