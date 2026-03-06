@@ -257,13 +257,7 @@ class RecitationController extends Controller
 
             // Calculate totals
             foreach ($pages as $page) {
-                // For 'recitation' (سرد) type: 3 hesitations = 1 equivalent error per page
-                if ($request->type === 'recitation') {
-                    $pageErrors = $page['errors'] + floor($page['hesitations'] / 3);
-                    $totalErrors += $pageErrors;
-                } else {
-                    $totalErrors += $page['errors'];
-                }
+                $totalErrors += $page['errors'];
                 $totalHesitations += $page['hesitations'];
             }
 
