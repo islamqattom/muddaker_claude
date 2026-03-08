@@ -53,6 +53,10 @@
         </div>
         @endforeach
     </div>
+    <div class="mt-3">
+        <label class="form-label">ملاحظات</label>
+        <textarea name="notes" class="form-control" rows="2" placeholder="ملاحظات..."></textarea>
+    </div>
     <div class="d-flex gap-3 mt-4">
         <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary btn-lg"><i class="fas fa-arrow-right me-2"></i>رجوع</a>
         <button type="button" class="btn btn-warning btn-lg" onclick="stopSard()"><i class="fas fa-stop me-2"></i>إيقاف مبكر</button>
