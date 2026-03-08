@@ -22,10 +22,15 @@
 </div>
 <form id="sardForm">
     @csrf
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <label class="form-label">تاريخ التسميع <span class="text-muted">(اتركه فارغاً للتاريخ الحالي)</span></label>
+            <input type="date" name="session_date" id="sessionDate" class="form-control" value="{{ date('Y-m-d') }}">
+        </div>
+    </div>
     <input type="hidden" name="student_id" value="{{ $student->id }}">
     <input type="hidden" name="type" value="recitation">
     <input type="hidden" name="part_id" value="{{ $part->id }}">
-    <input type="hidden" name="session_date" value="{{ date('Y-m-d') }}">
     <input type="hidden" name="failed" id="failedFlag" value="0">
     <div class="row g-2">
         @foreach($pages as $index => $pageNum)
@@ -116,6 +121,12 @@ function stopSard() { document.getElementById('failedFlag').value='1'; submitSar
 function stopSardNow() { document.getElementById('failedFlag').value='1'; bootstrap.Modal.getInstance(document.getElementById('maxErrorsModal')).hide(); submitSard(); }
 
 function submitSard() {
+    // If session_date is empty, set it to today
+    const dateInput = document.getElementById('sessionDate');
+    if (!dateInput.value) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+
     const data = new FormData(document.getElementById('sardForm'));
     $.ajax({ url:'{{ route('supervisor.recitation.save') }}', method:'POST', data:data, processData:false, contentType:false,
         success:()=>{ toastr.success('تم حفظ نتيجة السرد'); setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500); },
