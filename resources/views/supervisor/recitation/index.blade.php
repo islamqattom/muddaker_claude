@@ -52,6 +52,11 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">تاريخ التسميع <span class="text-muted">(اتركه فارغاً للتاريخ الحالي)</span></label>
+                        <input type="date" name="session_date" id="sessionDate" class="form-control" value="{{ date('Y-m-d') }}">
+                    </div>
+
                     <div class="mb-4">
                         <label class="form-label">نوع التسميع <span class="text-danger">*</span></label>
                         <div class="row g-2" id="sessionTypes">
@@ -444,6 +449,8 @@ function showTypeOptions(type) {
 function startSession() {
     const studentId = document.getElementById('studentSelect').value;
     const typeEl = document.querySelector('input[name="type"]:checked');
+    const sessionDateInput = document.getElementById('sessionDate');
+    const sessionDate = sessionDateInput.value || new Date().toISOString().split('T')[0];
 
     if (!studentId) {
         toastr.warning('يرجى اختيار الطالب');
@@ -476,7 +483,7 @@ function startSession() {
         if (continuationPart) {
             continuationParam = `&continuation_part_id=${continuationPart}`;
         }
-        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}${continuationParam}`;
+        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParam}`;
     } else if (type === 'review') {
         const partId = document.querySelector('select[name="part_id_review"]').value;
         const pageNumber = document.getElementById('page_number_review').value;
@@ -496,7 +503,7 @@ function startSession() {
         if (continuationPartReview) {
             continuationParamReview = `&continuation_part_id=${continuationPartReview}`;
         }
-        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}${continuationParamReview}`;
+        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParamReview}`;
     } else if (type === 'unmastered') {
         const partId = document.querySelector('select[name="part_id_unmastered"]').value;
         const pageNumber = document.getElementById('page_number_unmastered').value;
@@ -511,14 +518,14 @@ function startSession() {
             toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
             return;
         }
-        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}`;
+        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}&session_date=${sessionDate}`;
     } else if (type === 'recitation') {
         const partId = document.querySelector('select[name="part_id_recitation"]').value;
-        url = `{{ route('supervisor.recitation.recitation') }}?student_id=${studentId}&part_id=${partId}`;
+        url = `{{ route('supervisor.recitation.recitation') }}?student_id=${studentId}&part_id=${partId}&session_date=${sessionDate}`;
     } else if (type === 'mafsil') {
         const mafsilType = document.querySelector('input[name="mafsil_type"]:checked')?.value;
         if (!mafsilType) { toastr.warning('يرجى اختيار نوع المفصل'); return; }
-        url = `{{ route('supervisor.recitation.mafsil') }}?student_id=${studentId}&mafsil_type=${mafsilType}`;
+        url = `{{ route('supervisor.recitation.mafsil') }}?student_id=${studentId}&mafsil_type=${mafsilType}&session_date=${sessionDate}`;
     } else if (type === 'not_recitate') {
         // Show modal for not_recitate
         document.getElementById('notRecitateStudentId').value = studentId;
