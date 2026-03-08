@@ -117,6 +117,22 @@ class ReportController extends Controller {
         // Set font for Arabic
         $pdf->SetFont('aealarabiya', '', 12);
 
+        // Center info
+        $centerName = config('app.center_name', 'مركز التسميع');
+        $centerPhone = config('app.center_phone', '');
+        $centerEmail = config('app.center_email', '');
+
+        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 8, $centerName, 0, true, 'C', 0);
+        $pdf->SetFontSize(10);
+        $contactInfo = [];
+        if ($centerPhone) $contactInfo[] = '📞 ' . $centerPhone;
+        if ($centerEmail) $contactInfo[] = '✉️ ' . $centerEmail;
+        if (!empty($contactInfo)) {
+            $pdf->Cell(0, 6, implode('  |  ', $contactInfo), 0, true, 'C', 0);
+        }
+        $pdf->Ln(3);
+
         // Title
         $pdf->SetFontSize(18);
         $pdf->Cell(0, 10, 'تقرير جلسات التسميع', 0, true, 'C', 0);
@@ -298,6 +314,22 @@ class ReportController extends Controller {
         $pdf->AddPage();
 
         $pdf->SetFont('aealarabiya', '', 12);
+
+        // Center info
+        $centerName = config('app.center_name', 'مركز التسميع');
+        $centerPhone = config('app.center_phone', '');
+        $centerEmail = config('app.center_email', '');
+
+        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 8, $centerName, 0, true, 'C', 0);
+        $pdf->SetFontSize(10);
+        $contactInfo = [];
+        if ($centerPhone) $contactInfo[] = '📞 ' . $centerPhone;
+        if ($centerEmail) $contactInfo[] = '✉️ ' . $centerEmail;
+        if (!empty($contactInfo)) {
+            $pdf->Cell(0, 6, implode('  |  ', $contactInfo), 0, true, 'C', 0);
+        }
+        $pdf->Ln(3);
 
         // Title
         $pdf->SetFontSize(18);

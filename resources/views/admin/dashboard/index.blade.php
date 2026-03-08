@@ -68,6 +68,31 @@
     </div>
 </div>
 
+{{-- Center Info & Working Hours --}}
+<div class="row g-4 mt-1">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-body py-2 d-flex flex-wrap justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-university text-primary fa-lg me-3"></i>
+                    <div>
+                        <strong class="text-primary">{{ config('app.center_name', 'مركز التسميع') }}</strong>
+                        @if(config('app.center_phone') || config('app.center_email'))
+                            <span class="text-muted me-2">|</span>
+                            @if(config('app.center_phone'))<span class="small"><i class="fas fa-phone me-1"></i>{{ config('app.center_phone') }}</span>@endif
+                            @if(config('app.center_email'))<span class="small me-2"><i class="fas fa-envelope me-1"></i>{{ config('app.center_email') }}</span>@endif
+                        @endif
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary"><i class="fas fa-clock me-1"></i>{{ config('app.work_start_time', '08:00') }} - {{ config('app.work_end_time', '20:00') }}</span>
+                    <span class="badge bg-secondary ms-1">{{ config('app.work_days', 'saturday,sunday,monday,tuesday,thursday') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4 mt-1">
     <div class="col-lg-8">
         <div class="card">

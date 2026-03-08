@@ -92,16 +92,18 @@ class WarningController extends Controller
             'additional_notes' => $request->additional_notes,
         ]);
 
-        // Notify parents
-        $student = Student::with('parents.user')->findOrFail($request->student_id);
-        foreach ($student->parents as $parent) {
-            Notification::create([
-                'user_id' => $parent->user_id,
-                'title' => 'إنذار جديد',
-                'message' => "صدر إنذار جديد بحق ابنكم/ابنتكم {$student->user->name}",
-                'type' => 'warning',
-                'link' => route('parent.warnings.show', $warning->id),
-            ]);
+        // Notify parents (if notifications are enabled)
+        if (config('app.enable_notifications', true)) {
+            $student = Student::with('parents.user')->findOrFail($request->student_id);
+            foreach ($student->parents as $parent) {
+                Notification::create([
+                    'user_id' => $parent->user_id,
+                    'title' => 'إنذار جديد',
+                    'message' => "صدر إنذار جديد بحق ابنكم/ابنتكم {$student->user->name}",
+                    'type' => 'warning',
+                    'link' => route('parent.warnings.show', $warning->id),
+                ]);
+            }
         }
 
         return redirect()->route('supervisor.warnings.show', $warning)
