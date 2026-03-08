@@ -62,6 +62,7 @@
                                 ['value' => 'unmastered', 'label' => 'حفظ غير متقن', 'icon' => 'fa-exclamation', 'color' => 'warning'],
                                 ['value' => 'recitation', 'label' => 'سرد', 'icon' => 'fa-scroll', 'color' => 'info'],
                                 ['value' => 'mafsil', 'label' => 'مفصل', 'icon' => 'fa-star', 'color' => 'danger'],
+                                ['value' => 'not_recitate', 'label' => 'لم يسمع', 'icon' => 'fa-times-circle', 'color' => 'secondary'],
                             ];
                             @endphp
                             @foreach($types as $type)
@@ -195,6 +196,13 @@
                         </div>
                     </div>
 
+                    <div id="options-not_recitate" class="d-none session-options">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            سيتم تسجيل الطالب على أنه لم يسمع بدون تقييم أي صفحات
+                        </div>
+                    </div>
+
                     <div class="mt-3">
                         <button type="button" class="btn btn-primary w-100 py-3 fs-5" onclick="startSession()">
                             <i class="fas fa-play me-2"></i>
@@ -286,6 +294,36 @@
                 <div class="p-4 text-center text-muted">لا توجد جلسات اليوم</div>
                 @endforelse
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Not Recitate -->
+<div class="modal fade" id="notRecitateModal" tabindex="-1" aria-labelledby="notRecitateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notRecitateModalLabel">لم يسمع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="notRecitateForm" method="POST" action="{{ route('supervisor.recitation.save-not-recitate') }}">
+                @csrf
+                <div class="modal-body">
+                    <input type="hidden" name="student_id" id="notRecitateStudentId">
+                    <div class="mb-3">
+                        <label class="form-label">التاريخ</label>
+                        <input type="date" name="session_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">السبب (اختياري)</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="أدخل سبب عدم التسميع"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -481,6 +519,12 @@ function startSession() {
         const mafsilType = document.querySelector('input[name="mafsil_type"]:checked')?.value;
         if (!mafsilType) { toastr.warning('يرجى اختيار نوع المفصل'); return; }
         url = `{{ route('supervisor.recitation.mafsil') }}?student_id=${studentId}&mafsil_type=${mafsilType}`;
+    } else if (type === 'not_recitate') {
+        // Show modal for not_recitate
+        document.getElementById('notRecitateStudentId').value = studentId;
+        const modal = new bootstrap.Modal(document.getElementById('notRecitateModal'));
+        modal.show();
+        return;
     }
 
     if (url) window.location.href = url;

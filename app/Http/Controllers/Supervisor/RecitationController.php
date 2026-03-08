@@ -24,7 +24,7 @@ class RecitationController extends Controller
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil,not_recitate',
         ]);
 
         $student = Student::with('level')->findOrFail($request->student_id);
@@ -229,6 +229,44 @@ class RecitationController extends Controller
         $parts = collect(); // Empty collection for now
         $selectionMode = true; // Show part selection UI
         return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode'));
+    }
+
+    /**
+     * Not Recitate Session (لم يسمع)
+     */
+    public function notRecitate(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+        ]);
+
+        $student = Student::with('level')->findOrFail($request->student_id);
+        $parts = QuranPart::orderBy('part_number')->get();
+
+        return view('supervisor.recitation.not-recitate', compact('student', 'parts'));
+    }
+
+    /**
+     * Save Not Recitate Session
+     */
+    public function saveNotRecitate(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'session_date' => 'required|date',
+        ]);
+
+        $session = RecitationSession::create([
+            'student_id' => $request->student_id,
+            'supervisor_id' => Auth::id(),
+            'type' => 'not_recitate',
+            'status' => 'not_heard',
+            'session_date' => $request->session_date,
+            'notes' => $request->reason,
+        ]);
+
+        return redirect()->route('supervisor.recitation.index')
+            ->with('success', 'تم تسجيل عدم التسميع بنجاح');
     }
 
     /**
