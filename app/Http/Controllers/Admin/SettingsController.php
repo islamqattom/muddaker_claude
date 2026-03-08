@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 
 class SettingsController extends Controller {
     public function index() {
@@ -51,6 +52,9 @@ class SettingsController extends Controller {
                 $envContent = $this->updateEnvValue($envContent, 'ENABLE_NOTIFICATIONS', $request->enable_notifications ? 'true' : 'false');
 
                 file_put_contents($envPath, $envContent);
+
+                // Clear config cache so new values are picked up
+                Artisan::call('config:clear');
             }
         } catch (\Exception $e) {
             // Log error but don't fail - settings work in memory
