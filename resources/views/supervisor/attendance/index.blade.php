@@ -163,6 +163,14 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                <span class="text-muted">{{ $students->count() }} طالب</span>
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-save me-2"></i>
+                    حفظ سجل الحضور
+                </button>
+            </div>
         </form>
         @endif
 
