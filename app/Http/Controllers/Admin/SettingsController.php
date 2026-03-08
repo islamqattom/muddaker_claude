@@ -2,7 +2,6 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 
 class SettingsController extends Controller {
     public function index() {
@@ -18,57 +17,34 @@ class SettingsController extends Controller {
             'work_end_time' => 'nullable',
         ]);
 
-        // Update config for current session (in-memory)
+        // Define settings to save
         $settings = [
-            'center_name',
-            'center_email',
-            'center_phone',
-            'work_start_time',
-            'work_end_time',
-            'enable_notifications',
+            'center_name' => $request->center_name ?? 'مركز التسميع',
+            'center_email' => $request->center_email ?? '',
+            'center_phone' => $request->center_phone ?? '',
+            'work_start_time' => $request->work_start_time ?? '08:00',
+            'work_end_time' => $request->work_end_time ?? '20:00',
+            'work_days' => implode(',', $request->work_days ?? ['saturday', 'sunday', 'monday', 'tuesday', 'thursday']),
+            'enable_notifications' => $request->has('enable_notifications') ? 'true' : 'false',
         ];
 
-        foreach ($settings as $key) {
-            if ($request->has($key)) {
-                config(['app.' . $key => $request->$key]);
+        // Save each setting to database
+        foreach ($settings as $key => $value) {
+            \DB::table('settings')->updateOrInsert(
+                ['key' => $key],
+                ['value' => $value, 'updated_at' => now()]
+            );
+
+            // Update config for current session
+            $configValue = $value;
+            if ($value === 'true') {
+                $configValue = true;
+            } elseif ($value === 'false') {
+                $configValue = false;
             }
-        }
-
-        if ($request->has('work_days') && is_array($request->work_days)) {
-            config(['app.work_days' => implode(',', $request->work_days)]);
-        }
-
-        // Try to persist to .env file with error handling
-        try {
-            $envPath = base_path('.env');
-            if (is_writable($envPath)) {
-                $envContent = file_get_contents($envPath);
-                $envContent = $this->updateEnvValue($envContent, 'CENTER_NAME', $request->center_name ?? 'مركز حفظ القرآن الكريم');
-                $envContent = $this->updateEnvValue($envContent, 'CENTER_EMAIL', $request->center_email ?? '');
-                $envContent = $this->updateEnvValue($envContent, 'CENTER_PHONE', $request->center_phone ?? '');
-                $envContent = $this->updateEnvValue($envContent, 'WORK_START_TIME', $request->work_start_time ?? '08:00');
-                $envContent = $this->updateEnvValue($envContent, 'WORK_END_TIME', $request->work_end_time ?? '20:00');
-                $envContent = $this->updateEnvValue($envContent, 'WORK_DAYS', implode(',', $request->work_days ?? ['saturday', 'sunday', 'monday', 'tuesday', 'thursday']));
-                $envContent = $this->updateEnvValue($envContent, 'ENABLE_NOTIFICATIONS', $request->enable_notifications ? 'true' : 'false');
-
-                file_put_contents($envPath, $envContent);
-
-                // Clear config cache so new values are picked up
-                Artisan::call('config:clear');
-            }
-        } catch (\Exception $e) {
-            // Log error but don't fail - settings work in memory
-            \Log::error('Failed to write settings to .env: ' . $e->getMessage());
+            config(['app.' . $key => $configValue]);
         }
 
         return redirect()->route('admin.settings.index')->with('success', 'تم حفظ الإعدادات بنجاح');
-    }
-
-    private function updateEnvValue($content, $key, $value) {
-        if (preg_match('/^' . $key . '=.*$/m', $content)) {
-            return preg_replace('/^' . $key . '=.*$/m', $key . '=' . $value, $content);
-        } else {
-            return $content . "\n" . $key . '=' . $value;
-        }
     }
 }
