@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">من تاريخ</label>
-                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date', $fromDate->toDateString()) }}">
+                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date', $fromDate ? $fromDate->toDateString() : '') }}">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">إلى تاريخ</label>
