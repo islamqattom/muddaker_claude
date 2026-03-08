@@ -17,7 +17,7 @@ class AttendanceFactory extends Factory
             'student_id' => Student::factory(),
             'supervisor_id' => User::factory()->supervisor(),
             'date' => fake()->date('Y-m-d'),
-            'status' => fake()->randomElement(['present', 'absent', 'late', 'excused']),
+            'status' => fake()->randomElement(['present', 'absent', 'late', 'excused', 'holiday']),
             'arrival_time' => fake()->time('H:i:s'),
             'scheduled_time' => '08:00:00',
             'notes' => null,
@@ -42,5 +42,10 @@ class AttendanceFactory extends Factory
     public function excused(): static
     {
         return $this->state(fn (array $attributes) => ['status' => 'excused']);
+    }
+
+    public function holiday(): static
+    {
+        return $this->state(fn (array $attributes) => ['status' => 'holiday']);
     }
 }

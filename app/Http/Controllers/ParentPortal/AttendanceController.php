@@ -12,7 +12,7 @@ class AttendanceController extends Controller {
 
         if ($studentIds->isEmpty()) {
             $attendances = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 30);
-            $stats = ['present' => 0, 'absent' => 0, 'late' => 0, 'excused' => 0];
+            $stats = ['present' => 0, 'absent' => 0, 'late' => 0, 'excused' => 0, 'holiday' => 0];
             $students = collect();
             $studentId = null;
             $period = 'all';
@@ -69,6 +69,7 @@ class AttendanceController extends Controller {
             'absent' => $allAttendances->where('status', 'absent')->count(),
             'late' => $allAttendances->where('status', 'late')->count(),
             'excused' => $allAttendances->where('status', 'excused')->count(),
+            'holiday' => $allAttendances->where('status', 'holiday')->count(),
         ];
 
         // Paginate for display

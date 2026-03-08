@@ -41,8 +41,12 @@
                         <div class="fw-bold fs-4">{{ $stats['excused'] }}</div>
                         <small>بعذر</small>
                     </div>
+                    <div class="text-center p-2 rounded bg-purple text-white flex-fill">
+                        <div class="fw-bold fs-4">{{ $stats['holiday'] ?? 0 }}</div>
+                        <small>عطلة</small>
+                    </div>
                     <div class="text-center p-2 rounded bg-secondary text-white flex-fill">
-                        <div class="fw-bold fs-4">{{ $stats['total'] - $stats['present'] - $stats['absent'] - $stats['late'] - $stats['excused'] }}</div>
+                        <div class="fw-bold fs-4">{{ $stats['total'] - $stats['present'] - $stats['absent'] - $stats['late'] - $stats['excused'] - ($stats['holiday'] ?? 0) }}</div>
                         <small>غير مسجل</small>
                     </div>
                 </div>
@@ -166,10 +170,20 @@
 
             <div class="p-3 border-top d-flex justify-content-between align-items-center">
                 <span class="text-muted">{{ $students->count() }} طالب</span>
-                <button type="submit" class="btn btn-primary btn-lg px-5">
-                    <i class="fas fa-save me-2"></i>
-                    حفظ سجل الحضور
-                </button>
+                <div class="d-flex gap-2">
+                    <form action="{{ route('supervisor.attendance.holiday') }}" method="POST" id="holidayForm">
+                        @csrf
+                        <input type="hidden" name="date" value="{{ $date->toDateString() }}">
+                        <button type="button" class="btn btn-purple btn-lg px-4" onclick="confirmHoliday()">
+                            <i class="fas fa-calendar-week me-2"></i>
+                            عطلة
+                        </button>
+                    </form>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>
+                        حفظ سجل الحضور
+                    </button>
+                </div>
             </div>
         </form>
         @endif
@@ -178,6 +192,21 @@
 @endsection
 
 @push('scripts')
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.btn-purple {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: #5a32a3;
+    border-color: #5a32a3;
+    color: white;
+}
+</style>
 <script>
 function handleStatusChange(studentId, status) {
     const arrivalInput = document.getElementById('arrival-' + studentId);
@@ -190,7 +219,13 @@ function handleStatusChange(studentId, status) {
     }
     // Color the row
     const row = document.getElementById('row-' + studentId);
-    row.className = 'table-' + (status === 'present' ? 'success' : status === 'absent' ? 'danger' : status === 'late' ? 'warning' : 'info');
+    let colorClass = 'table-';
+    if (status === 'present') colorClass += 'success';
+    else if (status === 'absent') colorClass += 'danger';
+    else if (status === 'late') colorClass += 'warning';
+    else if (status === 'excused') colorClass += 'info';
+    else if (status === 'holiday') colorClass = '';
+    row.className = colorClass;
 }
 
 function markAll(status) {
@@ -199,6 +234,12 @@ function markAll(status) {
         const studentId = radio.id.split('-')[1];
         handleStatusChange(studentId, status);
     });
+}
+
+function confirmHoliday() {
+    if (confirm('هل أنت متأكد من تسجيل هذا اليوم كعطلة لجميع الطلاب؟')) {
+        document.getElementById('holidayForm').submit();
+    }
 }
 
 // Initialize colors on load

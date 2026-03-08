@@ -28,6 +28,7 @@ class AttendanceController extends Controller
             'absent' => $existingAttendances->filter(fn($s) => $s === 'absent')->count(),
             'late' => $existingAttendances->filter(fn($s) => $s === 'late')->count(),
             'excused' => $existingAttendances->filter(fn($s) => $s === 'excused')->count(),
+            'holiday' => $existingAttendances->filter(fn($s) => $s === 'holiday')->count(),
             'total' => $students->count(),
         ];
 
@@ -39,7 +40,7 @@ class AttendanceController extends Controller
         $request->validate([
             'date' => 'required|date',
             'attendance' => 'required|array',
-            'attendance.*.status' => 'required|in:present,absent,late,excused',
+            'attendance.*.status' => 'required|in:present,absent,late,excused,holiday',
             'attendance.*.arrival_time' => 'nullable|date_format:H:i',
         ]);
 
@@ -58,6 +59,33 @@ class AttendanceController extends Controller
         }
 
         return redirect()->back()->with('success', 'تم حفظ سجل الحضور والغياب بنجاح');
+    }
+
+    public function holiday(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date',
+        ]);
+
+        $supervisorId = Auth::id();
+        $date = $request->date;
+
+        // Get all students under this supervisor
+        $students = Student::where('supervisor_id', $supervisorId)->get();
+
+        foreach ($students as $student) {
+            Attendance::updateOrCreate(
+                ['student_id' => $student->id, 'date' => $date],
+                [
+                    'supervisor_id' => $supervisorId,
+                    'status' => 'holiday',
+                    'arrival_time' => null,
+                    'notes' => 'عطلة',
+                ]
+            );
+        }
+
+        return redirect()->back()->with('success', 'تم تسجيل اليوم كعطلة لجميع الطلاب');
     }
 
     public function history(Request $request)

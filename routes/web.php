@@ -73,6 +73,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::prefix('attendance')->name('attendance.')->group(function () {
         Route::get('/', [Supervisor\AttendanceController::class, 'index'])->name('index');
         Route::post('/', [Supervisor\AttendanceController::class, 'store'])->name('store');
+        Route::post('/holiday', [Supervisor\AttendanceController::class, 'holiday'])->name('holiday');
         Route::get('/history', [Supervisor\AttendanceController::class, 'history'])->name('history');
         Route::delete('/{attendance}', [Supervisor\AttendanceController::class, 'destroy'])->name('destroy');
     });

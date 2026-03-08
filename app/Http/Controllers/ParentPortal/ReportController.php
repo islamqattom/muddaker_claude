@@ -70,6 +70,7 @@ class ReportController extends Controller {
         $absentCount = $attendances->where('status', 'absent')->count();
         $lateCount = $attendances->where('status', 'late')->count();
         $excusedCount = $attendances->where('status', 'excused')->count();
+        $holidayCount = $attendances->where('status', 'holiday')->count();
         $attendanceRate = $totalAttendances > 0 ? round(($presentCount + $lateCount) / $totalAttendances * 100) : 0;
 
         // Per-student statistics
@@ -101,7 +102,7 @@ class ReportController extends Controller {
             'parent', 'students', 'studentsData', 'studentId',
             'fromDate', 'toDate',
             'totalSessions', 'passedSessions', 'failedSessions',
-            'totalAttendances', 'presentCount', 'absentCount', 'lateCount', 'excusedCount', 'attendanceRate'
+            'totalAttendances', 'presentCount', 'absentCount', 'lateCount', 'excusedCount', 'holidayCount', 'attendanceRate'
         ));
     }
 }

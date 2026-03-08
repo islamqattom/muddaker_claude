@@ -56,6 +56,7 @@ class Attendance extends Model
             'absent' => 'غائب',
             'late' => 'متأخر',
             'excused' => 'غائب بعذر',
+            'holiday' => 'عطلة',
             default => 'غير محدد',
         };
     }
@@ -67,6 +68,7 @@ class Attendance extends Model
             'absent' => 'danger',
             'late' => 'warning',
             'excused' => 'info',
+            'holiday' => 'purple',
             default => 'secondary',
         };
     }
