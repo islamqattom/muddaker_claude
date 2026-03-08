@@ -92,11 +92,11 @@ class AttendanceController extends Controller
     {
         $supervisorId = Auth::id();
         $studentId = $request->student_id;
-        $fromDate = $request->from_date ? Carbon::parse($request->from_date) : null;
+        $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
 
         $query = Attendance::where('supervisor_id', $supervisorId)
-            ->when($fromDate, fn($q) => $q->whereBetween('date', [$fromDate, $toDate]))
+            ->whereBetween('date', [$fromDate, $toDate])
             ->with('student.user');
 
         if ($studentId) {
