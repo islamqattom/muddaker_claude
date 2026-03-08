@@ -6,7 +6,7 @@
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#182B48",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "icons": [
         {
             "src": "/images/muddaker-logo-main-nobg.png",
