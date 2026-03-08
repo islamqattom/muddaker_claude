@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller {
@@ -16,7 +17,6 @@ class ProfileController extends Controller {
         $student = $user->student;
 
         $request->validate([
-            'name' => 'required|string|max:255',
             'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
@@ -54,7 +54,6 @@ class ProfileController extends Controller {
         }
 
         $userData = [
-            'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
         ];
@@ -71,5 +70,27 @@ class ProfileController extends Controller {
         ]);
 
         return back()->with('success', 'تم تحديث الملف الشخصي بنجاح');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withInput()->with('error', 'كلمة المرور الحالية غير صحيحة');
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return back()->with('success', 'تم تغيير كلمة المرور بنجاح');
     }
 }

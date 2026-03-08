@@ -95,10 +95,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">الاسم</label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ $parent->user->name }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input type="text" name="name" class="form-control" value="{{ $parent->user->name }}" disabled>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -188,6 +185,56 @@
                         </table>
                     </div>
                 @endif
+            </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-lock me-2"></i>
+                    تغيير كلمة المرور
+                </h6>
+            </div>
+            <div class="card-body">
+                @if(session('error'))
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('parent.profile.password') }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">كلمة المرور الحالية</label>
+                            <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required>
+                            @error('current_password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <input type="password" name="new_password" class="form-control @error('new_password') is-invalid @enderror" required minlength="8">
+                            @error('new_password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" name="new_password_confirmation" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-key me-2"></i>تغيير كلمة المرور
+                    </button>
+                </form>
             </div>
         </div>
     </div>
