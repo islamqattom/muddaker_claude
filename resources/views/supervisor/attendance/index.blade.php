@@ -167,10 +167,10 @@
             <div class="p-3 border-top d-flex justify-content-between align-items-center">
                 <span class="text-muted">{{ $students->count() }} طالب</span>
                 <div class="d-flex gap-2">
-                    <form action="{{ route('supervisor.attendance.holiday') }}" method="POST" id="holidayForm">
+                    <form action="{{ route('supervisor.attendance.holiday') }}" method="POST">
                         @csrf
                         <input type="hidden" name="date" value="{{ $date->toDateString() }}">
-                        <button type="button" class="btn btn-purple btn-lg px-4" onclick="confirmHoliday()">
+                        <button type="submit" class="btn btn-purple btn-lg px-4" onclick="return confirm('هل أنت متأكد من تسجيل هذا اليوم كعطلة لجميع الطلاب؟');">
                             <i class="fas fa-calendar-week me-2"></i>
                             عطلة
                         </button>
@@ -230,12 +230,6 @@ function markAll(status) {
         const studentId = radio.id.split('-')[1];
         handleStatusChange(studentId, status);
     });
-}
-
-function confirmHoliday() {
-    if (confirm('هل أنت متأكد من تسجيل هذا اليوم كعطلة لجميع الطلاب؟')) {
-        document.getElementById('holidayForm').submit();
-    }
 }
 
 // Initialize colors on load
