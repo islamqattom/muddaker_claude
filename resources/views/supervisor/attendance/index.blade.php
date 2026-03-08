@@ -41,10 +41,6 @@
                         <div class="fw-bold fs-4">{{ $stats['excused'] }}</div>
                         <small>بعذر</small>
                     </div>
-                    <div class="text-center p-2 rounded bg-purple text-white flex-fill">
-                        <div class="fw-bold fs-4">{{ $stats['holiday'] ?? 0 }}</div>
-                        <small>عطلة</small>
-                    </div>
                     <div class="text-center p-2 rounded bg-secondary text-white flex-fill">
                         <div class="fw-bold fs-4">{{ $stats['total'] - $stats['present'] - $stats['absent'] - $stats['late'] - $stats['excused'] - ($stats['holiday'] ?? 0) }}</div>
                         <small>غير مسجل</small>

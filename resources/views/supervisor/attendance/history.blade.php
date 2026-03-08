@@ -112,6 +112,9 @@
                                     @case('excused')
                                         <span class="badge bg-info">معتذر</span>
                                         @break
+                                    @case('holiday')
+                                        <span class="badge" style="background-color: #6f42c1;">عطلة</span>
+                                        @break
                                 @endswitch
                             </td>
                             <td class="text-center">

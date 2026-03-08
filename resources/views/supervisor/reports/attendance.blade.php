@@ -157,6 +157,9 @@
                                     @case('excused')
                                         <span class="badge bg-info text-dark"><i class="fas fa-file-alt me-1"></i>بعذر</span>
                                         @break
+                                    @case('holiday')
+                                        <span class="badge" style="background-color: #6f42c1;"><i class="fas fa-calendar-week me-1"></i>عطلة</span>
+                                        @break
                                     @default
                                         <span class="badge bg-secondary">غير محدد</span>
                                 @endswitch
