@@ -294,6 +294,11 @@ class RecitationController extends Controller
                 $sessionStatus = 'failed';
             }
 
+            // For new_memorization, review, and unmastered: check if any page failed
+            if (in_array($request->type, ['new_memorization', 'review', 'unmastered']) && $failedPages > 0) {
+                $sessionStatus = 'failed';
+            }
+
             if ($request->failed) {
                 $sessionStatus = 'failed';
             }
