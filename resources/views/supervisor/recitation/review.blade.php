@@ -47,7 +47,7 @@
     <input type="hidden" name="student_id" value="{{ $student->id }}">
     <input type="hidden" name="type" value="review">
     <input type="hidden" name="part_id" value="{{ $part->id }}">
-    <input type="hidden" name="session_date" value="{{ date('Y-m-d') }}">
+    <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
 
     <!-- Pages -->
     @foreach($pages as $index => $pageNum)
