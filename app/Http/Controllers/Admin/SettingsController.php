@@ -29,10 +29,18 @@ class SettingsController extends Controller {
         ];
 
         // Save each setting to database
+        $now = now();
         foreach ($settings as $key => $value) {
+            $existing = \DB::table('settings')->where('key', $key)->first();
+
             \DB::table('settings')->updateOrInsert(
                 ['key' => $key],
-                ['value' => $value, 'updated_at' => now()]
+                [
+                    'value' => $value,
+                    'group' => 'general',
+                    'created_at' => $existing ? $existing->created_at : $now,
+                    'updated_at' => $now,
+                ]
             );
 
             // Update config for current session
