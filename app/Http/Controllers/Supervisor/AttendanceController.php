@@ -37,6 +37,33 @@ class AttendanceController extends Controller
 
     public function store(Request $request)
     {
+        // Handle holiday action
+        if ($request->action === 'holiday') {
+            $request->validate([
+                'date' => 'required|date',
+            ]);
+
+            $supervisorId = Auth::id();
+            $date = $request->date;
+
+            $students = Student::where('supervisor_id', $supervisorId)->get();
+
+            foreach ($students as $student) {
+                Attendance::updateOrCreate(
+                    ['student_id' => $student->id, 'date' => $date],
+                    [
+                        'supervisor_id' => $supervisorId,
+                        'status' => 'holiday',
+                        'arrival_time' => null,
+                        'notes' => 'عطلة',
+                    ]
+                );
+            }
+
+            return redirect()->back()->with('success', 'تم تسجيل اليوم كعطلة لجميع الطلاب');
+        }
+
+        // Handle normal attendance store
         $request->validate([
             'date' => 'required|date',
             'attendance' => 'required|array',

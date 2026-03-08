@@ -79,6 +79,7 @@
         <form action="{{ route('supervisor.attendance.store') }}" method="POST" id="attendanceForm">
             @csrf
             <input type="hidden" name="date" value="{{ $date->toDateString() }}">
+            <input type="hidden" name="action" id="formAction" value="store">
 
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
@@ -166,22 +167,19 @@
 
             <div class="p-3 border-top d-flex justify-content-between align-items-center">
                 <span class="text-muted">{{ $students->count() }} طالب</span>
-                <button type="submit" class="btn btn-primary btn-lg px-5">
-                    <i class="fas fa-save me-2"></i>
-                    حفظ سجل الحضور
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-purple btn-lg px-4" onclick="submitAsHoliday()">
+                        <i class="fas fa-calendar-week me-2"></i>
+                        عطلة
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save me-2"></i>
+                        حفظ سجل الحضور
+                    </button>
+                </div>
             </div>
         </form>
         @endif
-
-        <form action="{{ route('supervisor.attendance.holiday') }}" method="POST" class="mt-3 text-end">
-            @csrf
-            <input type="hidden" name="date" value="{{ $date->toDateString() }}">
-            <button type="submit" class="btn btn-purple" onclick="return confirm('هل أنت متأكد من تسجيل هذا اليوم كعطلة لجميع الطلاب؟');">
-                <i class="fas fa-calendar-week me-2"></i>
-                عطلة
-            </button>
-        </form>
     </div>
 </div>
 @endsection
@@ -229,6 +227,13 @@ function markAll(status) {
         const studentId = radio.id.split('-')[1];
         handleStatusChange(studentId, status);
     });
+}
+
+function submitAsHoliday() {
+    if (confirm('هل أنت متأكد من تسجيل هذا اليوم كعطلة لجميع الطلاب؟')) {
+        document.getElementById('formAction').value = 'holiday';
+        document.getElementById('attendanceForm').submit();
+    }
 }
 
 // Initialize colors on load
