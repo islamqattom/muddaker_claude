@@ -11,6 +11,16 @@ return [
     'cipher' => 'AES-256-CBC',
     'key' => env('APP_KEY'),
     'maintenance' => ['driver' => 'file'],
+
+    // Custom center settings
+    'center_name' => env('CENTER_NAME', 'مركز التسميع'),
+    'center_email' => env('CENTER_EMAIL', ''),
+    'center_phone' => env('CENTER_PHONE', ''),
+    'work_start_time' => env('WORK_START_TIME', '08:00'),
+    'work_end_time' => env('WORK_END_TIME', '20:00'),
+    'work_days' => env('WORK_DAYS', 'saturday,sunday,monday,tuesday,thursday'),
+    'enable_notifications' => env('ENABLE_NOTIFICATIONS', true),
+
     'providers' => [
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
