@@ -704,7 +704,6 @@ class RecitationController extends Controller
         $dayName = $sessionDate->format('l'); // English day name (Monday, Tuesday, etc.)
 
         // Check if day is a work day
-        $arabicDay = $sessionDate->format('l');
         $isWorkDay = false;
         foreach ($workDays as $workDay) {
             $workDay = trim($workDay);
