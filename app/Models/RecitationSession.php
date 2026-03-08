@@ -14,7 +14,8 @@ class RecitationSession extends Model
         'start_page', 'end_page', 'total_pages',
         'total_errors', 'total_hesitations', 'status',
         'mafsil_type', 'max_score', 'final_score',
-        'unmastered_pages_count', 'session_date', 'day', 'notes'
+        'unmastered_pages_count', 'session_date', 'day', 'notes',
+        'additional_pages', 'repeated_pages'
     ];
 
     protected $casts = [

@@ -112,6 +112,15 @@
                                 </select>
                             </div>
                         </div>
+                        <!-- Add Pages Button -->
+                        <div class="mt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('new_memorization')">
+                                <i class="fas fa-plus me-1"></i>إضافة صفحات
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('new_memorization')">
+                                <i class="fas fa-redo me-1"></i>صفحات معادة
+                            </button>
+                        </div>
                     </div>
 
                     <div id="options-review" class="d-none session-options">
@@ -142,6 +151,15 @@
                                 </select>
                             </div>
                         </div>
+                        <!-- Add Pages & Repeated Pages Buttons -->
+                        <div class="mt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('review')">
+                                <i class="fas fa-plus me-1"></i>إضافة صفحات
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('review')">
+                                <i class="fas fa-redo me-1"></i>صفحات معادة
+                            </button>
+                        </div>
                     </div>
 
                     <div id="options-unmastered" class="d-none session-options">
@@ -168,6 +186,15 @@
                                     @endforeach
                                 </div>
                             </div>
+                        </div>
+                        <!-- Add Pages Button -->
+                        <div class="mt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('unmastered')">
+                                <i class="fas fa-plus me-1"></i>إضافة صفحات
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('unmastered')">
+                                <i class="fas fa-redo me-1"></i>صفحات معادة
+                            </button>
                         </div>
                     </div>
 
@@ -332,6 +359,54 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for Adding Pages (إضافة صفحات) -->
+<div class="modal fade" id="addPagesModal" tabindex="-1" aria-labelledby="addPagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPagesModalLabel">إضافة صفحات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="additionalPagesContainer">
+                    <!-- Dynamic rows will be added here -->
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addAdditionalPageRow()">
+                    <i class="fas fa-plus me-1"></i>إضافة صف
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="applyAdditionalPages()">تطبيق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Repeated Pages (صفحات معادة) -->
+<div class="modal fade" id="repeatedPagesModal" tabindex="-1" aria-labelledby="repeatedPagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="repeatedPagesModalLabel">صفحات معادة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="repeatedPagesContainer">
+                    <!-- Dynamic rows will be added here -->
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addRepeatedPageRow()">
+                    <i class="fas fa-plus me-1"></i>إضافة صف
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-success" onclick="applyRepeatedPages()">تطبيق</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -446,6 +521,220 @@ function showTypeOptions(type) {
     }
 }
 
+// Store additional/repeated pages data
+let additionalPagesData = [];
+let repeatedPagesData = [];
+let currentSessionType = '';
+
+// Parts data for dropdowns
+const partsData = @json($parts);
+
+function openAddPagesModal(type) {
+    currentSessionType = type;
+    additionalPagesData = [];
+    const container = document.getElementById('additionalPagesContainer');
+    container.innerHTML = '';
+    // Add first row by default
+    addAdditionalPageRow();
+    const modal = new bootstrap.Modal(document.getElementById('addPagesModal'));
+    modal.show();
+}
+
+function addAdditionalPageRow() {
+    const container = document.getElementById('additionalPagesContainer');
+    const rowId = 'add-page-row-' + container.children.length;
+    const row = document.createElement('div');
+    row.className = 'row g-2 mb-2 align-items-end additional-page-row';
+    row.id = rowId;
+
+    // Build part options
+    let partOptions = '<option value="">-- اختر الجزء --</option>';
+    partsData.forEach(part => {
+        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}">الجزء ${part.part_number} (ص ${part.start_page} - ${part.end_page})</option>`;
+    });
+
+    row.innerHTML = `
+        <div class="col-5">
+            <label class="form-label mb-1">الجزء</label>
+            <select name="part_id_add" class="form-select form-select-sm" onchange="updatePageOptions('${rowId}', this.value)">
+                ${partOptions}
+            </select>
+        </div>
+        <div class="col-4">
+            <label class="form-label mb-1">الصفحة</label>
+            <select name="page_number_add" class="form-select form-select-sm" id="page_${rowId}">
+                <option value="">-- اختر الجزء أولاً --</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removePageRow('${rowId}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(row);
+}
+
+function updatePageOptions(rowId, partId) {
+    const row = document.getElementById(rowId);
+    const partSelect = row.querySelector('select[name="part_id_add"]');
+    const pageSelect = document.getElementById('page_' + rowId);
+
+    if (!partId) {
+        pageSelect.innerHTML = '<option value="">-- اختر الجزء أولاً --</option>';
+        return;
+    }
+
+    const selectedOption = partSelect.options[partSelect.selectedIndex];
+    const startPage = parseInt(selectedOption.dataset.startPage);
+    const endPage = parseInt(selectedOption.dataset.endPage);
+
+    pageSelect.innerHTML = '<option value="">-- اختر الصفحة --</option>';
+    for (let page = startPage; page <= endPage; page++) {
+        const option = document.createElement('option');
+        option.value = page;
+        option.textContent = 'صفحة ' + page;
+        pageSelect.appendChild(option);
+    }
+}
+
+function removePageRow(rowId) {
+    const row = document.getElementById(rowId);
+    row.remove();
+}
+
+function applyAdditionalPages() {
+    const rows = document.querySelectorAll('.additional-page-row');
+    additionalPagesData = [];
+
+    rows.forEach(row => {
+        const partId = row.querySelector('select[name="part_id_add"]').value;
+        const pageNumber = row.querySelector('select[name="page_number_add"]').value;
+        if (partId && pageNumber) {
+            additionalPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
+        }
+    });
+
+    if (additionalPagesData.length === 0) {
+        toastr.warning('يرجى اختيار صفحة واحدة على الأقل');
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('addPagesModal')).hide();
+    toastr.success('تمت إضافة ' + additionalPagesData.length + ' صفحة');
+}
+
+// Repeated Pages Modal Functions
+function openRepeatedPagesModal(type) {
+    currentSessionType = type;
+    repeatedPagesData = [];
+    const container = document.getElementById('repeatedPagesContainer');
+    container.innerHTML = '';
+    // Add first row by default
+    addRepeatedPageRow(type);
+    const modal = new bootstrap.Modal(document.getElementById('repeatedPagesModal'));
+    modal.show();
+}
+
+function addRepeatedPageRow(type) {
+    const container = document.getElementById('repeatedPagesContainer');
+    const rowId = 'repeated-page-row-' + container.children.length;
+    const row = document.createElement('div');
+    row.className = 'row g-2 mb-2 align-items-end repeated-page-row';
+    row.id = rowId;
+
+    // Determine which part selector to use based on type
+    let currentPartId = '';
+    if (type === 'review') {
+        currentPartId = document.querySelector('select[name="part_id_review"]')?.value || '';
+    } else if (type === 'new_memorization') {
+        currentPartId = document.querySelector('select[name="part_id_new"]')?.value || '';
+    } else if (type === 'unmastered') {
+        currentPartId = document.querySelector('select[name="part_id_unmastered"]')?.value || '';
+    }
+
+    let partOptions = '<option value="">-- اختر الجزء --</option>';
+    partsData.forEach(part => {
+        const selected = part.id == currentPartId ? 'selected' : '';
+        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}" ${selected}>الجزء ${part.part_number} (ص ${part.start_page} - ${part.end_page})</option>`;
+    });
+
+    row.innerHTML = `
+        <div class="col-5">
+            <label class="form-label mb-1">الجزء</label>
+            <select name="part_id_repeat" class="form-select form-select-sm" onchange="updateRepeatedPageOptions('${rowId}', this.value)">
+                ${partOptions}
+            </select>
+        </div>
+        <div class="col-4">
+            <label class="form-label mb-1">الصفحة</label>
+            <select name="page_number_repeat" class="form-select form-select-sm" id="page_repeat_${rowId}">
+                <option value="">-- اختر الصفحة --</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRepeatedPageRow('${rowId}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(row);
+
+    // If current part is selected, populate pages
+    if (currentPartId) {
+        updateRepeatedPageOptions(rowId, currentPartId);
+    }
+}
+
+function updateRepeatedPageOptions(rowId, partId) {
+    const row = document.getElementById(rowId);
+    const partSelect = row.querySelector('select[name="part_id_repeat"]');
+    const pageSelect = document.getElementById('page_repeat_' + rowId);
+
+    if (!partId) {
+        pageSelect.innerHTML = '<option value="">-- اختر الجزء أولاً --</option>';
+        return;
+    }
+
+    const selectedOption = partSelect.options[partSelect.selectedIndex];
+    const startPage = parseInt(selectedOption.dataset.startPage);
+    const endPage = parseInt(selectedOption.dataset.endPage);
+
+    pageSelect.innerHTML = '<option value="">-- اختر الصفحة --</option>';
+    for (let page = startPage; page <= endPage; page++) {
+        const option = document.createElement('option');
+        option.value = page;
+        option.textContent = 'صفحة ' + page;
+        pageSelect.appendChild(option);
+    }
+}
+
+function removeRepeatedPageRow(rowId) {
+    const row = document.getElementById(rowId);
+    row.remove();
+}
+
+function applyRepeatedPages() {
+    const rows = document.querySelectorAll('.repeated-page-row');
+    repeatedPagesData = [];
+
+    rows.forEach(row => {
+        const partId = row.querySelector('select[name="part_id_repeat"]').value;
+        const pageNumber = row.querySelector('select[name="page_number_repeat"]').value;
+        if (partId && pageNumber) {
+            repeatedPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
+        }
+    });
+
+    if (repeatedPagesData.length === 0) {
+        toastr.warning('يرجى اختيار صفحة واحدة على الأقل');
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('repeatedPagesModal')).hide();
+    toastr.success('تمت إضافة ' + repeatedPagesData.length + ' صفحة معادة');
+}
+
 function startSession() {
     const studentId = document.getElementById('studentSelect').value;
     const typeEl = document.querySelector('input[name="type"]:checked');
@@ -463,6 +752,18 @@ function startSession() {
 
     const type = typeEl.value;
     let url = '';
+
+    // Build additional params
+    let additionalPagesParam = '';
+    if (additionalPagesData.length > 0) {
+        additionalPagesParam = '&additional_pages=' + encodeURIComponent(JSON.stringify(additionalPagesData));
+    }
+
+    // Build repeated pages params (for review, new_memorization, unmastered)
+    let repeatedPagesParam = '';
+    if (repeatedPagesData.length > 0 && (type === 'review' || type === 'new_memorization' || type === 'unmastered')) {
+        repeatedPagesParam = '&repeated_pages=' + encodeURIComponent(JSON.stringify(repeatedPagesData));
+    }
 
     if (type === 'new_memorization') {
         const partId = document.querySelector('select[name="part_id_new"]').value;
@@ -483,7 +784,7 @@ function startSession() {
         if (continuationPart) {
             continuationParam = `&continuation_part_id=${continuationPart}`;
         }
-        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParam}`;
+        url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParam}${additionalPagesParam}${repeatedPagesParam}`;
     } else if (type === 'review') {
         const partId = document.querySelector('select[name="part_id_review"]').value;
         const pageNumber = document.getElementById('page_number_review').value;
@@ -503,7 +804,7 @@ function startSession() {
         if (continuationPartReview) {
             continuationParamReview = `&continuation_part_id=${continuationPartReview}`;
         }
-        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParamReview}`;
+        url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParamReview}${additionalPagesParam}${repeatedPagesParam}`;
     } else if (type === 'unmastered') {
         const partId = document.querySelector('select[name="part_id_unmastered"]').value;
         const pageNumber = document.getElementById('page_number_unmastered').value;
@@ -518,7 +819,7 @@ function startSession() {
             toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
             return;
         }
-        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}&session_date=${sessionDate}`;
+        url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}&session_date=${sessionDate}${additionalPagesParam}${repeatedPagesParam}`;
     } else if (type === 'recitation') {
         const partId = document.querySelector('select[name="part_id_recitation"]').value;
         url = `{{ route('supervisor.recitation.recitation') }}?student_id=${studentId}&part_id=${partId}&session_date=${sessionDate}`;

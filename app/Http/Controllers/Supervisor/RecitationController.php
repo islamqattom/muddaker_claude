@@ -79,6 +79,44 @@ class RecitationController extends Controller
             }
         }
 
+        // Handle additional pages (store original count for repeated pages calculation)
+        $originalPagesCount = count($pages);
+        if ($request->additional_pages) {
+            $additionalPages = json_decode($request->additional_pages, true);
+            if (is_array($additionalPages)) {
+                foreach ($additionalPages as $additionalPage) {
+                    if (isset($additionalPage['page_number'])) {
+                        $pages[] = $additionalPage['page_number'];
+                    }
+                }
+            }
+        }
+
+        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
+        if ($request->repeated_pages) {
+            $repeatedPages = json_decode($request->repeated_pages, true);
+            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
+                $repeatedCount = count($repeatedPages);
+                // Keep original pages minus repeated count
+                $keepCount = max(0, $originalPagesCount - $repeatedCount);
+                // Get the original pages (before additional)
+                $originalPages = array_slice($pages, 0, $keepCount);
+                // Add repeated pages
+                foreach ($repeatedPages as $repeatedPage) {
+                    if (isset($repeatedPage['page_number'])) {
+                        $originalPages[] = $repeatedPage['page_number'];
+                    }
+                }
+                // Append additional pages at the end
+                $additionalCount = count($pages) - $originalPagesCount;
+                if ($additionalCount > 0) {
+                    $additionalOnly = array_slice($pages, $originalPagesCount);
+                    $originalPages = array_merge($originalPages, $additionalOnly);
+                }
+                $pages = $originalPages;
+            }
+        }
+
         return view('supervisor.recitation.new-memorization', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
 
@@ -127,6 +165,44 @@ class RecitationController extends Controller
             }
         }
 
+        // Handle additional pages (store original count for repeated pages calculation)
+        $originalPagesCount = count($pages);
+        if ($request->additional_pages) {
+            $additionalPages = json_decode($request->additional_pages, true);
+            if (is_array($additionalPages)) {
+                foreach ($additionalPages as $additionalPage) {
+                    if (isset($additionalPage['page_number'])) {
+                        $pages[] = $additionalPage['page_number'];
+                    }
+                }
+            }
+        }
+
+        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
+        if ($request->repeated_pages) {
+            $repeatedPages = json_decode($request->repeated_pages, true);
+            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
+                $repeatedCount = count($repeatedPages);
+                // Keep original pages minus repeated count
+                $keepCount = max(0, $originalPagesCount - $repeatedCount);
+                // Get the original pages (before additional)
+                $originalPages = array_slice($pages, 0, $keepCount);
+                // Add repeated pages
+                foreach ($repeatedPages as $repeatedPage) {
+                    if (isset($repeatedPage['page_number'])) {
+                        $originalPages[] = $repeatedPage['page_number'];
+                    }
+                }
+                // Append additional pages at the end
+                $additionalCount = count($pages) - $originalPagesCount;
+                if ($additionalCount > 0) {
+                    $additionalOnly = array_slice($pages, $originalPagesCount);
+                    $originalPages = array_merge($originalPages, $additionalOnly);
+                }
+                $pages = $originalPages;
+            }
+        }
+
         return view('supervisor.recitation.review', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
 
@@ -158,6 +234,44 @@ class RecitationController extends Controller
             $pageNum = $startPage + $i;
             if ($pageNum <= $part->end_page) {
                 $pages[] = $pageNum;
+            }
+        }
+
+        // Handle additional pages (store original count for repeated pages calculation)
+        $originalPagesCount = count($pages);
+        if ($request->additional_pages) {
+            $additionalPages = json_decode($request->additional_pages, true);
+            if (is_array($additionalPages)) {
+                foreach ($additionalPages as $additionalPage) {
+                    if (isset($additionalPage['page_number'])) {
+                        $pages[] = $additionalPage['page_number'];
+                    }
+                }
+            }
+        }
+
+        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
+        if ($request->repeated_pages) {
+            $repeatedPages = json_decode($request->repeated_pages, true);
+            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
+                $repeatedCount = count($repeatedPages);
+                // Keep original pages minus repeated count
+                $keepCount = max(0, $originalPagesCount - $repeatedCount);
+                // Get the original pages (before additional)
+                $originalPages = array_slice($pages, 0, $keepCount);
+                // Add repeated pages
+                foreach ($repeatedPages as $repeatedPage) {
+                    if (isset($repeatedPage['page_number'])) {
+                        $originalPages[] = $repeatedPage['page_number'];
+                    }
+                }
+                // Append additional pages at the end
+                $additionalCount = count($pages) - $originalPagesCount;
+                if ($additionalCount > 0) {
+                    $additionalOnly = array_slice($pages, $originalPagesCount);
+                    $originalPages = array_merge($originalPages, $additionalOnly);
+                }
+                $pages = $originalPages;
             }
         }
 
