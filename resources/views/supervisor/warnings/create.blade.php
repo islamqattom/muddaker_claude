@@ -460,7 +460,7 @@ function renderAttendanceTable() {
     attendanceData.forEach(function(record, index) {
         const row = document.createElement('tr');
         // Format date to show only date part (without time)
-        const formattedDate = record.date ? record.date.split('T')[0] : '-';
+        const formattedDate = record.date ? (record.date.includes('T') ? record.date.split('T')[0] : record.date) : '-';
         row.innerHTML = `
             <td>${escapeHtml(record.day || '-')}</td>
             <td>${escapeHtml(formattedDate)}</td>
@@ -556,7 +556,7 @@ function renderRecitationTable() {
     recitationData.forEach(function(record, index) {
         const row = document.createElement('tr');
         // Format date to show only date part (without time)
-        const formattedDate = record.session_date ? record.session_date.split('T')[0] : '-';
+        const formattedDate = record.session_date ? (record.session_date.includes('T') ? record.session_date.split('T')[0] : record.session_date) : '-';
         // Get existing notes or empty string for manual entry
         const existingNotes = record.notes || '';
         // Use passed_pages and failed_pages from API (calculated from pages table)

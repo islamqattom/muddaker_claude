@@ -163,16 +163,48 @@ class WarningController extends Controller
         $fromDate = $request->from_date ?? date('Y-m-01');
 
         try {
+            // Only fetch absent, late, and excused records (not present)
             $attendances = Attendance::where('student_id', $student->id)
                 ->where('date', '>=', $fromDate)
+                ->whereIn('status', ['absent', 'late', 'excused'])
                 ->orderBy('date', 'desc')
                 ->get();
+
+            // Format date and time properly
+            $attendances = $attendances->map(function($record) {
+                return [
+                    'id' => $record->id,
+                    'day' => $record->day,
+                    'date' => $record->date->toDateString(), // Use toDateString to avoid timezone issues
+                    'status' => $record->status,
+                    'arrival_time' => $record->arrival_time ? $this->convertTo12HourFormat($record->arrival_time) : null,
+                    'notes' => $record->notes,
+                ];
+            });
 
             return response()->json($attendances);
         } catch (\Exception $e) {
             \Log::error('Failed to fetch attendance: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch attendance data'], 500);
         }
+    }
+
+    /**
+     * Convert time from 24-hour to 12-hour format
+     */
+    private function convertTo12HourFormat($time)
+    {
+        if (!$time) return null;
+        $dateTime = \Carbon\Carbon::createFromFormat('H:i:s', $time);
+        if ($dateTime) {
+            return $dateTime->format('h:i A');
+        }
+        // Try without seconds
+        $dateTime = \Carbon\Carbon::createFromFormat('H:i', $time);
+        if ($dateTime) {
+            return $dateTime->format('h:i A');
+        }
+        return $time;
     }
 
     public function getRecitations(Request $request, Student $student)
@@ -185,10 +217,10 @@ class WarningController extends Controller
         $fromDate = $request->from_date ?? date('Y-m-01');
 
         try {
-            // Only fetch failed recitations
+            // Fetch failed and not_recitate recitations
             $recitations = RecitationSession::where('student_id', $student->id)
                 ->where('session_date', '>=', $fromDate)
-                ->where('status', 'failed')
+                ->whereIn('status', ['failed', 'not_recitate'])
                 ->with(['pages' => function($query) {
                     $query->select('id', 'session_id', 'page_number', 'is_passed', 'color_status');
                 }])
@@ -203,8 +235,9 @@ class WarningController extends Controller
                 return [
                     'id' => $session->id,
                     'day' => $session->day,
-                    'session_date' => $session->session_date,
+                    'session_date' => $session->session_date->toDateString(), // Use toDateString to avoid timezone issues
                     'type' => $session->type,
+                    'status' => $session->status,
                     'total_pages' => $session->total_pages,
                     'passed_pages' => $passedPages,
                     'failed_pages' => $failedPages,
