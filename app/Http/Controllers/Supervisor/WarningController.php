@@ -35,38 +35,38 @@ class WarningController extends Controller
         $supervisorId = Auth::id();
         $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
 
-        $student = null;
+        $selectedStudent = null;
         $attendanceStats = null;
         $recitationStats = null;
 
         if ($request->student_id) {
             // Verify student belongs to this supervisor
-            $student = Student::where('supervisor_id', $supervisorId)
+            $selectedStudent = Student::where('supervisor_id', $supervisorId)
                 ->with(['user', 'level'])
                 ->find($request->student_id);
 
-            if ($student) {
+            if ($selectedStudent) {
                 // Default to current month
                 $fromDate = Carbon::now()->startOfMonth();
                 $toDate = Carbon::now();
 
                 $attendanceStats = [
-                    'present' => Attendance::where('student_id', $student->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'present')->count(),
-                    'absent' => Attendance::where('student_id', $student->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'absent')->count(),
-                    'late' => Attendance::where('student_id', $student->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'late')->count(),
-                    'excused' => Attendance::where('student_id', $student->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'excused')->count(),
-                    'total' => Attendance::where('student_id', $student->id)->whereBetween('date', [$fromDate, $toDate])->count(),
+                    'present' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'present')->count(),
+                    'absent' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'absent')->count(),
+                    'late' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'late')->count(),
+                    'excused' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'excused')->count(),
+                    'total' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->count(),
                 ];
 
                 $recitationStats = [
-                    'total' => RecitationSession::where('student_id', $student->id)->whereBetween('session_date', [$fromDate, $toDate])->count(),
-                    'passed' => RecitationSession::where('student_id', $student->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'passed')->count(),
-                    'failed' => RecitationSession::where('student_id', $student->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'failed')->count(),
+                    'total' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->count(),
+                    'passed' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'passed')->count(),
+                    'failed' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'failed')->count(),
                 ];
             }
         }
 
-        return view('supervisor.warnings.create', compact('students', 'student', 'attendanceStats', 'recitationStats'));
+        return view('supervisor.warnings.create', compact('students', 'selectedStudent', 'attendanceStats', 'recitationStats'));
     }
 
     public function store(Request $request)

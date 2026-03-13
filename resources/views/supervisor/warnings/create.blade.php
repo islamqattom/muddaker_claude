@@ -222,12 +222,12 @@
                     <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>معاينة</h6>
                 </div>
                 <div class="card-body">
-                    @if($student)
+                    @if($selectedStudent)
                         <div class="text-center mb-4">
-                            <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
-                            <h5>{{ $student->user->name }}</h5>
-                            <p class="text-muted mb-1">{{ $student->student_number }}</p>
-                            <span class="badge bg-light text-dark">{{ $student->level->name ?? '-' }}</span>
+                            <img src="{{ $selectedStudent->user->avatar_url }}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
+                            <h5>{{ $selectedStudent->user->name }}</h5>
+                            <p class="text-muted mb-1">{{ $selectedStudent->student_number }}</p>
+                            <span class="badge bg-light text-dark">{{ $selectedStudent->level->name ?? '-' }}</span>
                         </div>
 
                         @if($attendanceStats)
