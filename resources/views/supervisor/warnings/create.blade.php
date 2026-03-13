@@ -194,6 +194,7 @@
                                 <tr>
                                     <th>اليوم</th>
                                     <th>التاريخ</th>
+                                    <th>نوع التسميع</th>
                                     <th>المطلوب تسميعه</th>
                                     <th>الصفحات التي نجح بها</th>
                                     <th>الصفحات التي رسب بها</th>
@@ -554,17 +555,22 @@ function renderRecitationTable() {
 
     recitationData.forEach(function(record, index) {
         const row = document.createElement('tr');
-        const passedPages = (record.total_pages || 0) - (record.unmastered_pages_count || 0);
         // Format date to show only date part (without time)
         const formattedDate = record.session_date ? record.session_date.split('T')[0] : '-';
         // Get existing notes or empty string for manual entry
         const existingNotes = record.notes || '';
+        // Use passed_pages and failed_pages from API (calculated from pages table)
+        const passedPages = record.passed_pages || 0;
+        const failedPages = record.failed_pages || 0;
+        const totalPages = record.total_pages || 0;
+
         row.innerHTML = `
             <td>${escapeHtml(record.day || '-')}</td>
             <td>${escapeHtml(formattedDate)}</td>
             <td>${escapeHtml(typeLabels[record.type] || record.type)}</td>
+            <td>${totalPages}</td>
             <td>${passedPages}</td>
-            <td>${record.unmastered_pages_count || 0}</td>
+            <td>${failedPages}</td>
             <td>
                 <input type="text" class="form-control form-control-sm"
                     placeholder="أضف ملاحظات..."

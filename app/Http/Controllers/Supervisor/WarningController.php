@@ -185,10 +185,32 @@ class WarningController extends Controller
         $fromDate = $request->from_date ?? date('Y-m-01');
 
         try {
+            // Only fetch failed recitations
             $recitations = RecitationSession::where('student_id', $student->id)
                 ->where('session_date', '>=', $fromDate)
+                ->where('status', 'failed')
+                ->with(['pages' => function($query) {
+                    $query->select('id', 'session_id', 'page_number', 'is_passed', 'color_status');
+                }])
                 ->orderBy('session_date', 'desc')
                 ->get();
+
+            // Transform to add computed fields
+            $recitations = $recitations->map(function($session) {
+                $passedPages = $session->pages->where('is_passed', true)->count();
+                $failedPages = $session->pages->where('is_passed', false)->count();
+
+                return [
+                    'id' => $session->id,
+                    'day' => $session->day,
+                    'session_date' => $session->session_date,
+                    'type' => $session->type,
+                    'total_pages' => $session->total_pages,
+                    'passed_pages' => $passedPages,
+                    'failed_pages' => $failedPages,
+                    'notes' => $session->notes,
+                ];
+            });
 
             return response()->json($recitations);
         } catch (\Exception $e) {
@@ -439,6 +461,7 @@ class WarningController extends Controller
                 <tr style="background-color: #e8f4fd; font-weight: bold;">
                     <td align="center">اليوم</td>
                     <td align="center">التاريخ</td>
+                    <td align="center">نوع التسميع</td>
                     <td align="center">المطلوب تسميعه</td>
                     <td align="center">الصفحات التي نجح بها</td>
                     <td align="center">الصفحات التي رسب بها</td>
@@ -448,14 +471,16 @@ class WarningController extends Controller
             foreach ($warning->recitation_data as $record) {
                 $date = is_string($record['session_date']) ? explode('T', $record['session_date'])[0] : $record['session_date'];
                 $type = $typeLabels[$record['type']] ?? $record['type'];
-                $passedPages = ($record['total_pages'] ?? 0) - ($record['unmastered_pages_count'] ?? 0);
-                $failedPages = $record['unmastered_pages_count'] ?? 0;
+                $totalPages = $record['total_pages'] ?? 0;
+                $passedPages = $record['passed_pages'] ?? 0;
+                $failedPages = $record['failed_pages'] ?? 0;
                 $notes = $record['notes'] ?? '-';
 
                 $recitationHtml .= '<tr>
                     <td align="center">' . ($record['day'] ?? '-') . '</td>
                     <td align="center">' . $date . '</td>
                     <td align="center">' . $type . '</td>
+                    <td align="center">' . $totalPages . '</td>
                     <td align="center">' . $passedPages . '</td>
                     <td align="center">' . $failedPages . '</td>
                     <td align="center">' . $notes . '</td>

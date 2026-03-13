@@ -236,6 +236,7 @@
                             <tr>
                                 <th>اليوم</th>
                                 <th>التاريخ</th>
+                                <th>نوع التسميع</th>
                                 <th>المطلوب تسميعه</th>
                                 <th>الصفحات التي نجح بها</th>
                                 <th>الصفحات التي رسب بها</th>
@@ -243,25 +244,24 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $typeLabels = [
+                                    'new_memorization' => 'حفظ جديد',
+                                    'review' => 'مراجعة',
+                                    'unmastered' => 'حفظ غير متقن',
+                                    'recitation' => 'سرد',
+                                    'mafsil' => 'مفصل',
+                                    'not_recitate' => 'لم يسمع'
+                                ];
+                            @endphp
                             @foreach($warning->recitation_data as $record)
                             <tr>
                                 <td>{{ $record['day'] ?? '-' }}</td>
                                 <td>{{ \Illuminate\Support\Str::of($record['session_date'])->before('T') }}</td>
-                                <td>
-                                    @php
-                                        $typeLabels = [
-                                            'new_memorization' => 'حفظ جديد',
-                                            'review' => 'مراجعة',
-                                            'unmastered' => 'حفظ غير متقن',
-                                            'recitation' => 'سرد',
-                                            'mafsil' => 'مفصل',
-                                            'not_recitate' => 'لم يسمع'
-                                        ];
-                                    @endphp
-                                    {{ $typeLabels[$record['type']] ?? $record['type'] }}
-                                </td>
-                                <td>{{ ($record['total_pages'] ?? 0) - ($record['unmastered_pages_count'] ?? 0) }}</td>
-                                <td>{{ $record['unmastered_pages_count'] ?? 0 }}</td>
+                                <td>{{ $typeLabels[$record['type']] ?? $record['type'] }}</td>
+                                <td>{{ $record['total_pages'] ?? 0 }}</td>
+                                <td>{{ $record['passed_pages'] ?? 0 }}</td>
+                                <td>{{ $record['failed_pages'] ?? 0 }}</td>
                                 <td>{{ $record['notes'] ?? '-' }}</td>
                             </tr>
                             @endforeach
