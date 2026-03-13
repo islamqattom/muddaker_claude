@@ -323,6 +323,21 @@ document.getElementById('studentSelect').addEventListener('change', function() {
     }
 });
 
+// Check if student is already selected on page load and reload if stats are missing
+document.addEventListener('DOMContentLoaded', function() {
+    const studentSelect = document.getElementById('studentSelect');
+    const studentId = studentSelect.value;
+
+    // If a student is selected but no stats container exists, reload with student_id
+    if (studentId && !document.getElementById('attendanceStats') && !document.querySelector('.alert-warning')) {
+        // Check if URL doesn't have student_id parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('student_id')) {
+            window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
+        }
+    }
+});
+
 // Escape HTML to prevent XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
