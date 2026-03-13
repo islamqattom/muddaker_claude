@@ -167,6 +167,110 @@
             </div>
         </div>
         @endif
+
+        <!-- Attendance Data Table -->
+        @if($warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-warning bg-opacity-10">
+                <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>سجل الحضور</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اليوم</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>وقت الحضور</th>
+                                <th>الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->attendance_data as $record)
+                            <tr>
+                                <td>{{ $record['day'] ?? '-' }}</td>
+                                <td>{{ \Illuminate\Support\Str::of($record['date'])->before('T') }}</td>
+                                <td>
+                                    @php
+                                        $statusLabels = [
+                                            'present' => 'حاضر',
+                                            'absent' => 'غائب',
+                                            'late' => 'متأخر',
+                                            'excused' => 'غائب بعذر',
+                                            'holiday' => 'عطلة'
+                                        ];
+                                        $statusColors = [
+                                            'present' => 'success',
+                                            'absent' => 'danger',
+                                            'late' => 'warning',
+                                            'excused' => 'info',
+                                            'holiday' => 'secondary'
+                                        ];
+                                    @endphp
+                                    <span class="badge bg-{{ $statusColors[$record['status']] ?? 'secondary' }}">
+                                        {{ $statusLabels[$record['status']] ?? $record['status'] }}
+                                    </span>
+                                </td>
+                                <td>{{ $record['arrival_time'] ?? '-' }}</td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Recitation Data Table -->
+        @if($warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-info bg-opacity-10">
+                <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>سجل التسميع</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اليوم</th>
+                                <th>التاريخ</th>
+                                <th>المطلوب تسميعه</th>
+                                <th>الصفحات التي نجح بها</th>
+                                <th>الصفحات التي رسب بها</th>
+                                <th>الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->recitation_data as $record)
+                            <tr>
+                                <td>{{ $record['day'] ?? '-' }}</td>
+                                <td>{{ \Illuminate\Support\Str::of($record['session_date'])->before('T') }}</td>
+                                <td>
+                                    @php
+                                        $typeLabels = [
+                                            'new_memorization' => 'حفظ جديد',
+                                            'review' => 'مراجعة',
+                                            'unmastered' => 'حفظ غير متقن',
+                                            'recitation' => 'سرد',
+                                            'mafsil' => 'مفصل',
+                                            'not_recitate' => 'لم يسمع'
+                                        ];
+                                    @endphp
+                                    {{ $typeLabels[$record['type']] ?? $record['type'] }}
+                                </td>
+                                <td>{{ ($record['total_pages'] ?? 0) - ($record['unmastered_pages_count'] ?? 0) }}</td>
+                                <td>{{ $record['unmastered_pages_count'] ?? 0 }}</td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Sidebar -->

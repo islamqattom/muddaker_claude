@@ -17,6 +17,8 @@
 @section('content')
 <form action="{{ route('supervisor.warnings.store') }}" method="POST" id="warningForm">
     @csrf
+    <input type="hidden" name="attendance_data" id="attendanceData">
+    <input type="hidden" name="recitation_data" id="recitationData">
     <div class="row">
         <!-- Student Selection -->
         <div class="col-lg-8">
@@ -121,6 +123,93 @@
                             <label class="form-label">جلسات راسبة <span class="text-danger">*</span></label>
                             <input type="number" name="failed_sessions" class="form-control" value="{{ old('failed_sessions', 0) }}" min="0" id="failedSessions" onchange="calculateRecitationStats()">
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Data Section -->
+            <div class="card mb-4" id="attendanceDataSection">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>سجل الحضور (اختياري)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label">بدء من تاريخ</label>
+                            <input type="date" class="form-control" id="attendanceFromDate" value="{{ date('Y-m-01') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-warning" onclick="fetchAttendance()">
+                                <i class="fas fa-search me-1"></i>بحث
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3" id="attendanceTableContainer" style="display: none;">
+                        <table class="table table-sm table-bordered" id="attendanceTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>وقت الحضور</th>
+                                    <th>الملاحظات</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                            </tbody>
+                        </table>
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
+                        </div>
+                    </div>
+                    <div class="mt-2" id="noAttendanceMessage" style="display: none;">
+                        <div class="alert alert-info mb-0">لا توجد سجلات حضور للفترة المحددة</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recitation Data Section -->
+            <div class="card mb-4" id="recitationDataSection">
+                <div class="card-header bg-info bg-opacity-10">
+                    <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>سجل التسميع (اختياري)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label">بدء من تاريخ</label>
+                            <input type="date" class="form-control" id="recitationFromDate" value="{{ date('Y-m-01') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-info" onclick="fetchRecitations()">
+                                <i class="fas fa-search me-1"></i>بحث
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3" id="recitationTableContainer" style="display: none;">
+                        <table class="table table-sm table-bordered" id="recitationTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>اليوم</th>
+                                    <th>التاريخ</th>
+                                    <th>المطلوب تسميعه</th>
+                                    <th>الصفحات التي نجح بها</th>
+                                    <th>الصفحات التي رسب بها</th>
+                                    <th>الملاحظات</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="recitationTableBody">
+                            </tbody>
+                        </table>
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
+                        </div>
+                    </div>
+                    <div class="mt-2" id="noRecitationMessage" style="display: none;">
+                        <div class="alert alert-info mb-0">لا توجد سجلات تسميع للفترة المحددة</div>
                     </div>
                 </div>
             </div>
@@ -237,6 +326,9 @@
 
 @push('scripts')
 <script>
+let attendanceData = [];
+let recitationData = [];
+
 function toggleWarningFields() {
     const type = document.getElementById('typeSelect').value;
     const attendanceFields = document.getElementById('attendanceFields');
@@ -268,11 +360,218 @@ document.getElementById('studentSelect').addEventListener('change', function() {
     }
 });
 
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Fetch attendance data via AJAX
+function fetchAttendance() {
+    const studentId = document.getElementById('studentSelect').value;
+    if (!studentId) {
+        alert('يرجى اختيار طالب أولاً');
+        return;
+    }
+
+    const fromDate = document.getElementById('attendanceFromDate').value;
+    const url = '{{ route("supervisor.warnings.attendance", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            attendanceData = data;
+            renderAttendanceTable();
+            updateHiddenInputs();
+        })
+        .catch(error => {
+            console.error('Error fetching attendance:', error);
+            alert('حدث خطأ أثناء جلب بيانات الحضور');
+        });
+}
+
+// Render attendance table
+function renderAttendanceTable() {
+    const tbody = document.getElementById('attendanceTableBody');
+    const container = document.getElementById('attendanceTableContainer');
+    const noDataMsg = document.getElementById('noAttendanceMessage');
+
+    tbody.innerHTML = '';
+
+    if (attendanceData.length === 0) {
+        container.style.display = 'none';
+        noDataMsg.style.display = 'block';
+        return;
+    }
+
+    container.style.display = 'block';
+    noDataMsg.style.display = 'none';
+
+    const statusLabels = {
+        'present': 'حاضر',
+        'absent': 'غائب',
+        'late': 'متأخر',
+        'excused': 'غائب بعذر',
+        'holiday': 'عطلة'
+    };
+
+    attendanceData.forEach(function(record, index) {
+        const row = document.createElement('tr');
+        // Format date to show only date part (without time)
+        const formattedDate = record.date ? record.date.split('T')[0] : '-';
+        row.innerHTML = `
+            <td>${escapeHtml(record.day || '-')}</td>
+            <td>${escapeHtml(formattedDate)}</td>
+            <td><span class="badge bg-${getStatusColor(record.status)}">${escapeHtml(statusLabels[record.status] || record.status)}</span></td>
+            <td>${escapeHtml(record.arrival_time || '-')}</td>
+            <td>${escapeHtml(record.notes || '-')}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttendanceRow(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function getStatusColor(status) {
+    const colors = {
+        'present': 'success',
+        'absent': 'danger',
+        'late': 'warning',
+        'excused': 'info',
+        'holiday': 'secondary'
+    };
+    return colors[status] || 'secondary';
+}
+
+function deleteAttendanceRow(index) {
+    attendanceData.splice(index, 1);
+    renderAttendanceTable();
+    updateHiddenInputs();
+}
+
+// Fetch recitation data via AJAX
+function fetchRecitations() {
+    const studentId = document.getElementById('studentSelect').value;
+    if (!studentId) {
+        alert('يرجى اختيار طالب أولاً');
+        return;
+    }
+
+    const fromDate = document.getElementById('recitationFromDate').value;
+    const url = '{{ route("supervisor.warnings.recitations", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            recitationData = data;
+            renderRecitationTable();
+            updateHiddenInputs();
+        })
+        .catch(error => {
+            console.error('Error fetching recitations:', error);
+            alert('حدث خطأ أثناء جلب بيانات التسميع');
+        });
+}
+
+// Render recitation table
+function renderRecitationTable() {
+    const tbody = document.getElementById('recitationTableBody');
+    const container = document.getElementById('recitationTableContainer');
+    const noDataMsg = document.getElementById('noRecitationMessage');
+
+    tbody.innerHTML = '';
+
+    if (recitationData.length === 0) {
+        container.style.display = 'none';
+        noDataMsg.style.display = 'block';
+        return;
+    }
+
+    container.style.display = 'block';
+    noDataMsg.style.display = 'none';
+
+    const typeLabels = {
+        'new_memorization': 'حفظ جديد',
+        'review': 'مراجعة',
+        'unmastered': 'حفظ غير متقن',
+        'recitation': 'سرد',
+        'mafsil': 'مفصل',
+        'not_recitate': 'لم يسمع'
+    };
+
+    recitationData.forEach(function(record, index) {
+        const row = document.createElement('tr');
+        const passedPages = (record.total_pages || 0) - (record.unmastered_pages_count || 0);
+        // Format date to show only date part (without time)
+        const formattedDate = record.session_date ? record.session_date.split('T')[0] : '-';
+        // Get existing notes or empty string for manual entry
+        const existingNotes = record.notes || '';
+        row.innerHTML = `
+            <td>${escapeHtml(record.day || '-')}</td>
+            <td>${escapeHtml(formattedDate)}</td>
+            <td>${escapeHtml(typeLabels[record.type] || record.type)}</td>
+            <td>${passedPages}</td>
+            <td>${record.unmastered_pages_count || 0}</td>
+            <td>
+                <input type="text" class="form-control form-control-sm"
+                    placeholder="أضف ملاحظات..."
+                    value="${escapeHtml(existingNotes)}"
+                    onchange="updateRecitationNotes(${index}, this.value)">
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="deleteRecitationRow(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updateRecitationNotes(index, notes) {
+    recitationData[index].notes = notes;
+    updateHiddenInputs();
+}
+
+function deleteRecitationRow(index) {
+    recitationData.splice(index, 1);
+    renderRecitationTable();
+    updateHiddenInputs();
+}
+
+function updateHiddenInputs() {
+    document.getElementById('attendanceData').value = JSON.stringify(attendanceData);
+    document.getElementById('recitationData').value = JSON.stringify(recitationData);
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleWarningFields();
     calculateTotalDays();
     calculateRecitationStats();
+    updateHiddenInputs();
 });
 </script>
 @endpush

@@ -14,7 +14,8 @@ class Warning extends Model
         'content', 'issue_date', 'issue_day', 'from_date', 'from_day', 'to_date', 'to_day',
         'absent_days', 'late_days', 'total_days',
         'failed_sessions', 'total_sessions',
-        'additional_notes', 'is_read_by_parent'
+        'additional_notes', 'is_read_by_parent',
+        'attendance_data', 'recitation_data'
     ];
 
     protected $casts = [
@@ -22,6 +23,8 @@ class Warning extends Model
         'from_date' => 'date',
         'to_date' => 'date',
         'is_read_by_parent' => 'boolean',
+        'attendance_data' => 'array',
+        'recitation_data' => 'array',
     ];
 
     protected static function boot()

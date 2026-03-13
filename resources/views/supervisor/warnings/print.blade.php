@@ -237,6 +237,81 @@
     </div>
     @endif
 
+    <!-- Attendance Data Table -->
+    @if($warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0)
+    <div class="section">
+        <div class="section-title">📅 سجل الحضور</div>
+        <table>
+            <tr>
+                <th>اليوم</th>
+                <th>التاريخ</th>
+                <th>الحالة</th>
+                <th>وقت الحضور</th>
+                <th>الملاحظات</th>
+            </tr>
+            @foreach($warning->attendance_data as $record)
+            <tr>
+                <td>{{ $record['day'] ?? '-' }}</td>
+                <td>{{ \Illuminate\Support\Str::of($record['date'])->before('T') }}</td>
+                <td>
+                    @php
+                        $statusLabels = [
+                            'present' => 'حاضر',
+                            'absent' => 'غائب',
+                            'late' => 'متأخر',
+                            'excused' => 'غائب بعذر',
+                            'holiday' => 'عطلة'
+                        ];
+                    @endphp
+                    {{ $statusLabels[$record['status']] ?? $record['status'] }}
+                </td>
+                <td>{{ $record['arrival_time'] ?? '-' }}</td>
+                <td>{{ $record['notes'] ?? '-' }}</td>
+            </tr>
+            @endforeach
+        </table>
+    </div>
+    @endif
+
+    <!-- Recitation Data Table -->
+    @if($warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0)
+    <div class="section">
+        <div class="section-title">🎤 سجل التسميع</div>
+        <table>
+            <tr>
+                <th>اليوم</th>
+                <th>التاريخ</th>
+                <th>المطلوب تسميعه</th>
+                <th>الصفحات التي نجح بها</th>
+                <th>الصفحات التي رسب بها</th>
+                <th>الملاحظات</th>
+            </tr>
+            @foreach($warning->recitation_data as $record)
+            <tr>
+                <td>{{ $record['day'] ?? '-' }}</td>
+                <td>{{ \Illuminate\Support\Str::of($record['session_date'])->before('T') }}</td>
+                <td>
+                    @php
+                        $typeLabels = [
+                            'new_memorization' => 'حفظ جديد',
+                            'review' => 'مراجعة',
+                            'unmastered' => 'حفظ غير متقن',
+                            'recitation' => 'سرد',
+                            'mafsil' => 'مفصل',
+                            'not_recitate' => 'لم يسمع'
+                        ];
+                    @endphp
+                    {{ $typeLabels[$record['type']] ?? $record['type'] }}
+                </td>
+                <td>{{ ($record['total_pages'] ?? 0) - ($record['unmastered_pages_count'] ?? 0) }}</td>
+                <td>{{ $record['unmastered_pages_count'] ?? 0 }}</td>
+                <td>{{ $record['notes'] ?? '-' }}</td>
+            </tr>
+            @endforeach
+        </table>
+    </div>
+    @endif
+
     <!-- Signature -->
     <div class="signature-section">
         <div class="signature-box">

@@ -74,6 +74,31 @@ class WarningController extends Controller
             'to_date' => 'nullable|date',
         ]);
 
+        // Verify student belongs to this supervisor
+        $student = Student::findOrFail($request->student_id);
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403, 'Unauthorized to create warning for this student');
+        }
+
+        // Validate JSON data if provided
+        $attendanceData = null;
+        if ($request->attendance_data) {
+            $decoded = json_decode($request->attendance_data, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return back()->withErrors(['attendance_data' => 'Invalid JSON format in attendance data'])->withInput();
+            }
+            $attendanceData = $decoded;
+        }
+
+        $recitationData = null;
+        if ($request->recitation_data) {
+            $decoded = json_decode($request->recitation_data, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return back()->withErrors(['recitation_data' => 'Invalid JSON format in recitation data'])->withInput();
+            }
+            $recitationData = $decoded;
+        }
+
         $warning = Warning::create([
             'student_id' => $request->student_id,
             'issued_by' => Auth::id(),
@@ -90,6 +115,8 @@ class WarningController extends Controller
             'failed_sessions' => $request->failed_sessions,
             'total_sessions' => $request->total_sessions,
             'additional_notes' => $request->additional_notes,
+            'attendance_data' => $attendanceData,
+            'recitation_data' => $recitationData,
         ]);
 
         // Notify parents (if notifications are enabled)
@@ -114,6 +141,50 @@ class WarningController extends Controller
     {
         $warning->load(['student.user', 'issuedBy']);
         return view('supervisor.warnings.show', compact('warning'));
+    }
+
+    public function getAttendance(Request $request, Student $student)
+    {
+        // Verify student belongs to this supervisor
+        if ($student->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $fromDate = $request->from_date ?? date('Y-m-01');
+
+        try {
+            $attendances = Attendance::where('student_id', $student->id)
+                ->where('date', '>=', $fromDate)
+                ->orderBy('date', 'desc')
+                ->get();
+
+            return response()->json($attendances);
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch attendance: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch attendance data'], 500);
+        }
+    }
+
+    public function getRecitations(Request $request, Student $student)
+    {
+        // Verify student belongs to this supervisor
+        if ($student->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $fromDate = $request->from_date ?? date('Y-m-01');
+
+        try {
+            $recitations = RecitationSession::where('student_id', $student->id)
+                ->where('session_date', '>=', $fromDate)
+                ->orderBy('session_date', 'desc')
+                ->get();
+
+            return response()->json($recitations);
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch recitations: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch recitation data'], 500);
+        }
     }
 
     public function destroy(Warning $warning)
