@@ -173,6 +173,126 @@
             </div>
         </div>
         @endif
+
+        <!-- Detailed Attendance Data Table -->
+        @if($warning->type === 'attendance' && $warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-warning bg-opacity-10">
+                <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>تفاصيل سجل الحضور</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اليوم</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>وقت الحضور</th>
+                                <th>الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->attendance_data as $record)
+                            <tr>
+                                <td>{{ $record['day'] ?? '-' }}</td>
+                                <td>{{ $record['date'] ?? '-' }}</td>
+                                <td>
+                                    @switch($record['status'] ?? '')
+                                        @case('present')
+                                            <span class="badge bg-success">حاضر</span>
+                                            @break
+                                        @case('absent')
+                                            <span class="badge bg-danger">غائب</span>
+                                            @break
+                                        @case('late')
+                                            <span class="badge bg-warning">متأخر</span>
+                                            @break
+                                        @case('excused')
+                                            <span class="badge bg-info">معذور</span>
+                                            @break
+                                        @default
+                                            {{ $record['status'] ?? '-' }}
+                                    @endswitch
+                                </td>
+                                <td>{{ $record['time'] ?? '-' }}</td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Detailed Recitation Data Table -->
+        @if($warning->type === 'recitation' && $warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-info bg-opacity-10">
+                <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>تفاصيل سجل التسميع</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>اليوم</th>
+                                <th>التاريخ</th>
+                                <th>نوع التسميع</th>
+                                <th>المطلوب</th>
+                                <th>نجح</th>
+                                <th>رسب</th>
+                                <th>الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->recitation_data as $record)
+                            <tr>
+                                <td>{{ $record['day'] ?? '-' }}</td>
+                                <td>{{ $record['date'] ?? '-' }}</td>
+                                <td>{{ $record['type'] ?? '-' }}</td>
+                                <td>{{ $record['required'] ?? '-' }}</td>
+                                <td><span class="text-success">{{ $record['passed'] ?? '-' }}</span></td>
+                                <td><span class="text-danger">{{ $record['failed'] ?? '-' }}</span></td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Test Data Table -->
+        @if($warning->test_data && is_array($warning->test_data) && count($warning->test_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-primary bg-opacity-10">
+                <h6 class="mb-0 text-primary"><i class="fas fa-clipboard-list me-2"></i>الاختبارات</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>الاختبار</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->test_data as $test)
+                            <tr>
+                                <td>{{ $test['name'] ?? '-' }}</td>
+                                <td>{{ $test['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Sidebar -->

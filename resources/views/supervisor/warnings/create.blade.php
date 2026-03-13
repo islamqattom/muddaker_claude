@@ -34,7 +34,7 @@
                             <select name="student_id" id="studentSelect" class="form-select @error('student_id') is-invalid @enderror" required>
                                 <option value="">-- اختر الطالب --</option>
                                 @foreach($students as $student)
-                                    <option value="{{ $student->id }}" {{ old('student_id', request('student_id')) == $student->id ? 'selected' : '' }}>
+                                    <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
                                         {{ $student->user->name }} - {{ $student->student_number }}
                                     </option>
                                 @endforeach
