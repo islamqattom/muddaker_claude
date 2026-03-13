@@ -85,7 +85,7 @@ class RecitationSession extends Model
             'failed' => 'راسب',
             'failed_continued' => 'راسب ومكمل',
             'in_progress' => 'جارٍ',
-            'not_heard' => 'لم يسمع',
+            'not_recitate' => 'لم يسمع',
             default => $this->status,
         };
     }
@@ -97,7 +97,7 @@ class RecitationSession extends Model
             'failed' => 'danger',
             'failed_continued' => 'warning',
             'in_progress' => 'warning',
-            'not_heard' => 'secondary',
+            'not_recitate' => 'secondary',
             default => 'secondary',
         };
     }

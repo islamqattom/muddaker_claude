@@ -380,7 +380,7 @@ class RecitationController extends Controller
             'student_id' => $request->student_id,
             'supervisor_id' => Auth::id(),
             'type' => 'not_recitate',
-            'status' => 'not_heard',
+            'status' => 'not_recitate',
             'session_date' => $request->session_date,
             'notes' => $request->reason,
         ]);
