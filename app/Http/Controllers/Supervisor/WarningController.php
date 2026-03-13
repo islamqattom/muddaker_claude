@@ -70,8 +70,6 @@ class WarningController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'issue_date' => 'required|date',
-            'from_date' => 'nullable|date',
-            'to_date' => 'nullable|date',
         ]);
 
         // Verify student belongs to this supervisor
@@ -116,13 +114,6 @@ class WarningController extends Controller
             'title' => $request->title,
             'content' => $request->content,
             'issue_date' => $request->issue_date,
-            'from_date' => $request->from_date,
-            'to_date' => $request->to_date,
-            'absent_days' => $request->absent_days,
-            'late_days' => $request->late_days,
-            'total_days' => $request->total_days,
-            'failed_sessions' => $request->failed_sessions,
-            'total_sessions' => $request->total_sessions,
             'additional_notes' => $request->additional_notes,
             'attendance_data' => $attendanceData,
             'recitation_data' => $recitationData,

@@ -57,16 +57,8 @@
                         </div>
                     </div>
 
-                    <!-- Date Range -->
+                    <!-- Date -->
                     <div class="row g-3 mt-2">
-                        <div class="col-md-4">
-                            <label class="form-label">من تاريخ</label>
-                            <input type="date" name="from_date" class="form-control" value="{{ old('from_date') }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">إلى تاريخ</label>
-                            <input type="date" name="to_date" class="form-control" value="{{ old('to_date') }}">
-                        </div>
                         <div class="col-md-4">
                             <label class="form-label">تاريخ الإنذار <span class="text-danger">*</span></label>
                             <input type="date" name="issue_date" class="form-control @error('issue_date') is-invalid @enderror" value="{{ old('issue_date', date('Y-m-d')) }}" required>
@@ -78,58 +70,8 @@
                 </div>
             </div>
 
-            <!-- Attendance Fields -->
-            <div class="card mb-4" id="attendanceFields" style="display: none;">
-                <div class="card-header bg-warning bg-opacity-10">
-                    <h6 class="mb-0 text-warning"><i class="fas fa-calendar-times me-2"></i>إحصائيات الحضور والغياب</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">أيام الحضور</label>
-                            <input type="number" name="present_days" class="form-control" value="0" min="0" readonly id="presentDays">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">أيام الغياب <span class="text-danger">*</span></label>
-                            <input type="number" name="absent_days" class="form-control" value="{{ old('absent_days', 0) }}" min="0" id="absentDays" onchange="calculateTotalDays()">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">أيام التأخير</label>
-                            <input type="number" name="late_days" class="form-control" value="{{ old('late_days', 0) }}" min="0" id="lateDays" onchange="calculateTotalDays()">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">إجمالي الأيام</label>
-                            <input type="number" name="total_days" class="form-control" value="{{ old('total_days', 0) }}" min="0" readonly id="totalDays">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recitation Fields -->
-            <div class="card mb-4" id="recitationFields" style="display: none;">
-                <div class="card-header bg-info bg-opacity-10">
-                    <h6 class="mb-0 text-info"><i class="fas fa-microphone me-2"></i>إحصائيات التسميع</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">إجمالي الجلسات</label>
-                            <input type="number" name="total_sessions" class="form-control" value="{{ old('total_sessions', 0) }}" min="0" id="totalSessions" onchange="calculateRecitationStats()">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">جلسات ناجحة</label>
-                            <input type="number" name="passed_sessions" class="form-control" value="0" min="0" readonly id="passedSessions">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">جلسات راسبة <span class="text-danger">*</span></label>
-                            <input type="number" name="failed_sessions" class="form-control" value="{{ old('failed_sessions', 0) }}" min="0" id="failedSessions" onchange="calculateRecitationStats()">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Attendance Data Section -->
-            <div class="card mb-4" id="attendanceDataSection">
+            <div class="card mb-4" id="attendanceDataSection" style="display: none;">
                 <div class="card-header bg-warning bg-opacity-10">
                     <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>سجل الحضور (اختياري)</h6>
                 </div>
@@ -172,7 +114,7 @@
             </div>
 
             <!-- Recitation Data Section -->
-            <div class="card mb-4" id="recitationDataSection">
+            <div class="card mb-4" id="recitationDataSection" style="display: none;">
                 <div class="card-header bg-info bg-opacity-10">
                     <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>سجل التسميع (اختياري)</h6>
                 </div>
@@ -363,32 +305,21 @@ let testData = [];
 
 function toggleWarningFields() {
     const type = document.getElementById('typeSelect').value;
-    const attendanceFields = document.getElementById('attendanceFields');
-    const recitationFields = document.getElementById('recitationFields');
+    const attendanceDataSection = document.getElementById('attendanceDataSection');
+    const recitationDataSection = document.getElementById('recitationDataSection');
 
-    attendanceFields.style.display = (type === 'attendance') ? 'block' : 'none';
-    recitationFields.style.display = (type === 'recitation') ? 'block' : 'none';
-}
+    // Show attendance table for attendance or general types
+    attendanceDataSection.style.display = (type === 'attendance' || type === 'general') ? 'block' : 'none';
 
-function calculateTotalDays() {
-    const absent = parseInt(document.getElementById('absentDays').value) || 0;
-    const late = parseInt(document.getElementById('lateDays').value) || 0;
-    document.getElementById('totalDays').value = absent + late;
-}
-
-function calculateRecitationStats() {
-    const total = parseInt(document.getElementById('totalSessions').value) || 0;
-    const failed = parseInt(document.getElementById('failedSessions').value) || 0;
-    document.getElementById('passedSessions').value = total - failed;
+    // Show recitation table for recitation or general types
+    recitationDataSection.style.display = (type === 'recitation' || type === 'general') ? 'block' : 'none';
 }
 
 // Auto-fetch stats when student is selected
 document.getElementById('studentSelect').addEventListener('change', function() {
     const studentId = this.value;
     if (studentId) {
-        const fromDate = document.querySelector('input[name="from_date"]').value || '{{ date("Y-m-01") }}';
-        const toDate = document.querySelector('input[name="to_date"]').value || '{{ date("Y-m-d") }}';
-        window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId + '&from_date=' + fromDate + '&to_date=' + toDate;
+        window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
     }
 });
 
@@ -679,8 +610,6 @@ function renderTestTable() {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleWarningFields();
-    calculateTotalDays();
-    calculateRecitationStats();
     updateHiddenInputs();
 });
 </script>
