@@ -227,17 +227,23 @@ class WarningController extends Controller
         // Set font for Arabic
         $pdf->SetFont('aealarabiya', '', 12);
 
-        // Header
-        $pdf->SetFontSize(20);
+        // Header with Logo
+        $logoPath = public_path('images/muddaker-logo-main-nobg.png');
+        if (file_exists($logoPath)) {
+            $pdf->Image($logoPath, 85, 5, 40, 40, 'PNG', '', '', false, 300, '', false, false, 0);
+            $pdf->Ln(42);
+        }
+
+        $pdf->SetFontSize(18);
         $pdf->SetTextColor(26, 82, 118);
-        $pdf->Cell(0, 8, 'مشروع مدكر القرآني', 0, true, 'C', 0);
-        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 6, 'مشروع مدكر القرآني', 0, true, 'C', 0);
+        $pdf->SetFontSize(14);
         $pdf->SetTextColor(201, 162, 39);
-        $pdf->Cell(0, 8, 'إنذار رسمي', 0, true, 'C', 0);
-        $pdf->SetFontSize(10);
+        $pdf->Cell(0, 6, 'إنذار رسمي', 0, true, 'C', 0);
+        $pdf->SetFontSize(9);
         $pdf->SetTextColor(102, 102, 102);
-        $pdf->Cell(0, 5, 'تعمل هذه الجمعية على المحافظة على كتاب الله وتعليم حفاظه', 0, true, 'C', 0);
-        $pdf->Ln(5);
+        $pdf->Cell(0, 4, 'تعمل هذه الجمعية على المحافظة على كتاب الله وتعليم حفاظه', 0, true, 'C', 0);
+        $pdf->Ln(3);
 
         // Warning Meta
         $pdf->SetFillColor(248, 249, 250);
@@ -349,6 +355,106 @@ class WarningController extends Controller
             $pdf->Rect(10, $pdf->GetY(), 190, 20, 'F');
             $pdf->MultiCell(0, 6, $warning->additional_notes, 0, 'R', 0, 1, '', '', true, 0, true);
             $pdf->Ln(10);
+        }
+
+        // Attendance Data Table
+        if ($warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0) {
+            $pdf->SetFontSize(14);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetFillColor(26, 82, 118);
+            $pdf->Cell(0, 8, 'سجل الحضور', 0, 1, 'R', 1);
+            $pdf->Ln(3);
+
+            $pdf->SetFontSize(9);
+            $pdf->SetTextColor(0, 0, 0);
+
+            $statusLabels = [
+                'present' => 'حاضر',
+                'absent' => 'غائب',
+                'late' => 'متأخر',
+                'excused' => 'غائب بعذر',
+                'holiday' => 'عطلة'
+            ];
+
+            $attendanceHtml = '<table border="1" cellpadding="4">
+                <tr style="background-color: #e8f4fd; font-weight: bold;">
+                    <td align="center">اليوم</td>
+                    <td align="center">التاريخ</td>
+                    <td align="center">الحالة</td>
+                    <td align="center">وقت الحضور</td>
+                    <td align="center">الملاحظات</td>
+                </tr>';
+
+            foreach ($warning->attendance_data as $record) {
+                $date = is_string($record['date']) ? explode('T', $record['date'])[0] : $record['date'];
+                $status = $statusLabels[$record['status']] ?? $record['status'];
+                $arrivalTime = $record['arrival_time'] ?? '-';
+                $notes = $record['notes'] ?? '-';
+
+                $attendanceHtml .= '<tr>
+                    <td align="center">' . ($record['day'] ?? '-') . '</td>
+                    <td align="center">' . $date . '</td>
+                    <td align="center">' . $status . '</td>
+                    <td align="center">' . $arrivalTime . '</td>
+                    <td align="center">' . $notes . '</td>
+                </tr>';
+            }
+
+            $attendanceHtml .= '</table>';
+            $pdf->writeHTML($attendanceHtml, true, false, false, false, 'R');
+            $pdf->Ln(5);
+        }
+
+        // Recitation Data Table
+        if ($warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0) {
+            $pdf->SetFontSize(14);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetFillColor(26, 82, 118);
+            $pdf->Cell(0, 8, 'سجل التسميع', 0, 1, 'R', 1);
+            $pdf->Ln(3);
+
+            $pdf->SetFontSize(9);
+            $pdf->SetTextColor(0, 0, 0);
+
+            $typeLabels = [
+                'new_memorization' => 'حفظ جديد',
+                'review' => 'مراجعة',
+                'unmastered' => 'حفظ غير متقن',
+                'recitation' => 'سرد',
+                'mafsil' => 'مفصل',
+                'not_recitate' => 'لم يسمع'
+            ];
+
+            $recitationHtml = '<table border="1" cellpadding="4">
+                <tr style="background-color: #e8f4fd; font-weight: bold;">
+                    <td align="center">اليوم</td>
+                    <td align="center">التاريخ</td>
+                    <td align="center">المطلوب تسميعه</td>
+                    <td align="center">الصفحات التي نجح بها</td>
+                    <td align="center">الصفحات التي رسب بها</td>
+                    <td align="center">الملاحظات</td>
+                </tr>';
+
+            foreach ($warning->recitation_data as $record) {
+                $date = is_string($record['session_date']) ? explode('T', $record['session_date'])[0] : $record['session_date'];
+                $type = $typeLabels[$record['type']] ?? $record['type'];
+                $passedPages = ($record['total_pages'] ?? 0) - ($record['unmastered_pages_count'] ?? 0);
+                $failedPages = $record['unmastered_pages_count'] ?? 0;
+                $notes = $record['notes'] ?? '-';
+
+                $recitationHtml .= '<tr>
+                    <td align="center">' . ($record['day'] ?? '-') . '</td>
+                    <td align="center">' . $date . '</td>
+                    <td align="center">' . $type . '</td>
+                    <td align="center">' . $passedPages . '</td>
+                    <td align="center">' . $failedPages . '</td>
+                    <td align="center">' . $notes . '</td>
+                </tr>';
+            }
+
+            $recitationHtml .= '</table>';
+            $pdf->writeHTML($recitationHtml, true, false, false, false, 'R');
+            $pdf->Ln(5);
         }
 
         // Signature Section
