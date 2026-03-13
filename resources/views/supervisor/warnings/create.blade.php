@@ -550,7 +550,7 @@ function renderRecitationTable() {
         'unmastered': 'حفظ غير متقن',
         'recitation': 'سرد',
         'mafsil': 'مفصل',
-        'not_recitate': 'لم يسمع'
+        'not_heard': 'لم يسمع'
     };
 
     recitationData.forEach(function(record, index) {
