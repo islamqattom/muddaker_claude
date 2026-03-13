@@ -19,6 +19,7 @@
     @csrf
     <input type="hidden" name="attendance_data" id="attendanceData">
     <input type="hidden" name="recitation_data" id="recitationData">
+    <input type="hidden" name="test_data" id="testData">
     <div class="row">
         <!-- Student Selection -->
         <div class="col-lg-8">
@@ -214,6 +215,35 @@
                 </div>
             </div>
 
+            <!-- Tests Data Section -->
+            <div class="card mb-4" id="testDataSection">
+                <div class="card-header bg-primary bg-opacity-10">
+                    <h6 class="mb-0 text-primary"><i class="fas fa-clipboard-list me-2"></i>الاختبارات</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered" id="testTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 45%;">الاختبار</th>
+                                    <th style="width: 45%;">ملاحظات</th>
+                                    <th style="width: 10%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="testTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary mt-2" onclick="addTestRow()">
+                        <i class="fas fa-plus me-1"></i>إضافة صف
+                    </button>
+                    <div class="text-muted small mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        يمكنك إضافة صفوف متعددة للاختبارات
+                    </div>
+                </div>
+            </div>
+
             <!-- Warning Content -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -328,6 +358,7 @@
 <script>
 let attendanceData = [];
 let recitationData = [];
+let testData = [];
 
 function toggleWarningFields() {
     const type = document.getElementById('typeSelect').value;
@@ -564,6 +595,79 @@ function deleteRecitationRow(index) {
 function updateHiddenInputs() {
     document.getElementById('attendanceData').value = JSON.stringify(attendanceData);
     document.getElementById('recitationData').value = JSON.stringify(recitationData);
+    document.getElementById('testData').value = JSON.stringify(testData);
+}
+
+// Add a new test row
+function addTestRow() {
+    const tbody = document.getElementById('testTableBody');
+    const rowIndex = testData.length;
+
+    testData.push({ test: '', notes: '' });
+
+    const row = document.createElement('tr');
+    row.id = 'testRow_' + rowIndex;
+    row.innerHTML = `
+        <td>
+            <input type="text" class="form-control form-control-sm"
+                placeholder="أدخل اسم الاختبار..."
+                onchange="updateTestRow(${rowIndex}, 'test', this.value)">
+        </td>
+        <td>
+            <input type="text" class="form-control form-control-sm"
+                placeholder="أضف ملاحظات..."
+                onchange="updateTestRow(${rowIndex}, 'notes', this.value)">
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="deleteTestRow(${rowIndex})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(row);
+}
+
+function updateTestRow(index, field, value) {
+    if (testData[index]) {
+        testData[index][field] = value;
+        updateHiddenInputs();
+    }
+}
+
+function deleteTestRow(index) {
+    testData.splice(index, 1);
+    renderTestTable();
+    updateHiddenInputs();
+}
+
+function renderTestTable() {
+    const tbody = document.getElementById('testTableBody');
+    tbody.innerHTML = '';
+
+    testData.forEach(function(item, index) {
+        const row = document.createElement('tr');
+        row.id = 'testRow_' + index;
+        row.innerHTML = `
+            <td>
+                <input type="text" class="form-control form-control-sm"
+                    placeholder="أدخل اسم الاختبار..."
+                    value="${escapeHtml(item.test || '')}"
+                    onchange="updateTestRow(${index}, 'test', this.value)">
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm"
+                    placeholder="أضف ملاحظات..."
+                    value="${escapeHtml(item.notes || '')}"
+                    onchange="updateTestRow(${index}, 'notes', this.value)">
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-danger" onclick="deleteTestRow(${index})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 // Initialize on page load

@@ -271,6 +271,35 @@
             </div>
         </div>
         @endif
+
+        <!-- Test Data Table -->
+        @if($warning->test_data && is_array($warning->test_data) && count($warning->test_data) > 0)
+        <div class="card mb-4">
+            <div class="card-header bg-primary bg-opacity-10">
+                <h6 class="mb-0 text-primary"><i class="fas fa-clipboard-list me-2"></i>الاختبارات</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>الاختبار</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($warning->test_data as $record)
+                            <tr>
+                                <td>{{ $record['test'] ?? '-' }}</td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <!-- Sidebar -->

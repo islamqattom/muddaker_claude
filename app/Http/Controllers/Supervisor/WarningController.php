@@ -99,6 +99,15 @@ class WarningController extends Controller
             $recitationData = $decoded;
         }
 
+        $testData = null;
+        if ($request->test_data) {
+            $decoded = json_decode($request->test_data, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return back()->withErrors(['test_data' => 'Invalid JSON format in test data'])->withInput();
+            }
+            $testData = $decoded;
+        }
+
         $warning = Warning::create([
             'student_id' => $request->student_id,
             'issued_by' => Auth::id(),
@@ -117,6 +126,7 @@ class WarningController extends Controller
             'additional_notes' => $request->additional_notes,
             'attendance_data' => $attendanceData,
             'recitation_data' => $recitationData,
+            'test_data' => $testData,
         ]);
 
         // Notify parents (if notifications are enabled)
@@ -454,6 +464,38 @@ class WarningController extends Controller
 
             $recitationHtml .= '</table>';
             $pdf->writeHTML($recitationHtml, true, false, false, false, 'R');
+            $pdf->Ln(5);
+        }
+
+        // Test Data Table
+        if ($warning->test_data && is_array($warning->test_data) && count($warning->test_data) > 0) {
+            $pdf->SetFontSize(14);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetFillColor(26, 82, 118);
+            $pdf->Cell(0, 8, 'الاختبارات', 0, 1, 'R', 1);
+            $pdf->Ln(3);
+
+            $pdf->SetFontSize(10);
+            $pdf->SetTextColor(0, 0, 0);
+
+            $testHtml = '<table border="1" cellpadding="5">
+                <tr style="background-color: #e8f4fd; font-weight: bold;">
+                    <td align="center" style="width: 50%;">الاختبار</td>
+                    <td align="center" style="width: 50%;">ملاحظات</td>
+                </tr>';
+
+            foreach ($warning->test_data as $record) {
+                $test = $record['test'] ?? '-';
+                $notes = $record['notes'] ?? '-';
+
+                $testHtml .= '<tr>
+                    <td align="center">' . $test . '</td>
+                    <td align="center">' . $notes . '</td>
+                </tr>';
+            }
+
+            $testHtml .= '</table>';
+            $pdf->writeHTML($testHtml, true, false, false, false, 'R');
             $pdf->Ln(5);
         }
 
