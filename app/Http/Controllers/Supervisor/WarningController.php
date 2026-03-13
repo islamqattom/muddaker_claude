@@ -217,10 +217,10 @@ class WarningController extends Controller
         $fromDate = $request->from_date ?? date('Y-m-01');
 
         try {
-            // Fetch failed and not_heard recitations
+            // Fetch failed and not_recitate recitations
             $recitations = RecitationSession::where('student_id', $student->id)
                 ->where('session_date', '>=', $fromDate)
-                ->whereIn('status', ['failed', 'not_heard'])
+                ->whereIn('status', ['failed', 'not_recitate'])
                 ->with(['pages' => function($query) {
                     $query->select('id', 'session_id', 'page_number', 'is_passed', 'color_status');
                 }])
@@ -487,7 +487,7 @@ class WarningController extends Controller
                 'unmastered' => 'حفظ غير متقن',
                 'recitation' => 'سرد',
                 'mafsil' => 'مفصل',
-                'not_heard' => 'لم يسمع'
+                'not_recitate' => 'لم يسمع'
             ];
 
             $recitationHtml = '<table border="1" cellpadding="4">

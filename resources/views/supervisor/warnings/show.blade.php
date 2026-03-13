@@ -251,7 +251,7 @@
                                     'unmastered' => 'حفظ غير متقن',
                                     'recitation' => 'سرد',
                                     'mafsil' => 'مفصل',
-                                    'not_heard' => 'لم يسمع'
+                                    'not_recitate' => 'لم يسمع'
                                 ];
                             @endphp
                             @foreach($warning->recitation_data as $record)
