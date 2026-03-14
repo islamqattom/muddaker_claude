@@ -108,7 +108,7 @@
         </div>
 
         <!-- Stats Card -->
-        @if($warning->type === 'attendance' && $warning->total_days)
+        @if($warning->total_days)
         <div class="card mb-4">
             <div class="card-header bg-warning bg-opacity-10">
                 <h6 class="mb-0 text-warning"><i class="fas fa-calendar-times me-2"></i>إحصائيات الحضور والغياب</h6>
@@ -144,7 +144,7 @@
         </div>
         @endif
 
-        @if($warning->type === 'recitation' && $warning->total_sessions)
+        @if($warning->total_sessions)
         <div class="card mb-4">
             <div class="card-header bg-info bg-opacity-10">
                 <h6 class="mb-0 text-info"><i class="fas fa-microphone me-2"></i>إحصائيات التسميع</h6>
@@ -175,10 +175,10 @@
         @endif
 
         <!-- Detailed Attendance Data Table -->
-        @if($warning->type === 'attendance' && $warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0)
+        @if($warning->attendance_data && is_array($warning->attendance_data) && count($warning->attendance_data) > 0)
         <div class="card mb-4">
             <div class="card-header bg-warning bg-opacity-10">
-                <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>تفاصيل سجل الحضور</h6>
+                <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>سجل الحضور</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -196,26 +196,29 @@
                             @foreach($warning->attendance_data as $record)
                             <tr>
                                 <td>{{ $record['day'] ?? '-' }}</td>
-                                <td>{{ $record['date'] ?? '-' }}</td>
+                                <td>{{ \Illuminate\Support\Str::of($record['date'])->before('T') }}</td>
                                 <td>
-                                    @switch($record['status'] ?? '')
-                                        @case('present')
-                                            <span class="badge bg-success">حاضر</span>
-                                            @break
-                                        @case('absent')
-                                            <span class="badge bg-danger">غائب</span>
-                                            @break
-                                        @case('late')
-                                            <span class="badge bg-warning">متأخر</span>
-                                            @break
-                                        @case('excused')
-                                            <span class="badge bg-info">معذور</span>
-                                            @break
-                                        @default
-                                            {{ $record['status'] ?? '-' }}
-                                    @endswitch
+                                    @php
+                                        $statusLabels = [
+                                            'present' => 'حاضر',
+                                            'absent' => 'غائب',
+                                            'late' => 'متأخر',
+                                            'excused' => 'غائب بعذر',
+                                            'holiday' => 'عطلة'
+                                        ];
+                                        $statusColors = [
+                                            'present' => 'success',
+                                            'absent' => 'danger',
+                                            'late' => 'warning',
+                                            'excused' => 'info',
+                                            'holiday' => 'secondary'
+                                        ];
+                                    @endphp
+                                    <span class="badge bg-{{ $statusColors[$record['status']] ?? 'secondary' }}">
+                                        {{ $statusLabels[$record['status']] ?? $record['status'] }}
+                                    </span>
                                 </td>
-                                <td>{{ $record['time'] ?? '-' }}</td>
+                                <td>{{ $record['arrival_time'] ?? '-' }}</td>
                                 <td>{{ $record['notes'] ?? '-' }}</td>
                             </tr>
                             @endforeach
@@ -227,10 +230,10 @@
         @endif
 
         <!-- Detailed Recitation Data Table -->
-        @if($warning->type === 'recitation' && $warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0)
+        @if($warning->recitation_data && is_array($warning->recitation_data) && count($warning->recitation_data) > 0)
         <div class="card mb-4">
             <div class="card-header bg-info bg-opacity-10">
-                <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>تفاصيل سجل التسميع</h6>
+                <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>سجل التسميع</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -240,21 +243,31 @@
                                 <th>اليوم</th>
                                 <th>التاريخ</th>
                                 <th>نوع التسميع</th>
-                                <th>المطلوب</th>
-                                <th>نجح</th>
-                                <th>رسب</th>
+                                <th>المطلوب تسميعه</th>
+                                <th>الصفحات التي نجح بها</th>
+                                <th>الصفحات التي رسب بها</th>
                                 <th>الملاحظات</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $typeLabels = [
+                                    'new_memorization' => 'حفظ جديد',
+                                    'review' => 'مراجعة',
+                                    'unmastered' => 'حفظ غير متقن',
+                                    'recitation' => 'سرد',
+                                    'mafsil' => 'مفصل',
+                                    'not_recitate' => 'لم يسمع'
+                                ];
+                            @endphp
                             @foreach($warning->recitation_data as $record)
                             <tr>
                                 <td>{{ $record['day'] ?? '-' }}</td>
-                                <td>{{ $record['date'] ?? '-' }}</td>
-                                <td>{{ $record['type'] ?? '-' }}</td>
-                                <td>{{ $record['required'] ?? '-' }}</td>
-                                <td><span class="text-success">{{ $record['passed'] ?? '-' }}</span></td>
-                                <td><span class="text-danger">{{ $record['failed'] ?? '-' }}</span></td>
+                                <td>{{ \Illuminate\Support\Str::of($record['session_date'])->before('T') }}</td>
+                                <td>{{ $typeLabels[$record['type']] ?? $record['type'] }}</td>
+                                <td>{{ $record['total_pages'] ?? 0 }}</td>
+                                <td>{{ $record['passed_pages'] ?? 0 }}</td>
+                                <td>{{ $record['failed_pages'] ?? 0 }}</td>
                                 <td>{{ $record['notes'] ?? '-' }}</td>
                             </tr>
                             @endforeach
@@ -281,10 +294,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($warning->test_data as $test)
+                            @foreach($warning->test_data as $record)
                             <tr>
-                                <td>{{ $test['name'] ?? '-' }}</td>
-                                <td>{{ $test['notes'] ?? '-' }}</td>
+                                <td>{{ $record['test'] ?? '-' }}</td>
+                                <td>{{ $record['notes'] ?? '-' }}</td>
                             </tr>
                             @endforeach
                         </tbody>
