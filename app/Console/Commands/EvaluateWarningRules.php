@@ -62,6 +62,7 @@ class EvaluateWarningRules extends Command
         foreach ($triggeringStudents as $studentData) {
             $student = Student::find($studentData['student_id']);
             if (!$student || !$student->supervisor_id) {
+                $this->warn("  Skipped student ID {$studentData['student_id']}: not found or no supervisor assigned");
                 continue;
             }
 
@@ -122,7 +123,7 @@ class EvaluateWarningRules extends Command
                 try {
                     $supervisor->notify(new WarningDraftCreated($draft));
                 } catch (\Exception $e) {
-                    Log::error("Failed to notify supervisor about warning draft: " . $e->getMessage());
+                    Log::error("Failed to notify supervisor {$supervisor->id} about warning draft {$draft->id} for rule {$rule->id}: " . $e->getMessage());
                 }
             }
 
