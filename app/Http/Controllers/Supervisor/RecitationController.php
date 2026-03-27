@@ -674,7 +674,7 @@ class RecitationController extends Controller
     public function destroy(RecitationSession $recitation)
     {
         // Ensure the recitation belongs to a student of this supervisor
-        if ($recitation->student->supervisor_id !== Auth::id()) {
+        if ($recitation->student?->supervisor_id !== Auth::id()) {
             abort(403);
         }
 
@@ -763,7 +763,7 @@ class RecitationController extends Controller
                 route('parent.sessions.show', $session->id)
             );
         } catch (\Exception $e) {
-            \Log::warning("Failed to notify parent about session: " . $e->getMessage());
+            \Log::error("Failed to notify parent about session {$session->id}: " . $e->getMessage());
         }
     }
 }

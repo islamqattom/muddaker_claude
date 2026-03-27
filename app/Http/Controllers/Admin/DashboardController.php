@@ -57,14 +57,28 @@ class DashboardController extends Controller
 
     private function getMonthlyAttendanceData(): array
     {
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        $rows = Attendance::whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->selectRaw("date, status, COUNT(*) as count")
+            ->groupBy('date', 'status')
+            ->get();
+
+        $byDate = [];
+        foreach ($rows as $row) {
+            $byDate[$row->date][$row->status] = $row->count;
+        }
+
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
+            $dateStr = $date->toDateString();
             $data[] = [
                 'date' => $date->format('d/m'),
-                'present' => Attendance::where('date', $date->toDateString())->where('status', 'present')->count(),
-                'absent' => Attendance::where('date', $date->toDateString())->where('status', 'absent')->count(),
-                'late' => Attendance::where('date', $date->toDateString())->where('status', 'late')->count(),
+                'present' => $byDate[$dateStr]['present'] ?? 0,
+                'absent' => $byDate[$dateStr]['absent'] ?? 0,
+                'late' => $byDate[$dateStr]['late'] ?? 0,
             ];
         }
         return $data;
@@ -72,14 +86,28 @@ class DashboardController extends Controller
 
     private function getWeeklySessionsData(): array
     {
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        $rows = RecitationSession::whereBetween('session_date', [$startDate->toDateString(), $endDate->toDateString()])
+            ->selectRaw("DATE(session_date) as date, status, COUNT(*) as count")
+            ->groupBy('date', 'status')
+            ->get();
+
+        $byDate = [];
+        foreach ($rows as $row) {
+            $byDate[$row->date][$row->status] = $row->count;
+        }
+
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
+            $dateStr = $date->toDateString();
             $data[] = [
                 'date' => $date->format('d/m'),
-                'sessions' => RecitationSession::whereDate('session_date', $date->toDateString())->count(),
-                'passed' => RecitationSession::whereDate('session_date', $date->toDateString())->where('status', 'passed')->count(),
-                'failed' => RecitationSession::whereDate('session_date', $date->toDateString())->where('status', 'failed')->count(),
+                'sessions' => array_sum($byDate[$dateStr] ?? []),
+                'passed' => $byDate[$dateStr]['passed'] ?? 0,
+                'failed' => $byDate[$dateStr]['failed'] ?? 0,
             ];
         }
         return $data;

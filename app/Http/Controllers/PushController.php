@@ -28,8 +28,8 @@ class PushController extends Controller
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            Log::error('Push subscription failed', ['error' => $e->getMessage()]);
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            Log::error('Push subscription failed', ['error' => $e->getMessage(), 'user_id' => $request->user()->id]);
+            return response()->json(['success' => false, 'error' => 'Failed to subscribe to push notifications'], 500);
         }
     }
 
@@ -46,7 +46,8 @@ class PushController extends Controller
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+            Log::error('Push unsubscription failed', ['error' => $e->getMessage(), 'user_id' => $request->user()->id]);
+            return response()->json(['success' => false, 'error' => 'Failed to unsubscribe from push notifications'], 500);
         }
     }
 }

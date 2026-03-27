@@ -109,16 +109,7 @@
                 if (permission === 'granted') {
                     await subscribeToPush(registration);
                 } else if (permission === 'default') {
-                    // Listen for permission change to auto-subscribe
-                    const observer = new MutationObserver(async function () {
-                        if (Notification.permission === 'granted') {
-                            observer.disconnect();
-                            await subscribeToPush(registration);
-                        }
-                    });
-                    observer.observe(document, { attributes: true, attributeFilter: ['data-notification-permission'] });
-
-                    // Also check immediately when permission is granted via API
+                    // Override requestPermission to auto-subscribe when user grants permission
                     const originalRequestPermission = Notification.requestPermission;
                     Notification.requestPermission = async function () {
                         const result = await originalRequestPermission.call(Notification);

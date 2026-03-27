@@ -42,7 +42,7 @@ class WarningDraftController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
 
-        $type = $draft->warningRule->type ?? 'general';
+        $type = $draft->warningRule?->type ?? 'general';
 
         $attendanceRecords = $draft->attendance_data ?? [];
         $recitationRecords = $draft->recitation_data ?? [];
@@ -86,8 +86,6 @@ class WarningDraftController extends Controller
                 'test_data' => $draft->test_data ?? [],
             ]);
 
-            $this->notifyParent($draft->student, $warning);
-
             $draft->update([
                 'status' => 'approved',
                 'reviewed_by' => Auth::id(),
@@ -96,6 +94,11 @@ class WarningDraftController extends Controller
 
             return $warning;
         });
+
+        // Notify parent after transaction commits to avoid rolling back the warning on notification failure
+        if ($warning) {
+            $this->notifyParent($draft->student, $warning);
+        }
 
         return redirect()
             ->route('supervisor.warnings.show', $warning->id)

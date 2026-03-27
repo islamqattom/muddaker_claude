@@ -179,7 +179,7 @@ class AttendanceController extends Controller
                 route('parent.attendance.index')
             );
         } catch (\Exception $e) {
-            \Log::warning("Failed to notify parent about attendance: " . $e->getMessage());
+            \Log::error("Failed to notify parent about attendance {$attendance->id}: " . $e->getMessage());
         }
     }
 }

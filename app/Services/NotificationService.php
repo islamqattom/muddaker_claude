@@ -48,8 +48,9 @@ class NotificationService
 
         Notification::insert($notifications);
 
+        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
         foreach ($userIds as $userId) {
-            $user = User::find($userId);
+            $user = $users->get($userId);
             if ($user) {
                 $this->sendWebPush($user, $title, $body, $link);
             }
@@ -78,7 +79,7 @@ class NotificationService
                 'link' => $link,
             ]));
         } catch (\Exception $e) {
-            Log::warning('Web push failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            Log::error('Web push failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
         }
     }
 }
