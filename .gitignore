@@ -29,3 +29,4 @@ yarn-error.log
 /playwright-report/
 /.playwright-mcp/
 playwright.config.js
+/.worktrees/
