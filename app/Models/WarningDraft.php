@@ -43,7 +43,7 @@ class WarningDraft extends Model
 
     public const STATUSES = ['pending', 'approved', 'dismissed'];
 
-    public function rule(): BelongsTo
+    public function warningRule(): BelongsTo
     {
         return $this->belongsTo(WarningRule::class, 'warning_rule_id');
     }
