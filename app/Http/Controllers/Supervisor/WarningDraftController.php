@@ -9,6 +9,7 @@ use App\Models\WarningDraft;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
 
 class WarningDraftController extends Controller
 {
@@ -127,9 +128,14 @@ class WarningDraftController extends Controller
         }
 
         try {
-            if (class_exists(\App\Notifications\WarningIssued::class)) {
-                $parent->user->notify(new \App\Notifications\WarningIssued($warning));
-            }
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $parent->user,
+                'warning',
+                "إنذار جديد للطالب {$student->name}",
+                "تم إصدار إنذار جديد: {$warning->title}",
+                route('student.warnings.show', $warning->id)
+            );
         } catch (\Exception $e) {
             \Log::error("Failed to notify parent {$parent->id} about warning {$warning->id}: " . $e->getMessage());
         }

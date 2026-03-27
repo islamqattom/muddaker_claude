@@ -7,6 +7,7 @@ use App\Models\{Attendance, Student};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Services\NotificationService;
 
 class AttendanceController extends Controller
 {
@@ -74,7 +75,7 @@ class AttendanceController extends Controller
         $supervisorId = Auth::id();
 
         foreach ($request->attendance as $studentId => $data) {
-            Attendance::updateOrCreate(
+            $attendance = Attendance::updateOrCreate(
                 ['student_id' => $studentId, 'date' => $request->date],
                 [
                     'supervisor_id' => $supervisorId,
@@ -83,6 +84,10 @@ class AttendanceController extends Controller
                     'notes' => $data['notes'] ?? null,
                 ]
             );
+
+            if (in_array($data['status'], ['absent', 'late'])) {
+                $this->notifyParentOnAttendance($attendance);
+            }
         }
 
         return redirect()->back()->with('success', 'تم حفظ سجل الحضور والغياب بنجاح');
@@ -148,5 +153,33 @@ class AttendanceController extends Controller
 
         return redirect()->back()
             ->with('success', 'تم حذف سجل الحضور بنجاح');
+    }
+
+    protected function notifyParentOnAttendance(Attendance $attendance): void
+    {
+        $student = $attendance->student;
+        $parent = $student->parents()->first();
+        if (!$parent || !$parent->user) {
+            return;
+        }
+
+        $statusLabels = [
+            'absent' => 'غائب',
+            'late' => 'متأخر',
+        ];
+        $statusLabel = $statusLabels[$attendance->status] ?? $attendance->status;
+
+        try {
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $parent->user,
+                'attendance',
+                "غياب/تأخر للطالب {$student->name}",
+                "تم تسجيل الطالب {$student->name} ك{$statusLabel} بتاريخ {$attendance->date}",
+                route('parent.attendance.index')
+            );
+        } catch (\Exception $e) {
+            \Log::warning("Failed to notify parent about attendance: " . $e->getMessage());
+        }
     }
 }

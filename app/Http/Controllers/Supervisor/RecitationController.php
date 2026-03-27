@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
 
 class RecitationController extends Controller
 {
@@ -411,7 +412,7 @@ class RecitationController extends Controller
             return redirect()->back()->with('error', $scheduleError)->withInput();
         }
 
-        DB::transaction(function() use ($request) {
+        $session = DB::transaction(function() use ($request) {
             $pages = $request->input('pages');
             $totalErrors = 0;
             $totalHesitations = 0;
@@ -508,6 +509,9 @@ class RecitationController extends Controller
 
             return $session;
         });
+
+        // Notify parent about the session
+        $this->notifyParentOnSession($session);
 
         return redirect()->route('supervisor.recitation.index')
             ->with('success', 'تم حفظ جلسة التسميع بنجاح');
@@ -727,5 +731,39 @@ class RecitationController extends Controller
         }
 
         return null; // Valid
+    }
+
+    protected function notifyParentOnSession(RecitationSession $session): void
+    {
+        $student = $session->student;
+        $parent = $student->parents()->first();
+        if (!$parent || !$parent->user) {
+            return;
+        }
+
+        $typeLabels = [
+            'new_memorization' => 'حفظ جديد',
+            'review' => 'مراجعة',
+            'unmastered' => 'غير متقنة',
+            'recitation' => 'تلاوة',
+            'mafsil' => 'مفصل',
+        ];
+
+        $typeLabel = $typeLabels[$session->type] ?? $session->type;
+        $scoreText = $session->final_score !== null ? " - الدرجة: {$session->final_score}" : '';
+        $statusText = $session->status === 'passed' ? 'ناجح' : 'راسب';
+
+        try {
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $parent->user,
+                'recitation_session',
+                "تسميع جديد للطالب {$student->name}",
+                "تم تسجيل {$typeLabel} بتاريخ {$session->session_date}{$scoreText} - {$statusText}",
+                route('parent.sessions.show', $session->id)
+            );
+        } catch (\Exception $e) {
+            \Log::warning("Failed to notify parent about session: " . $e->getMessage());
+        }
     }
 }
