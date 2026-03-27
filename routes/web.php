@@ -44,6 +44,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Warnings
     Route::resource('warnings', Admin\WarningController::class);
+    Route::get('/warnings/attendance/{student}', [Admin\WarningController::class, 'getAttendance'])->name('warnings.attendance');
+    Route::get('/warnings/recitations/{student}', [Admin\WarningController::class, 'getRecitations'])->name('warnings.recitations');
 
     // Warning Rules
     Route::resource('warning-rules', Admin\WarningRuleController::class);
