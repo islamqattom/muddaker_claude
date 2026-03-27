@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ParentPortal;
 
 use App\Http\Controllers\Controller;
 use App\Models\{RecitationSession, Attendance, Warning, Notification};
+use App\Services\AnalyticsService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -73,8 +74,19 @@ class DashboardController extends Controller
         $warnings = Warning::where('student_id', $student->id)->latest()->get();
         $warnings->each(fn($w) => $w->update(['is_read_by_parent' => true]));
 
-        return view('parent.dashboard.student-detail', compact(
-            'student', 'sessions', 'attendances', 'warnings', 'fromDate', 'toDate'
+        $analyticsService = app(AnalyticsService::class);
+        $progressData = $analyticsService->getStudentProgressData($student->id);
+
+        return view('parent.dashboard.student-detail', array_merge(
+            compact('student', 'sessions', 'attendances', 'warnings', 'fromDate', 'toDate'),
+            [
+                'velocityData' => $progressData->velocityWeeks,
+                'heatmapData' => $progressData->pageDifficulty,
+                'recentSessions' => $progressData->recentSessions,
+                'completionPercent' => $progressData->completionPercent,
+                'levelPagesTotal' => $progressData->currentLevelPagesTotal,
+                'levelPagesDone' => $progressData->currentLevelPagesDone,
+            ]
         ));
     }
 }

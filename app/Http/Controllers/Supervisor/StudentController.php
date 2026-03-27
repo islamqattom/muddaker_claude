@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
 use App\Models\{Student, User, Level};
+use App\Services\AnalyticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -200,7 +201,21 @@ class StudentController extends Controller {
             abort(403);
         }
         $student->load(['user','level','attendances'=>fn($q)=>$q->latest()->take(30),'recitationSessions'=>fn($q)=>$q->with('part')->latest()->take(20),'warnings'=>fn($q)=>$q->latest()]);
-        return view('supervisor.students.show', compact('student'));
+
+        $analyticsService = app(AnalyticsService::class);
+        $progressData = $analyticsService->getStudentProgressData($student->id);
+
+        return view('supervisor.students.show', array_merge(
+            compact('student'),
+            [
+                'velocityData' => $progressData->velocityWeeks,
+                'heatmapData' => $progressData->pageDifficulty,
+                'recentSessions' => $progressData->recentSessions,
+                'completionPercent' => $progressData->completionPercent,
+                'levelPagesTotal' => $progressData->currentLevelPagesTotal,
+                'levelPagesDone' => $progressData->currentLevelPagesDone,
+            ]
+        ));
     }
 
     public function destroy(Student $student)

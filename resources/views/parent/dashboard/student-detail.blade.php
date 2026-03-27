@@ -51,6 +51,18 @@
     </div>
 </div>
 
+<!-- Analytics Charts -->
+<x-student-progress-chart :student-id="$student->id" :velocity-data="$velocityData" />
+
+<div class="row">
+    <div class="col-md-8">
+        <x-page-difficulty-heatmap :student-id="$student->id" :heatmap-data="$heatmapData" />
+    </div>
+    <div class="col-md-4">
+        <x-recent-session-timeline :sessions="$recentSessions" />
+    </div>
+</div>
+
 <!-- Date Filter -->
 <div class="card mb-4">
     <div class="card-body">
