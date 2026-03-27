@@ -45,6 +45,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Warnings
     Route::resource('warnings', Admin\WarningController::class);
 
+    // Warning Rules
+    Route::resource('warning-rules', Admin\WarningRuleController::class);
+    Route::post('warning-rules/{id}/toggle', [Admin\WarningRuleController::class, 'toggle'])->name('warning-rules.toggle');
+    Route::post('warning-rules/test', [Admin\WarningRuleController::class, 'test'])->name('warning-rules.test');
+
     // Settings
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
@@ -111,6 +116,12 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/warnings/{warning}/print', [Supervisor\WarningController::class, 'print'])->name('warnings.print');
     Route::get('/warnings/attendance/{student}', [Supervisor\WarningController::class, 'getAttendance'])->name('warnings.attendance');
     Route::get('/warnings/recitations/{student}', [Supervisor\WarningController::class, 'getRecitations'])->name('warnings.recitations');
+
+    // Warning Drafts
+    Route::get('warning-drafts', [Supervisor\WarningDraftController::class, 'index'])->name('warning-drafts.index');
+    Route::get('warning-drafts/{id}', [Supervisor\WarningDraftController::class, 'show'])->name('warning-drafts.show');
+    Route::post('warning-drafts/{id}/approve', [Supervisor\WarningDraftController::class, 'approve'])->name('warning-drafts.approve');
+    Route::post('warning-drafts/{id}/dismiss', [Supervisor\WarningDraftController::class, 'dismiss'])->name('warning-drafts.dismiss');
 
     // Students (view only)
     Route::get('/students', [Supervisor\StudentController::class, 'index'])->name('students.index');
