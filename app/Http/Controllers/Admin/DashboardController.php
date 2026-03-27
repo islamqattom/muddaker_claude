@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Student, User, Attendance, RecitationSession, Warning};
+use App\Services\AnalyticsService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -43,9 +44,14 @@ class DashboardController extends Controller
         // Weekly sessions chart data
         $weeklySessions = $this->getWeeklySessionsData();
 
+        // Supervisor performance
+        $analyticsService = app(AnalyticsService::class);
+        $supervisorsPerformance = $analyticsService->getAllSupervisorsPerformance();
+
         return view('admin.dashboard.index', compact(
             'stats', 'recentSessions', 'recentWarnings',
-            'monthlyAttendance', 'weeklySessions'
+            'monthlyAttendance', 'weeklySessions',
+            'supervisorsPerformance'
         ));
     }
 

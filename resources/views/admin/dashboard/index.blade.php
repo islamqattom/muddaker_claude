@@ -93,6 +93,20 @@
     </div>
 </div>
 
+{{-- Supervisor Performance --}}
+<div class="row g-4 mt-1">
+    <div class="col-12">
+        <h5 class="mb-3"><i class="fas fa-user-tie me-2"></i>@lang('Supervisor Performance')</h5>
+    </div>
+    @forelse($supervisorsPerformance as $sp)
+        <x-supervisor-performance-card :supervisor="$sp" :perf="$sp['data']" />
+    @empty
+        <div class="col-12">
+            <p class="text-muted">@lang('No supervisors found')</p>
+        </div>
+    @endforelse
+</div>
+
 <div class="row g-4 mt-1">
     <div class="col-lg-8">
         <div class="card">
