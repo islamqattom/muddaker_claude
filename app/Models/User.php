@@ -82,4 +82,9 @@ class User extends Authenticatable
     {
         return $this->notifications()->where('is_read', false)->count();
     }
+
+    public function pushSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PushSubscription::class);
+    }
 }

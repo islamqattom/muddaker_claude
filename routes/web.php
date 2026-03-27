@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Student;
 use App\Http\Controllers\ParentPortal;
+use App\Http\Controllers\PushController;
 
 // Redirect root to login
 Route::get('/', fn() => redirect()->route('login'));
@@ -14,6 +15,12 @@ Route::get('/', fn() => redirect()->route('login'));
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Push subscription routes (authenticated)
+Route::middleware('auth')->group(function () {
+    Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
+    Route::delete('/push/unsubscribe', [PushController::class, 'unsubscribe'])->name('push.unsubscribe');
+});
 
 // ============================
 // ADMIN ROUTES
