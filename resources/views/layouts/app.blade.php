@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="مدكر">
     <link rel="manifest" href="/manifest.json">
+    <meta name="vapid-public-key" content="{{ config('web-push.vapid.public_key', '') }}">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'نظام تسميع القرآن الكريم') - مشروع مدكر القرآني</title>
@@ -888,21 +889,10 @@
         });
     </script>
 
-    <!-- PWA Service Worker -->
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                    console.log('SW registered:', registration.scope);
-                })
-                .catch(function(error) {
-                    console.log('SW registration failed:', error);
-                });
-        });
-    }
+    <!-- PWA Push + Service Worker -->
+    <script src="/js/push-init.js"></script>
 
-    // PWA Install Prompt Handler
+    <!-- PWA Install Prompt Handler
     let deferredPrompt;
     const installButton = document.getElementById('pwa-install-btn');
 

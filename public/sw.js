@@ -43,6 +43,69 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
+// Push event - show notification when push message is received
+self.addEventListener('push', event => {
+    let data = {
+        title: 'مشروع مدكر القرآني',
+        body: 'لديك إشعار جديد',
+        icon: '/images/muddaker-logo-main-nobg.png',
+        link: '/',
+    };
+
+    try {
+        if (event.data) {
+            const payload = event.data.json();
+            data = {
+                title: payload.title || data.title,
+                body: payload.body || data.body,
+                icon: payload.icon || data.icon,
+                link: payload.link || payload.url || data.link,
+                tag: payload.tag || 'quran-notification',
+                requireInteraction: payload.requireInteraction || false,
+            };
+        }
+    } catch (e) {
+        // Fall back to text if JSON parsing fails
+        if (event.data) {
+            data.body = event.data.text();
+        }
+    }
+
+    const options = {
+        body: data.body,
+        icon: data.icon,
+        tag: data.tag || 'quran-notification',
+        requireInteraction: data.requireInteraction || false,
+        data: { url: data.link },
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, options)
+    );
+});
+
+// Notification click event - open link when notification is clicked
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+
+    const url = event.notification.data?.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+            // Focus existing window if open
+            for (const client of clientList) {
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Open new window
+            if (clients.openWindow) {
+                return clients.openWindow(url);
+            }
+        })
+    );
+});
+
 // Fetch event - different strategies for different resources
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
