@@ -189,6 +189,26 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/profile', [Student\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [Student\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [Student\ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Quran Reader
+    Route::get('/quran', [Student\QuranReaderController::class, 'index'])->name('quran');
+    Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
+    Route::get('/quran/part/{part}', [Student\QuranReaderController::class, 'part'])->name('quran.part');
+
+    // Progress & Goals
+    Route::get('/progress', [Student\ProgressController::class, 'index'])->name('progress');
+    Route::get('/progress/goals', [Student\ProgressController::class, 'goals'])->name('progress.goals');
+    Route::put('/progress/goals', [Student\ProgressController::class, 'updateGoal'])->name('progress.goals.update');
+
+    // Bookmarks
+    Route::get('/bookmarks', [Student\BookmarkController::class, 'index'])->name('bookmarks');
+    Route::post('/bookmarks', [Student\BookmarkController::class, 'store'])->name('bookmarks.store');
+    Route::put('/bookmarks/{id}', [Student\BookmarkController::class, 'update'])->name('bookmarks.update');
+    Route::delete('/bookmarks/{id}', [Student\BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+    Route::get('/bookmarks/export', [Student\BookmarkController::class, 'export'])->name('bookmarks.export');
+
+    // Achievements
+    Route::get('/achievements', [Student\AchievementController::class, 'index'])->name('achievements');
 });
 
 // ============================

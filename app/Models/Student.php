@@ -14,11 +14,19 @@ class Student extends Model
         'national_id', 'birth_date', 'phone', 'address',
         'memorized_parts', 'current_part', 'current_page',
         'enrollment_date', 'notes',
+        'current_streak', 'longest_streak', 'last_memorization_date', 'accuracy_rate',
     ];
 
     protected $casts = [
         'birth_date' => 'date',
         'enrollment_date' => 'date',
+        'last_memorization_date' => 'date',
+        'memorized_parts' => 'integer',
+        'current_part' => 'integer',
+        'current_page' => 'integer',
+        'current_streak' => 'integer',
+        'longest_streak' => 'integer',
+        'accuracy_rate' => 'float',
     ];
 
     public function user()
@@ -54,6 +62,31 @@ class Student extends Model
     public function warnings()
     {
         return $this->hasMany(Warning::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(StudentBookmark::class);
+    }
+
+    public function bookmarkCategories()
+    {
+        return $this->hasMany(BookmarkCategory::class);
+    }
+
+    public function memorizationGoal()
+    {
+        return $this->hasOne(MemorizationGoal::class);
+    }
+
+    public function dailyProgress()
+    {
+        return $this->hasMany(DailyProgress::class);
+    }
+
+    public function achievements()
+    {
+        return $this->hasMany(StudentAchievement::class);
     }
 
     public function getNameAttribute(): string
