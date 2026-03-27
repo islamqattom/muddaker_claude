@@ -121,7 +121,7 @@ class WarningDraftController extends Controller
 
     protected function notifyParent(Student $student, Warning $warning): void
     {
-        $parent = $student->parent;
+        $parent = $student->parents()->first();
         if (!$parent || !$parent->user) {
             return;
         }
@@ -131,7 +131,7 @@ class WarningDraftController extends Controller
                 $parent->user->notify(new \App\Notifications\WarningIssued($warning));
             }
         } catch (\Exception $e) {
-            \Log::error("Failed to notify parent: " . $e->getMessage());
+            \Log::error("Failed to notify parent {$parent->id} about warning {$warning->id}: " . $e->getMessage());
         }
     }
 }
