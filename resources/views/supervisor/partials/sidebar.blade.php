@@ -37,3 +37,6 @@
         <span class="badge bg-danger">{{ $warnCount }}</span>
     @endif
 </a>
+<a href="{{ route('supervisor.warning-drafts.index') }}" class="nav-link {{ request()->routeIs('supervisor.warning-drafts.*') ? 'active' : '' }}">
+    <i class="fas fa-edit"></i> مسودات الإنذارات
+</a>

@@ -29,3 +29,6 @@
 <a href="{{ route('admin.warnings.index') }}" class="nav-link {{ request()->routeIs('admin.warnings.*') ? 'active' : '' }}">
     <i class="fas fa-exclamation-triangle"></i> الإنذارات
 </a>
+<a href="{{ route('admin.warning-rules.index') }}" class="nav-link {{ request()->routeIs('admin.warning-rules.*') ? 'active' : '' }}">
+    <i class="fas fa-exclamation-triangle"></i> قواعد الإنذار
+</a>
