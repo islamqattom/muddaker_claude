@@ -7,6 +7,7 @@ use App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Student;
 use App\Http\Controllers\ParentPortal;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\NotificationController;
 
 // Redirect root to login
 Route::get('/', fn() => redirect()->route('login'));
@@ -20,6 +21,12 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
     Route::delete('/push/unsubscribe', [PushController::class, 'unsubscribe'])->name('push.unsubscribe');
+
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::get('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
 });
 
 // ============================

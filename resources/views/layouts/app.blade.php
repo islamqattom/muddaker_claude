@@ -646,24 +646,33 @@
             <div class="header-actions">
                 <!-- Notifications -->
                 <div class="dropdown">
-                    <div class="notification-bell" data-bs-toggle="dropdown">
+                    <div class="notification-bell" data-bs-toggle="dropdown" id="notifBell">
                         <i class="fas fa-bell"></i>
                         @php $notifCount = auth()->user()->unreadNotificationsCount(); @endphp
                         @if($notifCount > 0)
-                            <span class="notification-badge">{{ $notifCount }}</span>
+                            <span class="notification-badge" id="notifBadge">{{ $notifCount }}</span>
                         @endif
                     </div>
-                    <div class="dropdown-menu dropdown-menu-start p-0" style="width: 300px; max-height: 400px; overflow-y: auto;">
-                        <div class="p-3 border-bottom">
+                    <div class="dropdown-menu dropdown-menu-start p-0" style="width: 320px; max-height: 450px; overflow-y: auto;">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                             <strong>الإشعارات</strong>
-                            @if($notifCount > 0)
-                                <span class="badge bg-danger ms-2">{{ $notifCount }} جديد</span>
-                            @endif
+                            <div>
+                                @if($notifCount > 0)
+                                    <a href="{{ route('notifications.markAllAsRead') }}" class="text-decoration-none small" onclick="event.stopPropagation(); this.click();">
+                                        @lang('Mark all as read')
+                                    </a>
+                                @endif
+                                <a href="{{ route('notifications.index') }}" class="text-decoration-none small me-2">
+                                    @lang('View All')
+                                </a>
+                            </div>
                         </div>
                         @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notif)
-                            <a href="{{ $notif->link ?? '#' }}" class="dropdown-item py-2 border-bottom {{ $notif->is_read ? '' : 'bg-light' }}" style="white-space: normal;">
-                                <div class="fw-bold" style="font-size:13px;">{{ $notif->title }}</div>
-                                <div class="text-muted" style="font-size:12px;">{{ $notif->message }}</div>
+                            <a href="{{ $notif->link ?? ($notif->is_read ? '#' : route('notifications.markAsRead', $notif->id)) }}"
+                               class="dropdown-item py-2 border-bottom {{ !$notif->is_read ? 'bg-light fw-bold' : '' }}"
+                               style="white-space: normal;">
+                                <div style="font-size:13px;">{{ $notif->title }}</div>
+                                <div class="text-muted" style="font-size:12px;">{{ Str::limit($notif->message, 60) }}</div>
                                 <div class="text-muted" style="font-size:11px;">{{ $notif->created_at->diffForHumans() }}</div>
                             </a>
                         @empty
