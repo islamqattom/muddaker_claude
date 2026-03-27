@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-8 offset-md-2">
+        <div class="col-md-8 mx-auto">
             <div class="card card-primary">
                 <div class="card-header">
                     <h3 class="card-title">{{ $rule ? 'تعديل قاعدة' : 'إضافة قاعدة جديدة' }}</h3>
@@ -93,13 +93,11 @@
                             <small class="form-text text-muted">اتركها فارغة لتطبيق القاعدة على جميع الصفوف</small>
                         </div>
 
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                <input type="checkbox" name="is_active" class="custom-control-input"
-                                       id="is_active" value="1"
-                                       @checked(old('is_active', $rule->is_active ?? true))>
-                                <label class="custom-control-label" for="is_active">مفعّل</label>
-                            </div>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="is_active" class="form-check-input"
+                                   id="is_active" value="1"
+                                   @checked(old('is_active', $rule->is_active ?? true))>
+                            <label class="form-check-label" for="is_active">مفعّل</label>
                         </div>
                     </div>
 
