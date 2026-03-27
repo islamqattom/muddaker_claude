@@ -8,6 +8,7 @@ use App\Models\Warning;
 use App\Models\WarningDraft;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class WarningDraftController extends Controller
 {
@@ -52,43 +53,48 @@ class WarningDraftController extends Controller
         $failedSessions = collect($recitationRecords)->whereIn('status', ['failed', 'not_recitate'])->count();
         $totalSessions = count($recitationRecords);
 
-        $prefix = 'WRN-' . date('Y') . '-';
-        $lastWarning = Warning::where('warning_number', 'LIKE', $prefix)
-            ->orderBy('warning_number', 'desc')
-            ->first();
-        $lastNum = $lastWarning ? (int) substr($lastWarning->warning_number, -4) : 0;
-        $warningNumber = $prefix . str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
+        $warning = \Illuminate\Support\Facades\DB::transaction(function () use ($draft, $type, $absentDays, $lateDays, $totalAttendance, $failedSessions, $totalSessions, $attendanceRecords, $recitationRecords) {
+            $prefix = 'WRN-' . date('Y') . '-';
+            $lastWarning = Warning::where('warning_number', 'LIKE', $prefix)
+                ->lockForUpdate()
+                ->orderBy('id', 'desc')
+                ->first();
+            $lastNum = $lastWarning ? (int) substr($lastWarning->warning_number, -4) : 0;
+            $warningNumber = $prefix . str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
 
-        $warning = Warning::create([
-            'student_id' => $draft->student_id,
-            'issued_by' => Auth::id(),
-            'warning_number' => $warningNumber,
-            'type' => $type,
-            'title' => $draft->title,
-            'content' => $draft->content,
-            'issue_date' => $draft->issue_date,
-            'issue_day' => $draft->issue_date ? \App\Models\Student::getArabicDay($draft->issue_date) : null,
-            'from_date' => $draft->from_date,
-            'from_day' => $draft->from_date ? \App\Models\Student::getArabicDay($draft->from_date) : null,
-            'to_date' => $draft->to_date,
-            'to_day' => $draft->to_date ? \App\Models\Student::getArabicDay($draft->to_date) : null,
-            'absent_days' => $absentDays,
-            'late_days' => $lateDays,
-            'total_days' => $totalAttendance ?: null,
-            'failed_sessions' => $failedSessions,
-            'total_sessions' => $totalSessions ?: null,
-            'attendance_data' => $attendanceRecords,
-            'recitation_data' => $recitationRecords,
-            'test_data' => $draft->test_data ?? [],
-        ]);
+            $warning = Warning::create([
+                'student_id' => $draft->student_id,
+                'issued_by' => Auth::id(),
+                'warning_number' => $warningNumber,
+                'type' => $type,
+                'title' => $draft->title,
+                'content' => $draft->content,
+                'issue_date' => $draft->issue_date,
+                'issue_day' => $draft->issue_date ? \App\Models\Student::getArabicDay($draft->issue_date) : null,
+                'from_date' => $draft->from_date,
+                'from_day' => $draft->from_date ? \App\Models\Student::getArabicDay($draft->from_date) : null,
+                'to_date' => $draft->to_date,
+                'to_day' => $draft->to_date ? \App\Models\Student::getArabicDay($draft->to_date) : null,
+                'absent_days' => $absentDays,
+                'late_days' => $lateDays,
+                'total_days' => $totalAttendance ?: null,
+                'failed_sessions' => $failedSessions,
+                'total_sessions' => $totalSessions ?: null,
+                'attendance_data' => $attendanceRecords,
+                'recitation_data' => $recitationRecords,
+                'test_data' => $draft->test_data ?? [],
+            ]);
 
-        $this->notifyParent($draft->student, $warning);
+            $this->notifyParent($draft->student, $warning);
 
-        $draft->update([
-            'status' => 'approved',
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => now(),
-        ]);
+            $draft->update([
+                'status' => 'approved',
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => now(),
+            ]);
+
+            return $warning;
+        });
 
         return redirect()
             ->route('supervisor.warnings.show', $warning->id)
