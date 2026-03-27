@@ -30,24 +30,29 @@ class SettingsServiceProvider extends ServiceProvider
             'enable_notifications',
         ];
 
-        $settings = \DB::table('settings')
-            ->whereIn('key', $knownSettings)
-            ->get()
-            ->keyBy('key');
+        try {
+            $settings = \DB::table('settings')
+                ->whereIn('key', $knownSettings)
+                ->get()
+                ->keyBy('key');
 
-        foreach ($knownSettings as $key) {
-            if (isset($settings[$key])) {
-                $value = $settings[$key]->value;
+            foreach ($knownSettings as $key) {
+                if (isset($settings[$key])) {
+                    $value = $settings[$key]->value;
 
-                // Convert string booleans to actual booleans
-                if ($value === 'true') {
-                    $value = true;
-                } elseif ($value === 'false') {
-                    $value = false;
+                    // Convert string booleans to actual booleans
+                    if ($value === 'true') {
+                        $value = true;
+                    } elseif ($value === 'false') {
+                        $value = false;
+                    }
+
+                    config(['app.' . $key => $value]);
                 }
-
-                config(['app.' . $key => $value]);
             }
+        } catch (\Exception $e) {
+            // Settings table may not exist during testing (before RefreshDatabase migrations run)
+            // Silently skip loading settings in that case
         }
     }
 }
