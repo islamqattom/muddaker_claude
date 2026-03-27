@@ -36,7 +36,7 @@ class WarningRuleController extends Controller
             'condition_type' => $request->condition_type,
             'threshold' => $request->threshold,
             'period_days' => $request->period_days ?? 30,
-            'level_ids' => $request->level_ids ?: null,
+            'level_ids' => empty($request->level_ids) ? null : array_values($request->level_ids),
             'is_active' => $request->boolean('is_active', true),
             'created_by' => auth()->id(),
         ]);
@@ -64,7 +64,7 @@ class WarningRuleController extends Controller
             'condition_type' => $request->condition_type,
             'threshold' => $request->threshold,
             'period_days' => $request->period_days ?? 30,
-            'level_ids' => $request->level_ids ?: null,
+            'level_ids' => empty($request->level_ids) ? null : array_values($request->level_ids),
             'is_active' => $request->boolean('is_active', true),
         ]);
 
