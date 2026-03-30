@@ -57,23 +57,6 @@
     </div>
     <div class="card-body p-0" style="max-height: 60vh; overflow-y: auto;">
         @if(isset($pageData))
-            @php
-                $partPageRanges = [
-                    1 => [1, 21], 2 => [22, 41], 3 => [42, 62], 4 => [63, 82], 5 => [83, 103],
-                    6 => [104, 124], 7 => [125, 144], 8 => [145, 164], 9 => [165, 185], 10 => [186, 205],
-                    11 => [206, 226], 12 => [227, 246], 13 => [247, 266], 14 => [267, 285], 15 => [286, 306],
-                    16 => [307, 325], 17 => [326, 345], 18 => [346, 364], 19 => [365, 384], 20 => [385, 404],
-                    21 => [405, 424], 22 => [425, 444], 23 => [445, 462], 24 => [463, 481], 25 => [482, 501],
-                    26 => [502, 520], 27 => [521, 539], 28 => [540, 557], 29 => [558, 577], 30 => [578, 604],
-                ];
-                $currentJuz = 1;
-                foreach ($partPageRanges as $juz => $range) {
-                    if ($currentPage >= $range[0] && $currentPage <= $range[1]) {
-                        $currentJuz = $juz;
-                        break;
-                    }
-                }
-            @endphp
             <div class="text-center p-3 bg-light border-bottom">
                 <small class="text-muted">الجزء {{ $currentJuz }} - صفحة {{ $currentPage }}</small>
             </div>

@@ -42,6 +42,7 @@ class QuranReaderController extends Controller
             $pageData = $this->quranApi->getPage($page);
             $audioUrls = $this->quranApi->getAudioUrls($page);
             $juzOptions = $this->quranApi->getJuzOptions();
+            $currentJuz = $this->quranApi->getJuzForPage($page);
         } catch (\Exception $e) {
             return back()->with('error', 'فشل في تحميل الصفحة: ' . $e->getMessage());
         }
@@ -52,6 +53,7 @@ class QuranReaderController extends Controller
             'pageData' => $pageData,
             'audioUrls' => $audioUrls,
             'juzOptions' => $juzOptions,
+            'currentJuz' => $currentJuz,
         ]);
     }
 
