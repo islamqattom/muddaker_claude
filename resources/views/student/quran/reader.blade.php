@@ -9,6 +9,8 @@
 @endsection
 
 @section('content')
+@include('student.partials.audio-player')
+
 <!-- Navigation Header -->
 <div class="card mb-3">
     <div class="card-body py-2">
@@ -87,10 +89,6 @@
     </div>
 </div>
 
-<!-- Audio Player -->
-@if(isset($pageData))
-    @include('student.partials.audio-player')
-@endif
 
 <!-- Bookmark Button -->
 @if(isset($pageData))
