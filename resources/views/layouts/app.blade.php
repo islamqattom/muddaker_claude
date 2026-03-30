@@ -892,45 +892,6 @@
     <!-- PWA Push + Service Worker -->
     <script src="/js/push-init.js"></script>
 
-    <!-- PWA Install Prompt Handler
-    let deferredPrompt;
-    const installButton = document.getElementById('pwa-install-btn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
-        // Stash the event so it can be triggered later
-        deferredPrompt = e;
-        // Show the install button if it exists
-        if (installButton) {
-            installButton.style.display = 'flex';
-        }
-    });
-
-    // Handle install button click
-    if (installButton) {
-        installButton.addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            // Show the prompt
-            deferredPrompt.prompt();
-            // Wait for the user to respond to the prompt
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log('User response to install prompt:', outcome);
-            // Reset the deferred prompt
-            deferredPrompt = null;
-            // Hide the button
-            installButton.style.display = 'none';
-        });
-    }
-
-    // Handle successful install
-    window.addEventListener('appinstalled', (evt) => {
-        console.log('PWA installed successfully');
-        if (installButton) {
-            installButton.style.display = 'none';
-        }
-    });
-    </script>
 
     @stack('scripts')
 </body>

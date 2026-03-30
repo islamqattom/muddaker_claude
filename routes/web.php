@@ -209,6 +209,43 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
     // Achievements
     Route::get('/achievements', [Student\AchievementController::class, 'index'])->name('achievements');
+
+    // Smart Review Scheduler (SM-2)
+    Route::get('/reviews', [Student\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/session', [Student\ReviewController::class, 'session'])->name('reviews.session');
+    Route::post('/reviews/{reviewItem}/submit', [Student\ReviewController::class, 'submitReview'])->name('reviews.submit');
+    Route::post('/reviews/add', [Student\ReviewController::class, 'addToReviews'])->name('reviews.add');
+    Route::delete('/reviews/{reviewItem}', [Student\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Weak Areas Detection
+    Route::get('/weak-areas', [Student\WeakAreaController::class, 'index'])->name('weak-areas.index');
+    Route::post('/weak-areas/{weakArea}/mark', [Student\WeakAreaController::class, 'markRemediated'])->name('weak-areas.mark');
+    Route::get('/weak-areas/refresh', [Student\WeakAreaController::class, 'refresh'])->name('weak-areas.refresh');
+
+    // Voice Pronunciation Analysis
+    Route::get('/pronunciation', [Student\PronunciationController::class, 'index'])->name('pronunciation.index');
+    Route::get('/pronunciation/practice', [Student\PronunciationController::class, 'practice'])->name('pronunciation.practice');
+    Route::get('/pronunciation/verse', [Student\PronunciationController::class, 'getVerse'])->name('pronunciation.verse');
+    Route::post('/pronunciation', [Student\PronunciationController::class, 'store'])->name('pronunciation.store');
+    Route::get('/pronunciation/{attempt}/results', [Student\PronunciationController::class, 'results'])->name('pronunciation.results');
+    Route::delete('/pronunciation/{attempt}', [Student\PronunciationController::class, 'destroy'])->name('pronunciation.destroy');
+
+    // Leaderboards
+    Route::get('/leaderboard', [Student\LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+    // Peer Challenges
+    Route::get('/challenges', [Student\ChallengeController::class, 'index'])->name('challenges.index');
+    Route::get('/challenges/create', [Student\ChallengeController::class, 'create'])->name('challenges.create');
+    Route::post('/challenges', [Student\ChallengeController::class, 'store'])->name('challenges.store');
+    Route::get('/challenges/{challenge}', [Student\ChallengeController::class, 'show'])->name('challenges.show');
+    Route::post('/challenges/{challenge}/accept', [Student\ChallengeController::class, 'accept'])->name('challenges.accept');
+    Route::post('/challenges/{challenge}/decline', [Student\ChallengeController::class, 'decline'])->name('challenges.decline');
+
+    // Group Events
+    Route::get('/events', [Student\GroupEventController::class, 'index'])->name('events.index');
+    Route::get('/events/{event}', [Student\GroupEventController::class, 'show'])->name('events.show');
+    Route::post('/events/{event}/join', [Student\GroupEventController::class, 'join'])->name('events.join');
+    Route::post('/events/{event}/leave', [Student\GroupEventController::class, 'leave'])->name('events.leave');
 });
 
 // ============================

@@ -13,7 +13,9 @@ test.describe('Supervisor Warnings', () => {
   test('should display warnings list page', async ({ page }) => {
     // Check page is accessible
     await expect(page).toHaveURL(/supervisor\/warnings/);
-    // Should have some content or message
-    await expect(page.locator('.card, table, h1, h4, h6').first()).toBeVisible();
+    // Should have page title h1
+    await expect(page.locator('h1:has-text("الإنذارات")')).toBeVisible();
+    // Should have cards
+    await expect(page.locator('.card').first()).toBeVisible();
   });
 });

@@ -89,6 +89,46 @@ class Student extends Model
         return $this->hasMany(StudentAchievement::class);
     }
 
+    public function reviewItems()
+    {
+        return $this->hasMany(ReviewItem::class);
+    }
+
+    public function recitationReviews()
+    {
+        return $this->hasMany(RecitationReview::class);
+    }
+
+    public function pronunciationAttempts()
+    {
+        return $this->hasMany(PronunciationAttempt::class);
+    }
+
+    public function weakAreas()
+    {
+        return $this->hasMany(WeakArea::class);
+    }
+
+    public function leaderboardEntries()
+    {
+        return $this->hasMany(LeaderboardEntry::class);
+    }
+
+    public function challengesAsChallenger()
+    {
+        return $this->hasMany(Challenge::class, 'challenger_id');
+    }
+
+    public function challengesAsChallenged()
+    {
+        return $this->hasMany(Challenge::class, 'challenged_id');
+    }
+
+    public function groupEventParticipations()
+    {
+        return $this->hasMany(GroupEventParticipant::class);
+    }
+
     public function getNameAttribute(): string
     {
         return $this->user->name;

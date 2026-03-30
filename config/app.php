@@ -21,6 +21,11 @@ return [
     'work_days' => env('WORK_DAYS', 'saturday,sunday,monday,tuesday,thursday'),
     'enable_notifications' => env('ENABLE_NOTIFICATIONS', true),
 
+    // Third-party API keys
+    'assemblyai' => [
+        'api_key' => env('ASSEMBLYAI_API_KEY', ''),
+    ],
+
     'providers' => [
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,

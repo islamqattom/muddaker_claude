@@ -10,13 +10,13 @@ test.describe('Student Dashboard', () => {
   });
 
   test('should display student dashboard correctly', async ({ page }) => {
-    // Check welcome message
-    await expect(page.locator('h4:has-text("مرحباً")')).toBeVisible();
+    // Check welcome message (h5 tag, not h4)
+    await expect(page.locator('h5:has-text("مرحباً")')).toBeVisible();
     // Check stats cards - use specific selectors to avoid strict mode
-    await expect(page.locator('small:has-text("حضور هذا الشهر")')).toBeVisible();
-    await expect(page.locator('small:has-text("غياب هذا الشهر")')).toBeVisible();
-    await expect(page.locator('small:has-text("جلسات التسميع")').first()).toBeVisible();
-    await expect(page.locator('small:has-text("صفحات جديدة")')).toBeVisible();
+    await expect(page.locator('small:has-text("حضور")').first()).toBeVisible();
+    await expect(page.locator('small:has-text("غياب")').first()).toBeVisible();
+    await expect(page.locator('small:has-text("جلسات")').first()).toBeVisible();
+    await expect(page.locator('small:has-text("الأجزاء المحفوظة")').first()).toBeVisible();
   });
 
   test('should display recent sessions section', async ({ page }) => {
