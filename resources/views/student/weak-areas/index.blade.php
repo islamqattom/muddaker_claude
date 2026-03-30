@@ -5,34 +5,7 @@
 @section('role-label', 'طالب')
 
 @section('sidebar-menu')
-    <span class="nav-section-title">الرئيسية</span>
-    <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
-        <i class="fas fa-home"></i> لوحتي الشخصية
-    </a>
-    <span class="nav-section-title mt-2">القرآن الكريم</span>
-    <a href="{{ route('student.quran') }}" class="nav-link {{ request()->routeIs('student.quran*') ? 'active' : '' }}">
-        <i class="fas fa-book-quran"></i> قراءة القرآن
-    </a>
-    <span class="nav-section-title mt-2">المتابعة</span>
-    <a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
-        <i class="fas fa-microphone"></i> جلسات التسميع
-    </a>
-    <span class="nav-section-title mt-2">التقدم</span>
-    <a href="{{ route('student.progress') }}" class="nav-link {{ request()->routeIs('student.progress*') ? 'active' : '' }}">
-        <i class="fas fa-chart-line"></i> تقدمي
-    </a>
-    <a href="{{ route('student.reviews.index') }}" class="nav-link {{ request()->routeIs('student.reviews*') ? 'active' : '' }}">
-        <i class="fas fa-clock"></i> المراجعة
-    </a>
-    <a href="{{ route('student.weak-areas.index') }}" class="nav-link {{ request()->routeIs('student.weak-areas*') ? 'active' : '' }}">
-        <i class="fas fa-exclamation-triangle"></i> المناطق الضعيفة
-    </a>
-    <a href="{{ route('student.achievements') }}" class="nav-link {{ request()->routeIs('student.achievements*') ? 'active' : '' }}">
-        <i class="fas fa-trophy"></i> إنجازاتي
-    </a>
-    <a href="{{ route('student.bookmarks') }}" class="nav-link {{ request()->routeIs('student.bookmarks*') ? 'active' : '' }}">
-        <i class="fas fa-bookmark"></i> علاماتي
-    </a>
+    @include('student.partials.sidebar')
 @endsection
 
 @section('content')

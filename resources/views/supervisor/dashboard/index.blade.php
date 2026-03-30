@@ -5,34 +5,7 @@
 @section('role-label', 'مشرف')
 
 @section('sidebar-menu')
-    <span class="nav-section-title">الرئيسية</span>
-    <a href="{{ route('supervisor.dashboard') }}" class="nav-link {{ request()->routeIs('supervisor.dashboard') ? 'active' : '' }}">
-        <i class="fas fa-home"></i> لوحة التحكم
-    </a>
-
-    <span class="nav-section-title mt-2">إدارة الطلاب</span>
-    <a href="{{ route('supervisor.students.index') }}" class="nav-link {{ request()->routeIs('supervisor.students.*') ? 'active' : '' }}">
-        <i class="fas fa-users"></i> الطلاب
-    </a>
-    <a href="{{ route('supervisor.attendance.index') }}" class="nav-link {{ request()->routeIs('supervisor.attendance.*') ? 'active' : '' }}">
-        <i class="fas fa-calendar-check"></i> الحضور والغياب
-    </a>
-
-    <span class="nav-section-title mt-2">التسميع</span>
-    <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.*') ? 'active' : '' }}">
-        <i class="fas fa-microphone"></i> جلسة تسميع جديدة
-    </a>
-    <a href="{{ route('supervisor.recitation.history') }}" class="nav-link">
-        <i class="fas fa-history"></i> سجل الجلسات
-    </a>
-
-    <span class="nav-section-title mt-2">التقارير والإنذارات</span>
-    <a href="{{ route('supervisor.reports.index') }}" class="nav-link {{ request()->routeIs('supervisor.reports.*') ? 'active' : '' }}">
-        <i class="fas fa-chart-bar"></i> التقارير
-    </a>
-    <a href="{{ route('supervisor.warnings.index') }}" class="nav-link {{ request()->routeIs('supervisor.warnings.*') ? 'active' : '' }}">
-        <i class="fas fa-exclamation-triangle"></i> الإنذارات
-    </a>
+    @include('supervisor.partials.sidebar')
 @endsection
 
 @section('content')
