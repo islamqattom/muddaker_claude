@@ -77,7 +77,7 @@
                         <label class="form-label">أيام العمل (اختر الأيام)</label>
                         <div class="row">
                             @php
-                                $workDays = explode(',', config('app.work_days', 'saturday,sunday,monday,tuesday,thursday'));
+                                $workDays = explode(',', config('app.work_days', 'saturday,sunday,monday,tuesday,wednesday,thursday'));
                             @endphp
                             <div class="col-md-6">
                                 <div class="form-check">

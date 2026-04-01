@@ -18,7 +18,7 @@ return [
     'center_phone' => env('CENTER_PHONE', ''),
     'work_start_time' => env('WORK_START_TIME', '08:00'),
     'work_end_time' => env('WORK_END_TIME', '20:00'),
-    'work_days' => env('WORK_DAYS', 'saturday,sunday,monday,tuesday,thursday'),
+    'work_days' => env('WORK_DAYS', 'saturday,sunday,monday,tuesday,wednesday,thursday'),
     'enable_notifications' => env('ENABLE_NOTIFICATIONS', true),
 
     // Third-party API keys

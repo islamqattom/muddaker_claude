@@ -284,13 +284,13 @@ function submitSession() {
             setTimeout(() => window.location.href = '{{ route('supervisor.recitation.index') }}', 1500);
         },
         error: function(xhr) {
-            if (xhr.responseJSON?.errors) {
-                const errors = Object.values(xhr.responseJSON.errors).flat().join('\n');
-                toastr.error(errors);
-            } else {
-                // If validation passes but redirect happens
-                window.location.href = '{{ route('supervisor.recitation.index') }}';
+            let errorMsg = 'حدث خطأ أثناء الحفظ';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
             }
+            toastr.error(errorMsg);
         }
     });
 }

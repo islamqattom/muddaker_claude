@@ -395,7 +395,8 @@ class RecitationController extends Controller
      */
     public function saveSession(Request $request)
     {
-        $request->validate([
+        // Validate common fields first
+        $rules = [
             'student_id' => 'required|exists:students,id',
             'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
             'part_id' => 'nullable|exists:quran_parts,id',
@@ -404,12 +405,32 @@ class RecitationController extends Controller
             'pages.*.page_number' => 'required|integer',
             'pages.*.errors' => 'required|integer|min:0',
             'pages.*.hesitations' => 'required|integer|min:0',
-        ]);
+        ];
 
-        // Validate work schedule
-        $scheduleError = $this->validateWorkSchedule($request->session_date);
-        if ($scheduleError) {
-            return redirect()->back()->with('error', $scheduleError)->withInput();
+        // For AJAX requests (jQuery sends X-Requested-With: XMLHttpRequest), return JSON errors
+        $isAjax = $request->expectsJson() || $request->isXmlHttpRequest();
+
+        if ($isAjax) {
+            try {
+                $request->validate($rules);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'errors' => $e->errors(),
+                    'message' => 'Validation failed'
+                ], 422);
+            }
+
+            // Validate work schedule and return JSON if fails
+            $scheduleError = $this->validateWorkSchedule($request->session_date);
+            if ($scheduleError) {
+                return response()->json(['message' => $scheduleError], 422);
+            }
+        } else {
+            $request->validate($rules);
+            $scheduleError = $this->validateWorkSchedule($request->session_date);
+            if ($scheduleError) {
+                return redirect()->back()->with('error', $scheduleError)->withInput();
+            }
         }
 
         $session = DB::transaction(function() use ($request) {
@@ -513,6 +534,16 @@ class RecitationController extends Controller
         // Notify parent about the session
         $this->notifyParentOnSession($session);
 
+        $isAjax = $request->expectsJson() || $request->isXmlHttpRequest();
+
+        if ($isAjax) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حفظ جلسة التسميع بنجاح',
+                'session_id' => $session->id
+            ]);
+        }
+
         return redirect()->route('supervisor.recitation.index')
             ->with('success', 'تم حفظ جلسة التسميع بنجاح');
     }
@@ -562,7 +593,7 @@ class RecitationController extends Controller
      */
     public function saveFailedContinue(Request $request)
     {
-        $request->validate([
+        $rules = [
             'student_id' => 'required|exists:students,id',
             'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
             'part_id' => 'nullable|exists:quran_parts,id',
@@ -571,12 +602,33 @@ class RecitationController extends Controller
             'pages.*.page_number' => 'required|integer',
             'pages.*.errors' => 'required|integer|min:0',
             'pages.*.hesitations' => 'required|integer|min:0',
-        ]);
+            'failed_continued' => 'nullable|boolean',
+            'is_final_submission' => 'nullable|boolean',
+        ];
 
-        // Validate work schedule
-        $scheduleError = $this->validateWorkSchedule($request->session_date);
-        if ($scheduleError) {
-            return redirect()->back()->with('error', $scheduleError)->withInput();
+        // For AJAX requests (jQuery sends X-Requested-With: XMLHttpRequest), return JSON errors
+        $isAjax = $request->expectsJson() || $request->isXmlHttpRequest();
+
+        if ($isAjax) {
+            try {
+                $request->validate($rules);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json([
+                    'errors' => $e->errors(),
+                    'message' => 'Validation failed'
+                ], 422);
+            }
+
+            $scheduleError = $this->validateWorkSchedule($request->session_date);
+            if ($scheduleError) {
+                return response()->json(['message' => $scheduleError], 422);
+            }
+        } else {
+            $request->validate($rules);
+            $scheduleError = $this->validateWorkSchedule($request->session_date);
+            if ($scheduleError) {
+                return redirect()->back()->with('error', $scheduleError)->withInput();
+            }
         }
 
         DB::transaction(function() use ($request) {

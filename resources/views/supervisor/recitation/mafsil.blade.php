@@ -383,8 +383,14 @@ function submitMafsil() {
             toastr.success('تم حفظ نتيجة المفصل بنجاح');
             setTimeout(() => window.location.href = '{{ route('supervisor.recitation.index') }}', 1500);
         },
-        error: function() {
-            window.location.href = '{{ route('supervisor.recitation.index') }}';
+        error: function(xhr) {
+            let errorMsg = 'حدث خطأ أثناء الحفظ';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+            }
+            toastr.error(errorMsg);
         }
     });
 }
@@ -424,8 +430,14 @@ function continueAfterFailure() {
             initialFailedRecordSaved = true;
             toastr.info('تم تسجيل أن الطالب راسب وسيكمل');
         },
-        error: function() {
-            toastr.error('حدث خطأ في حفظ السجل');
+        error: function(xhr) {
+            let errorMsg = 'حدث خطأ في حفظ السجل';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+            }
+            toastr.error(errorMsg);
         }
     });
 }
