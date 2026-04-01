@@ -67,7 +67,7 @@ class DashboardController extends Controller
 
         $byDate = [];
         foreach ($rows as $row) {
-            $byDate[$row->date][$row->status] = $row->count;
+            $byDate[$row->date->toDateString()][$row->status] = $row->count;
         }
 
         $data = [];
@@ -96,7 +96,7 @@ class DashboardController extends Controller
 
         $byDate = [];
         foreach ($rows as $row) {
-            $byDate[$row->date][$row->status] = $row->count;
+            $byDate[$row->date->toDateString()][$row->status] = $row->count;
         }
 
         $data = [];
