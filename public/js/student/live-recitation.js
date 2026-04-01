@@ -17,6 +17,8 @@ class LiveRecitationController {
         this.similarityThreshold = 80;
         this.apiToken = '';
         this.faultAudio = new Audio('/sounds/fault.mp3');
+        this.verseCardsCache = null;
+        this.silenceRafId = null;
         this.init();
     }
 
@@ -34,7 +36,10 @@ class LiveRecitationController {
         this.errorCountEl = document.getElementById('errorCount');
         this.currentVerseEl = document.getElementById('currentVerse');
         this.transcriptEl = document.getElementById('transcript');
-        this.autoPlayAudioCheckbox = document.getElementById('autoPlayAudio');
+        // Cache CSRF token once
+        this.csrfToken = document.querySelector('meta[name=csrf-token]')?.content || '';
+        // Read API token from meta tag if available
+        this.apiToken = document.querySelector('meta[name=api-token]')?.content || '';
         this.modeSelect.addEventListener('change', () => this.togglePageInputs());
         this.startBtn.addEventListener('click', () => this.startRecitation());
         this.stopBtn.addEventListener('click', () => this.stopRecitation());
@@ -57,27 +62,29 @@ class LiveRecitationController {
         this.startBtn.disabled = true;
         this.updateStatus('جارى البدء...');
 
-        // Get API token first - halt if failed
-        try {
-            const tokenResponse = await fetch('/student/live-recitation/token', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                credentials: 'include',
-            });
-            const tokenData = await tokenResponse.json();
-            if (!tokenData.success || !tokenData.token) {
-                this.showError('فشل في الحصول على رمز الدخول');
+        // Check if we have API token (from meta tag or previous fetch)
+        if (!this.apiToken) {
+            try {
+                const tokenResponse = await fetch('/student/live-recitation/token', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+                const tokenData = await tokenResponse.json();
+                if (!tokenData.success || !tokenData.token) {
+                    this.showError('فشل في الحصول على رمز الدخول');
+                    this.startBtn.disabled = false;
+                    return;
+                }
+                this.apiToken = tokenData.token;
+            } catch (error) {
+                console.error('Failed to get API token:', error);
+                this.showError('فشل في الاتصال بالخادم');
                 this.startBtn.disabled = false;
                 return;
             }
-            this.apiToken = tokenData.token;
-        } catch (error) {
-            console.error('Failed to get API token:', error);
-            this.showError('فشل في الاتصال بالخادم');
-            this.startBtn.disabled = false;
-            return;
         }
 
         try {
@@ -108,7 +115,8 @@ class LiveRecitationController {
             this.totalErrors = 0;
             this.transcriptText = '';
             this.updateProgress();
-            this.showVerse(0);
+            this.initializeVersesDisplay();
+            this.highlightVerse(0);
             this.stopBtn.classList.remove('d-none');
             this.nextVerseBtn.classList.remove('d-none');
             this.connectWebSocket();
@@ -120,14 +128,27 @@ class LiveRecitationController {
     }
 
     getCsrfToken() {
-        const meta = document.querySelector('meta[name=csrf-token]');
-        return meta ? meta.content : '';
+        return this.csrfToken;
     }
 
     connectWebSocket() {
         // API returns websocket_url (snake_case), access it correctly
         const websocketUrl = this.currentSession.websocket_url || this.currentSession.websocketUrl;
-        this.ws = new WebSocket(websocketUrl);
+
+        if (!websocketUrl) {
+            console.error('WebSocket URL is missing from session data');
+            this.showError('خطأ في الاتصال - عنوان الخادم غير موجود');
+            return;
+        }
+
+        try {
+            this.ws = new WebSocket(websocketUrl);
+        } catch (error) {
+            console.error('Failed to create WebSocket:', error);
+            this.showError('فشل في إنشاء الاتصال');
+            return;
+        }
+
         this.ws.onopen = () => {
             console.log('WebSocket connected');
             this.updateStatus('متصل - جارى الاستماع...');
@@ -135,8 +156,12 @@ class LiveRecitationController {
             this.startRecording();
         };
         this.ws.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            this.handleWebSocketMessage(message);
+            try {
+                const message = JSON.parse(event.data);
+                this.handleWebSocketMessage(message);
+            } catch (error) {
+                console.error('Failed to parse WebSocket message:', error);
+            }
         };
         this.ws.onerror = (error) => {
             console.error('WebSocket error:', error);
@@ -145,6 +170,7 @@ class LiveRecitationController {
         this.ws.onclose = () => {
             console.log('WebSocket closed');
             this.isRecording = false;
+            this.stopSilenceDetection();
             if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
                 this.mediaRecorder.stop();
             }
@@ -178,14 +204,17 @@ class LiveRecitationController {
 
     startSilenceDetection() {
         if (!this.audioContext || !this.isRecording) return;
-        const analyser = this.audioContext.createAnalyser();
-        const source = this.audioContext.createMediaStreamSource(this.mediaRecorder.stream);
-        source.connect(analyser);
-        analyser.fftSize = 256;
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        // Reuse existing analyser if already created
+        if (!this.analyser) {
+            this.analyser = this.audioContext.createAnalyser();
+            const source = this.audioContext.createMediaStreamSource(this.mediaRecorder.stream);
+            source.connect(this.analyser);
+            this.analyser.fftSize = 256;
+        }
+        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         const detectSilence = () => {
             if (!this.isRecording) return;
-            analyser.getByteFrequencyData(dataArray);
+            this.analyser.getByteFrequencyData(dataArray);
             const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
             if (average < 5) {
                 if (!this.silenceTimeout) {
@@ -199,26 +228,51 @@ class LiveRecitationController {
                     this.silenceTimeout = null;
                 }
             }
-            requestAnimationFrame(detectSilence);
+            this.silenceRafId = requestAnimationFrame(detectSilence);
         };
-        detectSilence();
+        this.silenceRafId = requestAnimationFrame(detectSilence);
+    }
+
+    stopSilenceDetection() {
+        if (this.silenceRafId) {
+            cancelAnimationFrame(this.silenceRafId);
+            this.silenceRafId = null;
+        }
+        if (this.silenceTimeout) {
+            clearTimeout(this.silenceTimeout);
+            this.silenceTimeout = null;
+        }
     }
 
     onSilenceDetected() {
         if (this.isEvaluating || this.currentVerseIndex >= this.verses.length) return;
         this.isEvaluating = true;
-        this.mediaRecorder.stop();
+        // Don't stop recording, just evaluate current transcript and continue
         this.evaluateCurrentVerse();
     }
 
     async sendAudioChunk(blob) {
         if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result.split(',')[1];
-            this.ws.send(JSON.stringify({ audio_data: base64 }));
-        };
-        reader.readAsDataURL(blob);
+
+        try {
+            const reader = new FileReader();
+            await new Promise((resolve, reject) => {
+                reader.onloadend = () => {
+                    try {
+                        const base64 = reader.result.split(',')[1];
+                        this.ws.send(JSON.stringify({ audio_data: base64 }));
+                        resolve();
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            console.error('Failed to send audio chunk:', error);
+        }
+
         this.audioChunks = [];
         if (this.isRecording && this.mediaRecorder.state === 'inactive') {
             this.mediaRecorder.start(1000);
@@ -230,28 +284,159 @@ class LiveRecitationController {
             const transcript = message.text;
             this.transcriptText = transcript;
             this.updateTranscript(transcript);
+
+            // Real-time verse detection - match transcription to verses immediately
             if (message.message_type === 'FinalTranscript' && transcript.trim().length > 0) {
-                clearTimeout(this.silenceTimeout);
-                this.silenceTimeout = null;
+                this.processRecitation(transcript);
             }
         }
     }
 
+    processRecitation(transcript) {
+        // Find the best matching verse for the transcription
+        let bestMatchIndex = -1;
+        let bestSimilarity = 0;
+
+        for (let i = 0; i < this.verses.length; i++) {
+            const similarity = this.calculateSimilarity(transcript, this.verses[i].text);
+            if (similarity > bestSimilarity) {
+                bestSimilarity = similarity;
+                bestMatchIndex = i;
+            }
+        }
+
+        // If we found a good match
+        if (bestMatchIndex !== -1 && bestSimilarity >= this.similarityThreshold) {
+            // Highlight the matching verse
+            this.highlightVerse(bestMatchIndex);
+
+            // If this is a new verse (different from current) and we've made progress
+            // Only auto-advance by ONE verse at a time to ensure validation
+            if (bestMatchIndex === this.currentVerseIndex + 1) {
+                this.currentVerseIndex = bestMatchIndex;
+                this.updateProgress();
+                this.updateProgressOnServer(bestSimilarity);
+
+                // Check if all verses completed
+                if (this.currentVerseIndex >= this.verses.length - 1) {
+                    this.finishRecitation();
+                    return;
+                }
+            } else if (bestMatchIndex > this.currentVerseIndex + 1) {
+                // Skipping verses is not allowed - just highlight but don't advance
+                this.highlightVerse(this.currentVerseIndex);
+            }
+        }
+        // Note: Error handling for current verse is done in evaluateCurrentVerse (on silence)
+        // to avoid double fault sound and ensure proper validation
+    }
+
+    highlightVerse(index) {
+        // Use cached verse cards if available, otherwise query
+        const verseCards = this.verseCardsCache || document.querySelectorAll('.verse-card');
+        verseCards.forEach((card, i) => {
+            if (i === index) {
+                card.classList.add('active-verse');
+            } else {
+                card.classList.remove('active-verse');
+            }
+        });
+    }
+
+    playFaultSound() {
+        this.faultAudio.play().catch((error) => {
+            console.warn('Fault audio playback failed:', error.message);
+        });
+        this.setVerseErrorState(this.currentVerseIndex, 1500);
+    }
+
+    setVerseErrorState(index, duration = 1500) {
+        const verseCards = this.verseCardsCache || document.querySelectorAll('.verse-card');
+        if (verseCards[index]) {
+            verseCards[index].classList.add('error-verse');
+            setTimeout(() => {
+                verseCards[index].classList.remove('error-verse');
+            }, duration);
+        }
+    }
+
+    initializeVersesDisplay() {
+        // Display all verses at once with highlighting for the current verse
+        const container = document.createElement('div');
+        container.className = 'verses-container';
+
+        this.verses.forEach((verse, index) => {
+            const card = document.createElement('div');
+            card.className = 'verse-card' + (index === 0 ? ' active-verse' : '');
+            card.dataset.index = index;
+
+            const header = document.createElement('div');
+            header.className = 'd-flex justify-content-between align-items-center mb-2';
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-secondary';
+            badge.textContent = verse.surah + ':' + verse.verse_number;
+
+            const counter = document.createElement('span');
+            counter.className = 'text-muted';
+            counter.textContent = (index + 1) + ' / ' + this.verses.length;
+
+            header.appendChild(badge);
+            header.appendChild(counter);
+
+            const text = document.createElement('p');
+            text.className = 'verse-text mb-0';
+            text.dir = 'rtl';
+            text.textContent = verse.text;
+
+            card.appendChild(header);
+            card.appendChild(text);
+            container.appendChild(card);
+        });
+
+        this.currentVerseEl.innerHTML = '';
+        this.currentVerseEl.appendChild(container);
+        // Cache the verse card elements for reuse
+        this.verseCardsCache = container.querySelectorAll('.verse-card');
+    }
+
     async evaluateCurrentVerse() {
+        // Only evaluate if we have a transcript
+        if (!this.transcriptText || this.transcriptText.trim().length === 0) {
+            this.isEvaluating = false;
+            return;
+        }
+
         const verse = this.verses[this.currentVerseIndex];
         const expectedText = verse.text;
         const similarity = this.calculateSimilarity(this.transcriptText, expectedText);
+
         if (similarity < this.similarityThreshold) {
             await this.recordError(verse, similarity);
             this.showErrorState(verse);
-            this.faultAudio.play().catch(() => {});
+            this.playFaultSound();
+        } else {
+            // Successfully recited - auto advance to next verse
+            if (this.currentVerseIndex < this.verses.length - 1) {
+                this.currentVerseIndex++;
+                this.highlightVerse(this.currentVerseIndex);
+                this.updateProgress();
+            } else {
+                // Last verse completed
+                this.finishRecitation();
+                return;
+            }
         }
+
         await this.updateProgressOnServer(similarity);
         this.isEvaluating = false;
         this.transcriptText = '';
+
         setTimeout(() => {
             if (this.isRecording && this.currentVerseIndex < this.verses.length) {
-                this.mediaRecorder.start(1000);
+                if (this.mediaRecorder.state === 'inactive') {
+                    this.mediaRecorder.start(1000);
+                }
                 this.startSilenceDetection();
             }
         }, 500);
@@ -314,8 +499,12 @@ class LiveRecitationController {
     }
 
     async recordError(verse, similarity) {
+        // Always update local state first
+        this.totalErrors++;
+        this.errorCountEl.textContent = this.totalErrors;
+
         try {
-            await fetch('/api/student/live-recitation/error', {
+            const response = await fetch('/api/student/live-recitation/error', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -334,10 +523,12 @@ class LiveRecitationController {
                     error_type: similarity < 50 ? 'unclear' : 'mismatch'
                 })
             });
-            this.totalErrors++;
-            this.errorCountEl.textContent = this.totalErrors;
+
+            if (!response.ok) {
+                throw new Error('Server responded with ' + response.status);
+            }
         } catch (error) {
-            console.error('Error recording error:', error);
+            console.error('Failed to record error to server:', error);
         }
     }
 
@@ -367,23 +558,15 @@ class LiveRecitationController {
             this.finishRecitation();
             return;
         }
-        const verse = this.verses[index];
-        const verseHtml = '<div class="verse-card"><div class="d-flex justify-content-between align-items-center mb-2"><span class="badge bg-secondary">' + verse.surah + ':' + verse.verse_number + '</span><span class="text-muted">' + (index + 1) + ' / ' + this.verses.length + '</span></div><p class="verse-text mb-0" dir="rtl">' + verse.text + '</p></div>';
-        this.currentVerseEl.innerHTML = verseHtml;
-        if (this.autoPlayAudioCheckbox.checked && this.currentSession.audioUrls[index]) {
-            const audio = new Audio(this.currentSession.audioUrls[index]);
-            audio.play().catch(() => {});
+        // Only initialize once, then just highlight
+        if (!this.verseCardsCache || this.verseCardsCache.length === 0) {
+            this.initializeVersesDisplay();
         }
+        this.highlightVerse(index);
     }
 
     showErrorState(verse) {
-        const verseCard = this.currentVerseEl.querySelector('.verse-card');
-        if (verseCard) {
-            verseCard.classList.add('error-verse');
-            setTimeout(() => {
-                verseCard.classList.remove('error-verse');
-            }, 2000);
-        }
+        this.setVerseErrorState(this.currentVerseIndex, 2000);
     }
 
     updateTranscript(text) {
@@ -395,11 +578,12 @@ class LiveRecitationController {
     }
 
     nextVerse() {
-        this.currentVerseIndex++;
-        this.updateProgress();
-        this.showVerse(this.currentVerseIndex);
-        this.transcriptText = '';
-        if (this.currentVerseIndex >= this.verses.length) {
+        if (this.currentVerseIndex < this.verses.length - 1) {
+            this.currentVerseIndex++;
+            this.updateProgress();
+            this.highlightVerse(this.currentVerseIndex);
+            this.transcriptText = '';
+        } else {
             this.finishRecitation();
         }
     }
@@ -420,14 +604,23 @@ class LiveRecitationController {
     async stopRecitation() {
         if (!this.sessionId) return;
         this.isRecording = false;
+        this.stopSilenceDetection();
+
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
             this.mediaRecorder.stop();
         }
+
+        // Stop all stream tracks to release microphone
+        if (this.mediaRecorder && this.mediaRecorder.stream) {
+            this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
+
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
         }
+
         try {
-            const response = await fetch('/api/student/live-recitation/session/' + this.sessionId + '/end', {
+            const response = await fetch(`/api/student/live-recitation/session/${this.sessionId}/end`, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + this.apiToken,
@@ -435,9 +628,16 @@ class LiveRecitationController {
                 },
                 credentials: 'include',
             });
+
+            if (!response.ok) {
+                throw new Error('Server responded with ' + response.status);
+            }
+
             const data = await response.json();
             if (data.success) {
                 this.showReport(data.data);
+            } else {
+                throw new Error(data.error || 'Unknown error');
             }
         } catch (error) {
             console.error('Error ending session:', error);
@@ -464,6 +664,7 @@ class LiveRecitationController {
         this.verses = [];
         this.currentVerseIndex = 0;
         this.totalErrors = 0;
+        this.verseCardsCache = null;
     }
 
     showReport(report) {

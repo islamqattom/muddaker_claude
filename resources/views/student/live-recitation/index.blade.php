@@ -47,7 +47,7 @@ $apiToken = $token ? $token->token : null;
 
                 <div class="mb-3">
                     <label class="form-label">عتبة التشابه (%)</label>
-                    <input type="number" class="form-control" id="similarityThreshold" value="80" min="50" max="100">
+                    <input type="number" class="form-control" id="similarityThreshold" value="70" min="50" max="100">
                     <small class="text-muted">إذا كان التشابه أقل من هذه القيمة يعتبر خطأ</small>
                 </div>
 
@@ -95,11 +95,8 @@ $apiToken = $token ? $token->token : null;
         <!-- Current Verse Display -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5><i class="fas fa-book-quran me-2"></i>الآية الحالية</h5>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="autoPlayAudio" checked>
-                    <label class="form-check-label" for="autoPlayAudio">تشغيل الصوت تلقائياً</label>
-                </div>
+                <h5><i class="fas fa-book-quran me-2"></i>الآيات</h5>
+                <small class="text-muted">الآية النشطة محددة باللون الأخضر</small>
             </div>
             <div class="card-body text-center">
                 <div id="currentVerse">
@@ -131,11 +128,12 @@ $apiToken = $token ? $token->token : null;
             </div>
             <div class="card-body">
                 <ol class="mb-0">
-                    <li class="mb-2">اختر نوع التسميع (صفحة واحدة أو نطاق)</li>
+                    <li class="mb-2">اختر صفحة البداية (صفحة واحدة أو نطاق)</li>
                     <li class="mb-2">اضغط "ابدأ التسميع" وامنح الإذن لاستخدام الميكروفون</li>
-                    <li class="mb-2">ستسمع الآية القرآنية أولاً، ثم ابدأ بنطقها</li>
+                    <li class="mb-2">ستظهر جميع الآيات في الصفحة - ابدأ بتلاوة الآية الأولى</li>
+                    <li class="mb-2">سيتم الاستماع إليك ومطابقة نطقك مع الآيات تلقائياً</li>
                     <li class="mb-2">عند اكتشاف خطأ، ستسمع صوت تنبيه وتُضاء الآية باللون الأحمر</li>
-                    <li class="mb-2">اضغط "التالي" للانتقال للآية التالية أو انتظر للإنتقال التلقائي</li>
+                    <li class="mb-2">عند إكمال آية بنجاح، يتم الانتقال تلقائياً للآية التالية</li>
                     <li>عند الانتهاء، سيظهر تقرير مفصل بالأخطاء</li>
                 </ol>
             </div>
@@ -152,6 +150,19 @@ $apiToken = $token ? $token->token : null;
     animation: shake 0.5s ease-in-out;
 }
 
+.active-verse {
+    background: linear-gradient(135deg, #d1e7dd, #a3cfbb) !important;
+    border: 2px solid #198754 !important;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+}
+
+.verses-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -162,6 +173,8 @@ $apiToken = $token ? $token->token : null;
     padding: 20px;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 12px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
 }
 
 .verse-text {
