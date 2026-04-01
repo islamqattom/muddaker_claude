@@ -117,9 +117,25 @@ function stopSardNow() { document.getElementById('failedFlag').value='1'; bootst
 
 function submitSard() {
     const data = new FormData(document.getElementById('sardForm'));
-    $.ajax({ url:'{{ route('supervisor.recitation.save') }}', method:'POST', data:data, processData:false, contentType:false,
-        success:()=>{ toastr.success('تم حفظ نتيجة السرد'); setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500); },
-        error:()=>{ window.location.href='{{ route('supervisor.recitation.index') }}'; }
+    $.ajax({
+        url:'{{ route('supervisor.recitation.save') }}',
+        method:'POST',
+        data:data,
+        processData:false,
+        contentType:false,
+        success:()=>{
+            toastr.success('تم حفظ نتيجة السرد');
+            setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500);
+        },
+        error:(xhr)=>{
+            let errorMsg = 'حدث خطأ أثناء الحفظ';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+            }
+            toastr.error(errorMsg);
+        }
     });
 }
 </script>
