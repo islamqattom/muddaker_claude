@@ -6,6 +6,9 @@
 <a href="{{ route('student.quran') }}" class="nav-link {{ request()->routeIs('student.quran*') ? 'active' : '' }}">
     <i class="fas fa-book-quran"></i> قراءة القرآن
 </a>
+<a href="{{ route('student.live-recitation') }}" class="nav-link {{ request()->routeIs('student.live-recitation*') ? 'active' : '' }}">
+    <i class="fas fa-microphone-alt"></i> التسميع المباشر
+</a>
 <span class="nav-section-title mt-2">المتابعة</span>
 <a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
     <i class="fas fa-microphone"></i> جلسات التسميع

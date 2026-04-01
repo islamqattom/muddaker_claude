@@ -6,6 +6,7 @@ use App\Http\Controllers\Student\QuranReaderController;
 use App\Http\Controllers\Student\BookmarkController;
 use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\AchievementController;
+use App\Http\Controllers\Student\LiveRecitationController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -40,4 +41,15 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/achievement
     Route::get('/earned', [AchievementController::class, 'apiEarned']);
     Route::get('/next', [AchievementController::class, 'apiNext']);
     Route::get('/progress/{code}', [AchievementController::class, 'apiProgress']);
+});
+
+// Live Recitation API
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/live-recitation')->group(function () {
+    Route::post('/start', [LiveRecitationController::class, 'start']);
+    Route::get('/session/{id}', [LiveRecitationController::class, 'getSession']);
+    Route::post('/session/{id}/end', [LiveRecitationController::class, 'endSession']);
+    Route::delete('/session/{id}', [LiveRecitationController::class, 'cancelSession']);
+    Route::post('/error', [LiveRecitationController::class, 'recordError']);
+    Route::post('/progress', [LiveRecitationController::class, 'updateProgress']);
+    Route::get('/session/{id}/report', [LiveRecitationController::class, 'getReport']);
 });

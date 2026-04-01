@@ -245,10 +245,12 @@ class TajweedEvaluatorService
      * @param string $text
      * @return string
      */
-    private function normalizeArabic(string $text): string
+    public function normalizeArabic(string $text): string
     {
-        // Remove diacritics (tashkeel)
-        $text = preg_replace('/[\u064B-\u065F\u0670]/u', '', $text);
+        // Remove diacritics (tashkeel) - Unicode ranges for Arabic diacritics
+        // \u064B-\u065F: Fatha through Tanween Fath, Damatan, Kasratan, Fatha, Damma, Kasra, Sukun, Shadda
+        // \u0670: Dagger alef
+        $text = preg_replace('/[\x{064B}-\x{065F}\x{0670}]/u', '', $text);
 
         // Normalize alef variations
         $text = preg_replace('/[إأآا]/u', 'ا', $text);
@@ -270,7 +272,7 @@ class TajweedEvaluatorService
      * @param string $transcribed
      * @return float Similarity ratio (0-1)
      */
-    private function calculateSimilarity(string $expected, string $transcribed): float
+    public function calculateSimilarity(string $expected, string $transcribed): float
     {
         if (empty($expected) && empty($transcribed)) {
             return 1.0;
@@ -279,10 +281,58 @@ class TajweedEvaluatorService
             return 0.0;
         }
 
-        $levenshtein = levenshtein($expected, $transcribed);
-        $maxLength = max(mb_strlen($expected), mb_strlen($transcribed));
+        // Use custom character-based Levenshtein for proper UTF-8 support
+        $levenshtein = $this->mbLevenshtein($expected, $transcribed);
+        $expectedChars = mb_strlen($expected);
+        $transcribedChars = mb_strlen($transcribed);
+        $maxLength = max($expectedChars, $transcribedChars);
 
         return 1 - ($levenshtein / $maxLength);
+    }
+
+    /**
+     * Multibyte character-based Levenshtein distance
+     *
+     * @param string $str1
+     * @param string $str2
+     * @return int
+     */
+    private function mbLevenshtein(string $str1, string $str2): int
+    {
+        // Split into Unicode characters
+        $chars1 = preg_split('//u', $str1, -1, PREG_SPLIT_NO_EMPTY);
+        $chars2 = preg_split('//u', $str2, -1, PREG_SPLIT_NO_EMPTY);
+        $len1 = count($chars1);
+        $len2 = count($chars2);
+
+        if ($len1 === 0) {
+            return $len2;
+        }
+        if ($len2 === 0) {
+            return $len1;
+        }
+
+        // Build distance matrix
+        $matrix = [];
+        for ($i = 0; $i <= $len1; $i++) {
+            $matrix[$i] = [$i];
+        }
+        for ($j = 0; $j <= $len2; $j++) {
+            $matrix[0][$j] = $j;
+        }
+
+        for ($i = 1; $i <= $len1; $i++) {
+            for ($j = 1; $j <= $len2; $j++) {
+                $cost = ($chars1[$i - 1] === $chars2[$j - 1]) ? 0 : 1;
+                $matrix[$i][$j] = min(
+                    $matrix[$i - 1][$j] + 1,
+                    $matrix[$i][$j - 1] + 1,
+                    $matrix[$i - 1][$j - 1] + $cost
+                );
+            }
+        }
+
+        return $matrix[$len1][$len2];
     }
 
     /**
@@ -392,5 +442,74 @@ class TajweedEvaluatorService
             $score >= 60 => 'مقبول',
             default => 'يحتاج تحسين',
         };
+    }
+
+    /**
+     * Evaluate a transcribed verse in real-time
+     *
+     * @param string $expected Expected Arabic text
+     * @param string $transcribed Transcribed text from speech recognition
+     * @param float $threshold Similarity threshold (0-100), default 80
+     * @return array{is_error: bool, similarity: float, error_type: ?string, details: ?array}
+     */
+    public function evaluateVerseRealtime(string $expected, string $transcribed, float $threshold = 80.0): array
+    {
+        $normalizedExpected = $this->normalizeArabic($expected);
+        $normalizedTranscribed = $this->normalizeArabic($transcribed);
+
+        $similarity = $this->calculateSimilarity($normalizedExpected, $normalizedTranscribed);
+        $similarityPercent = $similarity * 100;
+
+        if ($similarityPercent >= $threshold) {
+            return [
+                'is_error' => false,
+                'similarity' => round($similarityPercent, 2),
+                'error_type' => null,
+                'details' => null,
+            ];
+        }
+
+        // Identify specific errors
+        $errors = $this->identifyErrors($normalizedExpected, $normalizedTranscribed);
+        $errorType = $this->classifyError($errors, count(explode(' ', $normalizedExpected)), count(explode(' ', $normalizedTranscribed)));
+
+        return [
+            'is_error' => true,
+            'similarity' => round($similarityPercent, 2),
+            'error_type' => $errorType,
+            'details' => $errors,
+        ];
+    }
+
+    /**
+     * Classify the type of error based on word-level errors
+     */
+    private function classifyError(array $errors, int $expectedWordCount, int $transcribedWordCount): string
+    {
+        if (empty($errors)) {
+            return 'unclear';
+        }
+
+        $hasMissing = collect($errors)->contains('type', 'missing');
+        $hasExtra = collect($errors)->contains('type', 'extra');
+        $hasMismatch = collect($errors)->contains('type', 'mismatch');
+
+        if ($transcribedWordCount < $expectedWordCount * 0.5) {
+            return 'unclear';
+        }
+
+        if ($hasMissing && $hasExtra) {
+            return 'mismatch';
+        }
+
+        if ($hasMissing) {
+            return 'missing';
+        }
+
+        if ($hasExtra) {
+            return 'extra';
+        }
+
+        return 'mismatch';
     }
 }

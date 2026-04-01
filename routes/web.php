@@ -195,6 +195,10 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
     Route::get('/quran/part/{part}', [Student\QuranReaderController::class, 'part'])->name('quran.part');
 
+    // Live Recitation (real-time evaluation)
+    Route::get('/live-recitation', [Student\LiveRecitationController::class, 'index'])->name('live-recitation');
+    Route::get('/live-recitation/token', [Student\LiveRecitationController::class, 'getToken'])->name('live-recitation.token');
+
     // Progress & Goals
     Route::get('/progress', [Student\ProgressController::class, 'index'])->name('progress');
     Route::get('/progress/goals', [Student\ProgressController::class, 'goals'])->name('progress.goals');
