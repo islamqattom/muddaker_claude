@@ -67,7 +67,11 @@ class DashboardController extends Controller
 
         $byDate = [];
         foreach ($rows as $row) {
-            $byDate[$row->date->toDateString()][$row->status] = $row->count;
+            if (empty($row->date)) {
+                \Log::warning('Empty date in attendance data', ['row' => $row]);
+                continue;
+            }
+            $byDate[Carbon::parse($row->date)->toDateString()][$row->status] = $row->count;
         }
 
         $data = [];
