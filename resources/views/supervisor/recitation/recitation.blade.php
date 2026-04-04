@@ -112,8 +112,21 @@ function updateTotalErrors() {
     if(total >= 6 && !maxErrorsShown) { maxErrorsShown=true; new bootstrap.Modal(document.getElementById('maxErrorsModal')).show(); }
 }
 
-function stopSard() { document.getElementById('failedFlag').value='1'; submitSard(); }
-function stopSardNow() { document.getElementById('failedFlag').value='1'; bootstrap.Modal.getInstance(document.getElementById('maxErrorsModal')).hide(); submitSard(); }
+let isSubmittingSard = false;
+
+function stopSard() {
+    if (isSubmittingSard) return;
+    isSubmittingSard = true;
+    document.getElementById('failedFlag').value='1';
+    submitSard();
+}
+function stopSardNow() {
+    if (isSubmittingSard) return;
+    isSubmittingSard = true;
+    document.getElementById('failedFlag').value='1';
+    bootstrap.Modal.getInstance(document.getElementById('maxErrorsModal')).hide();
+    submitSard();
+}
 
 function submitSard() {
     const data = new FormData(document.getElementById('sardForm'));
@@ -128,11 +141,12 @@ function submitSard() {
             setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500);
         },
         error:(xhr)=>{
+            isSubmittingSard = false;
             let errorMsg = 'حدث خطأ أثناء الحفظ';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+            if (xhr.responseJSON && xhr.responseJSON.errors) {
                 errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
             }
             toastr.error(errorMsg);
         }

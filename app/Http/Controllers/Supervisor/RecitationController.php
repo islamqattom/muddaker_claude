@@ -414,6 +414,13 @@ class RecitationController extends Controller
             try {
                 $request->validate($rules);
             } catch (\Illuminate\Validation\ValidationException $e) {
+                \Log::warning('Recitation saveSession validation failed', [
+                    'student_id' => $request->student_id,
+                    'type' => $request->type,
+                    'session_date' => $request->session_date,
+                    'errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                ]);
                 return response()->json([
                     'errors' => $e->errors(),
                     'message' => 'Validation failed'
@@ -613,6 +620,13 @@ class RecitationController extends Controller
             try {
                 $request->validate($rules);
             } catch (\Illuminate\Validation\ValidationException $e) {
+                \Log::warning('Recitation saveFailedContinue validation failed', [
+                    'student_id' => $request->student_id,
+                    'type' => $request->type,
+                    'session_date' => $request->session_date,
+                    'errors' => $e->errors(),
+                    'ip' => $request->ip(),
+                ]);
                 return response()->json([
                     'errors' => $e->errors(),
                     'message' => 'Validation failed'
@@ -756,7 +770,7 @@ class RecitationController extends Controller
             'friday' => 'Friday',
         ];
 
-        $sessionDate = Carbon::parse($date);
+        $sessionDate = Carbon::parse($date, 'Asia/Amman');
         $dayName = $sessionDate->format('l'); // English day name (Monday, Tuesday, etc.)
 
         // Check if day is a work day
