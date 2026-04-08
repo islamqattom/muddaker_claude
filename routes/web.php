@@ -80,6 +80,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Sessions
     Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');
     Route::get('/sessions/{session}', [Admin\SessionController::class, 'show'])->name('sessions.show');
+
+    // Audit Logs
+    Route::resource('audit-logs', Admin\AuditLogController::class)->only(['index', 'show']);
+    Route::get('/audit-logs/export', [Admin\AuditLogController::class, 'export'])->name('audit-logs.export');
 });
 
 // ============================

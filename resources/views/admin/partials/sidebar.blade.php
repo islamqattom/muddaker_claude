@@ -19,6 +19,10 @@
 <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
     <i class="fas fa-cog"></i> إعدادات النظام
 </a>
+<span class="nav-section-title mt-2">سجل التدقيق</span>
+<a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+    <i class="fas fa-history"></i> سجل التدقيق
+</a>
 <span class="nav-section-title mt-2">التقارير والإنذارات</span>
 <a href="{{ route('admin.sessions.index') }}" class="nav-link {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
     <i class="fas fa-microphone"></i> جلسات التسميع

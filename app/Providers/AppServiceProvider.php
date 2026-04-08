@@ -4,9 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Pagination\Paginator;
 use Carbon\Carbon;
 use App\Services\NotificationService;
+use App\Listeners\AuthenticationListener;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Failed;
 use Minishlink\WebPush\WebPush;
 
 class AppServiceProvider extends ServiceProvider
@@ -43,5 +48,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Use Bootstrap 5 pagination
         Paginator::useBootstrapFive();
+
+        // Register authentication audit listeners
+        Event::listen(Login::class, [AuthenticationListener::class, 'handleLogin']);
+        Event::listen(Logout::class, [AuthenticationListener::class, 'handleLogout']);
+        Event::listen(Failed::class, [AuthenticationListener::class, 'handleFailed']);
     }
 }
