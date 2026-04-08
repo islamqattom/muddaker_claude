@@ -180,7 +180,10 @@ class StudentController extends Controller
             }
         }
 
-        DB::transaction(function() use ($request, $student, $newAvatarPath) {
+        $oldSupervisorId = $student->supervisor_id;
+        $newSupervisorId = $request->supervisor_id;
+
+        DB::transaction(function() use ($request, $student, $newAvatarPath, $oldSupervisorId, $newSupervisorId) {
             $userData = [
                 'name' => $request->name,
                 'username' => $request->username,
@@ -199,7 +202,7 @@ class StudentController extends Controller
             }
 
             $student->update([
-                'supervisor_id' => $request->supervisor_id,
+                'supervisor_id' => $newSupervisorId,
                 'level_id' => $request->level_id,
                 'national_id' => $request->national_id,
                 'birth_date' => $request->birth_date,
@@ -208,6 +211,12 @@ class StudentController extends Controller
                 'notes' => $request->notes,
                 'is_active' => $request->boolean('is_active'),
             ]);
+
+            // Cascade supervisor change to all related records
+            if ($oldSupervisorId != $newSupervisorId) {
+                $student->recitationSessions()->update(['supervisor_id' => $newSupervisorId]);
+                $student->attendances()->update(['supervisor_id' => $newSupervisorId]);
+            }
         });
 
         return redirect()->route('admin.students.show', $student)
