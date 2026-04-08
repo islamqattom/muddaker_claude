@@ -371,12 +371,6 @@ class RecitationController extends Controller
             'session_date' => 'required|date',
         ]);
 
-        // Validate work schedule
-        $scheduleError = $this->validateWorkSchedule($request->session_date);
-        if ($scheduleError) {
-            return redirect()->back()->with('error', $scheduleError)->withInput();
-        }
-
         $session = RecitationSession::create([
             'student_id' => $request->student_id,
             'supervisor_id' => Auth::id(),
@@ -427,17 +421,8 @@ class RecitationController extends Controller
                 ], 422);
             }
 
-            // Validate work schedule and return JSON if fails
-            $scheduleError = $this->validateWorkSchedule($request->session_date);
-            if ($scheduleError) {
-                return response()->json(['message' => $scheduleError], 422);
-            }
         } else {
             $request->validate($rules);
-            $scheduleError = $this->validateWorkSchedule($request->session_date);
-            if ($scheduleError) {
-                return redirect()->back()->with('error', $scheduleError)->withInput();
-            }
         }
 
         $session = DB::transaction(function() use ($request) {
@@ -633,16 +618,8 @@ class RecitationController extends Controller
                 ], 422);
             }
 
-            $scheduleError = $this->validateWorkSchedule($request->session_date);
-            if ($scheduleError) {
-                return response()->json(['message' => $scheduleError], 422);
-            }
         } else {
             $request->validate($rules);
-            $scheduleError = $this->validateWorkSchedule($request->session_date);
-            if ($scheduleError) {
-                return redirect()->back()->with('error', $scheduleError)->withInput();
-            }
         }
 
         DB::transaction(function() use ($request) {
@@ -748,55 +725,6 @@ class RecitationController extends Controller
 
         return redirect()->back()
             ->with('success', 'تم حذف جلسة التسميع بنجاح');
-    }
-
-    /**
-     * Validate session date against work days and hours
-     */
-    private function validateWorkSchedule($date): ?string
-    {
-        $workDays = explode(',', config('app.work_days', 'saturday,sunday,monday,tuesday,thursday'));
-        $workStart = config('app.work_start_time', '08:00');
-        $workEnd = config('app.work_end_time', '20:00');
-
-        // Map Arabic day names to English
-        $dayMap = [
-            'saturday' => 'Saturday',
-            'sunday' => 'Sunday',
-            'monday' => 'Monday',
-            'tuesday' => 'Tuesday',
-            'wednesday' => 'Wednesday',
-            'thursday' => 'Thursday',
-            'friday' => 'Friday',
-        ];
-
-        $sessionDate = Carbon::parse($date, 'Asia/Amman');
-        $dayName = $sessionDate->format('l'); // English day name (Monday, Tuesday, etc.)
-
-        // Check if day is a work day
-        $isWorkDay = false;
-        foreach ($workDays as $workDay) {
-            $workDay = trim($workDay);
-            if (isset($dayMap[$workDay]) && $dayMap[$workDay] === $dayName) {
-                $isWorkDay = true;
-                break;
-            }
-        }
-
-        if (!$isWorkDay) {
-            $daysList = implode('، ', array_map(fn($d) => __($d), $workDays));
-            return "اليوم المحدد ({$dayName}) ليس من أيام العمل. أيام العمل: {$daysList}";
-        }
-
-        // Check if time is within work hours (if time is provided)
-        if ($sessionDate->format('H:i') !== '00:00' && $sessionDate->format('H:i') !== '') {
-            $sessionTime = $sessionDate->format('H:i');
-            if ($sessionTime < $workStart || $sessionTime > $workEnd) {
-                return "الوقت المحدد ({$sessionTime}) خارج ساعات العمل ({$workStart} - {$workEnd})";
-            }
-        }
-
-        return null; // Valid
     }
 
     protected function notifyParentOnSession(RecitationSession $session): void
