@@ -26,7 +26,7 @@
     <input type="hidden" name="type" value="recitation">
     <input type="hidden" name="part_id" value="{{ $part->id }}">
     <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
-    <input type="hidden" name="failed" id="failedFlag" value="0">
+    <input type="hidden" name="failed" id="failed" value="0">
     <div class="row g-2">
         @foreach($pages as $index => $pageNum)
         <div class="col-md-4 col-lg-3">
@@ -117,13 +117,13 @@ let isSubmittingSard = false;
 function stopSard() {
     if (isSubmittingSard) return;
     isSubmittingSard = true;
-    document.getElementById('failedFlag').value='1';
+    document.getElementById('failed').value='1';
     submitSard();
 }
 function stopSardNow() {
     if (isSubmittingSard) return;
     isSubmittingSard = true;
-    document.getElementById('failedFlag').value='1';
+    document.getElementById('failed').value='1';
     bootstrap.Modal.getInstance(document.getElementById('maxErrorsModal')).hide();
     submitSard();
 }
