@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'تسميع - حفظ جديد')
-@section('page-title', 'جلسة تسميع - حفظ جديد')
+@section('title', 'تسميع - حفظ غير متقن')
+@section('page-title', 'جلسة تسميع - حفظ غير متقن')
 @section('role-label', 'مشرف')
 @section('sidebar-menu')
     @include('supervisor.partials.sidebar')

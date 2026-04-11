@@ -14,7 +14,7 @@ class RecitationController extends Controller
 {
     private const SESSION_VALIDATION_RULES = [
         'student_id' => 'required|exists:students,id',
-        'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+        'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil,not_recitate',
         'part_id' => 'nullable|exists:quran_parts,id',
         'session_date' => 'required|date',
         'pages' => 'required|array',
@@ -39,7 +39,7 @@ class RecitationController extends Controller
             'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil,not_recitate',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $parts = QuranPart::orderBy('part_number')->get();
 
         return view('supervisor.recitation.session', compact('student', 'parts'));
@@ -57,7 +57,7 @@ class RecitationController extends Controller
             'continuation_part_id' => 'nullable|exists:quran_parts,id',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
 
         // Validate page number is within part range
@@ -109,7 +109,7 @@ class RecitationController extends Controller
             'continuation_part_id' => 'nullable|exists:quran_parts,id',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
 
         // Validate page number is within part range
@@ -160,7 +160,7 @@ class RecitationController extends Controller
             'page_number' => 'required|integer|min:1',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $part = QuranPart::findOrFail($request->part_id);
 
         // Validate page number is within part range
@@ -195,7 +195,7 @@ class RecitationController extends Controller
             'part_id' => 'required|exists:quran_parts,id',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $part = QuranPart::with('pages')->findOrFail($request->part_id);
 
         $pages = range($part->start_page, $part->end_page);
@@ -213,7 +213,7 @@ class RecitationController extends Controller
             'mafsil_type' => 'required|in:3,6,10,15,20,25,30',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $mafsilType = $request->mafsil_type;
         $maxScore = 100; // Always use 100
         $passingPercentage = RecitationSession::getMafsilPassingPercentage($mafsilType);
@@ -264,7 +264,7 @@ class RecitationController extends Controller
             'student_id' => 'required|exists:students,id',
         ]);
 
-        $student = Student::with('level')->findOrFail($request->student_id);
+        $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $parts = QuranPart::orderBy('part_number')->get();
 
         return view('supervisor.recitation.not-recitate', compact('student', 'parts'));
@@ -300,6 +300,8 @@ class RecitationController extends Controller
     {
         try {
             $request->validate(self::SESSION_VALIDATION_RULES);
+
+            $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
 
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
@@ -377,6 +379,8 @@ class RecitationController extends Controller
     {
         try {
             $request->validate(self::SESSION_VALIDATION_RULES);
+
+            $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
 
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
@@ -547,6 +551,8 @@ class RecitationController extends Controller
             $request->validate($rules);
         }
 
+        $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
+
         try {
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
@@ -694,8 +700,8 @@ class RecitationController extends Controller
 
     public function destroy(RecitationSession $recitation)
     {
-        // Ensure the recitation belongs to a student of this supervisor
-        if ($recitation->student?->supervisor_id !== Auth::id()) {
+        // Ensure the recitation belongs to this supervisor
+        if ($recitation->supervisor_id !== Auth::id()) {
             abort(403);
         }
 

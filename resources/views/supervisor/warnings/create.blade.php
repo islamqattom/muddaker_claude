@@ -338,14 +338,14 @@ function fetchStudentStats(studentId) {
         })
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                toastr.error(data.error);
                 return;
             }
             updateStudentPreview(data);
         })
         .catch(error => {
             console.error('Error fetching student stats:', error);
-            alert('حدث خطأ أثناء جلب بيانات الطالب');
+            toastr.error('حدث خطأ أثناء جلب بيانات الطالب');
         });
 }
 
@@ -456,12 +456,15 @@ function escapeHtml(text) {
 function fetchAttendance() {
     const studentId = document.getElementById('studentSelect').value;
     if (!studentId) {
-        alert('يرجى اختيار طالب أولاً');
+        toastr.warning('يرجى اختيار طالب أولاً');
         return;
     }
 
     const fromDate = document.getElementById('attendanceFromDate').value;
     const url = '{{ route("supervisor.warnings.attendance", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
+    const tableContainer = document.getElementById('attendanceTableContainer');
+    const originalContent = tableContainer.innerHTML;
+    tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
     fetch(url)
         .then(response => {
@@ -472,7 +475,8 @@ function fetchAttendance() {
         })
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                tableContainer.innerHTML = originalContent;
+                toastr.error(data.error);
                 return;
             }
             attendanceData = data;
@@ -481,7 +485,8 @@ function fetchAttendance() {
         })
         .catch(error => {
             console.error('Error fetching attendance:', error);
-            alert('حدث خطأ أثناء جلب بيانات الحضور');
+            tableContainer.innerHTML = originalContent;
+            toastr.error('حدث خطأ أثناء جلب بيانات الحضور');
         });
 }
 
@@ -551,12 +556,15 @@ function deleteAttendanceRow(index) {
 function fetchRecitations() {
     const studentId = document.getElementById('studentSelect').value;
     if (!studentId) {
-        alert('يرجى اختيار طالب أولاً');
+        toastr.warning('يرجى اختيار طالب أولاً');
         return;
     }
 
     const fromDate = document.getElementById('recitationFromDate').value;
     const url = '{{ route("supervisor.warnings.recitations", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
+    const tableContainer = document.getElementById('recitationTableContainer');
+    const originalContent = tableContainer.innerHTML;
+    tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
     fetch(url)
         .then(response => {
@@ -567,7 +575,8 @@ function fetchRecitations() {
         })
         .then(data => {
             if (data.error) {
-                alert(data.error);
+                tableContainer.innerHTML = originalContent;
+                toastr.error(data.error);
                 return;
             }
             recitationData = data;
@@ -576,7 +585,8 @@ function fetchRecitations() {
         })
         .catch(error => {
             console.error('Error fetching recitations:', error);
-            alert('حدث خطأ أثناء جلب بيانات التسميع');
+            tableContainer.innerHTML = originalContent;
+            toastr.error('حدث خطأ أثناء جلب بيانات التسميع');
         });
 }
 

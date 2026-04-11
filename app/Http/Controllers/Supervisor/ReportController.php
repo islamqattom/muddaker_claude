@@ -333,6 +333,10 @@ class ReportController extends Controller
         $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
 
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+
         $student->load(['user', 'level', 'supervisor']);
 
         $sessions = RecitationSession::where('student_id', $student->id)

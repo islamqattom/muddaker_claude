@@ -256,29 +256,48 @@
                 <div class="row g-3">
                     <div class="col-sm-6">
                         <div class="p-3 rounded text-white" style="background:#27ae60;">
-                            <div class="fw-bold fs-5 mb-1">🟢 أخضر - ممتاز</div>
+                            <div class="fw-bold fs-5 mb-1">
+                                <span class="color-dot" style="background:#fff;"></span> أخضر - ممتاز
+                            </div>
                             <div style="font-size:13px;">لم يخطئ الطالب أو تردد بحد أقصى ترددين</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="p-3 rounded text-dark" style="background:#f39c12;">
-                            <div class="fw-bold fs-5 mb-1">🟠 برتقالي - جيد</div>
+                            <div class="fw-bold fs-5 mb-1">
+                                <span class="color-dot" style="background:#fff;"></span> برتقالي - جيد
+                            </div>
                             <div style="font-size:13px;">خطأ واحد أو من 3 إلى 5 ترددات</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="p-3 rounded text-white" style="background:#c0392b;">
-                            <div class="fw-bold fs-5 mb-1">🔴 أحمر - ضعيف</div>
+                            <div class="fw-bold fs-5 mb-1">
+                                <span class="color-dot" style="background:#fff;"></span> أحمر - ضعيف
+                            </div>
                             <div style="font-size:13px;">خطآن أو ما يعادلهما من الترددات</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="p-3 rounded text-white" style="background:#2c3e50;">
-                            <div class="fw-bold fs-5 mb-1">⚫ أسود - راسب</div>
+                            <div class="fw-bold fs-5 mb-1">
+                                <span class="color-dot" style="background:#fff;"></span> أسود - راسب
+                            </div>
                             <div style="font-size:13px;">خطآن + تردد واحد أو أكثر = رسوب</div>
                         </div>
                     </div>
                 </div>
+
+                <style>
+                    .color-dot {
+                        display: inline-block;
+                        width: 14px;
+                        height: 14px;
+                        border-radius: 50%;
+                        margin-left: 8px;
+                        vertical-align: middle;
+                    }
+                </style>
 
                 <div class="mt-3 p-3 bg-light rounded">
                     <h6 class="text-primary">المفاصل وعلاماتها:</h6>

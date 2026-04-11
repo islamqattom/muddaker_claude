@@ -633,12 +633,12 @@
         <!-- Header -->
         <header class="top-header">
             <!-- Mobile menu toggle -->
-            <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="القائمة">
+            <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="القائمة" aria-label="القائمة">
                 <i class="fas fa-bars"></i>
             </button>
 
             <!-- Desktop sidebar collapse toggle -->
-            <button class="btn btn-sm d-none d-lg-flex" id="sidebarToggle" onclick="toggleSidebar()" title="إظهار/إخفاء القائمة الجانبية">
+            <button class="btn btn-sm d-none d-lg-flex" id="sidebarToggle" onclick="toggleSidebar()" title="إظهار/إخفاء القائمة الجانبية" aria-label="إظهار/إخفاء القائمة الجانبية">
                 <i class="fas fa-bars"></i>
             </button>
 
@@ -684,12 +684,12 @@
 
                 <!-- User Menu -->
                 <div class="dropdown">
-                    <button class="user-avatar-btn" data-bs-toggle="dropdown">
+                    <button class="user-avatar-btn" data-bs-toggle="dropdown" aria-label="الملف الشخصي">
                         <div class="user-info">
                             <div class="name">{{ auth()->user()->name }}</div>
                             <div class="role">@yield('role-label', auth()->user()->role)</div>
                         </div>
-                        <img src="{{ auth()->user()->avatar_url }}" alt="avatar">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}">
                     </button>
                     <ul class="dropdown-menu dropdown-menu-start">
                         <li><a class="dropdown-item" href="{{ route(auth()->user()->role . '.profile.index') }}"><i class="fas fa-user me-2"></i>الملف الشخصي</a></li>
