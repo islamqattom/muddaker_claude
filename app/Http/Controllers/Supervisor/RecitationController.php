@@ -12,6 +12,17 @@ use App\Services\NotificationService;
 
 class RecitationController extends Controller
 {
+    private const SESSION_VALIDATION_RULES = [
+        'student_id' => 'required|exists:students,id',
+        'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
+        'part_id' => 'nullable|exists:quran_parts,id',
+        'session_date' => 'required|date',
+        'pages' => 'required|array',
+        'pages.*.page_number' => 'required|integer|exists:quran_pages,page_number',
+        'pages.*.errors' => 'required|integer|min:0',
+        'pages.*.hesitations' => 'required|integer|min:0',
+    ];
+
     public function index()
     {
         $supervisorId = Auth::id();
@@ -389,68 +400,29 @@ class RecitationController extends Controller
      */
     public function saveSession(Request $request)
     {
-        // Validate common fields first
-        $rules = [
-            'student_id' => 'required|exists:students,id',
-            'type' => 'required|in:new_memorization,review,unmastered,recitation,mafsil',
-            'part_id' => 'nullable|exists:quran_parts,id',
-            'session_date' => 'required|date',
-            'pages' => 'required|array',
-            'pages.*.page_number' => 'required|integer',
-            'pages.*.errors' => 'required|integer|min:0',
-            'pages.*.hesitations' => 'required|integer|min:0',
-        ];
-
-        // For AJAX requests (jQuery sends X-Requested-With: XMLHttpRequest), return JSON errors
-        $isAjax = $request->expectsJson() || $request->isXmlHttpRequest();
-
-        if ($isAjax) {
-            try {
-                $request->validate($rules);
-            } catch (\Illuminate\Validation\ValidationException $e) {
-                \Log::warning('Recitation saveSession validation failed', [
-                    'student_id' => $request->student_id,
-                    'type' => $request->type,
-                    'session_date' => $request->session_date,
-                    'errors' => $e->errors(),
-                    'ip' => $request->ip(),
-                ]);
-                return response()->json([
-                    'errors' => $e->errors(),
-                    'message' => 'Validation failed'
-                ], 422);
-            }
-
-        } else {
-            $request->validate($rules);
-        }
+        $request->validate(self::SESSION_VALIDATION_RULES);
 
         $session = DB::transaction(function() use ($request) {
             $pages = $request->input('pages');
             $totalErrors = 0;
             $totalHesitations = 0;
-            $sessionStatus = 'passed';
-            $finalScore = null;
-            $maxScore = null;
 
-            // Calculate totals
             foreach ($pages as $page) {
                 $totalHesitations += $page['hesitations'];
-                // For recitation type: 3 hesitations = 1 error
-                if ($request->type === 'recitation') {
+                if ($request->type === RecitationSession::TYPE_RECITATION) {
                     $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
                 } else {
                     $totalErrors += $page['errors'];
                 }
             }
 
-            // For mafsil, calculate score (always from 100)
-            if ($request->type === 'mafsil') {
+            $maxScore = null;
+            $finalScore = null;
+            if ($request->type === RecitationSession::TYPE_MAFSIL) {
                 $maxScore = 100;
                 $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
             }
 
-            // Check overall pass/fail
             $failedPages = 0;
             foreach ($pages as $page) {
                 $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
@@ -459,76 +431,28 @@ class RecitationController extends Controller
                 }
             }
 
-            // For mafsil ONLY: check passing percentage
-            // - مفصل 3,6: إذا حصل على أقل من 90% → راسب
-            // - مفصل 10,15: إذا حصل على أقل من 80% → راسب
-            // - مفصل 20,25,30: إذا حصل على أقل من 75% → راسب
-            if ($request->type === 'mafsil') {
+            $sessionStatus = RecitationSession::STATUS_PASSED;
+            if ($request->type === RecitationSession::TYPE_MAFSIL) {
                 $passingPercentage = RecitationSession::getMafsilPassingPercentage($request->mafsil_type);
                 if ($finalScore < $passingPercentage) {
-                    $sessionStatus = 'failed';
+                    $sessionStatus = RecitationSession::STATUS_FAILED;
                 }
-            } elseif ($request->type === 'recitation' && $totalErrors >= 6) {
-                $sessionStatus = 'failed';
-            }
-
-            // For new_memorization, review, and unmastered: check if any page failed
-            if (in_array($request->type, ['new_memorization', 'review', 'unmastered']) && $failedPages > 0) {
-                $sessionStatus = 'failed';
+            } elseif ($request->type === RecitationSession::TYPE_RECITATION && $totalErrors >= 6) {
+                $sessionStatus = RecitationSession::STATUS_FAILED;
+            } elseif (in_array($request->type, [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_REVIEW, RecitationSession::TYPE_UNMASTERED]) && $failedPages > 0) {
+                $sessionStatus = RecitationSession::STATUS_FAILED;
             }
 
             if ($request->failed) {
-                $sessionStatus = 'failed';
+                $sessionStatus = RecitationSession::STATUS_FAILED;
             }
 
-            $session = RecitationSession::create([
-                'student_id' => $request->student_id,
-                'supervisor_id' => Auth::id(),
-                'type' => $request->type,
-                'part_id' => $request->part_id,
-                'start_page' => $pages[0]['page_number'] ?? null,
-                'end_page' => end($pages)['page_number'] ?? null,
-                'total_pages' => count($pages),
-                'total_errors' => $totalErrors,
-                'total_hesitations' => $totalHesitations,
-                'status' => $sessionStatus,
-                'mafsil_type' => $request->mafsil_type ?? null,
-                'max_score' => $maxScore,
-                'final_score' => $finalScore,
-                'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
-                'session_date' => $request->session_date,
-                'notes' => $request->notes,
-            ]);
-
-            // Save each page
-            foreach ($pages as $pageData) {
-                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
-
-                $pageScore = null;
-                if ($request->type === 'mafsil') {
-                    $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
-                }
-
-                RecitationPage::create([
-                    'session_id' => $session->id,
-                    'page_number' => $pageData['page_number'],
-                    'errors' => $pageData['errors'],
-                    'hesitations' => $pageData['hesitations'],
-                    'color_status' => $colorResult['color'],
-                    'is_passed' => $colorResult['passed'],
-                    'page_score' => $pageScore,
-                ]);
-            }
-
-            return $session;
+            return $this->createSessionWithPages($request, $sessionStatus, $totalErrors, $totalHesitations, $maxScore, $finalScore);
         });
 
-        // Notify parent about the session
         $this->notifyParentOnSession($session);
 
-        $isAjax = $request->expectsJson() || $request->isXmlHttpRequest();
-
-        if ($isAjax) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'message' => 'تم حفظ جلسة التسميع بنجاح',
@@ -538,6 +462,93 @@ class RecitationController extends Controller
 
         return redirect()->route('supervisor.recitation.index')
             ->with('success', 'تم حفظ جلسة التسميع بنجاح');
+    }
+
+    /**
+     * Save Incomplete Session (لم يكمل)
+     */
+    public function saveIncomplete(Request $request)
+    {
+        $request->validate(self::SESSION_VALIDATION_RULES);
+
+        $session = DB::transaction(function() use ($request) {
+            $pages = $request->input('pages');
+            $totalErrors = 0;
+            $totalHesitations = 0;
+
+            foreach ($pages as $page) {
+                $totalHesitations += $page['hesitations'];
+                if ($request->type === RecitationSession::TYPE_RECITATION) {
+                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                } else {
+                    $totalErrors += $page['errors'];
+                }
+            }
+
+            $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
+            $finalScore = $maxScore ? RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations) : null;
+
+            return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore);
+        });
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حفظ الجلسة بنجاح (لم يكمل)',
+                'session_id' => $session->id
+            ]);
+        }
+
+        return redirect()->route('supervisor.recitation.index')
+            ->with('success', 'تم حفظ الجلسة بنجاح (لم يكمل)');
+    }
+
+    /**
+     * Create a recitation session with its pages
+     */
+    private function createSessionWithPages(Request $request, string $status, int $totalErrors, int $totalHesitations, ?float $maxScore, ?float $finalScore): RecitationSession
+    {
+        $pages = $request->input('pages');
+
+        $session = RecitationSession::create([
+            'student_id' => $request->student_id,
+            'supervisor_id' => Auth::id(),
+            'type' => $request->type,
+            'part_id' => $request->part_id,
+            'start_page' => $pages[0]['page_number'] ?? null,
+            'end_page' => end($pages)['page_number'] ?? null,
+            'total_pages' => count($pages),
+            'total_errors' => $totalErrors,
+            'total_hesitations' => $totalHesitations,
+            'status' => $status,
+            'mafsil_type' => $request->mafsil_type ?? null,
+            'max_score' => $maxScore,
+            'final_score' => $finalScore,
+            'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
+            'session_date' => $request->session_date,
+            'notes' => $request->notes,
+        ]);
+
+        foreach ($pages as $pageData) {
+            $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
+
+            $pageScore = null;
+            if ($request->type === RecitationSession::TYPE_MAFSIL) {
+                $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+            }
+
+            RecitationPage::create([
+                'session_id' => $session->id,
+                'page_number' => $pageData['page_number'],
+                'errors' => $pageData['errors'],
+                'hesitations' => $pageData['hesitations'],
+                'color_status' => $colorResult['color'],
+                'is_passed' => $colorResult['passed'],
+                'page_score' => $pageScore,
+            ]);
+        }
+
+        return $session;
     }
 
     /**
@@ -632,7 +643,7 @@ class RecitationController extends Controller
             foreach ($pages as $page) {
                 $totalHesitations += $page['hesitations'];
                 // For recitation type: 3 hesitations = 1 error
-                if ($request->type === 'recitation') {
+                if ($request->type === RecitationSession::TYPE_RECITATION) {
                     $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
                 } else {
                     $totalErrors += $page['errors'];
@@ -643,7 +654,7 @@ class RecitationController extends Controller
             $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
 
             // For failed_continued, we use 'failed' status but add note indicating continued
-            $sessionStatus = 'failed';
+            $sessionStatus = RecitationSession::STATUS_FAILED;
 
             $session = RecitationSession::create([
                 'student_id' => $request->student_id,
@@ -669,7 +680,7 @@ class RecitationController extends Controller
                 $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
 
                 $pageScore = null;
-                if ($request->type === 'mafsil') {
+                if ($request->type === RecitationSession::TYPE_MAFSIL) {
                     $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
                 }
 
@@ -745,7 +756,7 @@ class RecitationController extends Controller
 
         $typeLabel = $typeLabels[$session->type] ?? $session->type;
         $scoreText = $session->final_score !== null ? " - الدرجة: {$session->final_score}" : '';
-        $statusText = $session->status === 'passed' ? 'ناجح' : 'راسب';
+        $statusText = $session->status === RecitationSession::STATUS_PASSED ? 'ناجح' : 'راسب';
 
         try {
             $notificationService = app(NotificationService::class);

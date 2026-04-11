@@ -158,10 +158,16 @@
         <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary btn-lg px-4">
             <i class="fas fa-arrow-right me-2"></i>رجوع
         </a>
-        <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitSession()">
-            <i class="fas fa-save me-2"></i>
-            حفظ الجلسة
-        </button>
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-secondary btn-lg" onclick="submitSessionIncomplete()">
+                <i class="fas fa-times-circle me-2"></i>
+                لم يكمل
+            </button>
+            <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitSession()">
+                <i class="fas fa-save me-2"></i>
+                حفظ الجلسة
+            </button>
+        </div>
     </div>
 </form>
 
@@ -284,6 +290,37 @@ function submitSession() {
         contentType: false,
         success: function(response) {
             toastr.success('تم حفظ جلسة التسميع بنجاح');
+            setTimeout(() => window.location.href = '{{ route('supervisor.recitation.index') }}', 1500);
+        },
+        error: function(xhr) {
+            let errorMsg = 'حدث خطأ أثناء الحفظ';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
+            }
+            toastr.error(errorMsg);
+        }
+    });
+}
+
+function submitSessionIncomplete() {
+    if (!confirm('هل أنت متأكد من حفظ هذه الجلسة على أنها لم يكمل؟')) {
+        return;
+    }
+
+    const form = document.getElementById('recitationForm');
+    const data = new FormData(form);
+
+    $.ajax({
+        url: '{{ route('supervisor.recitation.saveIncomplete') }}',
+        method: 'POST',
+        data: data,
+        processData: false,
+        contentType: false,
+        timeout: 30000,
+        success: function(response) {
+            toastr.success('تم حفظ الجلسة بنجاح (لم يكمل)');
             setTimeout(() => window.location.href = '{{ route('supervisor.recitation.index') }}', 1500);
         },
         error: function(xhr) {

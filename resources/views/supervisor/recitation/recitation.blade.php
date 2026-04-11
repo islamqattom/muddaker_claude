@@ -60,6 +60,7 @@
     <div class="d-flex gap-3 mt-4">
         <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary btn-lg"><i class="fas fa-arrow-right me-2"></i>رجوع</a>
         <button type="button" class="btn btn-warning btn-lg" onclick="stopSard()"><i class="fas fa-stop me-2"></i>إيقاف مبكر</button>
+        <button type="button" class="btn btn-secondary btn-lg" onclick="submitSardIncomplete()"><i class="fas fa-times-circle me-2"></i>لم يكمل</button>
         <button type="button" class="btn btn-primary btn-lg flex-fill" onclick="submitSard()"><i class="fas fa-save me-2"></i>حفظ نتيجة السرد</button>
     </div>
 </form>
@@ -147,6 +148,34 @@ function submitSard() {
                 errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
             } else if (xhr.responseJSON && xhr.responseJSON.message) {
                 errorMsg = xhr.responseJSON.message;
+            }
+            toastr.error(errorMsg);
+        }
+    });
+}
+
+function submitSardIncomplete() {
+    if (!confirm('هل أنت متأكد من حفظ هذه الجلسة على أنها لم يكمل؟')) {
+        return;
+    }
+    const data = new FormData(document.getElementById('sardForm'));
+    $.ajax({
+        url:'{{ route('supervisor.recitation.saveIncomplete') }}',
+        method:'POST',
+        data:data,
+        processData:false,
+        contentType:false,
+        timeout: 30000,
+        success:()=>{
+            toastr.success('تم حفظ الجلسة بنجاح (لم يكمل)');
+            setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500);
+        },
+        error:(xhr)=>{
+            let errorMsg = 'حدث خطأ أثناء الحفظ';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
             }
             toastr.error(errorMsg);
         }

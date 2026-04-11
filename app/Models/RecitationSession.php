@@ -10,6 +10,29 @@ class RecitationSession extends Model
 {
     use HasFactory, Auditable;
 
+    public const TYPE_NEW_MEMORIZATION = 'new_memorization';
+    public const TYPE_REVIEW = 'review';
+    public const TYPE_UNMASTERED = 'unmastered';
+    public const TYPE_RECITATION = 'recitation';
+    public const TYPE_MAFSIL = 'mafsil';
+    public const TYPE_NOT_RECITE = 'not_recitate';
+
+    public const STATUS_PASSED = 'passed';
+    public const STATUS_FAILED = 'failed';
+    public const STATUS_FAILED_CONTINUED = 'failed_continued';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_NOT_RECITE = 'not_recitate';
+    public const STATUS_INCOMPLETE = 'incomplete';
+
+    public const TYPES = [
+        self::TYPE_NEW_MEMORIZATION,
+        self::TYPE_REVIEW,
+        self::TYPE_UNMASTERED,
+        self::TYPE_RECITATION,
+        self::TYPE_MAFSIL,
+        self::TYPE_NOT_RECITE,
+    ];
+
     protected $fillable = [
         'student_id', 'supervisor_id', 'type', 'part_id',
         'start_page', 'end_page', 'total_pages',
@@ -87,6 +110,7 @@ class RecitationSession extends Model
             'failed_continued' => 'راسب ومكمل',
             'in_progress' => 'جارٍ',
             'not_recitate' => 'لم يسمع',
+            'incomplete' => 'لم يكمل',
             default => $this->status,
         };
     }
@@ -99,6 +123,7 @@ class RecitationSession extends Model
             'failed_continued' => 'warning',
             'in_progress' => 'warning',
             'not_recitate' => 'secondary',
+            'incomplete' => 'secondary',
             default => 'secondary',
         };
     }
