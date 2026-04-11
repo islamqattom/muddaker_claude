@@ -165,7 +165,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="11" class="text-center py-4 text-muted">
+                            <td colspan="12" class="text-center py-4 text-muted">
                                 <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                 لا توجد جلسات في الفترة المحددة
                             </td>

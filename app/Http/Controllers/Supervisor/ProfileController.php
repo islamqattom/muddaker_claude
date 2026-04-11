@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller {
     public function index() {
@@ -27,23 +28,16 @@ class ProfileController extends Controller {
             // Delete old avatar if exists
             if ($user->avatar) {
                 try {
-                    $oldPath = storage_path('app/public/' . $user->avatar);
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
+                    Storage::disk('public')->delete($user->avatar);
                 } catch (\Exception $e) {
-                    Log::error('Failed to delete old avatar: ' . $e->getMessage());
+                    Log::warning('Could not delete old avatar file: ' . $e->getMessage());
                 }
             }
             try {
                 $file = $request->file('image');
                 $filename = uniqid('avatar_') . '.' . $file->extension();
-                $destinationPath = storage_path('app/public/avatars');
-                if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0755, true);
-                }
-                $file->move($destinationPath, $filename);
-                $newAvatarPath = 'avatars/' . $filename;
+                $path = $file->storeAs('avatars', $filename, 'public');
+                $newAvatarPath = $path;
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage());
                 return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');

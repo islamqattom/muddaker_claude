@@ -186,8 +186,8 @@
                                 <tr>
                                     <td>{{ $session->session_date->format('d/m/Y') }}</td>
                                     <td>{{ $session->part->name ?? '-' }}</td>
-                                    <td>{{ $session->from_page }}</td>
-                                    <td>{{ $session->to_page }}</td>
+                                    <td>{{ $session->start_page }}</td>
+                                    <td>{{ $session->end_page }}</td>
                                     <td>
                                         @if($session->status === 'passed')
                                             <span class="badge bg-success">ناجح</span>

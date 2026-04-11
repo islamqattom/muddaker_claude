@@ -84,7 +84,7 @@ class ReportController extends Controller
     private function generateRecitationPdf($sessions, $stats, $fromDate, $toDate)
     {
         // Create new PDF document with RTL support
-        $pdf = new TCPDF('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
+        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
 
         // Set document information
@@ -240,7 +240,7 @@ class ReportController extends Controller
         $percentage = $stats['total'] > 0 ? round(($stats['present'] / $stats['total']) * 100) : 0;
 
         // Create new PDF document with RTL support
-        $pdf = new TCPDF('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
+        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
 
         $pdf->SetCreator('Quran System');
@@ -376,7 +376,7 @@ class ReportController extends Controller
         $passRate = $sessionStats['total'] > 0 ? round(($sessionStats['passed'] / $sessionStats['total']) * 100) : 0;
 
         // Create new PDF document with RTL support
-        $pdf = new TCPDF('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
+        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
 
         $pdf->SetCreator('Quran System');

@@ -319,24 +319,131 @@ function toggleWarningFields() {
 document.getElementById('studentSelect').addEventListener('change', function() {
     const studentId = this.value;
     if (studentId) {
-        window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
+        fetchStudentStats(studentId);
+    } else {
+        clearStudentStats();
     }
 });
 
-// Check if student is already selected on page load and reload if stats are missing
-document.addEventListener('DOMContentLoaded', function() {
-    const studentSelect = document.getElementById('studentSelect');
-    const studentId = studentSelect.value;
+// Fetch student stats via AJAX
+function fetchStudentStats(studentId) {
+    const url = '{{ route("supervisor.warnings.studentStats", ":student") }}'.replace(':student', studentId);
 
-    // If a student is selected but no stats container exists, reload with student_id
-    if (studentId && !document.getElementById('attendanceStats') && !document.querySelector('.alert-warning')) {
-        // Check if URL doesn't have student_id parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('student_id')) {
-            window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
-        }
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            updateStudentPreview(data);
+        })
+        .catch(error => {
+            console.error('Error fetching student stats:', error);
+            alert('حدث خطأ أثناء جلب بيانات الطالب');
+        });
+}
+
+// Update the sidebar with student stats
+function updateStudentPreview(data) {
+    const previewCard = document.querySelector('.sticky-top .card-body');
+    const studentInfo = previewCard.querySelector('.text-center.mb-4');
+    if (studentInfo) {
+        studentInfo.remove();
     }
-});
+    const alerts = previewCard.querySelectorAll('.alert');
+    alerts.forEach(el => el.remove());
+
+    const hr = previewCard.querySelector('hr');
+    if (hr) {
+        hr.remove();
+    }
+
+    previewCard.insertBefore(createStudentPreviewHTML(data), previewCard.firstChild);
+}
+
+function createStudentPreviewHTML(data) {
+    const s = data.student;
+    const a = data.attendance_stats;
+    const r = data.recitation_stats;
+
+    const wrapper = document.createElement('div');
+
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'text-center mb-4';
+    infoDiv.innerHTML = `
+        <img src="${s.avatar_url}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
+        <h5>${escapeHtml(s.name)}</h5>
+        <p class="text-muted mb-1">${escapeHtml(s.student_number)}</p>
+        <span class="badge bg-light text-dark">${escapeHtml(s.level_name)}</span>
+    `;
+    wrapper.appendChild(infoDiv);
+
+    if (a && a.total > 0) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning';
+        alertDiv.innerHTML = `
+            <h6 class="alert-heading"><i class="fas fa-calendar me-2"></i>إحصائيات الحضور</h6>
+            <div class="row text-center g-2">
+                <div class="col-6">
+                    <div class="text-success fw-bold">${a.present}</div>
+                    <small>حاضر</small>
+                </div>
+                <div class="col-6">
+                    <div class="text-danger fw-bold">${a.absent}</div>
+                    <small>غائب</small>
+                </div>
+                <div class="col-6">
+                    <div class="text-warning fw-bold">${a.late}</div>
+                    <small>متأخر</small>
+                </div>
+                <div class="col-6">
+                    <div class="fw-bold">${a.total}</div>
+                    <small>الإجمالي</small>
+                </div>
+            </div>
+        `;
+        wrapper.appendChild(alertDiv);
+    }
+
+    if (r && r.total > 0) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info';
+        alertDiv.innerHTML = `
+            <h6 class="alert-heading"><i class="fas fa-microphone me-2"></i>إحصائيات التسميع</h6>
+            <div class="row text-center g-2">
+                <div class="col-6">
+                    <div class="fw-bold">${r.total}</div>
+                    <small>الإجمالي</small>
+                </div>
+                <div class="col-6">
+                    <div class="text-success fw-bold">${r.passed}</div>
+                    <small>ناجح</small>
+                </div>
+                <div class="col-6">
+                    <div class="text-danger fw-bold">${r.failed}</div>
+                    <small>راسب</small>
+                </div>
+            </div>
+        `;
+        wrapper.appendChild(alertDiv);
+    }
+
+    return wrapper;
+}
+
+function clearStudentStats() {
+    const previewCard = document.querySelector('.sticky-top .card-body');
+    const studentInfo = previewCard.querySelector('.text-center.mb-4');
+    if (studentInfo) studentInfo.remove();
+    const alerts = previewCard.querySelectorAll('.alert');
+    alerts.forEach(el => el.remove());
+}
 
 // Escape HTML to prevent XSS
 function escapeHtml(text) {

@@ -205,10 +205,10 @@ function updatePageColor(index) {
         // من 1 إلى أقل من 2 = برتقالي
         color = '#f39c12'; label = 'جيد 🟠'; bgColor = '#fef9e7'; passed = true;
     } else if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
-        // أحمر: 2 خطأ بدون تردد فقط
+        // أحمر: 2 خطأ equivalent (مع 0 أو 3 أو 6 ترددات) - ضعيف لكن يعتبر نجاح في هذه المرحلة
         color = '#e74c3c'; label = 'ضعيف 🔴'; bgColor = '#fadbd8'; passed = true;
     } else if (totalEquivalent === 2 && hesitations >= 1) {
-        // أسود: 2 خطأ + 1 تردد أو أكثر
+        // أسود: 2 خطأ equivalent + 1 تردد أو أكثر - رسوب
         color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
     } else if (totalEquivalent >= 3) {
         // 3 خطأ equivalent أو أكثر = أسود

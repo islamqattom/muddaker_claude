@@ -91,43 +91,8 @@ class RecitationController extends Controller
             }
         }
 
-        // Handle additional pages (store original count for repeated pages calculation)
-        $originalPagesCount = count($pages);
-        if ($request->additional_pages) {
-            $additionalPages = json_decode($request->additional_pages, true);
-            if (is_array($additionalPages)) {
-                foreach ($additionalPages as $additionalPage) {
-                    if (isset($additionalPage['page_number'])) {
-                        $pages[] = $additionalPage['page_number'];
-                    }
-                }
-            }
-        }
-
-        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
-        if ($request->repeated_pages) {
-            $repeatedPages = json_decode($request->repeated_pages, true);
-            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
-                $repeatedCount = count($repeatedPages);
-                // Keep original pages minus repeated count
-                $keepCount = max(0, $originalPagesCount - $repeatedCount);
-                // Get the original pages (before additional)
-                $originalPages = array_slice($pages, 0, $keepCount);
-                // Add repeated pages
-                foreach ($repeatedPages as $repeatedPage) {
-                    if (isset($repeatedPage['page_number'])) {
-                        $originalPages[] = $repeatedPage['page_number'];
-                    }
-                }
-                // Append additional pages at the end
-                $additionalCount = count($pages) - $originalPagesCount;
-                if ($additionalCount > 0) {
-                    $additionalOnly = array_slice($pages, $originalPagesCount);
-                    $originalPages = array_merge($originalPages, $additionalOnly);
-                }
-                $pages = $originalPages;
-            }
-        }
+        // Handle additional and repeated pages
+        $this->processAdditionalAndRepeatedPages($pages, $request);
 
         return view('supervisor.recitation.new-memorization', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
@@ -177,43 +142,8 @@ class RecitationController extends Controller
             }
         }
 
-        // Handle additional pages (store original count for repeated pages calculation)
-        $originalPagesCount = count($pages);
-        if ($request->additional_pages) {
-            $additionalPages = json_decode($request->additional_pages, true);
-            if (is_array($additionalPages)) {
-                foreach ($additionalPages as $additionalPage) {
-                    if (isset($additionalPage['page_number'])) {
-                        $pages[] = $additionalPage['page_number'];
-                    }
-                }
-            }
-        }
-
-        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
-        if ($request->repeated_pages) {
-            $repeatedPages = json_decode($request->repeated_pages, true);
-            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
-                $repeatedCount = count($repeatedPages);
-                // Keep original pages minus repeated count
-                $keepCount = max(0, $originalPagesCount - $repeatedCount);
-                // Get the original pages (before additional)
-                $originalPages = array_slice($pages, 0, $keepCount);
-                // Add repeated pages
-                foreach ($repeatedPages as $repeatedPage) {
-                    if (isset($repeatedPage['page_number'])) {
-                        $originalPages[] = $repeatedPage['page_number'];
-                    }
-                }
-                // Append additional pages at the end
-                $additionalCount = count($pages) - $originalPagesCount;
-                if ($additionalCount > 0) {
-                    $additionalOnly = array_slice($pages, $originalPagesCount);
-                    $originalPages = array_merge($originalPages, $additionalOnly);
-                }
-                $pages = $originalPages;
-            }
-        }
+        // Handle additional and repeated pages
+        $this->processAdditionalAndRepeatedPages($pages, $request);
 
         return view('supervisor.recitation.review', compact('student', 'part', 'pages', 'pagesCount', 'continuationPart'));
     }
@@ -249,43 +179,8 @@ class RecitationController extends Controller
             }
         }
 
-        // Handle additional pages (store original count for repeated pages calculation)
-        $originalPagesCount = count($pages);
-        if ($request->additional_pages) {
-            $additionalPages = json_decode($request->additional_pages, true);
-            if (is_array($additionalPages)) {
-                foreach ($additionalPages as $additionalPage) {
-                    if (isset($additionalPage['page_number'])) {
-                        $pages[] = $additionalPage['page_number'];
-                    }
-                }
-            }
-        }
-
-        // Handle repeated pages (replace last N pages from ORIGINAL pages only, not additional)
-        if ($request->repeated_pages) {
-            $repeatedPages = json_decode($request->repeated_pages, true);
-            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
-                $repeatedCount = count($repeatedPages);
-                // Keep original pages minus repeated count
-                $keepCount = max(0, $originalPagesCount - $repeatedCount);
-                // Get the original pages (before additional)
-                $originalPages = array_slice($pages, 0, $keepCount);
-                // Add repeated pages
-                foreach ($repeatedPages as $repeatedPage) {
-                    if (isset($repeatedPage['page_number'])) {
-                        $originalPages[] = $repeatedPage['page_number'];
-                    }
-                }
-                // Append additional pages at the end
-                $additionalCount = count($pages) - $originalPagesCount;
-                if ($additionalCount > 0) {
-                    $additionalOnly = array_slice($pages, $originalPagesCount);
-                    $originalPages = array_merge($originalPages, $additionalOnly);
-                }
-                $pages = $originalPages;
-            }
-        }
+        // Handle additional and repeated pages
+        $this->processAdditionalAndRepeatedPages($pages, $request);
 
         return view('supervisor.recitation.unmastered', compact('student', 'part', 'pages', 'pagesCount'));
     }
@@ -335,6 +230,9 @@ class RecitationController extends Controller
             if (count($selectedParts) != $partsCount) {
                 return back()->withErrors(['selected_parts' => 'يجب اختيار exactly ' . $partsCount . ' أجزاء']);
             }
+
+            // Ensure all selected parts are integers to prevent SQL injection
+            $selectedParts = array_map('intval', $selectedParts);
 
             // Validate selected parts exist
             $parts = QuranPart::whereIn('part_number', $selectedParts)
@@ -400,68 +298,76 @@ class RecitationController extends Controller
      */
     public function saveSession(Request $request)
     {
-        $request->validate(self::SESSION_VALIDATION_RULES);
+        try {
+            $request->validate(self::SESSION_VALIDATION_RULES);
 
-        $session = DB::transaction(function() use ($request) {
-            $pages = $request->input('pages');
-            $totalErrors = 0;
-            $totalHesitations = 0;
+            $session = DB::transaction(function() use ($request) {
+                $pages = $request->input('pages');
+                $totalErrors = 0;
+                $totalHesitations = 0;
 
-            foreach ($pages as $page) {
-                $totalHesitations += $page['hesitations'];
-                if ($request->type === RecitationSession::TYPE_RECITATION) {
-                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                } else {
-                    $totalErrors += $page['errors'];
+                foreach ($pages as $page) {
+                    $totalHesitations += $page['hesitations'];
+                    if ($request->type === RecitationSession::TYPE_RECITATION) {
+                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                    } else {
+                        $totalErrors += $page['errors'];
+                    }
                 }
-            }
 
-            $maxScore = null;
-            $finalScore = null;
-            if ($request->type === RecitationSession::TYPE_MAFSIL) {
-                $maxScore = 100;
-                $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
-            }
-
-            $failedPages = 0;
-            foreach ($pages as $page) {
-                $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
-                if (!$colorResult['passed']) {
-                    $failedPages++;
+                $maxScore = null;
+                $finalScore = null;
+                if ($request->type === RecitationSession::TYPE_MAFSIL) {
+                    $maxScore = 100;
+                    $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
                 }
-            }
 
-            $sessionStatus = RecitationSession::STATUS_PASSED;
-            if ($request->type === RecitationSession::TYPE_MAFSIL) {
-                $passingPercentage = RecitationSession::getMafsilPassingPercentage($request->mafsil_type);
-                if ($finalScore < $passingPercentage) {
+                $failedPages = 0;
+                foreach ($pages as $page) {
+                    $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
+                    if (!$colorResult['passed']) {
+                        $failedPages++;
+                    }
+                }
+
+                $sessionStatus = RecitationSession::STATUS_PASSED;
+                if ($request->type === RecitationSession::TYPE_MAFSIL) {
+                    $passingPercentage = RecitationSession::getMafsilPassingPercentage($request->mafsil_type);
+                    if ($finalScore < $passingPercentage) {
+                        $sessionStatus = RecitationSession::STATUS_FAILED;
+                    }
+                } elseif ($request->type === RecitationSession::TYPE_RECITATION && $totalErrors >= 6) {
+                    $sessionStatus = RecitationSession::STATUS_FAILED;
+                } elseif (in_array($request->type, [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_REVIEW, RecitationSession::TYPE_UNMASTERED]) && $failedPages > 0) {
                     $sessionStatus = RecitationSession::STATUS_FAILED;
                 }
-            } elseif ($request->type === RecitationSession::TYPE_RECITATION && $totalErrors >= 6) {
-                $sessionStatus = RecitationSession::STATUS_FAILED;
-            } elseif (in_array($request->type, [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_REVIEW, RecitationSession::TYPE_UNMASTERED]) && $failedPages > 0) {
-                $sessionStatus = RecitationSession::STATUS_FAILED;
+
+                if ($request->failed) {
+                    $sessionStatus = RecitationSession::STATUS_FAILED;
+                }
+
+                return $this->createSessionWithPages($request, $sessionStatus, $totalErrors, $totalHesitations, $maxScore, $finalScore);
+            });
+
+            $this->notifyParentOnSession($session);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم حفظ جلسة التسميع بنجاح',
+                    'session_id' => $session->id
+                ]);
             }
 
-            if ($request->failed) {
-                $sessionStatus = RecitationSession::STATUS_FAILED;
+            return redirect()->route('supervisor.recitation.index')
+                ->with('success', 'تم حفظ جلسة التسميع بنجاح');
+        } catch (\Exception $e) {
+            \Log::error('Failed to save session: ' . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
             }
-
-            return $this->createSessionWithPages($request, $sessionStatus, $totalErrors, $totalHesitations, $maxScore, $finalScore);
-        });
-
-        $this->notifyParentOnSession($session);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'تم حفظ جلسة التسميع بنجاح',
-                'session_id' => $session->id
-            ]);
+            return back()->with('error', 'حدث خطأ أثناء الحفظ');
         }
-
-        return redirect()->route('supervisor.recitation.index')
-            ->with('success', 'تم حفظ جلسة التسميع بنجاح');
     }
 
     /**
@@ -469,38 +375,46 @@ class RecitationController extends Controller
      */
     public function saveIncomplete(Request $request)
     {
-        $request->validate(self::SESSION_VALIDATION_RULES);
+        try {
+            $request->validate(self::SESSION_VALIDATION_RULES);
 
-        $session = DB::transaction(function() use ($request) {
-            $pages = $request->input('pages');
-            $totalErrors = 0;
-            $totalHesitations = 0;
+            $session = DB::transaction(function() use ($request) {
+                $pages = $request->input('pages');
+                $totalErrors = 0;
+                $totalHesitations = 0;
 
-            foreach ($pages as $page) {
-                $totalHesitations += $page['hesitations'];
-                if ($request->type === RecitationSession::TYPE_RECITATION) {
-                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                } else {
-                    $totalErrors += $page['errors'];
+                foreach ($pages as $page) {
+                    $totalHesitations += $page['hesitations'];
+                    if ($request->type === RecitationSession::TYPE_RECITATION) {
+                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                    } else {
+                        $totalErrors += $page['errors'];
+                    }
                 }
+
+                $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
+                $finalScore = $maxScore ? RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations) : null;
+
+                return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore);
+            });
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم حفظ الجلسة بنجاح (لم يكمل)',
+                    'session_id' => $session->id
+                ]);
             }
 
-            $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
-            $finalScore = $maxScore ? RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations) : null;
-
-            return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore);
-        });
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'تم حفظ الجلسة بنجاح (لم يكمل)',
-                'session_id' => $session->id
-            ]);
+            return redirect()->route('supervisor.recitation.index')
+                ->with('success', 'تم حفظ الجلسة بنجاح (لم يكمل)');
+        } catch (\Exception $e) {
+            \Log::error('Failed to save incomplete session: ' . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
+            }
+            return back()->with('error', 'حدث خطأ أثناء الحفظ');
         }
-
-        return redirect()->route('supervisor.recitation.index')
-            ->with('success', 'تم حفظ الجلسة بنجاح (لم يكمل)');
     }
 
     /**
@@ -633,72 +547,125 @@ class RecitationController extends Controller
             $request->validate($rules);
         }
 
-        DB::transaction(function() use ($request) {
-            $pages = $request->input('pages');
-            $totalErrors = 0;
-            $totalHesitations = 0;
-            $maxScore = 100;
+        try {
+            $session = DB::transaction(function() use ($request) {
+                $pages = $request->input('pages');
+                $totalErrors = 0;
+                $totalHesitations = 0;
+                $maxScore = 100;
 
-            // Calculate totals
-            foreach ($pages as $page) {
-                $totalHesitations += $page['hesitations'];
-                // For recitation type: 3 hesitations = 1 error
-                if ($request->type === RecitationSession::TYPE_RECITATION) {
-                    $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                } else {
-                    $totalErrors += $page['errors'];
-                }
-            }
-
-            // Calculate score
-            $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
-
-            // For failed_continued, we use 'failed' status but add note indicating continued
-            $sessionStatus = RecitationSession::STATUS_FAILED;
-
-            $session = RecitationSession::create([
-                'student_id' => $request->student_id,
-                'supervisor_id' => Auth::id(),
-                'type' => $request->type,
-                'part_id' => $request->part_id,
-                'start_page' => $pages[0]['page_number'] ?? null,
-                'end_page' => end($pages)['page_number'] ?? null,
-                'total_pages' => count($pages),
-                'total_errors' => $totalErrors,
-                'total_hesitations' => $totalHesitations,
-                'status' => $sessionStatus,
-                'mafsil_type' => $request->mafsil_type ?? null,
-                'max_score' => $maxScore,
-                'final_score' => $finalScore,
-                'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
-                'session_date' => $request->session_date,
-                'notes' => ($request->notes ?? '') . ' [راسب ومكمل - أكمل بعد الرسوب]',
-            ]);
-
-            // Save each page
-            foreach ($pages as $pageData) {
-                $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
-
-                $pageScore = null;
-                if ($request->type === RecitationSession::TYPE_MAFSIL) {
-                    $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                // Calculate totals
+                foreach ($pages as $page) {
+                    $totalHesitations += $page['hesitations'];
+                    // For recitation type: 3 hesitations = 1 error
+                    if ($request->type === RecitationSession::TYPE_RECITATION) {
+                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+                    } else {
+                        $totalErrors += $page['errors'];
+                    }
                 }
 
-                RecitationPage::create([
-                    'session_id' => $session->id,
-                    'page_number' => $pageData['page_number'],
-                    'errors' => $pageData['errors'],
-                    'hesitations' => $pageData['hesitations'],
-                    'color_status' => $colorResult['color'],
-                    'is_passed' => $colorResult['passed'],
-                    'page_score' => $pageScore,
+                // Calculate score
+                $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
+
+                // For failed_continued, we use 'failed' status but add note indicating continued
+                $sessionStatus = RecitationSession::STATUS_FAILED;
+
+                $session = RecitationSession::create([
+                    'student_id' => $request->student_id,
+                    'supervisor_id' => Auth::id(),
+                    'type' => $request->type,
+                    'part_id' => $request->part_id,
+                    'start_page' => $pages[0]['page_number'] ?? null,
+                    'end_page' => end($pages)['page_number'] ?? null,
+                    'total_pages' => count($pages),
+                    'total_errors' => $totalErrors,
+                    'total_hesitations' => $totalHesitations,
+                    'status' => $sessionStatus,
+                    'mafsil_type' => $request->mafsil_type ?? null,
+                    'max_score' => $maxScore,
+                    'final_score' => $finalScore,
+                    'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
+                    'session_date' => $request->session_date,
+                    'notes' => ($request->notes ?? '') . ' [راسب ومكمل - أكمل بعد الرسوب]',
                 ]);
+
+                // Save each page
+                foreach ($pages as $pageData) {
+                    $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
+
+                    $pageScore = null;
+                    if ($request->type === RecitationSession::TYPE_MAFSIL) {
+                        $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                    }
+
+                    RecitationPage::create([
+                        'session_id' => $session->id,
+                        'page_number' => $pageData['page_number'],
+                        'errors' => $pageData['errors'],
+                        'hesitations' => $pageData['hesitations'],
+                        'color_status' => $colorResult['color'],
+                        'is_passed' => $colorResult['passed'],
+                        'page_score' => $pageScore,
+                    ]);
+                }
+
+                return $session;
+            });
+
+            return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
+        } catch (\Exception $e) {
+            \Log::error('Failed to save recitation session: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء حفظ السجل'
+            ], 500);
+        }
+    }
+
+    /**
+     * Process additional and repeated pages for a recitation session.
+     * Modifies $pages array by reference.
+     */
+    private function processAdditionalAndRepeatedPages(array &$pages, Request $request): void
+    {
+        $originalPagesCount = count($pages);
+
+        // Handle additional pages
+        if ($request->additional_pages) {
+            $additionalPages = json_decode($request->additional_pages, true);
+            if (is_array($additionalPages)) {
+                foreach ($additionalPages as $additionalPage) {
+                    if (isset($additionalPage['page_number'])) {
+                        $pages[] = $additionalPage['page_number'];
+                    }
+                }
             }
+        }
 
-            return $session;
-        });
+        // Handle repeated pages (replace last N pages from ORIGINAL pages only)
+        if ($request->repeated_pages) {
+            $repeatedPages = json_decode($request->repeated_pages, true);
+            if (is_array($repeatedPages) && count($repeatedPages) > 0) {
+                $repeatedCount = count($repeatedPages);
+                $keepCount = max(0, $originalPagesCount - $repeatedCount);
+                $originalPages = array_slice($pages, 0, $keepCount);
 
-        return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
+                foreach ($repeatedPages as $repeatedPage) {
+                    if (isset($repeatedPage['page_number'])) {
+                        $originalPages[] = $repeatedPage['page_number'];
+                    }
+                }
+
+                // Append additional pages at the end
+                $additionalCount = count($pages) - $originalPagesCount;
+                if ($additionalCount > 0) {
+                    $additionalOnly = array_slice($pages, $originalPagesCount);
+                    $originalPages = array_merge($originalPages, $additionalOnly);
+                }
+                $pages = $originalPages;
+            }
+        }
     }
 
     /**

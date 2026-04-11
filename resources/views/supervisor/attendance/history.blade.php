@@ -159,7 +159,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">
+                            <td colspan="8" class="text-center py-4 text-muted">
                                 <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                                 لا توجد سجلات في الفترة المحددة
                             </td>

@@ -50,19 +50,8 @@ class WarningController extends Controller
                 $fromDate = Carbon::now()->startOfMonth();
                 $toDate = Carbon::now();
 
-                $attendanceStats = [
-                    'present' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'present')->count(),
-                    'absent' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'absent')->count(),
-                    'late' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'late')->count(),
-                    'excused' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->where('status', 'excused')->count(),
-                    'total' => Attendance::where('student_id', $selectedStudent->id)->whereBetween('date', [$fromDate, $toDate])->count(),
-                ];
-
-                $recitationStats = [
-                    'total' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->count(),
-                    'passed' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'passed')->count(),
-                    'failed' => RecitationSession::where('student_id', $selectedStudent->id)->whereBetween('session_date', [$fromDate, $toDate])->where('status', 'failed')->count(),
-                ];
+                $attendanceStats = $this->getAttendanceStatsForPeriod($selectedStudent->id, $fromDate, $toDate);
+                $recitationStats = $this->getRecitationStatsForPeriod($selectedStudent->id, $fromDate, $toDate);
             }
         }
 
@@ -86,32 +75,9 @@ class WarningController extends Controller
         }
 
         // Validate JSON data if provided
-        $attendanceData = null;
-        if ($request->attendance_data) {
-            $decoded = json_decode($request->attendance_data, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors(['attendance_data' => 'Invalid JSON format in attendance data'])->withInput();
-            }
-            $attendanceData = $decoded;
-        }
-
-        $recitationData = null;
-        if ($request->recitation_data) {
-            $decoded = json_decode($request->recitation_data, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors(['recitation_data' => 'Invalid JSON format in recitation data'])->withInput();
-            }
-            $recitationData = $decoded;
-        }
-
-        $testData = null;
-        if ($request->test_data) {
-            $decoded = json_decode($request->test_data, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors(['test_data' => 'Invalid JSON format in test data'])->withInput();
-            }
-            $testData = $decoded;
-        }
+        $attendanceData = $this->decodeJsonField($request->attendance_data, 'attendance_data');
+        $recitationData = $this->decodeJsonField($request->recitation_data, 'recitation_data');
+        $testData = $this->decodeJsonField($request->test_data, 'test_data');
 
         $warning = Warning::create([
             'student_id' => $request->student_id,
@@ -203,6 +169,25 @@ class WarningController extends Controller
             return $dateTime->format('h:i A');
         }
         return $time;
+    }
+
+    /**
+     * Decode and validate a JSON field from request.
+     * Returns the decoded array on success, null if field is empty.
+     * Throws validation error on JSON parse failure.
+     */
+    private function decodeJsonField($value, string $fieldName): ?array
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        $decoded = json_decode($value, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return back()->withErrors([$fieldName => 'تنسيق ' . $fieldName . ' غير صحيح'])->withInput();
+        }
+
+        return $decoded;
     }
 
     public function getRecitations(Request $request, Student $student)
@@ -586,5 +571,83 @@ class WarningController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="إنذار-' . $warning->warning_number . '.pdf"',
         ]);
+    }
+
+    public function getStudentStats(Request $request, Student $student)
+    {
+        if ($student->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        try {
+            $fromDate = Carbon::now()->startOfMonth();
+            $toDate = Carbon::now();
+
+            $attendanceStats = $this->getAttendanceStatsForPeriod($student->id, $fromDate, $toDate);
+            $recitationStats = $this->getRecitationStatsForPeriod($student->id, $fromDate, $toDate);
+
+            $studentData = [
+                'id' => $student->id,
+                'name' => $student->user->name,
+                'avatar_url' => $student->user->avatar_url,
+                'student_number' => $student->student_number,
+                'level_name' => $student->level->name ?? '-',
+            ];
+
+            return response()->json([
+                'student' => $studentData,
+                'attendance_stats' => $attendanceStats,
+                'recitation_stats' => $recitationStats,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch student stats: ' . $e->getMessage());
+            return response()->json(['error' => 'حدث خطأ أثناء جلب بيانات الطالب'], 500);
+        }
+    }
+
+    /**
+     * Get attendance stats for a student within a date range using efficient GROUP BY query.
+     */
+    private function getAttendanceStatsForPeriod(int $studentId, Carbon $fromDate, Carbon $toDate): array
+    {
+        $counts = Attendance::where('student_id', $studentId)
+            ->whereBetween('date', [$fromDate, $toDate])
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
+                SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
+                SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
+                SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused
+            ")
+            ->first();
+
+        return [
+            'present' => (int) $counts->present,
+            'absent' => (int) $counts->absent,
+            'late' => (int) $counts->late,
+            'excused' => (int) $counts->excused,
+            'total' => (int) $counts->total,
+        ];
+    }
+
+    /**
+     * Get recitation stats for a student within a date range using efficient GROUP BY query.
+     */
+    private function getRecitationStatsForPeriod(int $studentId, Carbon $fromDate, Carbon $toDate): array
+    {
+        $counts = RecitationSession::where('student_id', $studentId)
+            ->whereBetween('session_date', [$fromDate, $toDate])
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'passed' THEN 1 ELSE 0 END) as passed,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
+            ")
+            ->first();
+
+        return [
+            'total' => (int) $counts->total,
+            'passed' => (int) $counts->passed,
+            'failed' => (int) $counts->failed,
+        ];
     }
 }

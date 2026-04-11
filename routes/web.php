@@ -137,6 +137,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/warnings/{warning}/print', [Supervisor\WarningController::class, 'print'])->name('warnings.print');
     Route::get('/warnings/attendance/{student}', [Supervisor\WarningController::class, 'getAttendance'])->name('warnings.attendance');
     Route::get('/warnings/recitations/{student}', [Supervisor\WarningController::class, 'getRecitations'])->name('warnings.recitations');
+    Route::get('/warnings/student-stats/{student}', [Supervisor\WarningController::class, 'getStudentStats'])->name('warnings.studentStats');
 
     // Warning Drafts
     Route::get('warning-drafts', [Supervisor\WarningDraftController::class, 'index'])->name('warning-drafts.index');
