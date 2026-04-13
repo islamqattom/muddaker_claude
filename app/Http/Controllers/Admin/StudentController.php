@@ -231,12 +231,30 @@ class StudentController extends Controller
 
     public function destroy(Student $student)
     {
-        DB::transaction(function() use ($student) {
-            $student->user->delete();
-            $student->delete();
-        });
+        try {
+            DB::transaction(function() use ($student) {
+                $student->user->delete();
+                $student->delete();
+            });
 
-        return redirect()->route('admin.students.index')
-            ->with('success', 'تم حذف الطالب بنجاح');
+            Log::info('Student deleted', [
+                'admin_id' => auth()->id(),
+                'student_id' => $student->id,
+                'user_id' => $student->user_id,
+                'timestamp' => now()->toISOString(),
+            ]);
+
+            return redirect()->route('admin.students.index')
+                ->with('success', 'تم حذف الطالب بنجاح');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete student', [
+                'admin_id' => auth()->id(),
+                'student_id' => $student->id,
+                'user_id' => $student->user_id,
+                'error' => $e->getMessage(),
+            ]);
+            return redirect()->route('admin.students.show', $student)
+                ->with('error', 'فشل في حذف الطالب. يرجى المحاولة مرة أخرى.');
+        }
     }
 }
