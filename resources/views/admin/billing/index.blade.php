@@ -122,6 +122,9 @@
                                         <i class="fas fa-check"></i>
                                     </button>
                                 @endif
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteFee({{ $fee->id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                         @empty
@@ -143,7 +146,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تسجيل دفعة سابقة</h5>
+                <h5 class="modal-title" id="addPaymentModalTitle">تسجيل دفعة سابقة</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="addPaymentForm">
@@ -183,8 +186,14 @@
                         </div>
                     </div>
                     <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="is_paid" name="is_paid" value="1" checked>
+                            <label class="form-check-label" for="is_paid">تسجيل كمدفوع</label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="paid_at_container">
                         <label class="form-label">تاريخ الدفع</label>
-                        <input type="date" name="paid_at" class="form-control" required max="{{ date('Y-m-d') }}">
+                        <input type="date" name="paid_at" id="paid_at" class="form-control" max="{{ date('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -199,6 +208,14 @@
 <script>
 let addPaymentModal;
 
+function resetStudentSelect(select, message) {
+    select.innerHTML = '';
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = message;
+    select.appendChild(opt);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     addPaymentModal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
 
@@ -207,17 +224,26 @@ document.addEventListener('DOMContentLoaded', function() {
         submitAddPayment();
     });
 
+    document.getElementById('is_paid').addEventListener('change', function() {
+        const paidAtContainer = document.getElementById('paid_at_container');
+        const paidAtInput = document.getElementById('paid_at');
+        const modalTitle = document.getElementById('addPaymentModalTitle');
+
+        if (this.checked) {
+            paidAtContainer.style.display = 'block';
+            paidAtInput.required = true;
+            modalTitle.textContent = 'تسجيل دفعة سابقة';
+        } else {
+            paidAtContainer.style.display = 'none';
+            paidAtInput.required = false;
+            paidAtInput.value = '';
+            modalTitle.textContent = 'تسجيل دفعة غير مدفوعة';
+        }
+    });
+
     document.getElementById('payment_parent_id').addEventListener('change', function() {
         const parentId = this.value;
         const studentSelect = document.getElementById('payment_student_id');
-
-        function resetStudentSelect(select, message) {
-            select.innerHTML = '';
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = message;
-            select.appendChild(opt);
-        }
 
         if (!parentId) {
             resetStudentSelect(studentSelect, 'اختر الطالب');
@@ -228,7 +254,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const url = @json(route('admin.billing.studentsForParent', ['parentId' => '__PARENT_ID__'])).replace('__PARENT_ID__', parentId);
         fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error: ' + response.status);
+                }
+                return response.json();
+            })
             .then(students => {
                 resetStudentSelect(studentSelect, 'اختر الطالب');
                 students.forEach(student => {
@@ -246,52 +277,95 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function openAddPaymentModal() {
     document.getElementById('addPaymentForm').reset();
-    document.getElementById('payment_student_id').innerHTML = '<option value="">اختر الطالب</option>';
+    const studentSelect = document.getElementById('payment_student_id');
+    resetStudentSelect(studentSelect, 'اختر الطالب');
+    document.getElementById('is_paid').dispatchEvent(new Event('change'));
     addPaymentModal.show();
 }
 
-function submitAddPayment() {
+async function submitAddPayment() {
     const form = document.getElementById('addPaymentForm');
     const formData = new FormData(form);
 
-    fetch('{{ route('admin.billing.recordPayment') }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch('{{ route('admin.billing.recordPayment') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Server error: ' + response.status);
+        }
+
+        const data = await response.json();
         if (data.success) {
             addPaymentModal.hide();
             location.reload();
         } else {
             alert(data.message || 'حدث خطأ');
         }
-    })
-    .catch(() => {
+    } catch (error) {
         alert('حدث خطأ أثناء حفظ البيانات');
-    });
+    }
 }
 
-function markPaid(feeId) {
+async function markPaid(feeId) {
     if (!confirm('هل أنت متأكد من تعيين هذا السجل كمدفوع؟')) return;
 
-    fetch('{{ route('admin.billing.markPaid') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ fee_id: feeId })
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const response = await fetch('{{ route('admin.billing.markPaid') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ fee_id: feeId })
+        });
+
+        if (!response.ok) {
+            throw new Error('Server error: ' + response.status);
+        }
+
+        const data = await response.json();
         if (data.success) {
             location.reload();
+        } else {
+            alert(data.message || 'حدث خطأ');
         }
-    });
+    } catch (error) {
+        alert('حدث خطأ أثناء تحديث حالة الدفع');
+    }
+}
+
+async function deleteFee(feeId) {
+    if (!confirm('هل أنت متأكد من حذف هذا السجل؟')) return;
+
+    try {
+        const response = await fetch('{{ route('admin.billing.deleteFee') }}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ fee_id: feeId })
+        });
+
+        if (!response.ok) {
+            throw new Error('Server error: ' + response.status);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'حدث خطأ');
+        }
+    } catch (error) {
+        alert('حدث خطأ أثناء حذف السجل');
+    }
 }
 
 function markSelectedPaid() {

@@ -174,8 +174,11 @@ class BillingController extends Controller
             'student_id' => 'required|exists:students,id',
             'year' => 'required|integer|min:2020|max:' . (now()->year + 1),
             'month' => 'required|integer|min:1|max:12',
-            'paid_at' => 'required|date|before_or_equal:today',
+            'is_paid' => 'boolean',
+            'paid_at' => 'required_if:is_paid,true|date|before_or_equal:today',
         ]);
+
+        $isPaid = $request->boolean('is_paid', true);
 
         $fee = MonthlyFee::where('parent_id', $request->parent_id)
             ->where('student_id', $request->student_id)
@@ -183,7 +186,7 @@ class BillingController extends Controller
             ->where('month', $request->month)
             ->first();
 
-        if ($fee && $fee->status === MonthlyFee::STATUS_PAID) {
+        if ($fee && $fee->status === MonthlyFee::STATUS_PAID && $isPaid) {
             return response()->json([
                 'success' => false,
                 'message' => 'هذا السجل مسجل كمدفوع مسبقاً'
@@ -191,42 +194,85 @@ class BillingController extends Controller
         }
 
         try {
+            $logContext = [
+                'admin_id' => Auth::id(),
+                'parent_id' => $request->parent_id,
+                'student_id' => $request->student_id,
+                'year' => $request->year,
+                'month' => $request->month,
+                'is_paid' => $isPaid,
+            ];
+
             if ($fee) {
-                $fee->markAsPaid(Auth::id(), $request->paid_at);
+                if ($isPaid) {
+                    $fee->markAsPaid(Auth::id(), $request->paid_at);
+                    $logContext['paid_at'] = $request->paid_at;
+                } else {
+                    $fee->markAsUnpaid();
+                }
             } else {
                 MonthlyFee::create([
                     'parent_id' => $request->parent_id,
                     'student_id' => $request->student_id,
                     'year' => $request->year,
                     'month' => $request->month,
-                    'status' => MonthlyFee::STATUS_PAID,
-                    'paid_at' => $request->paid_at,
-                    'paid_by' => Auth::id(),
+                    'status' => $isPaid ? MonthlyFee::STATUS_PAID : MonthlyFee::STATUS_UNPAID,
+                    'paid_at' => $isPaid ? $request->paid_at : null,
+                    'paid_by' => $isPaid ? Auth::id() : null,
                 ]);
+                if ($isPaid) {
+                    $logContext['paid_at'] = $request->paid_at;
+                }
             }
 
-            Log::info('Billing: old payment recorded', [
+            Log::info('Billing: fee record saved', $logContext);
+
+            return response()->json([
+                'success' => true,
+                'message' => $isPaid ? 'تم تسجيل الدفعة بنجاح' : 'تم تسجيل السجل كغير مدفوع'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to record payment', [
                 'admin_id' => Auth::id(),
                 'parent_id' => $request->parent_id,
                 'student_id' => $request->student_id,
                 'year' => $request->year,
                 'month' => $request->month,
-                'paid_at' => $request->paid_at,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'تم تسجيل الدفعة بنجاح'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to record payment', [
-                'admin_id' => Auth::id(),
+                'is_paid' => $isPaid,
                 'error' => $e->getMessage(),
             ]);
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء تسجيل الدفعة'
             ], 500);
+        }
+    }
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'fee_id' => 'required|exists:monthly_fees,id',
+        ]);
+
+        $fee = MonthlyFee::find($request->fee_id);
+
+        try {
+            $fee->delete();
+
+            Log::info('Billing: fee deleted', [
+                'admin_id' => Auth::id(),
+                'fee_id' => $fee->id,
+                'timestamp' => now()->toIso8601String(),
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'تم حذف السجل بنجاح']);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete fee', [
+                'fee_id' => $request->fee_id,
+                'admin_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء حذف السجل'], 500);
         }
     }
 

@@ -60,6 +60,15 @@ class MonthlyFee extends Model
         ]);
     }
 
+    public function markAsUnpaid(): void
+    {
+        $this->update([
+            'status' => self::STATUS_UNPAID,
+            'paid_at' => null,
+            'paid_by' => null,
+        ]);
+    }
+
     public function scopeUnpaid($query)
     {
         return $query->where('status', self::STATUS_UNPAID);
