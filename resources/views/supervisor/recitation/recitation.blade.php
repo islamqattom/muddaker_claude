@@ -55,15 +55,31 @@
                     <div class="row g-1">
                         <div class="col-6">
                             <label style="font-size:10px;" class="d-block text-center text-danger">أخطاء</label>
-                            <input type="number" name="pages[{{ $index }}][errors]" id="e-{{ $index }}"
-                                   class="form-control form-control-sm text-center" value="0" min="0"
-                                   oninput="updateSardColor({{ $index }})">
+                            <div class="input-group input-group-sm">
+                                <button type="button" class="btn btn-outline-danger" onclick="adjustSardValue('e-{{ $index }}', -1, {{ $index }})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="pages[{{ $index }}][errors]" id="e-{{ $index }}"
+                                       class="form-control form-control-sm text-center" value="0" min="0"
+                                       oninput="updateSardColor({{ $index }})">
+                                <button type="button" class="btn btn-outline-danger" onclick="adjustSardValue('e-{{ $index }}', 1, {{ $index }})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-6">
                             <label style="font-size:10px;" class="d-block text-center text-warning">ترددات</label>
-                            <input type="number" name="pages[{{ $index }}][hesitations]" id="h-{{ $index }}"
-                                   class="form-control form-control-sm text-center" value="0" min="0"
-                                   oninput="updateSardColor({{ $index }})">
+                            <div class="input-group input-group-sm">
+                                <button type="button" class="btn btn-outline-warning" onclick="adjustSardValue('h-{{ $index }}', -1, {{ $index }})">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="pages[{{ $index }}][hesitations]" id="h-{{ $index }}"
+                                       class="form-control form-control-sm text-center" value="0" min="0"
+                                       oninput="updateSardColor({{ $index }})">
+                                <button type="button" class="btn btn-outline-warning" onclick="adjustSardValue('h-{{ $index }}', 1, {{ $index }})">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -102,6 +118,14 @@ let totalErrors = 0;
 let maxErrorsShown = false;
 const pageCount = {{ count($pages) }};
 const colors = { green:'#27ae60', orange:'#f39c12', red:'#e74c3c', black:'#2c3e50' };
+
+function adjustSardValue(id, delta, index) {
+    const input = document.getElementById(id);
+    let val = parseInt(input.value) + delta;
+    val = Math.max(parseInt(input.min), Math.min(999, val));
+    input.value = val;
+    updateSardColor(index);
+}
 
 function updateSardColor(index) {
     const errors = parseInt(document.getElementById('e-'+index).value)||0;
