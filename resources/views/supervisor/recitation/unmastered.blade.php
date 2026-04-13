@@ -8,24 +8,6 @@
 @endsection
 
 @section('content')
-<style>
-/* Mobile-friendly number input buttons */
-@media (max-width: 768px) {
-    .input-group .btn {
-        min-width: 50px;
-        min-height: 50px;
-        font-size: 1.25rem;
-        padding: 0;
-    }
-    .input-group .form-control {
-        min-height: 50px;
-        font-size: 1.25rem;
-    }
-    .input-group .fa-plus, .input-group .fa-minus {
-        font-size: 1.25rem;
-    }
-}
-</style>
 <div class="row justify-content-center">
 <div class="col-lg-9">
 
