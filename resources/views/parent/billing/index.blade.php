@@ -41,10 +41,10 @@
             <div class="card-body py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <small>الرسوم لكل طالب</small>
-                        <h4 class="mb-0">{{ number_format(config('app.billing_monthly_fee_per_student', 0), 2) }} دينار</h4>
+                        <small>عدد الأبناء</small>
+                        <h4 class="mb-0">{{ $studentFees ? count($studentFees) : 0 }}</h4>
                     </div>
-                    <i class="fas fa-user-graduate fa-2x opacity-50"></i>
+                    <i class="fas fa-users fa-2x opacity-50"></i>
                 </div>
             </div>
         </div>
