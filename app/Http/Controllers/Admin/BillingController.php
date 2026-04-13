@@ -260,6 +260,10 @@ class BillingController extends Controller
 
         $fee = MonthlyFee::find($request->fee_id);
 
+        if (!$fee) {
+            return response()->json(['success' => false, 'message' => 'السجل غير موجود'], 404);
+        }
+
         try {
             $fee->delete();
 
