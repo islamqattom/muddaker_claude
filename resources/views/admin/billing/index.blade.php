@@ -303,16 +303,22 @@ async function submitAddPayment() {
         const response = await fetch('{{ route('admin.billing.recordPayment') }}', {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
             },
             body: formData
         });
 
-        if (!response.ok) {
-            throw new Error('Server error: ' + response.status);
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            if (!response.ok) {
+                throw new Error('Server error: ' + response.status);
+            }
+            throw new Error('Unexpected response format');
         }
 
         const data = await response.json();
+
         if (data.success) {
             addPaymentModal.hide();
             location.reload();
@@ -320,7 +326,9 @@ async function submitAddPayment() {
             alert(data.message || 'حدث خطأ');
         }
     } catch (error) {
-        alert('حدث خطأ أثناء حفظ البيانات');
+        alert(error.message === 'Server error: 302'
+            ? 'انتهت الجلسة، يرجى تحديث الصفحة والمحاولة مرة أخرى'
+            : 'حدث خطأ أثناء حفظ البيانات');
     }
 }
 
