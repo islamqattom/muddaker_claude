@@ -230,9 +230,15 @@ class BillingController extends Controller
         }
     }
 
-    public function getStudentsForParent(ParentProfile $parent)
+    public function getStudentsForParent($parentId)
     {
-        $students = $parent->students()->with('user:id,name')->get();
+        $parent = ParentProfile::with('students.user:id,name')->find($parentId);
+
+        if (!$parent) {
+            return response()->json(['message' => 'Parent not found'], 404);
+        }
+
+        $students = $parent->students;
         return response()->json($students->map(fn($s) => [
             'id' => $s->id,
             'name' => $s->user->name
