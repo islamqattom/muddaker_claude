@@ -17,3 +17,7 @@
 <a href="{{ route('parent.reports.index') }}" class="nav-link {{ request()->routeIs('parent.reports.*') ? 'active' : '' }}">
     <i class="fas fa-chart-bar"></i> التقارير
 </a>
+<span class="nav-section-title mt-2">المالية</span>
+<a href="{{ route('parent.billing') }}" class="nav-link {{ request()->routeIs('parent.billing') ? 'active' : '' }}">
+    <i class="fas fa-money-bill"></i> الرسوم الشهرية
+</a>

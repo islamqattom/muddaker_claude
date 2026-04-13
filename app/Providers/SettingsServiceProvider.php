@@ -28,6 +28,9 @@ class SettingsServiceProvider extends ServiceProvider
             'work_end_time',
             'work_days',
             'enable_notifications',
+            'billing_monthly_fee_per_student',
+            'billing_reminder_frequency_days',
+            'billing_reminder_enabled',
         ];
 
         try {
