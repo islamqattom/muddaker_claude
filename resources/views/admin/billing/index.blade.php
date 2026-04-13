@@ -195,9 +195,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@section('scripts')
 <script>
 let addPaymentModal;
 
