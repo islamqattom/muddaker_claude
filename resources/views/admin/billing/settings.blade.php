@@ -32,7 +32,7 @@
             </h6>
 
             <div class="mb-3">
-                <label class="form-label">الرسوم الشهرية لكل طالب (ريال)</label>
+                <label class="form-label">الرسوم الشهرية لكل طالب (دينار)</label>
                 <input type="number" name="billing_monthly_fee_per_student"
                        class="form-control"
                        value="{{ $settings['billing_monthly_fee_per_student'] }}"

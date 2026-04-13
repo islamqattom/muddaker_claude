@@ -51,11 +51,11 @@ class MonthlyFee extends Model
         return $this->status === self::STATUS_PAID;
     }
 
-    public function markAsPaid(int $adminId): void
+    public function markAsPaid(int $adminId, ?string $paidAt = null): void
     {
         $this->update([
             'status' => self::STATUS_PAID,
-            'paid_at' => now(),
+            'paid_at' => $paidAt ?? now(),
             'paid_by' => $adminId,
         ]);
     }

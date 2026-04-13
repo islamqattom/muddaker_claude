@@ -16,9 +16,14 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="fas fa-money-bill me-2"></i>الرسوم الشهرية</h6>
-        <a href="{{ route('admin.billing.settings') }}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-cog me-1"></i>إعدادات الفوترة
-        </a>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary btn-sm" onclick="openAddPaymentModal()">
+                <i class="fas fa-plus me-1"></i>تسجيل دفعة سابقة
+            </button>
+            <a href="{{ route('admin.billing.settings') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-cog me-1"></i>إعدادات الفوترة
+            </a>
+        </div>
     </div>
     <div class="card-body">
         {{-- Filters --}}
@@ -132,10 +137,110 @@
         {{ $fees->withQueryString()->links() }}
     </div>
 </div>
+
+{{-- Add Old Payment Modal --}}
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تسجيل دفعة سابقة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addPaymentForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">ولي الأمر</label>
+                        <select name="parent_id" id="payment_parent_id" class="form-select" required>
+                            <option value="">اختر ولي الأمر</option>
+                            @foreach($parents as $parent)
+                                <option value="{{ $parent->id }}">{{ $parent->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الطالب</label>
+                        <select name="student_id" id="payment_student_id" class="form-select" required>
+                            <option value="">اختر الطالب</option>
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">السنة</label>
+                            <select name="year" class="form-select" required>
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">الشهر</label>
+                            <select name="month" class="form-select" required>
+                                @foreach($months as $num => $name)
+                                    <option value="{{ $num }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">تاريخ الدفع</label>
+                        <input type="date" name="paid_at" class="form-control" required max="{{ date('Y-m-d') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
+let addPaymentModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    addPaymentModal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
+
+    document.getElementById('addPaymentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitAddPayment();
+    });
+});
+
+function openAddPaymentModal() {
+    document.getElementById('addPaymentForm').reset();
+    document.getElementById('payment_student_id').innerHTML = '<option value="">اختر الطالب</option>';
+    addPaymentModal.show();
+}
+
+function submitAddPayment() {
+    const form = document.getElementById('addPaymentForm');
+    const formData = new FormData(form);
+
+    fetch('{{ route('admin.billing.recordPayment') }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            addPaymentModal.hide();
+            location.reload();
+        } else {
+            alert(data.message || 'حدث خطأ');
+        }
+    })
+    .catch(() => {
+        alert('حدث خطأ أثناء حفظ البيانات');
+    });
+}
+
 function markPaid(feeId) {
     if (!confirm('هل أنت متأكد من تعيين هذا السجل كمدفوع؟')) return;
 

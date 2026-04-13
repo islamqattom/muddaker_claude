@@ -16,7 +16,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <small>المدفوع هذا العام</small>
-                        <h4 class="mb-0">{{ number_format($totalPaidThisYear, 2) }} ريال</h4>
+                        <h4 class="mb-0">{{ number_format($totalPaidThisYear, 2) }} دينار</h4>
                     </div>
                     <i class="fas fa-check-circle fa-2x opacity-50"></i>
                 </div>
@@ -29,7 +29,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <small>المستحق (غير مدفوع)</small>
-                        <h4 class="mb-0">{{ number_format($totalUnpaid, 2) }} ريال</h4>
+                        <h4 class="mb-0">{{ number_format($totalUnpaid, 2) }} دينار</h4>
                     </div>
                     <i class="fas fa-exclamation-circle fa-2x opacity-50"></i>
                 </div>
@@ -42,7 +42,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <small>الرسوم لكل طالب</small>
-                        <h4 class="mb-0">{{ number_format(config('app.billing_monthly_fee_per_student', 0), 2) }} ريال</h4>
+                        <h4 class="mb-0">{{ number_format(config('app.billing_monthly_fee_per_student', 0), 2) }} دينار</h4>
                     </div>
                     <i class="fas fa-user-graduate fa-2x opacity-50"></i>
                 </div>
