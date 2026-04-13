@@ -23,12 +23,14 @@ class MonthlyFee extends Model
         'year',
         'month',
         'status',
+        'fee_amount',
         'paid_at',
         'paid_by',
     ];
 
     protected $casts = [
         'paid_at' => 'datetime',
+        'fee_amount' => 'decimal:2',
     ];
 
     public function parent(): BelongsTo
@@ -44,6 +46,11 @@ class MonthlyFee extends Model
     public function paidBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'paid_by');
+    }
+
+    public function feeCategory(): BelongsTo
+    {
+        return $this->belongsTo(FeeCategory::class);
     }
 
     public function isPaid(): bool

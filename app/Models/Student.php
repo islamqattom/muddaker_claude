@@ -50,6 +50,11 @@ class Student extends Model
         return $this->belongsToMany(ParentProfile::class, 'parent_student', 'student_id', 'parent_id');
     }
 
+    public function feeCategory()
+    {
+        return $this->belongsTo(FeeCategory::class);
+    }
+
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
