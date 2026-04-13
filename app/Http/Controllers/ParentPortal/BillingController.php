@@ -67,6 +67,8 @@ class BillingController extends Controller
             })
             ->count() * $feeAmount;
 
+        $months = MonthlyFee::getMonthNames();
+
         return view('parent.billing.index', compact(
             'studentFees',
             'months',
