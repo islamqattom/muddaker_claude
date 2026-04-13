@@ -96,6 +96,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::delete('/delete', [Admin\BillingController::class, 'destroy'])->name('deleteFee');
         Route::get('/students-for-parent/{parentId}', [Admin\BillingController::class, 'getStudentsForParent'])->name('studentsForParent');
         Route::get('/history', [Admin\BillingController::class, 'history'])->name('history');
+        Route::get('/fee-categories', [Admin\FeeCategoryController::class, 'index'])->name('feeCategories');
+        Route::post('/fee-categories', [Admin\FeeCategoryController::class, 'store'])->name('feeCategories.store');
+        Route::put('/fee-categories/{feeCategory}', [Admin\FeeCategoryController::class, 'update'])->name('feeCategories.update');
+        Route::post('/fee-categories/{feeCategory}/toggle-active', [Admin\FeeCategoryController::class, 'toggleActive'])->name('feeCategories.toggleActive');
+        Route::delete('/fee-categories/{feeCategory}', [Admin\FeeCategoryController::class, 'destroy'])->name('feeCategories.destroy');
     });
 });
 
