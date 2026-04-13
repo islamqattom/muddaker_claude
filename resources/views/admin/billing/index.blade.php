@@ -195,9 +195,7 @@
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
 <script>
 let addPaymentModal;
 
@@ -276,4 +274,4 @@ document.getElementById('selectAll').addEventListener('change', function() {
     document.querySelectorAll('.fee-checkbox').forEach(cb => cb.checked = this.checked);
 });
 </script>
-@endpush
+@endsection
