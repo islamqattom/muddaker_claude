@@ -167,6 +167,69 @@ class BillingController extends Controller
         }
     }
 
+    public function recordPayment(Request $request)
+    {
+        $request->validate([
+            'parent_id' => 'required|exists:parents,id',
+            'student_id' => 'required|exists:students,id',
+            'year' => 'required|integer|min:2020|max:' . (now()->year + 1),
+            'month' => 'required|integer|min:1|max:12',
+            'paid_at' => 'required|date|before_or_equal:today',
+        ]);
+
+        $fee = MonthlyFee::where('parent_id', $request->parent_id)
+            ->where('student_id', $request->student_id)
+            ->where('year', $request->year)
+            ->where('month', $request->month)
+            ->first();
+
+        if ($fee && $fee->status === MonthlyFee::STATUS_PAID) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا السجل مسجل كمدفوع مسبقاً'
+            ], 422);
+        }
+
+        try {
+            if ($fee) {
+                $fee->markAsPaid(Auth::id(), $request->paid_at);
+            } else {
+                MonthlyFee::create([
+                    'parent_id' => $request->parent_id,
+                    'student_id' => $request->student_id,
+                    'year' => $request->year,
+                    'month' => $request->month,
+                    'status' => MonthlyFee::STATUS_PAID,
+                    'paid_at' => $request->paid_at,
+                    'paid_by' => Auth::id(),
+                ]);
+            }
+
+            Log::info('Billing: old payment recorded', [
+                'admin_id' => Auth::id(),
+                'parent_id' => $request->parent_id,
+                'student_id' => $request->student_id,
+                'year' => $request->year,
+                'month' => $request->month,
+                'paid_at' => $request->paid_at,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تسجيل الدفعة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to record payment', [
+                'admin_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تسجيل الدفعة'
+            ], 500);
+        }
+    }
+
     public function history(Request $request)
     {
         $query = MonthlyFee::with(['parent.user', 'student', 'paidBy'])

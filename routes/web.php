@@ -92,6 +92,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::put('/settings', [Admin\BillingController::class, 'updateSettings'])->name('settings.update');
         Route::post('/mark-paid', [Admin\BillingController::class, 'markPaid'])->name('markPaid');
         Route::post('/mark-paid-bulk', [Admin\BillingController::class, 'markPaidBulk'])->name('markPaidBulk');
+        Route::post('/record-payment', [Admin\BillingController::class, 'recordPayment'])->name('recordPayment');
         Route::get('/history', [Admin\BillingController::class, 'history'])->name('history');
     });
 });
