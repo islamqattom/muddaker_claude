@@ -198,6 +198,7 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-check">
+                            <input type="hidden" name="is_paid" value="0">
                             <input type="checkbox" class="form-check-input" id="is_paid" name="is_paid" value="1" checked>
                             <label class="form-check-label" for="is_paid">تسجيل كمدفوع</label>
                         </div>

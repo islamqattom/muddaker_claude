@@ -184,7 +184,7 @@ class BillingController extends Controller
             'paid_at' => 'required_if:is_paid,true|date|before_or_equal:today',
         ]);
 
-        $isPaid = $request->boolean('is_paid', true);
+        $isPaid = $request->boolean('is_paid', false);
 
         $fee = MonthlyFee::forParentStudent($request->parent_id, $request->student_id)
             ->forPeriod($request->year, $request->month)
