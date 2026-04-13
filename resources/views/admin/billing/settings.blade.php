@@ -31,13 +31,10 @@
                 <i class="fas fa-money-bill me-1"></i>الرسوم الشهرية
             </h6>
 
-            <div class="mb-3">
-                <label class="form-label">الرسوم الشهرية لكل طالب (دينار)</label>
-                <input type="number" name="billing_monthly_fee_per_student"
-                       class="form-control"
-                       value="{{ $settings['billing_monthly_fee_per_student'] }}"
-                       min="0" step="0.01">
-                <small class="text-muted">سيتم حساب رسوم كل ولي أمر بناءً على عدد أبنائه</small>
+            <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>ملاحظة:</strong> يتم الآن تحديد الرسوم الشهرية عبر <a href="{{ route('admin.billing.feeCategories') }}" class="alert-link">فئات الرسوم</a>.
+                قم بإضافة فئات رسوم وإسناد الطلاب إليها.
             </div>
 
             <h6 class="border-bottom pb-2 mb-3 mt-4 text-primary">
