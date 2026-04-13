@@ -93,6 +93,7 @@
                             <th><input type="checkbox" id="selectAll"></th>
                             <th>ولي الأمر</th>
                             <th>الطالب</th>
+                            <th>الرسوم</th>
                             <th>الشهر</th>
                             <th>الحالة</th>
                             <th>تاريخ الدفع</th>
@@ -106,6 +107,7 @@
                             <td><input type="checkbox" name="fee_ids[]" value="{{ $fee->id }}" class="fee-checkbox"></td>
                             <td>{{ $fee->parent->user->name ?? '-' }}</td>
                             <td>{{ $fee->student->user->name ?? '-' }}</td>
+                            <td>{{ $fee->fee_amount ? number_format($fee->fee_amount, 2) . ' د.ع' : '-' }}</td>
                             <td>{{ $months[$fee->month] ?? $fee->month }} / {{ $fee->year }}</td>
                             <td>
                                 @if($fee->status === 'paid')

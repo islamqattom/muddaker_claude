@@ -92,6 +92,9 @@
                     <div class="col-md-2 col-4">
                         <div class="p-2 rounded text-center {{ $fee->status === 'paid' ? 'bg-success bg-opacity-10' : 'bg-danger bg-opacity-10' }}">
                             <div class="fw-bold">{{ $months[$fee->month] ?? $fee->month }}</div>
+                            @if($fee->fee_amount)
+                                <div class="small text-muted">{{ number_format($fee->fee_amount, 2) }} د.ع</div>
+                            @endif
                             @if($fee->status === 'paid')
                                 <span class="badge bg-success mt-1">
                                     <i class="fas fa-check"></i> مدفوع

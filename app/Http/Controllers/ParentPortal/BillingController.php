@@ -47,15 +47,14 @@ class BillingController extends Controller
             ];
         }
 
-        // Calculate summary
+        // Calculate summary using actual fee amounts from records
         $currentYear = now()->year;
         $currentMonth = now()->month;
-        $feeAmount = (float) config('app.' . MonthlyFee::CONFIG_FEE_PER_STUDENT, 0);
 
         $totalPaidThisYear = $fees
             ->where('year', $currentYear)
             ->where('status', MonthlyFee::STATUS_PAID)
-            ->count() * $feeAmount;
+            ->sum('fee_amount');
 
         $totalUnpaid = $fees
             ->filter(function ($fee) use ($currentYear, $currentMonth) {
@@ -65,7 +64,7 @@ class BillingController extends Controller
                 return $fee->year < $currentYear
                     || ($fee->year === $currentYear && $fee->month <= $currentMonth);
             })
-            ->count() * $feeAmount;
+            ->sum('fee_amount');
 
         $months = MonthlyFee::getMonthNames();
 
