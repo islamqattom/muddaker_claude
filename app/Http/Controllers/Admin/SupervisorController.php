@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 
 class SupervisorController extends Controller
 {
+    private const USERNAME_REGEX_MESSAGE = 'اسم المستخدم يجب أن يحتوي فقط على حروف إنجليزية وأرقام وشرطة سفلية (_) دون مسافات أو رموز.';
+
     public function index()
     {
         $supervisors = User::where('role', 'supervisor')->with('supervisor')->paginate(20);
@@ -31,6 +33,8 @@ class SupervisorController extends Controller
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ], [
+            'username.regex' => self::USERNAME_REGEX_MESSAGE,
         ]);
 
         $avatarPath = null;
@@ -87,6 +91,8 @@ class SupervisorController extends Controller
             'phone' => 'nullable|string|unique:users,phone,' . $supervisor->id,
             'email' => 'nullable|email|unique:users,email,' . $supervisor->id,
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ], [
+            'username.regex' => self::USERNAME_REGEX_MESSAGE,
         ]);
 
         $newAvatarPath = null;

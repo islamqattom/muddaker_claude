@@ -73,7 +73,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">اسم المستخدم <span class="text-danger">*</span></label>
-                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $supervisor->username) }}" required>
+                                <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $supervisor->username) }}" placeholder="حروف إنجليزية وأرقام وشرطة سفلية (_) فقط" required>
                                 @error('username')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
