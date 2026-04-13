@@ -144,6 +144,12 @@ self.addEventListener('fetch', event => {
     }
 
     // Network-first for local static resources (fall back to cache)
+    // Only cache GET requests — the Cache API does not support POST/PUT/DELETE
+    if (event.request.method !== 'GET') {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     event.respondWith(
         fetch(event.request)
             .then(response => {
