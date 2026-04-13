@@ -84,6 +84,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Audit Logs
     Route::resource('audit-logs', Admin\AuditLogController::class)->only(['index', 'show']);
     Route::get('/audit-logs/export', [Admin\AuditLogController::class, 'export'])->name('audit-logs.export');
+
+    // Billing
+    Route::prefix('billing')->name('billing.')->group(function () {
+        Route::get('/', [Admin\BillingController::class, 'index'])->name('index');
+        Route::get('/settings', [Admin\BillingController::class, 'settings'])->name('settings');
+        Route::put('/settings', [Admin\BillingController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/mark-paid', [Admin\BillingController::class, 'markPaid'])->name('markPaid');
+        Route::post('/mark-paid-bulk', [Admin\BillingController::class, 'markPaidBulk'])->name('markPaidBulk');
+        Route::post('/record-payment', [Admin\BillingController::class, 'recordPayment'])->name('recordPayment');
+        Route::get('/students-for-parent/{parentId}', [Admin\BillingController::class, 'getStudentsForParent'])->name('studentsForParent');
+        Route::get('/history', [Admin\BillingController::class, 'history'])->name('history');
+    });
 });
 
 // ============================
@@ -285,4 +297,7 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     Route::get('/profile', [ParentPortal\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [ParentPortal\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ParentPortal\ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Billing
+    Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');
 });
