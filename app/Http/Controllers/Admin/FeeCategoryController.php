@@ -39,7 +39,7 @@ class FeeCategoryController extends Controller
             Log::info('Fee category created', [
                 'admin_id' => auth()->id(),
                 'category_id' => $category->id,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toIso8601String(),
             ]);
 
             return response()->json([
@@ -74,7 +74,7 @@ class FeeCategoryController extends Controller
             Log::info('Fee category updated', [
                 'admin_id' => auth()->id(),
                 'category_id' => $feeCategory->id,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toIso8601String(),
             ]);
 
             return response()->json([
@@ -103,7 +103,7 @@ class FeeCategoryController extends Controller
                 'admin_id' => auth()->id(),
                 'category_id' => $feeCategory->id,
                 'is_active' => $feeCategory->is_active,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toIso8601String(),
             ]);
 
             return response()->json([
@@ -135,7 +135,7 @@ class FeeCategoryController extends Controller
             Log::info('Fee category deleted', [
                 'admin_id' => auth()->id(),
                 'category_id' => $feeCategory->id,
-                'timestamp' => now()->toISOString(),
+                'timestamp' => now()->toIso8601String(),
             ]);
 
             return response()->json([

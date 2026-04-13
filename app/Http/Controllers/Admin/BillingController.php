@@ -51,7 +51,7 @@ class BillingController extends Controller
         $parents = ParentProfile::with('user')->get();
         $years = range(now()->year, now()->year - 2);
         $months = MonthlyFee::getMonthNames();
-        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
+        $feeCategories = FeeCategory::active()->orderBy('name')->get();
 
         return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories'));
     }
@@ -106,10 +106,7 @@ class BillingController extends Controller
             'fee_id' => 'required|exists:monthly_fees,id',
         ]);
 
-        $fee = MonthlyFee::find($request->fee_id);
-        if (!$fee) {
-            return response()->json(['success' => false, 'message' => 'السجل غير موجود'], 404);
-        }
+        $fee = MonthlyFee::findOrFail($request->fee_id);
 
         try {
             $fee->markAsPaid(Auth::id());
@@ -189,10 +186,8 @@ class BillingController extends Controller
 
         $isPaid = $request->boolean('is_paid', true);
 
-        $fee = MonthlyFee::where('parent_id', $request->parent_id)
-            ->where('student_id', $request->student_id)
-            ->where('year', $request->year)
-            ->where('month', $request->month)
+        $fee = MonthlyFee::forParentStudent($request->parent_id, $request->student_id)
+            ->forPeriod($request->year, $request->month)
             ->first();
 
         if ($fee && $fee->status === MonthlyFee::STATUS_PAID && $isPaid) {
@@ -220,8 +215,8 @@ class BillingController extends Controller
                     $fee->markAsUnpaid();
                 }
             } else {
-                $student = Student::with('feeCategory')->find($request->student_id);
-                $feeAmount = $student?->feeCategory?->amount ?? 0;
+                $student = Student::find($request->student_id);
+                $feeAmount = $student->feeCategory?->amount ?? 0;
                 MonthlyFee::create([
                     'parent_id' => $request->parent_id,
                     'student_id' => $request->student_id,

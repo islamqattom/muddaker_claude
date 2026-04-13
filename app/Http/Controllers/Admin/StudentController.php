@@ -39,7 +39,7 @@ class StudentController extends Controller
     {
         $levels = Level::all();
         $supervisors = User::where('role', 'supervisor')->get();
-        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
+        $feeCategories = FeeCategory::active()->orderBy('name')->get();
         return view('admin.students.create', compact('levels', 'supervisors', 'feeCategories'));
     }
 
@@ -139,7 +139,7 @@ class StudentController extends Controller
         $student->load('user');
         $levels = Level::all();
         $supervisors = User::where('role', 'supervisor')->get();
-        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
+        $feeCategories = FeeCategory::active()->orderBy('name')->get();
         return view('admin.students.edit', compact('student', 'levels', 'supervisors', 'feeCategories'));
     }
 

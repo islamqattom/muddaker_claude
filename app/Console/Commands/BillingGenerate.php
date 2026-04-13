@@ -19,7 +19,12 @@ class BillingGenerate extends Command
 
         $this->info("Generating billing records for {$month}/{$year}...");
 
-        $parents = ParentProfile::with('students')->get();
+        // Pre-fetch existing fees for the period to avoid N+1
+        $existingFees = MonthlyFee::forPeriod($year, $month)
+            ->get()
+            ->mapWithKeys(fn($f) => [$f->parent_id . '-' . $f->student_id => true]);
+
+        $parents = ParentProfile::with(['students.feeCategory'])->get();
         $created = 0;
         $skipped = 0;
         $failed = 0;
@@ -27,11 +32,9 @@ class BillingGenerate extends Command
 
         foreach ($parents as $parent) {
             foreach ($parent->students as $student) {
-                $exists = MonthlyFee::forParentStudent($parent->id, $student->id)
-                    ->forPeriod($year, $month)
-                    ->exists();
+                $key = $parent->id . '-' . $student->id;
 
-                if ($exists) {
+                if (isset($existingFees[$key])) {
                     $skipped++;
                     continue;
                 }
