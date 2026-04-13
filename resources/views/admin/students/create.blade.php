@@ -147,6 +147,22 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">فئة الرسوم</label>
+                                <select name="fee_category_id" class="form-select @error('fee_category_id') is-invalid @enderror">
+                                    <option value="">— بدون فئة —</option>
+                                    @foreach($feeCategories as $category)
+                                        <option value="{{ $category->id }}" {{ old('fee_category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }} ({{ number_format($category->amount, 2) }} دينار)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('fee_category_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
 
                     </div>
                     <div class="row">

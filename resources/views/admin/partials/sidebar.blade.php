@@ -27,6 +27,9 @@
 <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}">
     <i class="fas fa-money-bill"></i> إدارة الرسوم
 </a>
+<a href="{{ route('admin.billing.feeCategories') }}" class="nav-link {{ request()->routeIs('admin.billing.feeCategories') ? 'active' : '' }}">
+    <i class="fas fa-tags"></i> فئات الرسوم
+</a>
 <span class="nav-section-title mt-2">التقارير والإنذارات</span>
 <a href="{{ route('admin.sessions.index') }}" class="nav-link {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
     <i class="fas fa-microphone"></i> جلسات التسميع

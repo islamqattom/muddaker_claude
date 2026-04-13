@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Student, User, Level, Supervisor};
+use App\Models\{Student, User, Level, Supervisor, FeeCategory};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +39,8 @@ class StudentController extends Controller
     {
         $levels = Level::all();
         $supervisors = User::where('role', 'supervisor')->get();
-        return view('admin.students.create', compact('levels', 'supervisors'));
+        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
+        return view('admin.students.create', compact('levels', 'supervisors', 'feeCategories'));
     }
 
     public function store(Request $request)
@@ -58,6 +59,7 @@ class StudentController extends Controller
             'enrollment_date' => 'nullable|date',
             'notes' => 'nullable|string',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'fee_category_id' => 'nullable|exists:fee_categories,id',
         ]);
 
         $avatarPath = null;
@@ -106,6 +108,7 @@ class StudentController extends Controller
                 'address' => $request->address,
                 'enrollment_date' => $request->enrollment_date ?? today(),
                 'notes' => $request->notes,
+                'fee_category_id' => $request->fee_category_id,
             ]);
         });
 
@@ -136,7 +139,8 @@ class StudentController extends Controller
         $student->load('user');
         $levels = Level::all();
         $supervisors = User::where('role', 'supervisor')->get();
-        return view('admin.students.edit', compact('student', 'levels', 'supervisors'));
+        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
+        return view('admin.students.edit', compact('student', 'levels', 'supervisors', 'feeCategories'));
     }
 
     public function update(Request $request, Student $student)
@@ -149,6 +153,7 @@ class StudentController extends Controller
             'level_id' => 'required|exists:levels,id',
             'supervisor_id' => 'required|exists:users,id',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'fee_category_id' => 'nullable|exists:fee_categories,id',
         ]);
 
         $newAvatarPath = null;
@@ -210,6 +215,7 @@ class StudentController extends Controller
                 'enrollment_date' => $request->enrollment_date,
                 'notes' => $request->notes,
                 'is_active' => $request->boolean('is_active'),
+                'fee_category_id' => $request->fee_category_id,
             ]);
 
             // Cascade supervisor change to all related records
