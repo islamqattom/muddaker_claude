@@ -175,14 +175,18 @@ class BillingController extends Controller
 
     public function recordPayment(Request $request)
     {
-        $request->validate([
+        $rules = [
             'parent_id' => 'required|exists:parents,id',
             'student_id' => 'required|exists:students,id',
             'year' => 'required|integer|min:2020|max:' . (now()->year + 1),
             'month' => 'required|integer|min:1|max:12',
             'is_paid' => 'boolean',
-            'paid_at' => 'required_if:is_paid,true|date|before_or_equal:today',
-        ]);
+            'paid_at' => $request->boolean('is_paid')
+                ? 'required|date|before_or_equal:today'
+                : 'nullable|date|before_or_equal:today',
+        ];
+
+        $request->validate($rules);
 
         $isPaid = $request->boolean('is_paid', false);
 
