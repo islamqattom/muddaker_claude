@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MonthlyFee;
 use App\Models\ParentProfile;
 use App\Models\Student;
+use App\Models\FeeCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -37,6 +38,12 @@ class BillingController extends Controller
             $query->where('parent_id', $request->parent_id);
         }
 
+        if ($request->filled('fee_category_id')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('fee_category_id', $request->fee_category_id);
+            });
+        }
+
         $fees = $query->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->paginate(50);
@@ -44,8 +51,9 @@ class BillingController extends Controller
         $parents = ParentProfile::with('user')->get();
         $years = range(now()->year, now()->year - 2);
         $months = MonthlyFee::getMonthNames();
+        $feeCategories = FeeCategory::where('is_active', true)->orderBy('name')->get();
 
-        return view('admin.billing.index', compact('fees', 'parents', 'years', 'months'));
+        return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories'));
     }
 
     public function settings()

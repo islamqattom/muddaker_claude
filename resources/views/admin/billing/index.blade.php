@@ -64,7 +64,16 @@
                     <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>مدفوع</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">فئة الرسوم</label>
+                <select name="fee_category_id" class="form-select">
+                    <option value="">الكل</option>
+                    @foreach($feeCategories as $cat)
+                        <option value="{{ $cat->id }}" {{ request('fee_category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary me-2"><i class="fas fa-search"></i></button>
                 <a href="{{ route('admin.billing.index') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
             </div>
