@@ -45,6 +45,7 @@ class BillingGenerate extends Command
                         'year' => $year,
                         'month' => $month,
                     ]);
+                    continue;
                 }
 
                 try {

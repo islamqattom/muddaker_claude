@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\MonthlyFee;
 use App\Models\ParentProfile;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -211,12 +212,15 @@ class BillingController extends Controller
                     $fee->markAsUnpaid();
                 }
             } else {
+                $student = Student::with('feeCategory')->find($request->student_id);
+                $feeAmount = $student?->feeCategory?->amount ?? 0;
                 MonthlyFee::create([
                     'parent_id' => $request->parent_id,
                     'student_id' => $request->student_id,
                     'year' => $request->year,
                     'month' => $request->month,
                     'status' => $isPaid ? MonthlyFee::STATUS_PAID : MonthlyFee::STATUS_UNPAID,
+                    'fee_amount' => $feeAmount,
                     'paid_at' => $isPaid ? $request->paid_at : null,
                     'paid_by' => $isPaid ? Auth::id() : null,
                 ]);

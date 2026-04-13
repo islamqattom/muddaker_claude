@@ -111,6 +111,11 @@ class FeeCategoryController extends Controller
                 'message' => $feeCategory->is_active ? 'تم تفعيل فئة الرسوم' : 'تم تعطيل فئة الرسوم',
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to toggle fee category active status', [
+                'admin_id' => auth()->id(),
+                'category_id' => $feeCategory->id,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json(['success' => false, 'message' => 'حدث خطأ'], 500);
         }
     }
@@ -138,6 +143,11 @@ class FeeCategoryController extends Controller
                 'message' => 'تم حذف فئة الرسوم بنجاح',
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to delete fee category', [
+                'admin_id' => auth()->id(),
+                'category_id' => $feeCategory->id,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json(['success' => false, 'message' => 'حدث خطأ'], 500);
         }
     }

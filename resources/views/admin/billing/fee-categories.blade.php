@@ -65,7 +65,7 @@
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-sm btn-outline-primary me-1"
-                                                onclick="editCategory({{ $category->id }}, '{{ addslashes($category->name) }}', {{ $category->amount }})">
+                                                onclick="editCategory({{ $category->id }}, {{ json_encode($category->name) }}, {{ $category->amount }})">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button type="button" class="btn btn-sm btn-outline-{{ $category->is_active ? 'warning' : 'success' }} me-1"

@@ -14,7 +14,7 @@ class Student extends Model
         'user_id', 'supervisor_id', 'level_id', 'student_number',
         'national_id', 'birth_date', 'phone', 'address',
         'memorized_parts', 'current_part', 'current_page',
-        'enrollment_date', 'notes',
+        'enrollment_date', 'notes', 'fee_category_id',
         'current_streak', 'longest_streak', 'last_memorization_date', 'accuracy_rate',
     ];
 
