@@ -3,6 +3,24 @@
 @section('page-title','جلسة سرد - الجزء '.$part->part_number)
 @section('sidebar-menu') @include('supervisor.partials.sidebar') @endsection
 @section('content')
+<style>
+/* Mobile-friendly number input buttons */
+@media (max-width: 768px) {
+    .input-group .btn {
+        min-width: 50px;
+        min-height: 50px;
+        font-size: 1.25rem;
+        padding: 0;
+    }
+    .input-group .form-control {
+        min-height: 50px;
+        font-size: 1.25rem;
+    }
+    .input-group .fa-plus, .input-group .fa-minus {
+        font-size: 1.25rem;
+    }
+}
+</style>
 <div class="alert alert-info">
     <i class="fas fa-info-circle me-2"></i>
     <strong>السرد:</strong> تسميع الجزء {{ $part->part_number }} كاملاً ({{ count($pages) }} صفحة)
@@ -130,7 +148,15 @@ function stopSardNow() {
 }
 
 function submitSard() {
-    const data = new FormData(document.getElementById('sardForm'));
+    // Convert page numeric fields to integers before submission
+    const form = document.getElementById('sardForm');
+    const data = new FormData(form);
+    // Ensure page errors and hesitations are integers
+    for (let [key, value] of data.entries()) {
+        if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
+            data.set(key, parseInt(value, 10) || 0);
+        }
+    }
     $.ajax({
         url:'{{ route('supervisor.recitation.save') }}',
         method:'POST',
@@ -158,7 +184,14 @@ function submitSardIncomplete() {
     if (!confirm('هل أنت متأكد من حفظ هذه الجلسة على أنها لم يكمل؟')) {
         return;
     }
-    const data = new FormData(document.getElementById('sardForm'));
+    const form = document.getElementById('sardForm');
+    const data = new FormData(form);
+    // Ensure page errors and hesitations are integers
+    for (let [key, value] of data.entries()) {
+        if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
+            data.set(key, parseInt(value, 10) || 0);
+        }
+    }
     $.ajax({
         url:'{{ route('supervisor.recitation.saveIncomplete') }}',
         method:'POST',

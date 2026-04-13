@@ -364,8 +364,15 @@ class RecitationController extends Controller
             return redirect()->route('supervisor.recitation.index')
                 ->with('success', 'تم حفظ جلسة التسميع بنجاح');
         } catch (\Exception $e) {
-            \Log::error('Failed to save session: ' . $e->getMessage());
+            \Log::error('Failed to save session: ' . $e->getMessage(), [
+                'exception_class' => get_class($e),
+                'student_id' => $request->student_id,
+                'pages' => $request->input('pages'),
+            ]);
             if ($request->expectsJson()) {
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+                }
                 return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
             }
             return back()->with('error', 'حدث خطأ أثناء الحفظ');
@@ -413,8 +420,15 @@ class RecitationController extends Controller
             return redirect()->route('supervisor.recitation.index')
                 ->with('success', 'تم حفظ الجلسة بنجاح (لم يكمل)');
         } catch (\Exception $e) {
-            \Log::error('Failed to save incomplete session: ' . $e->getMessage());
+            \Log::error('Failed to save incomplete session: ' . $e->getMessage(), [
+                'exception_class' => get_class($e),
+                'student_id' => $request->student_id,
+                'pages' => $request->input('pages'),
+            ]);
             if ($request->expectsJson()) {
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+                }
                 return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
             }
             return back()->with('error', 'حدث خطأ أثناء الحفظ');

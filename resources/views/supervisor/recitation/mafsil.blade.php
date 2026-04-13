@@ -8,6 +8,24 @@
 @endsection
 
 @section('content')
+<style>
+/* Mobile-friendly number input buttons */
+@media (max-width: 768px) {
+    .input-group .btn {
+        min-width: 50px;
+        min-height: 50px;
+        font-size: 1.25rem;
+        padding: 0;
+    }
+    .input-group .form-control {
+        min-height: 50px;
+        font-size: 1.25rem;
+    }
+    .input-group .fa-plus, .input-group .fa-minus {
+        font-size: 1.25rem;
+    }
+}
+</style>
 <div class="row justify-content-center">
 <div class="col-lg-10">
 
@@ -373,6 +391,12 @@ function updateTotals() {
 function submitMafsil() {
     const form = document.getElementById('mafsilForm');
     const data = new FormData(form);
+    // Ensure page errors and hesitations are integers
+    for (let [key, value] of data.entries()) {
+        if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
+            data.set(key, parseInt(value, 10) || 0);
+        }
+    }
 
     // If already saved an initial failed record, we need to indicate this is the final submission
     if (failedButContinuing && initialFailedRecordSaved) {
@@ -454,6 +478,12 @@ function submitMafsilIncomplete() {
     }
     const form = document.getElementById('mafsilForm');
     const data = new FormData(form);
+    // Ensure page errors and hesitations are integers
+    for (let [key, value] of data.entries()) {
+        if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
+            data.set(key, parseInt(value, 10) || 0);
+        }
+    }
 
     $.ajax({
         url: '{{ route('supervisor.recitation.saveIncomplete') }}',
