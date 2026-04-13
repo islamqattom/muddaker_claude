@@ -23,6 +23,7 @@ class BillingGenerate extends Command
         $created = 0;
         $skipped = 0;
         $failed = 0;
+        $unassigned = 0;
 
         foreach ($parents as $parent) {
             foreach ($parent->students as $student) {
@@ -35,6 +36,17 @@ class BillingGenerate extends Command
                     continue;
                 }
 
+                $feeAmount = $student->feeCategory?->amount ?? 0;
+
+                if ($feeAmount <= 0) {
+                    $unassigned++;
+                    Log::warning('Student has no fee category', [
+                        'student_id' => $student->id,
+                        'year' => $year,
+                        'month' => $month,
+                    ]);
+                }
+
                 try {
                     MonthlyFee::create([
                         'parent_id' => $parent->id,
@@ -42,6 +54,7 @@ class BillingGenerate extends Command
                         'year' => $year,
                         'month' => $month,
                         'status' => MonthlyFee::STATUS_UNPAID,
+                        'fee_amount' => $feeAmount,
                     ]);
                     $created++;
                 } catch (\Exception $e) {
@@ -57,7 +70,7 @@ class BillingGenerate extends Command
             }
         }
 
-        $this->info("Done! Created: {$created}, Skipped (already exist): {$skipped}, Failed: {$failed}");
+        $this->info("Done! Created: {$created}, Skipped (already exist): {$skipped}, Failed: {$failed}, Unassigned (no category): {$unassigned}");
 
         return Command::SUCCESS;
     }
