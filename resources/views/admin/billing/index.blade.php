@@ -13,6 +13,9 @@
 @endsection
 
 @section('content')
+<script>
+window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk ?? []);
+</script>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0"><i class="fas fa-money-bill me-2"></i>الرسوم الشهرية</h6>
@@ -426,19 +429,8 @@ function openBulkCreateModal() {
 
 async function loadAllStudentsForBulk() {
     if (allStudentsCache) { renderStudentList(allStudentsCache); return; }
-    try {
-        const response = await fetch('{{ route('admin.students.list') }}', {
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-        });
-        if (!response.ok) throw new Error('Server error: ' + response.status);
-        const data = await response.json();
-        allStudentsCache = data.students || [];
-        renderStudentList(allStudentsCache);
-    } catch (error) {
-        console.error('Error loading students:', error);
-        document.getElementById('bulk_student_list').innerHTML =
-            '<div class="text-danger">فشل تحميل قائمة الطلاب</div>';
-    }
+    allStudentsCache = window.__STUDENTS_FOR_BULK__ || [];
+    renderStudentList(allStudentsCache);
 }
 
 function renderStudentList(students) {
