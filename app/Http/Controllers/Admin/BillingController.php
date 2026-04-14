@@ -54,7 +54,6 @@ class BillingController extends Controller
         $feeCategories = FeeCategory::active()->orderBy('name')->get();
 
         $studentsForBulk = Student::with('user')
-            ->whereNotNull('fee_category_id')
             ->get()
             ->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name ?? 'غير معروف']);
 
