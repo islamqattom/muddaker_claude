@@ -98,7 +98,7 @@
                 <h5 class="modal-title">إضافة فئة رسوم جديدة</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="createCategoryForm">
+            <form id="createCategoryForm" method="POST" action="{{ route('admin.billing.feeCategories.store') }}">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -127,7 +127,7 @@
                 <h5 class="modal-title">تعديل فئة الرسوم</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editCategoryForm">
+            <form id="editCategoryForm" method="POST" action="{{ route('admin.billing.feeCategories.update', 'REPLACE_ID') }}">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="id" id="edit_category_id">
@@ -154,20 +154,62 @@
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
+function showFormError(formId, message) {
+    const form = document.getElementById(formId);
+    const existing = form.querySelector('.alert-danger');
+    if (existing) existing.remove();
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger mt-2';
+    alertDiv.textContent = message;
+    form.querySelector('.modal-body').prepend(alertDiv);
+}
+
+function clearFormError(formId) {
+    const form = document.getElementById(formId);
+    const existing = form.querySelector('.alert-danger');
+    if (existing) existing.remove();
+}
+
+function setButtonLoading(button, loading) {
+    if (loading) {
+        button.disabled = true;
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner-border spinner-border-sm me-1';
+        button.prepend(spinner);
+        const text = document.createTextNode('جارٍ الحفظ...');
+        button.append(text);
+    } else {
+        button.disabled = false;
+        const spinner = button.querySelector('.spinner-border');
+        if (spinner) spinner.remove();
+        button.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = 'حفظ'; });
+    }
+}
+
 // Create
 document.getElementById('createCategoryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const form = new FormData(this);
-    const response = await fetch('{{ route("admin.billing.feeCategories.store") }}', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': CSRF },
-        body: form
-    });
-    const data = await response.json();
-    if (data.success) {
-        location.reload();
-    } else {
-        alert(data.message);
+    const form = this;
+    const submitBtn = form.querySelector('[type="submit"]');
+    clearFormError('createCategoryForm');
+    setButtonLoading(submitBtn, true);
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF },
+            body: new FormData(form)
+        });
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            showFormError('createCategoryForm', data.message || 'حدث خطأ');
+        }
+    } catch (err) {
+        showFormError('createCategoryForm', 'حدث خطأ في الاتصال');
+    } finally {
+        setButtonLoading(submitBtn, false);
     }
 });
 
@@ -176,55 +218,85 @@ function editCategory(id, name, amount) {
     document.getElementById('edit_category_id').value = id;
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_amount').value = amount;
+    clearFormError('editCategoryForm');
     new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
 }
 
 // Update
 document.getElementById('editCategoryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const form = this;
+    const submitBtn = form.querySelector('[type="submit"]');
     const id = document.getElementById('edit_category_id').value;
-    const form = new FormData(this);
-    form.append('_method', 'PUT');
-    const response = await fetch('/admin/billing/fee-categories/' + id, {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': CSRF },
-        body: form
-    });
-    const data = await response.json();
-    if (data.success) {
-        location.reload();
-    } else {
-        alert(data.message);
+    clearFormError('editCategoryForm');
+
+    if (!id) {
+        showFormError('editCategoryForm', 'معرّف الفئة غير صالح');
+        return;
+    }
+
+    if (!form.action.includes('REPLACE_ID')) {
+        showFormError('editCategoryForm', 'خطأ في تكوين النموذج');
+        return;
+    }
+
+    const url = form.action.replace('REPLACE_ID', id);
+    setButtonLoading(submitBtn, true);
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF },
+            body: new FormData(form)
+        });
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            showFormError('editCategoryForm', data.message || 'حدث خطأ');
+        }
+    } catch (err) {
+        showFormError('editCategoryForm', 'حدث خطأ في الاتصال');
+    } finally {
+        setButtonLoading(submitBtn, false);
     }
 });
 
 // Toggle active
 async function toggleActive(id) {
     if (!confirm('هل أنت متأكد من تغيير حالة هذه الفئة؟')) return;
-    const response = await fetch('/admin/billing/fee-categories/' + id + '/toggle-active', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': CSRF }
-    });
-    const data = await response.json();
-    if (data.success) {
-        location.reload();
-    } else {
-        alert(data.message);
+    try {
+        const response = await fetch('/admin/billing/fee-categories/' + id + '/toggle-active', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF }
+        });
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'حدث خطأ');
+        }
+    } catch (err) {
+        alert('حدث خطأ في الاتصال');
     }
 }
 
 // Delete
 async function deleteCategory(id) {
     if (!confirm('هل أنت متأكد من حذف هذه الفئة؟')) return;
-    const response = await fetch('/admin/billing/fee-categories/' + id, {
-        method: 'DELETE',
-        headers: { 'X-CSRF-TOKEN': CSRF }
-    });
-    const data = await response.json();
-    if (data.success) {
-        location.reload();
-    } else {
-        alert(data.message);
+    try {
+        const response = await fetch('/admin/billing/fee-categories/' + id, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': CSRF }
+        });
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'حدث خطأ');
+        }
+    } catch (err) {
+        alert('حدث خطأ في الاتصال');
     }
 }
 </script>
