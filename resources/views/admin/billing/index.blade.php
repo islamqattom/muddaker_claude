@@ -15,7 +15,6 @@
 @section('content')
 <script>
 window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
-console.log('Students for bulk:', window.__STUDENTS_FOR_BULK__);
 </script>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -443,10 +442,14 @@ function renderStudentList(students) {
     const escapeHtml = (text) => text.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
     container.innerHTML = students.map(student =>
         '<div class="form-check">' +
-            '<input type="checkbox" class="form-check-input student-check" value="' + student.id + '" checked>' +
-            '<label class="form-check-label">' + escapeHtml(student.name) + '</label>' +
+            '<input type="checkbox" class="form-check-input student-check" value="' + student.id + '" id="student_' + student.id + '">' +
+            '<label class="form-check-label" for="student_' + student.id + '">' + escapeHtml(student.name) + '</label>' +
         '</div>'
     ).join('');
+    // Add change listeners to checkboxes
+    container.querySelectorAll('.student-check').forEach(cb => {
+        cb.addEventListener('change', updateBulkSummary);
+    });
     updateBulkSummary();
 }
 

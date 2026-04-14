@@ -58,7 +58,6 @@ class BillingController extends Controller
             ->select('students.id', 'users.name')
             ->get()
             ->map(fn($s) => ['id' => $s->id, 'name' => $s->name ?? 'غير معروف']);
-        \Log::info('Students for bulk query result', ['count' => $studentsForBulk->count()]);
 
         return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories', 'studentsForBulk'));
     }
