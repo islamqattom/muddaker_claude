@@ -150,7 +150,7 @@
     </div>
 </div>
 
-@section('script')
+@push('scripts')
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -300,4 +300,4 @@ async function deleteCategory(id) {
     }
 }
 </script>
-@endsection
+@endpush
