@@ -428,13 +428,20 @@ function openBulkCreateModal() {
 }
 
 async function loadAllStudentsForBulk() {
+    console.log('Loading students, cache:', allStudentsCache, 'window data:', window.__STUDENTS_FOR_BULK__);
     if (allStudentsCache) { renderStudentList(allStudentsCache); return; }
     allStudentsCache = window.__STUDENTS_FOR_BULK__ || [];
+    console.log('After load, cache:', allStudentsCache);
     renderStudentList(allStudentsCache);
 }
 
 function renderStudentList(students) {
+    console.log('Rendering students:', students);
     const container = document.getElementById('bulk_student_list');
+    if (!students || students.length === 0) {
+        container.innerHTML = '<div class="text-muted">لا يوجد طلاب</div>';
+        return;
+    }
     const escapeHtml = (text) => text.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
     container.innerHTML = students.map(student =>
         '<div class="form-check">' +
@@ -447,9 +454,13 @@ function renderStudentList(students) {
 
 function filterStudentList() {
     const searchInput = document.getElementById('bulk_student_search');
-    if (!searchInput) return;
+    if (!searchInput) {
+        console.error('Search input not found');
+        return;
+    }
     const searchTerm = searchInput.value.toLowerCase().trim();
     const items = document.querySelectorAll('#bulk_student_list > div');
+    console.log('Filtering:', searchTerm, 'Items found:', items.length);
     items.forEach(item => {
         const label = item.querySelector('label');
         const text = label ? label.textContent.toLowerCase() : '';
