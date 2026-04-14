@@ -53,11 +53,10 @@ class BillingController extends Controller
         $months = MonthlyFee::getMonthNames();
         $feeCategories = FeeCategory::active()->orderBy('name')->get();
 
-        $studentsForBulk = Student::whereNotNull('fee_category_id')
-            ->whereHas('feeCategory', fn($q) => $q->where('amount', '>', 0))
-            ->with('user')
+        $studentsForBulk = Student::with('user')
+            ->whereNotNull('fee_category_id')
             ->get()
-            ->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name]);
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name ?? 'غير معروف']);
 
         return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories', 'studentsForBulk'));
     }
