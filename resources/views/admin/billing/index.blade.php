@@ -14,8 +14,8 @@
 
 @section('content')
 <script>
-window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk->toArray() ?? []);
-console.log('Students for bulk:', @json($studentsForBulk->toArray() ?? []));
+window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
+console.log('Students for bulk:', window.__STUDENTS_FOR_BULK__);
 </script>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">

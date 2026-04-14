@@ -53,9 +53,9 @@ class BillingController extends Controller
         $months = MonthlyFee::getMonthNames();
         $feeCategories = FeeCategory::active()->orderBy('name')->get();
 
-        $studentsForBulk = Student::with('user')
-            ->get()
-            ->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name ?? 'غير معروف']);
+        $studentsForBulk = Student::with('user')->get()->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name ?? 'غير معروف']);
+
+        \Log::info('Students for bulk: ' . $studentsForBulk->count());
 
         return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories', 'studentsForBulk'));
     }
