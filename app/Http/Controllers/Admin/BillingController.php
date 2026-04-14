@@ -259,6 +259,88 @@ class BillingController extends Controller
         }
     }
 
+    public function createBulkUnpaid(Request $request)
+    {
+        $request->validate([
+            'year' => 'required|integer|min:2020|max:' . (now()->year + 1),
+            'month' => 'required|integer|min:1|max:12',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        $year = $request->year;
+        $month = $request->month;
+        $studentIds = $request->input('student_ids', []);
+
+        $studentsQuery = Student::with(['parents', 'feeCategory']);
+        if (!empty($studentIds)) {
+            $studentsQuery->whereIn('id', $studentIds);
+        }
+        $students = $studentsQuery->get();
+
+        if ($students->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'لم يتم العثور على طلاب'], 422);
+        }
+
+        try {
+            $result = ['created' => 0, 'skipped' => 0, 'noCategory' => 0, 'failed' => 0];
+
+            DB::transaction(function () use ($students, $year, $month, &$result) {
+                $existingKeys = MonthlyFee::forPeriod($year, $month)
+                    ->select('parent_id', 'student_id')
+                    ->get()
+                    ->mapWithKeys(fn($f) => [$f->parent_id . '-' . $f->student_id => true]);
+
+                foreach ($students as $student) {
+                    $feeAmount = $student->feeCategory?->amount ?? 0;
+                    if ($feeAmount <= 0) { $result['noCategory']++; continue; }
+
+                    foreach ($student->parents as $parent) {
+                        $key = $parent->id . '-' . $student->id;
+                        if (isset($existingKeys[$key])) { $result['skipped']++; continue; }
+
+                        try {
+                            MonthlyFee::create([
+                                'parent_id' => $parent->id,
+                                'student_id' => $student->id,
+                                'year' => $year,
+                                'month' => $month,
+                                'status' => MonthlyFee::STATUS_UNPAID,
+                                'fee_amount' => $feeAmount,
+                            ]);
+                            $result['created']++;
+                        } catch (\Exception $e) {
+                            $result['failed']++;
+                            Log::error('Failed to create bulk unpaid fee', [
+                                'parent_id' => $parent->id,
+                                'student_id' => $student->id,
+                                'year' => $year,
+                                'month' => $month,
+                                'error' => $e->getMessage(),
+                            ]);
+                        }
+                    }
+                }
+            });
+
+            $message = "تم إنشاء {$result['created']} سجل بنجاح";
+            if ($result['skipped'] > 0) $message .= " ({$result['skipped']} تم تخطيها - موجودة مسبقاً)";
+            if ($result['noCategory'] > 0) $message .= " ({$result['noCategory']} تم تخطيها - بدون فئة رسوم)";
+            if ($result['failed'] > 0) $message .= " ({$result['failed']} فشل)";
+
+            return response()->json(['success' => true, 'message' => $message, 'counts' => $result]);
+        } catch (\Exception $e) {
+            Log::error('Bulk unpaid fee creation failed', [
+                'admin_id' => Auth::id(),
+                'year' => $year,
+                'month' => $month,
+                'student_count' => $students->count(),
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء إنشاء السجلات'], 500);
+        }
+    }
+
     public function destroy(Request $request)
     {
         $request->validate([

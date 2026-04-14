@@ -43,6 +43,16 @@ class StudentController extends Controller
         return view('admin.students.create', compact('levels', 'supervisors', 'feeCategories'));
     }
 
+    public function listForBilling()
+    {
+        $students = Student::with('user')
+            ->whereNotNull('fee_category_id')
+            ->whereHas('feeCategory', fn($q) => $q->where('amount', '>', 0))
+            ->get()
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name]);
+        return response()->json(['students' => $students]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

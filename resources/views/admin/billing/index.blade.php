@@ -20,6 +20,9 @@
             <button type="button" class="btn btn-primary btn-sm" onclick="openAddPaymentModal()">
                 <i class="fas fa-plus me-1"></i>تسجيل دفعة سابقة
             </button>
+            <button type="button" class="btn btn-warning btn-sm" onclick="openBulkCreateModal()">
+                <i class="fas fa-layer-group me-1"></i>إنشاء رسوم غير مدفوعة
+            </button>
             <a href="{{ route('admin.billing.settings') }}" class="btn btn-outline-primary btn-sm">
                 <i class="fas fa-cog me-1"></i>إعدادات الفوترة
             </a>
@@ -217,6 +220,61 @@
     </div>
 </div>
 
+{{-- Bulk Create Unpaid Modal --}}
+<div class="modal fade" id="bulkCreateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إنشاء رسوم غير مدفوعة بالجملة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="bulkCreateForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">السنة</label>
+                            <select name="year" id="bulk_year" class="form-select" required>
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">الشهر</label>
+                            <select name="month" id="bulk_month" class="form-select" required>
+                                @foreach($months as $num => $name)
+                                    <option value="{{ $num }}">{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الطلاب</label>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="bulk_all_students" checked>
+                            <label class="form-check-label" for="bulk_all_students">جميع الطلاب</label>
+                        </div>
+                        <div id="bulk_student_search_container" style="display:none;">
+                            <input type="text" id="bulk_student_search" class="form-control mb-2" placeholder="ابحث عن طالب...">
+                            <div id="bulk_student_list" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+                            <div id="bulk_student_count" class="form-text text-muted mt-1"></div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info" id="bulk_summary" style="display:none;">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <span id="bulk_summary_text"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-warning">إنشاء السجلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 let addPaymentModal;
 
@@ -230,6 +288,7 @@ function resetStudentSelect(select, message) {
 
 document.addEventListener('DOMContentLoaded', function() {
     addPaymentModal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
+    bulkCreateModal = new bootstrap.Modal(document.getElementById('bulkCreateModal'));
 
     document.getElementById('addPaymentForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -285,6 +344,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 resetStudentSelect(studentSelect, 'حدث خطأ');
             });
     });
+
+    document.getElementById('bulkCreateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitBulkCreate();
+    });
+
+    document.getElementById('bulk_all_students').addEventListener('change', function() {
+        const searchContainer = document.getElementById('bulk_student_search_container');
+        if (this.checked) {
+            searchContainer.style.display = 'none';
+        } else {
+            searchContainer.style.display = 'block';
+            loadAllStudentsForBulk();
+        }
+        updateBulkSummary();
+    });
+
+    document.getElementById('bulk_year').addEventListener('change', updateBulkSummary);
+    document.getElementById('bulk_month').addEventListener('change', updateBulkSummary);
+    document.getElementById('bulk_student_search').addEventListener('input', filterStudentList);
 });
 
 function openAddPaymentModal() {
@@ -330,6 +409,99 @@ async function submitAddPayment() {
             ? 'انتهت الجلسة، يرجى تحديث الصفحة والمحاولة مرة أخرى'
             : 'حدث خطأ أثناء حفظ البيانات');
     }
+}
+
+let allStudentsCache = null;
+
+function openBulkCreateModal() {
+    document.getElementById('bulkCreateForm').reset();
+    document.getElementById('bulk_all_students').checked = true;
+    document.getElementById('bulk_student_search_container').style.display = 'none';
+    document.getElementById('bulk_student_list').innerHTML = '';
+    document.getElementById('bulk_student_count').textContent = '';
+    document.getElementById('bulk_summary').style.display = 'none';
+    allStudentsCache = null;
+    bulkCreateModal.show();
+}
+
+async function loadAllStudentsForBulk() {
+    if (allStudentsCache) { renderStudentList(allStudentsCache); return; }
+    try {
+        const response = await fetch('{{ route('admin.students.list') }}', {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        });
+        if (!response.ok) throw new Error('Server error: ' + response.status);
+        const data = await response.json();
+        allStudentsCache = data.students || [];
+        renderStudentList(allStudentsCache);
+    } catch (error) {
+        console.error('Error loading students:', error);
+        document.getElementById('bulk_student_list').innerHTML =
+            '<div class="text-danger">فشل تحميل قائمة الطلاب</div>';
+    }
+}
+
+function renderStudentList(students) {
+    const container = document.getElementById('bulk_student_list');
+    const escapeHtml = (text) => text.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
+    container.innerHTML = students.map(student =>
+        '<div class="form-check">' +
+            '<input type="checkbox" class="form-check-input student-check" value="' + student.id + '" checked>' +
+            '<label class="form-check-label">' + escapeHtml(student.name) + '</label>' +
+        '</div>'
+    ).join('');
+    updateBulkSummary();
+}
+
+function filterStudentList() {
+    const searchTerm = document.getElementById('bulk_student_search').value.toLowerCase();
+    const checkboxes = document.querySelectorAll('#bulk_student_list .student-check');
+    checkboxes.forEach((cb) => {
+        const label = cb.nextElementSibling.textContent.toLowerCase();
+        cb.closest('div').style.display = label.includes(searchTerm) ? 'block' : 'none';
+    });
+}
+
+function updateBulkSummary() {
+    const year = document.getElementById('bulk_year').value;
+    const month = document.getElementById('bulk_month').value;
+    const monthName = document.querySelector('#bulk_month option[value="' + month + '"]').textContent;
+    const isAllStudents = document.getElementById('bulk_all_students').checked;
+    const checkedCount = document.querySelectorAll('#bulk_student_list .student-check:checked').length;
+    const totalCount = allStudentsCache ? allStudentsCache.length : 0;
+    const count = isAllStudents ? totalCount : checkedCount;
+    document.getElementById('bulk_summary_text').textContent =
+        'سيتم إنشاء سجلات لـ ' + count + ' طالب لشهر ' + monthName + '/' + year;
+    document.getElementById('bulk_summary').style.display = 'block';
+}
+
+async function submitBulkCreate() {
+    const formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('year', document.getElementById('bulk_year').value);
+    formData.append('month', document.getElementById('bulk_month').value);
+
+    if (!document.getElementById('bulk_all_students').checked) {
+        const selectedIds = Array.from(document.querySelectorAll('#bulk_student_list .student-check:checked')).map(cb => cb.value);
+        if (selectedIds.length === 0) {
+            alert('الرجاء اختيار طالب واحد على الأقل');
+            return;
+        }
+        selectedIds.forEach(id => formData.append('student_ids[]', id));
+    }
+
+    if (!confirm('هل أنت متأكد من إنشاء سجلات غير مدفوعة بالجملة؟')) return;
+
+    try {
+        const response = await fetch('{{ route('admin.billing.createBulkUnpaid') }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: formData
+        });
+        const data = await response.json();
+        if (data.success) { bulkCreateModal.hide(); alert(data.message); location.reload(); }
+        else { alert(data.message || 'حدث خطأ'); }
+    } catch (error) { alert('حدث خطأ أثناء إنشاء السجلات'); }
 }
 
 async function markPaid(feeId) {

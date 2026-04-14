@@ -39,6 +39,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Students
     Route::resource('students', Admin\StudentController::class);
+    Route::get('/students/list', [Admin\StudentController::class, 'listForBilling'])->name('students.list');
 
     // Supervisors
     Route::resource('supervisors', Admin\SupervisorController::class);
@@ -93,6 +94,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::post('/mark-paid', [Admin\BillingController::class, 'markPaid'])->name('markPaid');
         Route::post('/mark-paid-bulk', [Admin\BillingController::class, 'markPaidBulk'])->name('markPaidBulk');
         Route::post('/record-payment', [Admin\BillingController::class, 'recordPayment'])->name('recordPayment');
+        Route::post('/create-bulk-unpaid', [Admin\BillingController::class, 'createBulkUnpaid'])->name('createBulkUnpaid');
         Route::delete('/delete', [Admin\BillingController::class, 'destroy'])->name('deleteFee');
         Route::get('/students-for-parent/{parentId}', [Admin\BillingController::class, 'getStudentsForParent'])->name('studentsForParent');
         Route::get('/history', [Admin\BillingController::class, 'history'])->name('history');
