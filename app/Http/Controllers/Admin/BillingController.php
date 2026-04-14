@@ -9,8 +9,8 @@ use App\Models\Student;
 use App\Models\FeeCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class BillingController extends Controller
 {
@@ -53,8 +53,12 @@ class BillingController extends Controller
         $months = MonthlyFee::getMonthNames();
         $feeCategories = FeeCategory::active()->orderBy('name')->get();
 
-        $studentsForBulk = Student::with('user')->get()->map(fn($s) => ['id' => $s->id, 'name' => $s->user->name ?? 'غير معروف']);
-        \Log::info('Students for bulk query result', ['count' => $studentsForBulk->count(), 'students' => $studentsForBulk->toArray()]);
+        $studentsForBulk = DB::table('students')
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->select('students.id', 'users.name')
+            ->get()
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->name ?? 'غير معروف']);
+        \Log::info('Students for bulk query result', ['count' => $studentsForBulk->count()]);
 
         return view('admin.billing.index', compact('fees', 'parents', 'years', 'months', 'feeCategories', 'studentsForBulk'));
     }
