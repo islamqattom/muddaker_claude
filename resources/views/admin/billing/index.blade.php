@@ -446,11 +446,14 @@ function renderStudentList(students) {
 }
 
 function filterStudentList() {
-    const searchTerm = document.getElementById('bulk_student_search').value.toLowerCase();
-    const checkboxes = document.querySelectorAll('#bulk_student_list .student-check');
-    checkboxes.forEach((cb) => {
-        const label = cb.nextElementSibling.textContent.toLowerCase();
-        cb.closest('div').style.display = label.includes(searchTerm) ? 'block' : 'none';
+    const searchInput = document.getElementById('bulk_student_search');
+    if (!searchInput) return;
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const items = document.querySelectorAll('#bulk_student_list > div');
+    items.forEach(item => {
+        const label = item.querySelector('label');
+        const text = label ? label.textContent.toLowerCase() : '';
+        item.style.display = text.includes(searchTerm) ? 'block' : 'none';
     });
 }
 
