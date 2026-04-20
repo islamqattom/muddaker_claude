@@ -361,10 +361,7 @@
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="student_id" id="notRecitateStudentId">
-                    <div class="mb-3">
-                        <label class="form-label">التاريخ</label>
-                        <input type="date" name="session_date" class="form-control" value="{{ date('Y-m-d') }}" required>
-                    </div>
+                    <input type="hidden" name="session_date" id="notRecitateSessionDate">
                     <div class="mb-3">
                         <label class="form-label">السبب (اختياري)</label>
                         <textarea name="reason" class="form-control" rows="3" placeholder="أدخل سبب عدم التسميع"></textarea>
@@ -849,6 +846,7 @@ function startSession() {
     } else if (type === 'not_recitate') {
         // Show modal for not_recitate
         document.getElementById('notRecitateStudentId').value = studentId;
+        document.getElementById('notRecitateSessionDate').value = sessionDate;
         const modal = new bootstrap.Modal(document.getElementById('notRecitateModal'));
         modal.show();
         return;
