@@ -463,6 +463,7 @@ function fetchAttendance() {
     const fromDate = document.getElementById('attendanceFromDate').value;
     const url = '{{ route("supervisor.warnings.attendance", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
     const tableContainer = document.getElementById('attendanceTableContainer');
+    if (!tableContainer) return;
     const originalContent = tableContainer.innerHTML;
     tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
@@ -482,6 +483,9 @@ function fetchAttendance() {
             const isEmpty = Array.isArray(data) && data.length === 0;
             if (isEmpty) toastr.info('لا توجد سجلات حضور للفترة المحددة');
             attendanceData = isEmpty ? [] : (Array.isArray(data) ? data : []);
+            const attendanceSection = document.getElementById('attendanceDataSection');
+            if (attendanceSection) attendanceSection.style.display = 'block';
+            tableContainer.innerHTML = originalContent;
             renderAttendanceTable();
             updateHiddenInputs();
         })
@@ -568,6 +572,7 @@ function fetchRecitations() {
     const fromDate = document.getElementById('recitationFromDate').value;
     const url = '{{ route("supervisor.warnings.recitations", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
     const tableContainer = document.getElementById('recitationTableContainer');
+    if (!tableContainer) return;
     const originalContent = tableContainer.innerHTML;
     tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
@@ -587,6 +592,9 @@ function fetchRecitations() {
             const isEmpty = Array.isArray(data) && data.length === 0;
             if (isEmpty) toastr.info('لا توجد سجلات تسميع للفترة المحددة');
             recitationData = isEmpty ? [] : (Array.isArray(data) ? data : []);
+            const recitationSection = document.getElementById('recitationDataSection');
+            if (recitationSection) recitationSection.style.display = 'block';
+            tableContainer.innerHTML = originalContent;
             renderRecitationTable();
             updateHiddenInputs();
         })
