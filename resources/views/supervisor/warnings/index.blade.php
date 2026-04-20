@@ -16,10 +16,11 @@
 @section('content')
 <div class="card mb-4">
     <div class="card-body">
+        <form method="GET" action="{{ route('supervisor.warnings.index') }}">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label">اختر الطالب</label>
-                <select class="form-select" onchange="window.location='{{ route('supervisor.warnings.index') }}?student_id='+this.value">
+                <select name="student_id" class="form-select">
                     <option value="">جميع الطلاب</option>
                     @foreach($students as $student)
                         <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
@@ -30,19 +31,25 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">نوع الإنذار</label>
-                <select class="form-select" onchange="window.location='{{ route('supervisor.warnings.index') }}?type='+this.value+'&student_id={{ request('student_id') }}'">
+                <select name="type" class="form-select">
                     <option value="">جميع الأنواع</option>
                     <option value="attendance" {{ request('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
                     <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>إنذار تسميع</option>
                     <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>إنذار عام</option>
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-search me-1"></i>بحث
+                </button>
+            </div>
+            <div class="col-md-auto ms-auto">
                 <a href="{{ route('supervisor.warnings.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i>إنذار جديد
                 </a>
             </div>
         </div>
+        </form>
     </div>
 </div>
 
