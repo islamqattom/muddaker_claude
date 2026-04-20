@@ -57,8 +57,7 @@
                         </div>
                     </div>
 
-                    <!-- Date -->
-                    <div class="row g-3 mt-2">
+                    <div class="row mt-2">
                         <div class="col-md-4">
                             <label class="form-label">تاريخ الإنذار <span class="text-danger">*</span></label>
                             <input type="date" name="issue_date" class="form-control @error('issue_date') is-invalid @enderror" value="{{ old('issue_date', date('Y-m-d')) }}" required>
@@ -77,17 +76,17 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-6">
+                        <div class="col-sm-6">
                             <label class="form-label">بدء من تاريخ</label>
                             <input type="date" class="form-control" id="attendanceFromDate" value="{{ date('Y-m-01') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-sm-auto">
                             <button type="button" class="btn btn-warning" onclick="fetchAttendance()">
                                 <i class="fas fa-search me-1"></i>بحث
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3" id="attendanceTableContainer" style="display: none;">
+                    <div class="mt-3 table-responsive" id="attendanceTableContainer" style="display: none;">
                         <table class="table table-sm table-bordered" id="attendanceTable">
                             <thead class="table-light">
                                 <tr>
@@ -120,17 +119,17 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-6">
+                        <div class="col-sm-6">
                             <label class="form-label">بدء من تاريخ</label>
                             <input type="date" class="form-control" id="recitationFromDate" value="{{ date('Y-m-01') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-sm-auto">
                             <button type="button" class="btn btn-info" onclick="fetchRecitations()">
                                 <i class="fas fa-search me-1"></i>بحث
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3" id="recitationTableContainer" style="display: none;">
+                    <div class="mt-3 table-responsive" id="recitationTableContainer" style="display: none;">
                         <table class="table table-sm table-bordered" id="recitationTable">
                             <thead class="table-light">
                                 <tr>
