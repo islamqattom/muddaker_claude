@@ -479,14 +479,16 @@ function fetchAttendance() {
                 toastr.error(data.error);
                 return;
             }
-            attendanceData = data;
+            const isEmpty = Array.isArray(data) && data.length === 0;
+            if (isEmpty) toastr.info('لا توجد سجلات حضور للفترة المحددة');
+            attendanceData = isEmpty ? [] : (Array.isArray(data) ? data : []);
             renderAttendanceTable();
             updateHiddenInputs();
         })
         .catch(error => {
             console.error('Error fetching attendance:', error);
             tableContainer.innerHTML = originalContent;
-            toastr.error('حدث خطأ أثناء جلب بيانات الحضور');
+            toastr.error('حدث خطأ أثناء جلب بيانات الحضور. يرجى المحاولة مرة أخرى.');
         });
 }
 
@@ -495,6 +497,9 @@ function renderAttendanceTable() {
     const tbody = document.getElementById('attendanceTableBody');
     const container = document.getElementById('attendanceTableContainer');
     const noDataMsg = document.getElementById('noAttendanceMessage');
+
+    // Guard: if elements don't exist (e.g., hidden section not rendered), skip
+    if (!tbody || !container || !noDataMsg) return;
 
     tbody.innerHTML = '';
 
@@ -579,14 +584,16 @@ function fetchRecitations() {
                 toastr.error(data.error);
                 return;
             }
-            recitationData = data;
+            const isEmpty = Array.isArray(data) && data.length === 0;
+            if (isEmpty) toastr.info('لا توجد سجلات تسميع للفترة المحددة');
+            recitationData = isEmpty ? [] : (Array.isArray(data) ? data : []);
             renderRecitationTable();
             updateHiddenInputs();
         })
         .catch(error => {
             console.error('Error fetching recitations:', error);
             tableContainer.innerHTML = originalContent;
-            toastr.error('حدث خطأ أثناء جلب بيانات التسميع');
+            toastr.error('حدث خطأ أثناء جلب بيانات التسميع. يرجى المحاولة مرة أخرى.');
         });
 }
 
@@ -595,6 +602,9 @@ function renderRecitationTable() {
     const tbody = document.getElementById('recitationTableBody');
     const container = document.getElementById('recitationTableContainer');
     const noDataMsg = document.getElementById('noRecitationMessage');
+
+    // Guard: if elements don't exist (e.g., hidden section not rendered), skip
+    if (!tbody || !container || !noDataMsg) return;
 
     tbody.innerHTML = '';
 

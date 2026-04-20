@@ -138,7 +138,7 @@ class WarningController extends Controller
             $attendances = $attendances->map(function($record) {
                 return [
                     'id' => $record->id,
-                    'day' => $record->day,
+                    'day' => $record->day ?? 'غير محدد',
                     'date' => $record->date->toDateString(), // Use toDateString to avoid timezone issues
                     'status' => $record->status,
                     'arrival_time' => $record->arrival_time ? $this->convertTo12HourFormat($record->arrival_time) : null,
@@ -148,7 +148,7 @@ class WarningController extends Controller
 
             return response()->json($attendances);
         } catch (\Exception $e) {
-            \Log::error('Failed to fetch attendance: ' . $e->getMessage());
+            \Log::error('Failed to fetch attendance for student ' . $student->id . ': ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch attendance data'], 500);
         }
     }
@@ -158,16 +158,18 @@ class WarningController extends Controller
      */
     private function convertTo12HourFormat($time)
     {
-        if (!$time) return null;
-        $dateTime = \Carbon\Carbon::createFromFormat('H:i:s', $time);
-        if ($dateTime) {
-            return $dateTime->format('h:i A');
+        if (!$time || !is_string($time)) return null;
+
+        // Try common formats
+        foreach (['H:i:s', 'H:i', 'h:i:s A', 'h:i A', 'H:i:s.u'] as $format) {
+            try {
+                $dt = \Carbon\Carbon::createFromFormat($format, $time);
+                if ($dt) return $dt->format('h:i A');
+            } catch (\Exception $e) {
+                continue;
+            }
         }
-        // Try without seconds
-        $dateTime = \Carbon\Carbon::createFromFormat('H:i', $time);
-        if ($dateTime) {
-            return $dateTime->format('h:i A');
-        }
+
         return $time;
     }
 
@@ -212,16 +214,16 @@ class WarningController extends Controller
 
             // Transform to add computed fields
             $recitations = $recitations->map(function($session) {
-                $passedPages = $session->pages->where('is_passed', true)->count();
-                $failedPages = $session->pages->where('is_passed', false)->count();
+                $passedPages = $session->pages ? $session->pages->where('is_passed', true)->count() : 0;
+                $failedPages = $session->pages ? $session->pages->where('is_passed', false)->count() : 0;
 
                 return [
                     'id' => $session->id,
-                    'day' => $session->day,
+                    'day' => $session->day ?? 'غير محدد',
                     'session_date' => $session->session_date->toDateString(), // Use toDateString to avoid timezone issues
                     'type' => $session->type,
                     'status' => $session->status,
-                    'total_pages' => $session->total_pages,
+                    'total_pages' => $session->total_pages ?? 0,
                     'passed_pages' => $passedPages,
                     'failed_pages' => $failedPages,
                     'notes' => $session->notes,
@@ -230,7 +232,7 @@ class WarningController extends Controller
 
             return response()->json($recitations);
         } catch (\Exception $e) {
-            \Log::error('Failed to fetch recitations: ' . $e->getMessage());
+            \Log::error('Failed to fetch recitations for student ' . $student->id . ': ' . $e->getMessage());
             return response()->json(['error' => 'Failed to fetch recitation data'], 500);
         }
     }
