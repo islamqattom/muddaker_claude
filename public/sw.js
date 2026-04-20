@@ -77,6 +77,7 @@ self.addEventListener('push', event => {
         tag: data.tag || 'quran-notification',
         requireInteraction: data.requireInteraction || false,
         data: { url: data.link },
+        vibrate: [200, 100, 200],
     };
 
     event.waitUntil(

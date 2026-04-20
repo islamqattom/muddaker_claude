@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Warning, Student, Attendance, RecitationSession, Notification};
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -95,15 +96,19 @@ class WarningController extends Controller
 
         // Notify parents (if notifications are enabled)
         if (config('app.enable_notifications', true)) {
-            $student = Student::with('parents.user')->findOrFail($request->student_id);
+            $student->load('parents.user');
+            $notificationService = app(NotificationService::class);
+            $warningUrl = route('parent.warnings.show', $warning->id);
             foreach ($student->parents as $parent) {
-                Notification::create([
-                    'user_id' => $parent->user_id,
-                    'title' => 'إنذار جديد',
-                    'message' => "صدر إنذار جديد بحق ابنكم/ابنتكم {$student->user->name}",
-                    'type' => 'warning',
-                    'link' => route('parent.warnings.show', $warning->id),
-                ]);
+                if ($parent->user) {
+                    $notificationService->sendToUser(
+                        $parent->user,
+                        'warning',
+                        'إنذار جديد',
+                        "صدر إنذار جديد بحق ابنكم/ابنتكم {$student->user->name}",
+                        $warningUrl
+                    );
+                }
             }
         }
 
