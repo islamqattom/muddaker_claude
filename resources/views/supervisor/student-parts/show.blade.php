@@ -79,8 +79,8 @@
                                     <button class="btn btn-sm btn-primary edit-btn"
                                         data-part="{{ $part->part_number }}"
                                         data-record='@json($record)'
-                                        data-toggle="modal"
-                                        data-target="#editModal">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </td>
@@ -102,7 +102,7 @@
                 @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Part <span id="modalPartNumber"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="part_number" id="editPartNumber">
@@ -142,7 +142,7 @@
                     <button type="button" class="btn btn-outline-secondary" id="resetBtn">
                         <i class="fas fa-undo"></i> Reset to Auto
                     </button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </form>
         </div>
