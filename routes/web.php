@@ -191,7 +191,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Student Parts Record
     Route::get('/student-parts', [StudentPartRecordController::class, 'index'])->name('student-parts.index');
     Route::get('/student-parts/{studentId}', [StudentPartRecordController::class, 'show'])->name('student-parts.show');
-    Route::post('/student-parts/{studentId}/{partNumber}', [StudentPartRecordController::class, 'update'])->name('student-parts.update');
+    Route::put('/student-parts/{studentId}/{partNumber}', [StudentPartRecordController::class, 'update'])->name('student-parts.update');
     Route::post('/student-parts/{studentId}/{partNumber}/reset', [StudentPartRecordController::class, 'resetToAuto'])->name('student-parts.reset');
 });
 
