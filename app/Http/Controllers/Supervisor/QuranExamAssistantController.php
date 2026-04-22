@@ -16,8 +16,12 @@ class QuranExamAssistantController extends Controller
     public function index()
     {
         $surahs = Surah::orderBy('surah_number')->get();
+        $students = \App\Models\Student::where('supervisor_id', auth()->id())
+            ->with('level')
+            ->orderBy('name')
+            ->get();
 
-        return view('supervisor.exam-assistant.index', compact('surahs'));
+        return view('supervisor.exam-assistant.index', compact('surahs', 'students'));
     }
 
     public function generateQuestion(Request $request)
@@ -42,6 +46,8 @@ class QuranExamAssistantController extends Controller
 
         return response()->json([
             'success' => true,
+            'surah_id' => $ayah->surah_id,
+            'ayah_id' => $ayah->id,
             'ayah' => [
                 'id' => $ayah->id,
                 'text' => $ayah->text,
@@ -52,6 +58,7 @@ class QuranExamAssistantController extends Controller
                 'juz_number' => $ayah->juz_number,
             ],
             'reference' => "سورة {$ayah->surah->name_ar} - آية {$ayah->ayah_number} - صفحة {$ayah->page_number}",
+            'page_html' => $ayah->page_html,
         ]);
     }
 

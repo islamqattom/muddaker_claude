@@ -105,6 +105,11 @@ class Student extends Model
         return $this->hasMany(RecitationReview::class);
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
+    }
+
     public function pronunciationAttempts()
     {
         return $this->hasMany(PronunciationAttempt::class);

@@ -7,6 +7,7 @@ use App\Http\Controllers\Student\BookmarkController;
 use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\AchievementController;
 use App\Http\Controllers\Student\LiveRecitationController;
+use App\Http\Controllers\Api\ExamController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -52,4 +53,14 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/live-recita
     Route::post('/error', [LiveRecitationController::class, 'recordError']);
     Route::post('/progress', [LiveRecitationController::class, 'updateProgress']);
     Route::get('/session/{id}/report', [LiveRecitationController::class, 'getReport']);
+});
+
+// Exam API
+Route::middleware('auth')->group(function () {
+    Route::post('/exam/start', [ExamController::class, 'start']);
+    Route::post('/exam/add-question', [ExamController::class, 'addQuestion']);
+    Route::put('/exam/questions/{id}', [ExamController::class, 'updateQuestion']);
+    Route::post('/exam/{id}/finish', [ExamController::class, 'finish']);
+    Route::get('/exam/{examId}/questions', [ExamController::class, 'getQuestions']);
+    Route::get('/exam/in-progress', [ExamController::class, 'getInProgress']);
 });
