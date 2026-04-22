@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Parts Record — ' . $student->user->name)
+@section('title', 'سجل أجزاء الطالب — ' . $student->user->name)
 @section('page-title', 'أجزاء الطالب')
 @section('role-label', 'مشرف')
 
@@ -27,9 +27,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-book-quran"></i> Parts Record — {{ $student->user->name }}</h2>
+        <h2><i class="fas fa-book-quran"></i> سجل أجزاء الطالب — {{ $student->user->name }}</h2>
         <a href="{{ route('supervisor.student-parts.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back
+            <i class="fas fa-arrow-right"></i> رجوع
         </a>
     </div>
 
@@ -44,13 +44,13 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Part Name</th>
-                            <th>Status</th>
-                            <th>Errors</th>
-                            <th>Hesitations</th>
-                            <th>Score</th>
-                            <th>Last Recitation</th>
-                            <th>Actions</th>
+                            <th>اسم الجزء</th>
+                            <th>الحالة</th>
+                            <th>الأخطاء</th>
+                            <th>التلعثم</th>
+                            <th>الدرجة</th>
+                            <th>آخر تسميع</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,7 +68,7 @@
                                         {{ $isCompleted ? 'مُكمَل' : 'غير مُكمَل' }}
                                     </span>
                                     @if($isOverride)
-                                        <span class="override-badge">Manual</span>
+                                        <span class="override-badge">يدوي</span>
                                     @endif
                                 </td>
                                 <td>{{ $record ? $record->total_errors : '-' }}</td>
@@ -101,48 +101,48 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Part <span id="modalPartNumber"></span></h5>
+                    <h5 class="modal-title">تعديل الجزء <span id="modalPartNumber"></span></h5>
                     <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="part_number" id="editPartNumber">
 
                     <div class="form-group">
-                        <label><strong>Status</strong></label>
+                        <label><strong>الحالة</strong></label>
                         <select name="is_completed" id="editIsCompleted" class="form-control">
-                            <option value="1">مُكمَل (Completed)</option>
-                            <option value="0">غير مُكمَل (Not Completed)</option>
+                            <option value="1">مُكمَل</option>
+                            <option value="0">غير مُكمَل</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label><strong>Total Errors</strong></label>
+                        <label><strong>إجمالي الأخطاء</strong></label>
                         <input type="number" name="total_errors" id="editErrors" class="form-control" min="0">
                     </div>
 
                     <div class="form-group">
-                        <label><strong>Total Hesitations</strong></label>
+                        <label><strong>إجمالي التلعثم</strong></label>
                         <input type="number" name="total_hesitations" id="editHesitations" class="form-control" min="0">
                     </div>
 
                     <div class="form-group">
-                        <label><strong>Score (%)</strong></label>
+                        <label><strong>الدرجة (%)</strong></label>
                         <input type="number" name="total_score" id="editScore" class="form-control" min="0" max="100" step="0.01">
                     </div>
 
                     <div class="form-group">
-                        <label><strong>Last Recitation Date</strong></label>
+                        <label><strong>تاريخ آخر تسميع</strong></label>
                         <input type="date" name="last_recitation_date" id="editDate" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> Save
+                        <i class="fas fa-save"></i> حفظ
                     </button>
                     <button type="button" class="btn btn-outline-secondary" id="resetBtn">
-                        <i class="fas fa-undo"></i> Reset to Auto
+                        <i class="fas fa-undo"></i> إعادة للاحتساب التلقائي
                     </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 </div>
             </form>
         </div>
@@ -169,7 +169,7 @@ $(function() {
         $('#editForm').attr('action', '/supervisor/student-parts/' + studentId + '/' + part);
 
         $('#resetBtn').off('click').on('click', function() {
-            if (confirm('Reset this part to auto-calculated values?')) {
+            if (confirm('هل تريد إعادة الجزء للاحتساب التلقائي؟')) {
                 var form = $('<form>').attr('method', 'POST')
                     .attr('action', '/supervisor/student-parts/' + studentId + '/' + part + '/reset');
                 form.append($('<input>').attr({name: '_token', value: $('meta[name="csrf-token"]').attr('content')}));
