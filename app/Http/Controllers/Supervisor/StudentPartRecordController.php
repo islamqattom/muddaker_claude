@@ -30,19 +30,9 @@ class StudentPartRecordController extends Controller
         $student = Student::with(['user', 'level', 'supervisor'])->findOrFail($studentId);
         $this->authorizeStudent($student);
 
-        $existingRecords = StudentPartRecord::where('student_id', $studentId)->get()->keyBy('part_number');
-
-        // Only include sard (recitation) and mafsil sessions
-        $allSessions = RecitationSession::where('student_id', $studentId)
-            ->whereIn('type', ['recitation', 'mafsil'])
-            ->where('status', 'passed')
-            ->with('part')
-            ->get();
-
-        $this->autoFillRecords($student, $existingRecords, $allSessions);
-
+        $allSessions = $this->getSessionsForStudent($studentId);
+        $records = $this->autoFillRecords($student, $allSessions);
         $parts = QuranPart::orderBy('part_number')->get();
-        $records = StudentPartRecord::where('student_id', $studentId)->get()->keyBy('part_number');
 
         return view('supervisor.student-parts.show', [
             'student' => $student,
@@ -99,14 +89,15 @@ class StudentPartRecordController extends Controller
     private function getSessionsForStudent(int $studentId): \Illuminate\Database\Eloquent\Collection
     {
         return RecitationSession::where('student_id', $studentId)
-            ->whereIn('type', ['recitation', 'mafsil'])
-            ->where('status', 'passed')
+            ->whereIn('type', [RecitationSession::TYPE_RECITATION, RecitationSession::TYPE_MAFSIL])
+            ->where('status', RecitationSession::STATUS_PASSED)
             ->with('part')
             ->get();
     }
 
-    private function autoFillRecords(Student $student, $existingRecords, $allSessions): void
+    private function autoFillRecords(Student $student, $allSessions): \Illuminate\Support\Collection
     {
+        $existingRecords = StudentPartRecord::where('student_id', $student->id)->get()->keyBy('part_number');
         $partsToFill = [];
 
         foreach (range(1, 30) as $partNumber) {
@@ -137,6 +128,8 @@ class StudentPartRecordController extends Controller
                 $data
             );
         }
+
+        return StudentPartRecord::where('student_id', $student->id)->get()->keyBy('part_number');
     }
 
     private function calculatePartRecord(Student $student, int $partNumber, $allSessions): array
