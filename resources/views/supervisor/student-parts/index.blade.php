@@ -3,6 +3,7 @@
 @section('title', 'سجل أجزاء الطالب')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <style>
     .student-selector-card {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -66,6 +67,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(function() {
     $('#studentSelect').select2({
