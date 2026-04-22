@@ -21,18 +21,20 @@ class StudentPartRecordController extends Controller
     public function show($studentId)
     {
         $student = Student::with(['user', 'level', 'supervisor'])->findOrFail($studentId);
+        $this->authorizeStudent($student);
 
-        if ($student->supervisor_id !== Auth::id()) {
-            abort(403);
-        }
+        $existingRecords = StudentPartRecord::where('student_id', $studentId)->get()->keyBy('part_number');
 
-        $this->autoFillRecords($student);
+        $allSessions = RecitationSession::where('student_id', $studentId)
+            ->whereIn('type', ['new_memorization', 'review'])
+            ->where('status', 'passed')
+            ->with('part')
+            ->get();
+
+        $this->autoFillRecords($student, $existingRecords, $allSessions);
 
         $parts = QuranPart::orderBy('part_number')->get();
-
-        $records = StudentPartRecord::where('student_id', $studentId)
-            ->get()
-            ->keyBy('part_number');
+        $records = StudentPartRecord::where('student_id', $studentId)->get()->keyBy('part_number');
 
         return view('supervisor.student-parts.show', [
             'student' => $student,
@@ -44,9 +46,7 @@ class StudentPartRecordController extends Controller
     public function update(Request $request, $studentId, $partNumber)
     {
         $student = Student::findOrFail($studentId);
-        if ($student->supervisor_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorizeStudent($student);
 
         $validated = $request->validate([
             'is_completed' => 'boolean',
@@ -69,60 +69,71 @@ class StudentPartRecordController extends Controller
     public function resetToAuto($studentId, $partNumber)
     {
         $student = Student::findOrFail($studentId);
-        if ($student->supervisor_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorizeStudent($student);
 
-        DB::transaction(function () use ($studentId, $partNumber, $student) {
-            StudentPartRecord::where('student_id', $studentId)
-                ->where('part_number', $partNumber)
-                ->delete();
+        $calculated = $this->calculatePartRecord($student, $partNumber, $this->getSessionsForStudent($studentId));
 
-            $calculated = $this->calculatePartRecord($student, $partNumber);
-
-            StudentPartRecord::create(array_merge($calculated, [
-                'student_id' => $studentId,
-                'part_number' => $partNumber,
-            ]));
-        });
+        StudentPartRecord::updateOrCreate(
+            ['student_id' => $studentId, 'part_number' => $partNumber],
+            array_merge($calculated, ['is_manual_override' => false])
+        );
 
         return redirect()->back()->with('success', 'Part record reset to auto-calculated.');
     }
 
-    private function autoFillRecords(Student $student): void
+    private function authorizeStudent(Student $student): void
     {
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+    }
+
+    private function getSessionsForStudent(int $studentId): \Illuminate\Database\Eloquent\Collection
+    {
+        return RecitationSession::where('student_id', $studentId)
+            ->whereIn('type', ['new_memorization', 'review'])
+            ->where('status', 'passed')
+            ->with('part')
+            ->get();
+    }
+
+    private function autoFillRecords(Student $student, $existingRecords, $allSessions): void
+    {
+        $partsToFill = [];
+
         foreach (range(1, 30) as $partNumber) {
-            $existing = StudentPartRecord::where('student_id', $student->id)
-                ->where('part_number', $partNumber)
-                ->first();
+            $existing = $existingRecords->get($partNumber);
 
             if ($existing && $existing->is_manual_override) {
                 continue;
             }
 
-            $calculated = $this->calculatePartRecord($student, $partNumber);
+            $calculated = $this->calculatePartRecord($student, $partNumber, $allSessions);
 
+            if ($existing) {
+                $isDirty = $existing->total_errors != $calculated['total_errors']
+                    || $existing->total_hesitations != $calculated['total_hesitations']
+                    || $existing->total_score != $calculated['total_score']
+                    || $existing->is_completed != $calculated['is_completed'];
+                if ($isDirty) {
+                    $partsToFill[$partNumber] = $calculated;
+                }
+            } else {
+                $partsToFill[$partNumber] = $calculated;
+            }
+        }
+
+        foreach ($partsToFill as $partNumber => $data) {
             StudentPartRecord::updateOrCreate(
                 ['student_id' => $student->id, 'part_number' => $partNumber],
-                $calculated
+                $data
             );
         }
     }
 
-    private function calculatePartRecord(Student $student, int $partNumber): array
+    private function calculatePartRecord(Student $student, int $partNumber, $allSessions): array
     {
-        $sessions = RecitationSession::where('student_id', $student->id)
-            ->whereIn('type', ['new_memorization', 'review'])
-            ->where('status', 'passed')
-            ->get();
-
-        $partSessions = $sessions->filter(function ($session) use ($partNumber) {
-            $part = $session->part;
-            if (!$part) {
-                return false;
-            }
-            return $part->part_number == $partNumber;
-        });
+        $partSessions = $allSessions->filter(fn($s) => $s->part?->part_number === $partNumber);
 
         if ($partSessions->isEmpty()) {
             return [
@@ -135,17 +146,12 @@ class StudentPartRecordController extends Controller
             ];
         }
 
-        $totalErrors = $partSessions->sum('total_errors');
-        $totalHesitations = $partSessions->sum('total_hesitations');
-        $avgScore = $partSessions->avg('final_score');
-        $lastDate = $partSessions->max('session_date');
-
         return [
             'is_completed' => true,
-            'total_errors' => $totalErrors,
-            'total_hesitations' => $totalHesitations,
-            'total_score' => $avgScore,
-            'last_recitation_date' => $lastDate,
+            'total_errors' => $partSessions->sum('total_errors'),
+            'total_hesitations' => $partSessions->sum('total_hesitations'),
+            'total_score' => $partSessions->avg('final_score'),
+            'last_recitation_date' => $partSessions->max('session_date'),
             'is_manual_override' => false,
         ];
     }
