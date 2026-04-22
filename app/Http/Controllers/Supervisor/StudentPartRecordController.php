@@ -32,8 +32,9 @@ class StudentPartRecordController extends Controller
 
         $existingRecords = StudentPartRecord::where('student_id', $studentId)->get()->keyBy('part_number');
 
+        // Only include sard (recitation) and mafsil sessions
         $allSessions = RecitationSession::where('student_id', $studentId)
-            ->whereIn('type', ['new_memorization', 'review'])
+            ->whereIn('type', ['recitation', 'mafsil'])
             ->where('status', 'passed')
             ->with('part')
             ->get();
@@ -98,7 +99,7 @@ class StudentPartRecordController extends Controller
     private function getSessionsForStudent(int $studentId): \Illuminate\Database\Eloquent\Collection
     {
         return RecitationSession::where('student_id', $studentId)
-            ->whereIn('type', ['new_memorization', 'review'])
+            ->whereIn('type', ['recitation', 'mafsil'])
             ->where('status', 'passed')
             ->with('part')
             ->get();
