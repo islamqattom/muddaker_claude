@@ -233,4 +233,27 @@ class StudentController extends Controller {
         return redirect()->route('supervisor.students.index')
             ->with('success', 'تم حذف الطالب بنجاح');
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        $students = Student::with('user')
+            ->whereHas('user', function($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                  ->orWhere('student_number', 'like', '%' . $query . '%');
+            })
+            ->limit(20)
+            ->get()
+            ->map(function($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => $s->user->name,
+                    'student_number' => $s->student_number,
+                    'level_name' => $s->level->name ?? '-',
+                    'supervisor_name' => $s->supervisor->user->name ?? '-',
+                ];
+            });
+
+        return response()->json($students);
+    }
 }

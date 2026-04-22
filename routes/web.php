@@ -174,6 +174,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::put('/students/{student}', [Supervisor\StudentController::class, 'update'])->name('students.update');
     Route::get('/students/{student}', [Supervisor\StudentController::class, 'show'])->name('students.show');
     Route::delete('/students/{student}', [Supervisor\StudentController::class, 'destroy'])->name('students.destroy');
+    Route::get('/students/search', [Supervisor\StudentController::class, 'search'])->name('students.search');
 
     // Notifications
     Route::get('/notifications/mark-read', [Supervisor\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
