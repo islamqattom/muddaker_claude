@@ -19,7 +19,7 @@
 </a>
 <li class="nav-item">
     <a class="nav-link" href="{{ route('supervisor.student-parts.index') }}">
-        <i class="fas fa-book-quran"></i> Student Parts Record
+        <i class="fas fa-book-quran"></i> أجزاوء الطالب
     </a>
 </li>
 

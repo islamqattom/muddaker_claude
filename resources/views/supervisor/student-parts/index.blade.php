@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Student Parts Record')
+@section('title', 'سجل أجزاء الطالب')
 
 @push('styles')
 <style>
@@ -31,36 +31,36 @@
 @section('content')
 <div class="container-fluid">
     <div class="student-selector-card">
-        <h4><i class="fas fa-search"></i> Find Student</h4>
+        <h4><i class="fas fa-search"></i> البحث عن طالب</h4>
         <select id="studentSelect" class="form-control" style="max-width: 400px;">
-            <option value="">-- Select Student --</option>
+            <option value="">-- اختر الطالب --</option>
         </select>
     </div>
 
     <div id="studentInfoCard" class="student-info-card">
         <div class="row">
             <div class="col-md-3">
-                <strong>Name:</strong> <span id="studentName">-</span>
+                <strong>الاسم:</strong> <span id="studentName">-</span>
             </div>
             <div class="col-md-3">
-                <strong>Level:</strong> <span id="studentLevel">-</span>
+                <strong>المستوى:</strong> <span id="studentLevel">-</span>
             </div>
             <div class="col-md-3">
-                <strong>Supervisor:</strong> <span id="studentSupervisor">-</span>
+                <strong>المشرف:</strong> <span id="studentSupervisor">-</span>
             </div>
             <div class="col-md-3">
-                <strong>Student Number:</strong> <span id="studentNumber">-</span>
+                <strong>رقم الطالب:</strong> <span id="studentNumber">-</span>
             </div>
         </div>
         <div class="mt-3">
             <a id="viewRecordLink" href="#" class="btn btn-primary">
-                <i class="fas fa-list"></i> View Parts Record
+                <i class="fas fa-list"></i> عرض السجل
             </a>
         </div>
     </div>
 
     <div id="partsContainer" style="display: none;">
-        <p class="text-muted">Select a student to view their parts record.</p>
+        <p class="text-muted">اختر طالباً لعرض سجل أجزاء الطالب</p>
     </div>
 </div>
 @endsection
@@ -80,7 +80,7 @@ $(function() {
             }
         },
         minimumInputLength: 2,
-        placeholder: 'Search by name or student number...'
+        placeholder: 'ابحث بالاسم أو رقم الطالب...'
     });
 
     $('#studentSelect').on('change', function() {
