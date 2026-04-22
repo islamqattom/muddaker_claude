@@ -216,8 +216,76 @@
 
     {{-- Main Two-Column Layout --}}
     <div class="row">
-        {{-- Left: Page Display --}}
+        {{-- Left: Scope Selector + Page Display --}}
         <div class="col-lg-7">
+            {{-- Scope Selector --}}
+            <div class="card exam-card mb-3">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>نطاق السؤال</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3 flex-wrap">
+                        <label class="scope-option scope-tab active" data-scope="juz">
+                            <input type="radio" name="scope_type" value="juz" checked>
+                            <i class="fas fa-layer-group me-2"></i>بالجزء
+                        </label>
+                        <label class="scope-option scope-tab" data-scope="surah">
+                            <input type="radio" name="scope_type" value="surah">
+                            <i class="fas fa-book me-2"></i>بالسورة
+                        </label>
+                        <label class="scope-option scope-tab" data-scope="page">
+                            <input type="radio" name="scope_type" value="page">
+                            <i class="fas fa-file-alt me-2"></i>بالصفحة
+                        </label>
+                    </div>
+
+                    <div id="juz-options" class="scope-inputs">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">من جزء</label>
+                                <select name="start_juz" class="form-select">
+                                    @for($i = 1; $i <= 30; $i++)
+                                        <option value="{{ $i }}">الجزء {{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">إلى جزء</label>
+                                <select name="end_juz" class="form-select">
+                                    @for($i = 1; $i <= 30; $i++)
+                                        <option value="{{ $i }}" {{ $i == 30 ? 'selected' : '' }}>الجزء {{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="surah-options" class="scope-inputs d-none">
+                        <label class="form-label">اختر السورة</label>
+                        <select name="surah_id" class="form-select">
+                            <option value="">-- اختر السورة --</option>
+                            @foreach($surahs as $surah)
+                                <option value="{{ $surah->id }}">{{ $surah->surah_number }}. {{ $surah->name_ar }} ({{ $surah->total_ayahs }} آية)</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div id="page-options" class="scope-inputs d-none">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">من صفحة</label>
+                                <input type="number" name="start_page" class="form-control" min="1" max="604" placeholder="1">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">إلى صفحة</label>
+                                <input type="number" name="end_page" class="form-control" min="1" max="604" placeholder="604">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Page Display --}}
             <div class="card exam-card">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-book-quran me-2"></i>صفحة القرآن</h5>
@@ -294,6 +362,17 @@ $(document).ready(function() {
 
     // Check for in-progress exam on page load
     checkInProgressExam();
+
+    // Scope tab switching
+    let currentScope = 'juz';
+    $('.scope-tab').click(function() {
+        const scope = $(this).data('scope');
+        currentScope = scope;
+        $('.scope-tab').removeClass('active');
+        $(this).addClass('active');
+        $('.scope-inputs').addClass('d-none');
+        $('#' + scope + '-options').removeClass('d-none');
+    });
 
     // Student selection - use existing select2 if available, otherwise use datalist
     if ($('.select2').length && typeof $.fn.select2 !== 'undefined') {
@@ -395,9 +474,12 @@ $(document).ready(function() {
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
-                scope_type: 'juz',
-                start_juz: 1,
-                end_juz: 30,
+                scope_type: currentScope,
+                start_juz: $('select[name="start_juz"]').val(),
+                end_juz: $('select[name="end_juz"]').val(),
+                surah_id: $('select[name="surah_id"]').val(),
+                start_page: $('input[name="start_page"]').val(),
+                end_page: $('input[name="end_page"]').val(),
             },
             success: function(response) {
                 if (response.success) {
