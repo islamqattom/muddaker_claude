@@ -17,7 +17,9 @@ class StudentPartRecordController extends Controller
     {
         $students = Student::where('supervisor_id', Auth::id())
             ->with('user', 'level')
-            ->orderBy('user.name')
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->orderBy('users.name')
+            ->select('students.*')
             ->get();
 
         return view('supervisor.student-parts.index', compact('students'));
