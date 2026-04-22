@@ -179,7 +179,7 @@
                     <select id="studentSelect" class="form-select select2">
                         <option value="">-- ابحث عن طالب --</option>
                         @foreach($students as $student)
-                            <option value="{{ $student->id }}">{{ $student->name }} - {{ $student->level->name ?? '' }}</option>
+                            <option value="{{ $student->id }}">{{ $student->user->name ?? '' }} - {{ $student->level->name ?? '' }}</option>
                         @endforeach
                     </select>
                 </div>
