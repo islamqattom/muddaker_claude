@@ -221,66 +221,28 @@
             {{-- Scope Selector --}}
             <div class="card exam-card mb-3">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>نطاق السؤال</h5>
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>إعدادات الاختبار</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex gap-2 mb-3 flex-wrap">
-                        <label class="scope-option scope-tab active" data-scope="juz">
-                            <input type="radio" name="scope_type" value="juz" checked>
-                            <i class="fas fa-layer-group me-2"></i>بالجزء
-                        </label>
-                        <label class="scope-option scope-tab" data-scope="surah">
-                            <input type="radio" name="scope_type" value="surah">
-                            <i class="fas fa-book me-2"></i>بالسورة
-                        </label>
-                        <label class="scope-option scope-tab" data-scope="page">
-                            <input type="radio" name="scope_type" value="page">
-                            <i class="fas fa-file-alt me-2"></i>بالصفحة
-                        </label>
+                    <div class="mb-3">
+                        <label class="form-label">عدد المواضع لكل جزء</label>
+                        <input type="number" id="positionsPerJuz" class="form-control" min="1" value="3" placeholder="عدد المواضع لكل جزء">
                     </div>
-
-                    <div id="juz-options" class="scope-inputs">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label">من جزء</label>
-                                <select name="start_juz" class="form-select">
-                                    @for($i = 1; $i <= 30; $i++)
-                                        <option value="{{ $i }}">الجزء {{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">إلى جزء</label>
-                                <select name="end_juz" class="form-select">
-                                    @for($i = 1; $i <= 30; $i++)
-                                        <option value="{{ $i }}" {{ $i == 30 ? 'selected' : '' }}>الجزء {{ $i }}</option>
-                                    @endfor
-                                </select>
-                            </div>
+                    <div class="mb-3">
+                        <label class="form-label">اختر الأجزاء (<span id="selectedJuzCount">0</span> محدد)</label>
+                        <div class="row g-2" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+                            @for($i = 1; $i <= 30; $i++)
+                                <div class="col-4 col-md-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input juz-checkbox" type="checkbox" value="{{ $i }}" id="juz{{ $i }}">
+                                        <label class="form-check-label" for="juz{{ $i }}">الجزء {{ $i }}</label>
+                                    </div>
+                                </div>
+                            @endfor
                         </div>
                     </div>
-
-                    <div id="surah-options" class="scope-inputs d-none">
-                        <label class="form-label">اختر السورة</label>
-                        <select name="surah_id" class="form-select">
-                            <option value="">-- اختر السورة --</option>
-                            @foreach($surahs as $surah)
-                                <option value="{{ $surah->id }}">{{ $surah->surah_number }}. {{ $surah->name_ar }} ({{ $surah->total_ayahs }} آية)</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div id="page-options" class="scope-inputs d-none">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="form-label">من صفحة</label>
-                                <input type="number" name="start_page" class="form-control" min="1" max="604" placeholder="1">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">إلى صفحة</label>
-                                <input type="number" name="end_page" class="form-control" min="1" max="604" placeholder="604">
-                            </div>
-                        </div>
+                    <div class="text-muted small" id="totalQuestionsMsg">
+                        الإجمالي: <span id="totalQuestionsCount">0</span> موضع
                     </div>
                 </div>
             </div>
@@ -363,16 +325,16 @@ $(document).ready(function() {
     // Check for in-progress exam on page load
     checkInProgressExam();
 
-    // Scope tab switching
-    let currentScope = 'juz';
-    $('.scope-tab').click(function() {
-        const scope = $(this).data('scope');
-        currentScope = scope;
-        $('.scope-tab').removeClass('active');
-        $(this).addClass('active');
-        $('.scope-inputs').addClass('d-none');
-        $('#' + scope + '-options').removeClass('d-none');
-    });
+    // Juz selection logic
+    function updateJuzCount() {
+        const selected = $('.juz-checkbox:checked').length;
+        const perJuz = parseInt($('#positionsPerJuz').val()) || 0;
+        $('#selectedJuzCount').text(selected);
+        $('#totalQuestionsCount').text(selected * perJuz);
+    }
+
+    $('.juz-checkbox').on('change', updateJuzCount);
+    $('#positionsPerJuz').on('input', updateJuzCount);
 
     // Student selection - use existing select2 if available, otherwise use datalist
     if ($('.select2').length && typeof $.fn.select2 !== 'undefined') {
@@ -469,17 +431,17 @@ $(document).ready(function() {
             toastr.warning('الرجاء إنهاء التعديل أولاً');
             return;
         }
+        const selectedJuz = $('.juz-checkbox:checked').map(function() { return parseInt(this.value); }).get();
+        if (selectedJuz.length === 0) {
+            toastr.warning('الرجاء اختيار جزء واحد على الأقل');
+            return;
+        }
         $.ajax({
             url: '{{ route("supervisor.exam-assistant.generate") }}',
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
-                scope_type: currentScope,
-                start_juz: $('select[name="start_juz"]').val(),
-                end_juz: $('select[name="end_juz"]').val(),
-                surah_id: $('select[name="surah_id"]').val(),
-                start_page: $('input[name="start_page"]').val(),
-                end_page: $('input[name="end_page"]').val(),
+                juz_list: selectedJuz,
             },
             success: function(response) {
                 if (response.success) {
@@ -505,11 +467,11 @@ $(document).ready(function() {
             ayah_number: currentVerseData.ayah_number,
             page_number: currentVerseData.page_number,
             juz_number: currentVerseData.juz_number,
-            verse_text: currentVerseData.ayah.text || currentVerseData.ayah,
+            verse_text: currentVerseData.ayah?.text || currentVerseData.ayah,
             errors_count: $('#errorsCount').val(),
             notes: $('#notesInput').val()
         }, function(response) {
-            renderQuestionsList([response.question]);
+            appendQuestion(response.question);
             currentVerseData = null;
             $('#pageDisplay').html('<div class="placeholder"><i class="fas fa-hand-pointer fa-2x mb-3 d-block"></i>اضغط على "السؤال التالي" لعرض آية عشوائية</div>');
             $('#errorsCount').val(0);
@@ -517,6 +479,45 @@ $(document).ready(function() {
             toastr.success('تم إضافة النتيجة');
         }).fail(function(xhr) {
             toastr.error('حدث خطأ');
+        });
+    }
+
+    function appendQuestion(q) {
+        $('#noQuestionsMsg').addClass('d-none');
+        const ref = q.surah?.name_ar + ' - آية ' + q.ayah_number + ' - صفحة ' + q.page_number;
+        const html = `
+        <div class="list-group-item list-group-item-action question-item"
+             data-id="${q.id}"
+             data-surah="${q.surah?.name_ar || ''}"
+             data-ayah="${q.ayah_number}"
+             data-page="${q.page_number}"
+             data-errors="${q.errors_count}"
+             data-notes="${q.notes || ''}"
+             data-text="${q.verse_text || ''}"
+             style="cursor:pointer;">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold">${ref}</div>
+                    <small class="text-muted">أخطاء: ${q.errors_count}</small>
+                    ${q.notes ? '<div class="small text-muted mt-1">' + q.notes.substring(0, 50) + '...</div>' : ''}
+                </div>
+                <span class="badge bg-secondary">#${q.order || 1}</span>
+            </div>
+        </div>`;
+        $('#questionsList').append(html);
+        const count = parseInt($('#questionsCount').text()) + 1;
+        $('#questionsCount').text(count);
+        $('.question-item').off('click').on('click', function() {
+            const $el = $(this);
+            enterReviewMode({
+                id: $el.data('id'),
+                surah: $el.data('surah'),
+                ayah_number: $el.data('ayah'),
+                page_number: $el.data('page'),
+                errors_count: $el.data('errors'),
+                notes: $el.data('notes'),
+                verse_text: $el.data('text')
+            });
         });
     }
 

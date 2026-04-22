@@ -27,15 +27,14 @@ class QuranExamAssistantController extends Controller
     public function generateQuestion(Request $request)
     {
         $validated = $request->validate([
-            'scope_type' => 'required|in:juz,surah,page',
-            'start_juz' => 'required_if:scope_type,juz|integer|between:1,30',
-            'end_juz' => 'required_if:scope_type,juz|integer|between:1,30|gte:start_juz',
-            'surah_id' => 'required_if:scope_type,surah|exists:surahs,id',
-            'start_page' => 'required_if:scope_type,page|integer|between:1,604',
-            'end_page' => 'required_if:scope_type,page|integer|between:1,604|gte:start_page',
+            'juz_list' => 'required|array|min:1',
+            'juz_list.*' => 'integer|between:1,30',
         ]);
 
-        $ayah = $this->getRandomAyah($validated);
+        $ayah = Ayah::with('surah')
+            ->whereIn('juz_number', $validated['juz_list'])
+            ->inRandomOrder()
+            ->first();
 
         if (!$ayah) {
             return response()->json([
@@ -62,16 +61,4 @@ class QuranExamAssistantController extends Controller
         ]);
     }
 
-    private function getRandomAyah(array $filters)
-    {
-        $query = Ayah::with('surah');
-
-        match ($filters['scope_type']) {
-            self::SCOPE_JUZ => $query->whereBetween('juz_number', [$filters['start_juz'], $filters['end_juz']]),
-            self::SCOPE_SURAH => $query->where('surah_id', $filters['surah_id']),
-            self::SCOPE_PAGE => $query->whereBetween('page_number', [$filters['start_page'], $filters['end_page']]),
-        };
-
-        return $query->inRandomOrder()->first();
-    }
 }
