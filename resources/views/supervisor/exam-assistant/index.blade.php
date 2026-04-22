@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'مساعد الاختبار القرآني')
-@section('page-title', 'مساعد الاختبار القرآني')
+@section('title', 'اختبار المواضع')
+@section('page-title', 'اختبار المواضع')
 @section('role-label', 'مشرف')
 
 @section('sidebar-menu')
