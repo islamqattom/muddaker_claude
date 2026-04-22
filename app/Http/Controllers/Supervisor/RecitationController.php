@@ -699,7 +699,7 @@ class RecitationController extends Controller
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
 
         $query = RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
-            ->with(['student.user', 'part'])
+            ->with(['student.user', 'part', 'pages'])
             ->whereBetween('session_date', [$fromDate, $toDate]);
 
         if ($studentId) {

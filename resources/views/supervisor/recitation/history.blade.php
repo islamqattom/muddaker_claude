@@ -84,10 +84,19 @@
                                 <span class="badge bg-secondary">{{ $session->type_label }}</span>
                             </td>
                             <td>
-                                @if($session->part)
+                                @if($session->type === 'mafsil')
+                                    @php
+                                        $partNumbers = $session->pages->pluck('page_number');
+                                    @endphp
+                                    @if($partNumbers->isNotEmpty())
+                                        <span class="text-danger fw-semibold">أجزاء {{ $partNumbers->implode(', ') }}</span>
+                                    @elseif($session->part)
+                                        <span class="fw-semibold">جزء {{ $session->part->part_number }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                @elseif($session->part)
                                     <span class="text-primary fw-semibold">الجزء {{ $session->part->part_number }}</span>
-                                @elseif($session->mafsil_type)
-                                    <span class="text-danger fw-semibold">مفصل ({{ $session->mafsil_type }})</span>
                                 @else
                                     -
                                 @endif
