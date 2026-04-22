@@ -436,6 +436,13 @@ $(document).ready(function() {
     }
 
     function loadInProgressExam(exam, questions) {
+        // Only show exam interface if exam has valid student data
+        if (!exam || !exam.id || !exam.student) {
+            $('#student-selection').removeClass('d-none');
+            $('#exam-interface').addClass('d-none');
+            examId = null;
+            return;
+        }
         showExamInterface(exam);
         renderQuestionsList(questions);
     }
