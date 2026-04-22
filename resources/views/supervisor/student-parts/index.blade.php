@@ -85,7 +85,7 @@ $(function() {
             return;
         }
 
-        $.get('/supervisor/students/' + studentId, function(student) {
+        $.get('/supervisor/students/' + studentId + '/info', function(student) {
             $('#studentName').text(student.name);
             $('#studentLevel').text(student.level_name);
             $('#studentSupervisor').text(student.supervisor_name);

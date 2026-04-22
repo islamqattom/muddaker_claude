@@ -257,4 +257,19 @@ class StudentController extends Controller {
 
         return response()->json($students);
     }
+
+    public function apiShow(Student $student)
+    {
+        if ($student->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        return response()->json([
+            'id' => $student->id,
+            'name' => $student->user->name,
+            'student_number' => $student->student_number,
+            'level_name' => $student->level->name ?? '-',
+            'supervisor_name' => $student->supervisor->user->name ?? '-',
+        ]);
+    }
 }

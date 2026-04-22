@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Parts Record — ' . $student->user->name)
+@section('page-title', 'أجزاء الطالب')
+@section('role-label', 'مشرف')
+
+@section('sidebar-menu')
+    @include('supervisor.partials.sidebar')
+@endsection
 
 @push('styles')
 <style>
@@ -93,6 +99,7 @@
         <div class="modal-content">
             <form id="editForm" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Part <span id="modalPartNumber"></span></h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
