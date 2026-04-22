@@ -17,11 +17,9 @@
 <a href="{{ route('supervisor.attendance.history') }}" class="nav-link {{ request()->routeIs('supervisor.attendance.history') ? 'active' : '' }}">
     <i class="fas fa-history"></i> سجل الحضور
 </a>
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('supervisor.student-parts.index') }}">
-        <i class="fas fa-book-quran"></i> أجزاوء الطالب
-    </a>
-</li>
+<a href="{{ route('supervisor.student-parts.index') }}" class="nav-link {{ request()->routeIs('supervisor.student-parts.*') ? 'active' : '' }}">
+    <i class="fas fa-book-quran"></i> أجزاء الطالب
+</a>
 
 <span class="nav-section-title mt-2">التسميع</span>
 <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.index') ? 'active' : '' }}">

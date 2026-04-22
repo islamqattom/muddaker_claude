@@ -9,10 +9,9 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <style>
     .student-selector-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary);
         color: white;
         border-radius: 12px;
         padding: 24px;
@@ -39,8 +38,11 @@
 <div class="container-fluid">
     <div class="student-selector-card">
         <h4><i class="fas fa-search"></i> البحث عن طالب</h4>
-        <select id="studentSelect" class="form-control" style="max-width: 400px;">
+        <select id="studentSelect" class="form-select" style="max-width: 400px;">
             <option value="">-- اختر الطالب --</option>
+            @foreach($students as $student)
+                <option value="{{ $student->id }}">{{ $student->user->name }} ({{ $student->student_number }})</option>
+            @endforeach
         </select>
     </div>
 
@@ -73,24 +75,8 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(function() {
-    $('#studentSelect').select2({
-        ajax: {
-            url: '/supervisor/students/search',
-            processResults: function(data) {
-                return {
-                    results: data.map(function(s) {
-                        return { id: s.id, text: s.name + ' (' + s.student_number + ')' };
-                    })
-                };
-            }
-        },
-        minimumInputLength: 2,
-        placeholder: 'ابحث بالاسم أو رقم الطالب...'
-    });
-
     $('#studentSelect').on('change', function() {
         var studentId = $(this).val();
         if (!studentId) {
