@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 
 class QuranExamAssistantController extends Controller
 {
-    private const SCOPE_JUZ = 'juz';
-    private const SCOPE_SURAH = 'surah';
-    private const SCOPE_PAGE = 'page';
-
     public function index()
     {
         $surahs = Surah::orderBy('surah_number')->get();

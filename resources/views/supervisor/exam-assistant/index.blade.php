@@ -336,6 +336,20 @@ $(document).ready(function() {
     $('.juz-checkbox').on('change', updateJuzCount);
     $('#positionsPerJuz').on('input', updateJuzCount);
 
+    // Delegated click for question items (avoids O(n) rebind on each append)
+    $('#questionsList').on('click', '.question-item', function() {
+        const $el = $(this);
+        enterReviewMode({
+            id: $el.data('id'),
+            surah: $el.data('surah'),
+            ayah_number: $el.data('ayah'),
+            page_number: $el.data('page'),
+            errors_count: $el.data('errors'),
+            notes: $el.data('notes'),
+            verse_text: $el.data('text')
+        });
+    });
+
     // Student selection - use existing select2 if available, otherwise use datalist
     if ($('.select2').length && typeof $.fn.select2 !== 'undefined') {
         $('.select2').select2({
@@ -484,8 +498,13 @@ $(document).ready(function() {
 
     function appendQuestion(q) {
         $('#noQuestionsMsg').addClass('d-none');
-        const ref = q.surah?.name_ar + ' - آية ' + q.ayah_number + ' - صفحة ' + q.page_number;
-        const html = `
+        $('#questionsList').append(buildQuestionItemHTML(q));
+        $('#questionsCount').text(parseInt($('#questionsCount').text()) + 1);
+    }
+
+    function buildQuestionItemHTML(q) {
+        const ref = buildQuestionRef(q);
+        return `
         <div class="list-group-item list-group-item-action question-item"
              data-id="${q.id}"
              data-surah="${q.surah?.name_ar || ''}"
@@ -499,26 +518,19 @@ $(document).ready(function() {
                 <div>
                     <div class="fw-bold">${ref}</div>
                     <small class="text-muted">أخطاء: ${q.errors_count}</small>
-                    ${q.notes ? '<div class="small text-muted mt-1">' + q.notes.substring(0, 50) + '...</div>' : ''}
+                    ${q.notes ? '<div class="small text-muted mt-1">' + truncateNotes(q.notes) + '</div>' : ''}
                 </div>
                 <span class="badge bg-secondary">#${q.order || 1}</span>
             </div>
         </div>`;
-        $('#questionsList').append(html);
-        const count = parseInt($('#questionsCount').text()) + 1;
-        $('#questionsCount').text(count);
-        $('.question-item').off('click').on('click', function() {
-            const $el = $(this);
-            enterReviewMode({
-                id: $el.data('id'),
-                surah: $el.data('surah'),
-                ayah_number: $el.data('ayah'),
-                page_number: $el.data('page'),
-                errors_count: $el.data('errors'),
-                notes: $el.data('notes'),
-                verse_text: $el.data('text')
-            });
-        });
+    }
+
+    function buildQuestionRef(q) {
+        return `${q.surah?.name_ar} - آية ${q.ayah_number} - صفحة ${q.page_number}`;
+    }
+
+    function truncateNotes(notes) {
+        return notes.substring(0, 50) + '...';
     }
 
     function renderQuestionsList(questions) {
@@ -530,45 +542,12 @@ $(document).ready(function() {
 
         let html = '';
         questions.forEach(function(q) {
-            const ref = q.surah?.name_ar + ' - آية ' + q.ayah_number + ' - صفحة ' + q.page_number;
-            html += `
-            <div class="list-group-item list-group-item-action question-item"
-                 data-id="${q.id}"
-                 data-surah="${q.surah?.name_ar || ''}"
-                 data-ayah="${q.ayah_number}"
-                 data-page="${q.page_number}"
-                 data-errors="${q.errors_count}"
-                 data-notes="${q.notes || ''}"
-                 data-text="${q.verse_text || ''}"
-                 style="cursor:pointer;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="fw-bold">${ref}</div>
-                        <small class="text-muted">أخطاء: ${q.errors_count}</small>
-                        ${q.notes ? '<div class="small text-muted mt-1">' + q.notes.substring(0, 50) + '...</div>' : ''}
-                    </div>
-                    <span class="badge bg-secondary">#${q.order || 1}</span>
-                </div>
-            </div>`;
+            html += buildQuestionItemHTML(q);
         });
 
         $('#questionsList').html(html);
         $('#noQuestionsMsg').addClass('d-none');
         $('#questionsCount').text(questions.length);
-
-        // Bind click to review
-        $('.question-item').off('click').on('click', function() {
-            const $el = $(this);
-            enterReviewMode({
-                id: $el.data('id'),
-                surah: $el.data('surah'),
-                ayah_number: $el.data('ayah'),
-                page_number: $el.data('page'),
-                errors_count: $el.data('errors'),
-                notes: $el.data('notes'),
-                verse_text: $el.data('text')
-            });
-        });
     }
 
     function enterReviewMode(question) {
