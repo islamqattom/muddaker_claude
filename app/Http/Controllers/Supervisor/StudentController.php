@@ -238,6 +238,7 @@ class StudentController extends Controller {
     {
         $query = $request->get('q', '');
         $students = Student::with('user')
+            ->where('supervisor_id', Auth::id())
             ->whereHas('user', function($q) use ($query) {
                 $q->where('name', 'like', '%' . $query . '%')
                   ->orWhere('student_number', 'like', '%' . $query . '%');

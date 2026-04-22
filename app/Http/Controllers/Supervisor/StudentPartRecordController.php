@@ -8,6 +8,8 @@ use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StudentPartRecordController extends Controller
 {
@@ -19,6 +21,10 @@ class StudentPartRecordController extends Controller
     public function show($studentId)
     {
         $student = Student::with(['user', 'level', 'supervisor'])->findOrFail($studentId);
+
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
 
         $this->autoFillRecords($student);
 
@@ -37,6 +43,11 @@ class StudentPartRecordController extends Controller
 
     public function update(Request $request, $studentId, $partNumber)
     {
+        $student = Student::findOrFail($studentId);
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'is_completed' => 'boolean',
             'total_errors' => 'integer|min:0',
@@ -58,17 +69,22 @@ class StudentPartRecordController extends Controller
     public function resetToAuto($studentId, $partNumber)
     {
         $student = Student::findOrFail($studentId);
+        if ($student->supervisor_id !== Auth::id()) {
+            abort(403);
+        }
 
-        StudentPartRecord::where('student_id', $studentId)
-            ->where('part_number', $partNumber)
-            ->delete();
+        DB::transaction(function () use ($studentId, $partNumber, $student) {
+            StudentPartRecord::where('student_id', $studentId)
+                ->where('part_number', $partNumber)
+                ->delete();
 
-        $calculated = $this->calculatePartRecord($student, $partNumber);
+            $calculated = $this->calculatePartRecord($student, $partNumber);
 
-        StudentPartRecord::create(array_merge($calculated, [
-            'student_id' => $studentId,
-            'part_number' => $partNumber,
-        ]));
+            StudentPartRecord::create(array_merge($calculated, [
+                'student_id' => $studentId,
+                'part_number' => $partNumber,
+            ]));
+        });
 
         return redirect()->back()->with('success', 'Part record reset to auto-calculated.');
     }

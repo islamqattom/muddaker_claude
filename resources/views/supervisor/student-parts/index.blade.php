@@ -103,4 +103,3 @@ $(function() {
 });
 </script>
 @endpush
-@endsection
