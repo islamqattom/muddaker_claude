@@ -193,6 +193,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/student-parts/{studentId}', [StudentPartRecordController::class, 'show'])->name('student-parts.show');
     Route::put('/student-parts/{studentId}/{partNumber}', [StudentPartRecordController::class, 'update'])->name('student-parts.update');
     Route::post('/student-parts/{studentId}/{partNumber}/reset', [StudentPartRecordController::class, 'resetToAuto'])->name('student-parts.reset');
+
+    // Quran Exam Assistant
+    Route::get('/exam-assistant', [Supervisor\QuranExamAssistantController::class, 'index'])->name('exam-assistant.index');
+    Route::post('/exam-assistant/generate', [Supervisor\QuranExamAssistantController::class, 'generateQuestion'])->name('exam-assistant.generate');
 });
 
 // ============================

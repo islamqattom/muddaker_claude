@@ -28,6 +28,9 @@
 <a href="{{ route('supervisor.recitation.history') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.history') ? 'active' : '' }}">
     <i class="fas fa-history"></i> سجل الجلسات
 </a>
+<a href="{{ route('supervisor.exam-assistant.index') }}" class="nav-link {{ request()->routeIs('supervisor.exam-assistant.*') ? 'active' : '' }}">
+    <i class="fas fa-graduation-cap"></i> مساعد الاختبار
+</a>
 
 <span class="nav-section-title mt-2">التقارير والإنذارات</span>
 <a href="{{ route('supervisor.reports.index') }}" class="nav-link {{ request()->routeIs('supervisor.reports.*') ? 'active' : '' }}">
