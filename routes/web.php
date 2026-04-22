@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StudentPartRecordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin;
@@ -184,6 +185,12 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Sessions
     Route::get('/sessions', [Supervisor\SessionController::class, 'index'])->name('sessions.index');
     Route::get('/sessions/{session}', [Supervisor\SessionController::class, 'show'])->name('sessions.show');
+
+    // Student Parts Record
+    Route::get('/student-parts', [StudentPartRecordController::class, 'index'])->name('student-parts.index');
+    Route::get('/student-parts/{studentId}', [StudentPartRecordController::class, 'show'])->name('student-parts.show');
+    Route::post('/student-parts/{studentId}/{partNumber}', [StudentPartRecordController::class, 'update'])->name('student-parts.update');
+    Route::post('/student-parts/{studentId}/{partNumber}/reset', [StudentPartRecordController::class, 'resetToAuto'])->name('student-parts.reset');
 });
 
 // ============================
