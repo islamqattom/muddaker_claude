@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\StudentPartRecordController;
+use App\Http\Controllers\Supervisor\StudentPartRecordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin;
