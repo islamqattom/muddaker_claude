@@ -79,7 +79,7 @@
                                         $statusLabel = match(true) {
                                             $sessionType === 'mafsil' => 'مفصل',
                                             $sessionType === 'recitation' && $isCompleted => 'متقن',
-                                            $sessionType === 'recitation' && !$isCompleted => 'غير مكمل',
+                                            $sessionType === 'recitation' && !$isCompleted => 'غير متقن',
                                             default => 'غير مُكمَل'
                                         };
                                         $statusClass = match($sessionType) {
@@ -135,7 +135,7 @@
                         <label><strong>الحالة</strong></label>
                         <select name="is_completed" id="editIsCompleted" class="form-control">
                             <option value="1">متقن</option>
-                            <option value="0">غير مكمل</option>
+                            <option value="0">غير متقن</option>
                         </select>
                     </div>
 
