@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Traits;
 
 use App\Models\RecitationSession;
+use App\Models\QuranPart;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Database\Eloquent\Collection;
@@ -47,6 +48,34 @@ trait HasStudentPartRecords
 
         $records = $existingRecords->union($partsToFill)->filter();
         return $records;
+    }
+
+    protected function buildPartSessionTypes($allSessions): array
+    {
+        $partSessionTypes = [];
+        $allParts = QuranPart::orderBy('part_number')->get();
+
+        foreach ($allSessions as $session) {
+            if ($session->type === RecitationSession::TYPE_MAFSIL) {
+                $startPage = $session->start_page;
+                $endPage = $session->end_page;
+
+                if ($startPage && $endPage) {
+                    foreach ($allParts as $part) {
+                        if ($part->start_page <= $endPage && $part->end_page >= $startPage) {
+                            $partSessionTypes[$part->part_number] = RecitationSession::TYPE_MAFSIL;
+                        }
+                    }
+                }
+            } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
+                $partNum = $session->part?->part_number;
+                if ($partNum && !isset($partSessionTypes[$partNum])) {
+                    $partSessionTypes[$partNum] = $session->type;
+                }
+            }
+        }
+
+        return $partSessionTypes;
     }
 
     protected function calculatePartRecordWithGrouped($sessionsByPart, int $partNumber): array

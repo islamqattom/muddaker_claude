@@ -29,28 +29,10 @@ class StudentPartRecordController extends Controller
         $records = $this->autoFillRecords($student, $allSessions);
         $parts = QuranPart::orderBy('part_number')->get();
 
-        $partSessionTypes = [];
-        $mafsilCount = 0;
-        $mutqinSardCount = 0;
+        $partSessionTypes = $this->buildPartSessionTypes($allSessions);
 
-        foreach ($allSessions as $session) {
-            if ($session->type === \App\Models\RecitationSession::TYPE_MAFSIL) {
-                $mafsilType = $session->mafsil_type ?? 1;
-                $startPart = $session->part?->part_number;
-                if ($startPart) {
-                    for ($i = 0; $i < $mafsilType; $i++) {
-                        $partSessionTypes[$startPart + $i] = \App\Models\RecitationSession::TYPE_MAFSIL;
-                    }
-                    $mafsilCount += $mafsilType;
-                }
-            } elseif ($session->type === \App\Models\RecitationSession::TYPE_RECITATION) {
-                $partNum = $session->part?->part_number;
-                if ($partNum && !isset($partSessionTypes[$partNum])) {
-                    $partSessionTypes[$partNum] = $session->type;
-                    $mutqinSardCount++;
-                }
-            }
-        }
+        $mafsilCount = collect($partSessionTypes)->filter(fn($type) => $type === \App\Models\RecitationSession::TYPE_MAFSIL)->count();
+        $mutqinSardCount = collect($partSessionTypes)->filter(fn($type) => $type === \App\Models\RecitationSession::TYPE_RECITATION)->count();
 
         $totalMafsilAndMutqin = $mafsilCount + $mutqinSardCount;
 
