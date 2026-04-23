@@ -63,7 +63,7 @@ trait HasStudentPartRecords
                 }
             } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
                 $partNum = $session->part?->part_number;
-                if ($partNum && !isset($partSessionTypes[$partNum])) {
+                if ($partNum) {
                     $partSessionTypes[$partNum] = $session->type;
                 }
             }
