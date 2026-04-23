@@ -55,16 +55,24 @@ trait HasStudentPartRecords
     {
         $partSessionTypes = [];
 
+        // Process mafsil first so recitation (passed sard) always takes precedence
         foreach ($allSessions as $session) {
             if ($session->type === RecitationSession::TYPE_MAFSIL) {
                 $partNumbers = $session->pages->pluck('page_number')->toArray();
                 foreach ($partNumbers as $partNumber) {
-                    $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
+                    if (!isset($partSessionTypes[$partNumber])) {
+                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
+                    }
                 }
-            } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
+            }
+        }
+
+        // Recitation always overwrites (passed sard takes priority over mafsil)
+        foreach ($allSessions as $session) {
+            if ($session->type === RecitationSession::TYPE_RECITATION) {
                 $partNum = $session->part?->part_number;
                 if ($partNum) {
-                    $partSessionTypes[$partNum] = $session->type;
+                    $partSessionTypes[$partNum] = RecitationSession::TYPE_RECITATION;
                 }
             }
         }
