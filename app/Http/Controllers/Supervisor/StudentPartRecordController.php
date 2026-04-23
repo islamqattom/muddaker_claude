@@ -44,7 +44,6 @@ class StudentPartRecordController extends Controller
         $totalMafsilAndMutqin = $mafsilCount + $mutqinSardCount;
 
         // DEBUG: dump to view
-        $recordsArray = $records->toArray();
         $debug = [
             'student_id' => $studentId,
             'allSessions_count' => $allSessions->count(),
@@ -55,8 +54,7 @@ class StudentPartRecordController extends Controller
                 'part_number' => $s->part?->part_number,
                 'status' => $s->status,
             ])->values()->toArray(),
-            'records_keys' => array_keys($recordsArray),
-            'records_part_numbers' => array_values(array_column($recordsArray, 'part_number')),
+            'records_first_few' => $records->take(5)->values()->map(fn($r) => ['part_number' => $r->part_number, 'is_completed' => $r->is_completed])->toArray(),
         ];
 
         return view('supervisor.student-parts.show', [
