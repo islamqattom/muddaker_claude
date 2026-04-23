@@ -47,7 +47,9 @@ trait HasStudentPartRecords
             );
         }
 
-        $records = $existingRecords->merge($partsToFill)->filter();
+        $merged = $existingRecords->merge($partsToFill)->filter();
+        // Re-key by part_number after merge (merge with integer keys resets keyBy)
+        $records = $merged->keyBy(fn($record, $key) => $record->part_number);
         return $records;
     }
 
