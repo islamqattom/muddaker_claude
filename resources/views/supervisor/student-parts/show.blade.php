@@ -19,7 +19,8 @@
         padding: 2px 6px;
         border-radius: 4px;
     }
-    .status-completed { color: #28a745; font-weight: bold; }
+    .status-mafsil { color: #0d6efd; font-weight: bold; }
+    .status-mutqin { color: #28a745; font-weight: bold; }
     .status-not-completed { color: #dc3545; font-weight: bold; }
 </style>
 @endpush
@@ -38,13 +39,11 @@
     @endif
 
     <div class="alert alert-info mb-4">
-        <div class="d-flex gap-4">
-            <div>
-                <strong>عدد المفصل:</strong> {{ $mafsilCount }}
-            </div>
-            <div>
-                <strong>المفصل + المتقن:</strong> {{ $totalMafsilAndMutqin }}
-            </div>
+        <div>
+            <strong>عدد المفصل:</strong> {{ $mafsilCount }}
+        </div>
+        <div class="mt-1">
+            <strong>المفصل + المتقن:</strong> {{ $totalMafsilAndMutqin }}
         </div>
     </div>
 
@@ -83,7 +82,11 @@
                                             $sessionType === 'recitation' && !$isCompleted => 'غير مكمل',
                                             default => 'غير مُكمَل'
                                         };
-                                        $statusClass = $sessionType === 'mafsil' ? 'status-completed' : ($isCompleted ? 'status-completed' : 'status-not-completed');
+                                        $statusClass = match($sessionType) {
+                                            'mafsil' => 'status-mafsil',
+                                            'recitation' => $isCompleted ? 'status-mutqin' : 'status-not-completed',
+                                            default => 'status-not-completed'
+                                        };
                                     @endphp
                                     <span class="{{ $statusClass }}">
                                         {{ $statusLabel }}

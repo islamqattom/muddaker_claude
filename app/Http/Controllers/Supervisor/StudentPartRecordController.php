@@ -41,16 +41,20 @@ class StudentPartRecordController extends Controller
         $mutqinSardCount = 0;
 
         foreach ($allSessions as $session) {
-            $partNum = $session->part?->part_number;
-            if ($partNum) {
-                if ($session->type === RecitationSession::TYPE_MAFSIL) {
-                    $partSessionTypes[$partNum] = RecitationSession::TYPE_MAFSIL;
-                    $mafsilCount++;
-                } elseif (!isset($partSessionTypes[$partNum])) {
-                    $partSessionTypes[$partNum] = $session->type;
-                    if ($session->type === RecitationSession::TYPE_RECITATION) {
-                        $mutqinSardCount++;
+            if ($session->type === RecitationSession::TYPE_MAFSIL) {
+                $mafsilType = $session->mafsil_type ?? 1;
+                $startPart = $session->part?->part_number;
+                if ($startPart) {
+                    for ($i = 0; $i < $mafsilType; $i++) {
+                        $partSessionTypes[$startPart + $i] = RecitationSession::TYPE_MAFSIL;
                     }
+                    $mafsilCount++;
+                }
+            } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
+                $partNum = $session->part?->part_number;
+                if ($partNum && !isset($partSessionTypes[$partNum])) {
+                    $partSessionTypes[$partNum] = $session->type;
+                    $mutqinSardCount++;
                 }
             }
         }
