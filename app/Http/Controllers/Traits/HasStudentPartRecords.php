@@ -15,7 +15,7 @@ trait HasStudentPartRecords
         return RecitationSession::where('student_id', $studentId)
             ->whereIn('type', [RecitationSession::TYPE_RECITATION, RecitationSession::TYPE_MAFSIL])
             ->where('status', RecitationSession::STATUS_PASSED)
-            ->with('part')
+            ->with(['part', 'pages'])
             ->get();
     }
 
@@ -53,16 +53,20 @@ trait HasStudentPartRecords
     protected function buildPartSessionTypes($allSessions): array
     {
         $partSessionTypes = [];
-        $allParts = QuranPart::orderBy('part_number')->get();
 
         foreach ($allSessions as $session) {
             if ($session->type === RecitationSession::TYPE_MAFSIL) {
-                $startPage = $session->start_page;
-                $endPage = $session->end_page;
+                // Get distinct part_ids from the session's pages via quran_pages
+                $pageNumbers = $session->pages()->pluck('page_number')->toArray();
 
-                if ($startPage && $endPage) {
-                    foreach ($allParts as $part) {
-                        if ($part->start_page <= $endPage && $part->end_page >= $startPage) {
+                if (!empty($pageNumbers)) {
+                    $partIds = \App\Models\QuranPage::whereIn('page_number', $pageNumbers)
+                        ->pluck('part_id')
+                        ->unique();
+
+                    foreach ($partIds as $partId) {
+                        $part = \App\Models\QuranPart::find($partId);
+                        if ($part) {
                             $partSessionTypes[$part->part_number] = RecitationSession::TYPE_MAFSIL;
                         }
                     }
