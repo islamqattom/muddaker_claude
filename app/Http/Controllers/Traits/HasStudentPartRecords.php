@@ -47,9 +47,12 @@ trait HasStudentPartRecords
             );
         }
 
-        $merged = $existingRecords->merge($partsToFill)->filter();
-        // Re-key by part_number after merge (merge with integer keys resets keyBy)
-        $records = $merged->keyBy(fn($record, $key) => $record->part_number);
+        // Convert partsToFill arrays to StudentPartRecord model instances before merging
+        $newRecords = collect($partsToFill)->map(fn($data, $partNum) => new StudentPartRecord(
+            array_merge(['student_id' => $student->id, 'part_number' => $partNum], $data)
+        ));
+
+        $records = $existingRecords->merge($newRecords)->keyBy('part_number');
         return $records;
     }
 
