@@ -121,4 +121,22 @@ class ExamController extends Controller
             'questions' => $exam->questions()->with('surah', 'ayah')->orderBy('order')->get(),
         ]);
     }
+
+    public function destroy(int $id): JsonResponse
+    {
+        $exam = Exam::findOrFail($id);
+
+        if ($exam->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($exam->status === 'completed') {
+            return response()->json(['error' => 'Cannot cancel a completed exam'], 422);
+        }
+
+        $exam->questions()->delete();
+        $exam->delete();
+
+        return response()->json(['message' => 'Exam cancelled successfully']);
+    }
 }

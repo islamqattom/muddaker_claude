@@ -151,6 +151,54 @@
         color: #1e293b;
     }
 
+    /* Override for injected page HTML inside card-body */
+    #pageDisplay .quran-page,
+    #pageDisplay .quran-page * {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    /* Sticky questions list header */
+    #questionsList .card-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white;
+    }
+
+    /* Loading state for buttons */
+    .btn-loading {
+        position: relative;
+        pointer-events: none;
+    }
+    .btn-loading::after {
+        content: '';
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 50%;
+        left: 50%;
+        margin: -8px 0 0 -8px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Better zero-errors indicator */
+    .zero-errors {
+        color: #27ae60;
+        font-weight: 600;
+    }
+
+    /* Question item hover */
+    .question-item .order-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
     @media (max-width: 768px) {
         .verse-display {
             padding: 25px;
@@ -226,10 +274,6 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">عدد المواضع لكل جزء</label>
-                        <input type="number" id="positionsPerJuz" class="form-control" min="1" value="3" placeholder="عدد المواضع لكل جزء">
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">اختر الأجزاء (<span id="selectedJuzCount">0</span> محدد)</label>
                         <div class="row g-2" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
                             @for($i = 1; $i <= 30; $i++)
@@ -241,9 +285,6 @@
                                 </div>
                             @endfor
                         </div>
-                    </div>
-                    <div class="text-muted small" id="totalQuestionsMsg">
-                        الإجمالي: <span id="totalQuestionsCount">0</span> موضع
                     </div>
                 </div>
             </div>
@@ -329,13 +370,14 @@ $(document).ready(function() {
     // Juz selection logic
     function updateJuzCount() {
         const selected = $('.juz-checkbox:checked').length;
-        const perJuz = parseInt($('#positionsPerJuz').val()) || 0;
         $('#selectedJuzCount').text(selected);
-        $('#totalQuestionsCount').text(selected * perJuz);
+        // Enable/disable next question button based on selection
+        $('#nextQuestionBtn').prop('disabled', selected === 0);
     }
 
     $('.juz-checkbox').on('change', updateJuzCount);
-    $('#positionsPerJuz').on('input', updateJuzCount);
+    // Initially disable next question button until Juz is selected
+    $('#nextQuestionBtn').prop('disabled', true);
 
     // Delegated click for question items (avoids O(n) rebind on each append)
     $('#questionsList').on('click', '.question-item', function() {
@@ -376,15 +418,6 @@ $(document).ready(function() {
         generateQuestion();
     });
 
-    // Add Result
-    $('#addResultBtn').click(function() {
-        if (!examId || !currentVerseData) {
-            toastr.warning('الرجاء توليد سؤال أولاً');
-            return;
-        }
-        addResult();
-    });
-
     // Back to Exam (from review mode)
     $('#backToExamBtn').click(function() {
         exitReviewMode();
@@ -421,6 +454,8 @@ $(document).ready(function() {
     }
 
     function startExam(studentId) {
+        const $btn = $('#startExamBtn');
+        $btn.prop('disabled', true).addClass('btn-loading').html('<i class="fas fa-spinner fa-spin me-2"></i>جاري البدء');
         $.post('/api/exam/start', {
             _token: '{{ csrf_token() }}',
             student_id: studentId
@@ -428,8 +463,11 @@ $(document).ready(function() {
             examId = response.exam.id;
             showExamInterface(response.exam);
             toastr.success('تم بدء الاختبار');
+            $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-play me-2"></i>بدء الاختبار');
         }).fail(function(xhr) {
-            toastr.error('حدث خطأ أثناء بدء الاختبار');
+            const msg = xhr.responseJSON?.error || 'حدث خطأ أثناء بدء الاختبار';
+            toastr.error(msg);
+            $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-play me-2"></i>بدء الاختبار');
         });
     }
 
@@ -467,6 +505,8 @@ $(document).ready(function() {
             toastr.warning('الرجاء اختيار جزء واحد على الأقل');
             return;
         }
+        const $btn = $('#nextQuestionBtn');
+        $btn.prop('disabled', true).addClass('btn-loading').html('<i class="fas fa-spinner fa-spin me-1"></i>جاري التحميل');
         $.ajax({
             url: '{{ route("supervisor.exam-assistant.generate") }}',
             method: 'POST',
@@ -482,9 +522,12 @@ $(document).ready(function() {
                     $('#notesInput').val('');
                     toastr.success('تم توليد السؤال');
                 }
+                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي');
             },
-            error: function() {
-                toastr.error('حدث خطأ');
+            error: function(xhr) {
+                const msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'حدث خطأ';
+                toastr.error(msg);
+                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي');
             }
         });
     }
@@ -501,6 +544,8 @@ $(document).ready(function() {
             toastr.error('بيانات الآية غير مكتملة');
             return;
         }
+        const $btn = $('#addResultBtn');
+        $btn.prop('disabled', true).addClass('btn-loading');
         $.post('/api/exam/add-question', {
             _token: '{{ csrf_token() }}',
             exam_id: examId,
@@ -519,10 +564,12 @@ $(document).ready(function() {
             $('#errorsCount').val(0);
             $('#notesInput').val('');
             toastr.success('تم إضافة النتيجة');
+            $btn.prop('disabled', false).removeClass('btn-loading');
         }).fail(function(xhr) {
             console.error('addResult error:', xhr);
             const msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'حدث خطأ';
             toastr.error(msg);
+            $btn.prop('disabled', false).removeClass('btn-loading');
         });
     }
 
@@ -534,6 +581,9 @@ $(document).ready(function() {
 
     function buildQuestionItemHTML(q) {
         const ref = buildQuestionRef(q);
+        const errorsLabel = q.errors_count === 0
+            ? '<span class="zero-errors">✓ لا أخطاء</span>'
+            : '<small class="text-muted">أخطاء: ' + q.errors_count + '</small>';
         return `
         <div class="list-group-item list-group-item-action question-item"
              data-id="${q.id}"
@@ -547,10 +597,10 @@ $(document).ready(function() {
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="fw-bold">${ref}</div>
-                    <small class="text-muted">أخطاء: ${q.errors_count}</small>
+                    ${errorsLabel}
                     ${q.notes ? '<div class="small text-muted mt-1">' + truncateNotes(q.notes) + '</div>' : ''}
                 </div>
-                <span class="badge bg-secondary">#${q.order || 1}</span>
+                <span class="badge bg-secondary order-badge">#${q.order || 1}</span>
             </div>
         </div>`;
     }
@@ -583,8 +633,10 @@ $(document).ready(function() {
     function enterReviewMode(question) {
         isReviewMode = true;
         currentQuestionId = question.id;
-        $('#errorsCount').val(question.errors_count);
-        $('#notesInput').val(question.notes);
+        originalErrors = parseInt(question.errors_count) || 0;
+        originalNotes = question.notes || '';
+        $('#errorsCount').val(originalErrors);
+        $('#notesInput').val(originalNotes);
         $('#addResultBtn').removeClass('btn-generate').addClass('btn-warning').text('حفظ التعديلات');
         $('#backToExamBtn').removeClass('d-none');
         $('#resultFormCard .card-header h5').html('<i class="fas fa-edit me-2"></i>تعديل النتيجة');
@@ -610,6 +662,8 @@ $(document).ready(function() {
     });
 
     function updateQuestion() {
+        const $btn = $('#addResultBtn');
+        $btn.prop('disabled', true).addClass('btn-loading');
         $.ajax({
             url: '/api/exam/questions/' + currentQuestionId,
             method: 'PUT',
@@ -623,8 +677,10 @@ $(document).ready(function() {
                 exitReviewMode();
                 reloadQuestions();
             },
-            error: function() {
-                toastr.error('حدث خطأ');
+            error: function(xhr) {
+                const msg = xhr.responseJSON?.error || 'حدث خطأ';
+                toastr.error(msg);
+                $btn.prop('disabled', false).removeClass('btn-loading');
             }
         });
     }
@@ -640,18 +696,84 @@ $(document).ready(function() {
         $.post('/api/exam/' + examId + '/finish', {
             _token: '{{ csrf_token() }}'
         }, function(response) {
+            window.examFinished = true;
             toastr.success('تم إنهاء الاختبار بنجاح');
             $('#examStatusBadge').removeClass('bg-primary').addClass('bg-success').text('مكتمل');
-            $('#finishExamBtn, #cancelExamBtn, #nextQuestionBtn').prop('disabled', true);
-        }).fail(function() {
-            toastr.error('حدث خطأ');
+            // Disable all interactive buttons
+            $('#finishExamBtn, #cancelExamBtn, #nextQuestionBtn, #addResultBtn').prop('disabled', true);
+        }).fail(function(xhr) {
+            const msg = xhr.responseJSON?.error || 'حدث خطأ';
+            toastr.error(msg);
         });
     }
 
     function cancelExam() {
-        // For now, just reload - could add cancel API endpoint
-        location.reload();
+        if (!examId) return;
+        $.ajax({
+            url: '/api/exam/' + examId,
+            method: 'DELETE',
+            data: { _token: '{{ csrf_token() }}' },
+            success: function() {
+                examId = null;
+                location.reload();
+            },
+            error: function(xhr) {
+                const msg = xhr.responseJSON?.error || 'حدث خطأ';
+                toastr.error(msg);
+            }
+        });
     }
+
+    // Warn before leaving with unsaved in-progress exam
+    $(window).on('beforeunload', function() {
+        if (examId && !window.examFinished) {
+            return 'لديك اختبار قيد التنفيذ. هل أنت متأكد من المغادرة؟';
+        }
+    });
+
+    // Keyboard shortcuts
+    let originalErrors = 0;
+    let originalNotes = '';
+
+    $(document).on('keydown', function(e) {
+        const tag = e.target.tagName;
+        const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+        // Escape → exit review mode
+        if (e.key === 'Escape' && isReviewMode) {
+            const currentErrors = parseInt($('#errorsCount').val()) || 0;
+            const currentNotes = $('#notesInput').val() || '';
+            if (currentErrors !== originalErrors || currentNotes !== originalNotes) {
+                if (!confirm('توجد تغييرات غير محفوظة. هل تريد المغادرة؟')) {
+                    return;
+                }
+            }
+            exitReviewMode();
+        }
+
+        // Ignore shortcuts when in inputs (except Escape)
+        if (isInput && e.key !== 'Escape') return;
+
+        // Enter on errors_count or notes → add result
+        if (e.key === 'Enter') {
+            const target = e.target;
+            if (target.id === 'errorsCount' || target.id === 'notesInput') {
+                e.preventDefault();
+                if (isReviewMode && currentQuestionId) {
+                    updateQuestion();
+                } else if (!isReviewMode && currentVerseData) {
+                    addResult();
+                }
+            }
+        }
+
+        // N key → next question (when not in input)
+        if (e.key === 'n' || e.key === 'N') {
+            if (!isInput && !isReviewMode) {
+                generateQuestion();
+            }
+        }
+    });
 });
 </script>
 @endpush

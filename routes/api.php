@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/exam/add-question', [ExamController::class, 'addQuestion']);
     Route::put('/exam/questions/{id}', [ExamController::class, 'updateQuestion']);
     Route::post('/exam/{id}/finish', [ExamController::class, 'finish']);
+    Route::delete('/exam/{id}', [ExamController::class, 'destroy']);
     Route::get('/exam/{examId}/questions', [ExamController::class, 'getQuestions']);
     Route::get('/exam/in-progress', [ExamController::class, 'getInProgress']);
 });
