@@ -57,15 +57,9 @@ trait HasStudentPartRecords
 
         foreach ($allSessions as $session) {
             if ($session->type === RecitationSession::TYPE_MAFSIL) {
-                $pageNumbers = $session->pages->pluck('page_number')->toArray();
-                if (!empty($pageNumbers)) {
-                    $partNumbers = QuranPage::whereIn('page_number', $pageNumbers)
-                        ->join('quran_parts', 'quran_pages.part_id', '=', 'quran_parts.id')
-                        ->distinct()
-                        ->pluck('quran_parts.part_number');
-                    foreach ($partNumbers as $partNumber) {
-                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
-                    }
+                $partNumbers = $session->pages->pluck('page_number')->toArray();
+                foreach ($partNumbers as $partNumber) {
+                    $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
                 }
             } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
                 $partNum = $session->part?->part_number;
