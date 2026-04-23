@@ -47,7 +47,7 @@ trait HasStudentPartRecords
             );
         }
 
-        $records = $existingRecords->union($partsToFill)->filter();
+        $records = $existingRecords->merge($partsToFill)->filter();
         return $records;
     }
 
