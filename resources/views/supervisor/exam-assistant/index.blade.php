@@ -439,6 +439,10 @@ $(document).ready(function() {
         $('#examStudentName').text(exam.student?.user?.name || exam.student?.name || 'طالب');
         $('#examDate').text('التاريخ: ' + exam.exam_date);
         $('#examStatusBadge').removeClass('bg-success').addClass('bg-primary').text('قيد التقدم');
+        // Reset questions UI
+        $('#questionsList').html('<div class="text-center text-muted py-4" id="noQuestionsMsg"><i class="fas fa-inbox fa-2x mb-2 d-block"></i>لا توجد أسئلة بعد</div>');
+        $('#questionsCount').text('0');
+        $('#noQuestionsMsg').removeClass('d-none');
     }
 
     function loadInProgressExam(exam, questions) {
@@ -486,15 +490,26 @@ $(document).ready(function() {
     }
 
     function addResult() {
+        if (!examId || !currentVerseData) {
+            toastr.warning('الرجاء توليد سؤال أولاً');
+            return;
+        }
+        const verseText = currentVerseData.ayah?.text
+            || (typeof currentVerseData.ayah === 'string' ? currentVerseData.ayah : null);
+        if (!verseText) {
+            console.error('Verse text missing:', currentVerseData);
+            toastr.error('بيانات الآية غير مكتملة');
+            return;
+        }
         $.post('/api/exam/add-question', {
             _token: '{{ csrf_token() }}',
             exam_id: examId,
             surah_id: currentVerseData.surah_id,
             ayah_id: currentVerseData.ayah_id,
-            ayah_number: currentVerseData.ayah_number,
-            page_number: currentVerseData.page_number,
-            juz_number: currentVerseData.juz_number,
-            verse_text: currentVerseData.ayah?.text || currentVerseData.ayah,
+            ayah_number: currentVerseData.ayah?.ayah_number || currentVerseData.ayah_number,
+            page_number: currentVerseData.ayah?.page_number || currentVerseData.page_number,
+            juz_number: currentVerseData.ayah?.juz_number || currentVerseData.juz_number,
+            verse_text: verseText,
             errors_count: $('#errorsCount').val(),
             notes: $('#notesInput').val()
         }, function(response) {
@@ -505,7 +520,9 @@ $(document).ready(function() {
             $('#notesInput').val('');
             toastr.success('تم إضافة النتيجة');
         }).fail(function(xhr) {
-            toastr.error('حدث خطأ');
+            console.error('addResult error:', xhr);
+            const msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'حدث خطأ';
+            toastr.error(msg);
         });
     }
 
