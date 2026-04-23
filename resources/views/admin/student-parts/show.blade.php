@@ -60,6 +60,7 @@
                             <th>التلعثم</th>
                             <th>الدرجة</th>
                             <th>آخر تسميع</th>
+                            <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,6 +99,15 @@
                                 <td>{{ $record ? $record->total_hesitations : '-' }}</td>
                                 <td>{{ $record && $record->total_score !== null ? number_format($record->total_score, 1) . '%' : '-' }}</td>
                                 <td>{{ $record && $record->last_recitation_date ? $record->last_recitation_date->format('Y-m-d') : '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit-btn"
+                                        data-part="{{ $part->part_number }}"
+                                        data-record='@json($record)'
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -106,4 +116,79 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Modal -->
+<div class="modal fade edit-modal" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل الجزء <span id="modalPartNumber"></span></h5>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="part_number" id="editPartNumber">
+
+                    <div class="form-group">
+                        <label><strong>الحالة</strong></label>
+                        <select name="is_completed" id="editIsCompleted" class="form-control">
+                            <option value="1">متقن</option>
+                            <option value="0">غير متقن</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><strong>إجمالي الأخطاء</strong></label>
+                        <input type="number" name="total_errors" id="editErrors" class="form-control" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label><strong>إجمالي التلعثم</strong></label>
+                        <input type="number" name="total_hesitations" id="editHesitations" class="form-control" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label><strong>الدرجة (%)</strong></label>
+                        <input type="number" name="total_score" id="editScore" class="form-control" min="0" max="100" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label><strong>تاريخ آخر تسميع</strong></label>
+                        <input type="date" name="last_recitation_date" id="editDate" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+$(function() {
+    $('.edit-btn').on('click', function() {
+        var part = $(this).data('part');
+        var record = $(this).data('record') || {};
+
+        $('#modalPartNumber').text(part);
+        $('#editPartNumber').val(part);
+        $('#editIsCompleted').val(record.is_completed ? '1' : '0');
+        $('#editErrors').val(record.total_errors || 0);
+        $('#editHesitations').val(record.total_hesitations || 0);
+        $('#editScore').val(record.total_score || '');
+        $('#editDate').val(record.last_recitation_date || '');
+
+        var studentId = {{ $student->id }};
+        $('#editForm').attr('action', '/admin/student-parts/' + studentId + '/' + part);
+    });
+});
+</script>
+@endpush

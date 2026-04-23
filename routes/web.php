@@ -85,6 +85,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Student Parts Record
     Route::get('/student-parts', [AdminStudentPartRecordController::class, 'index'])->name('student-parts.index');
     Route::get('/student-parts/{studentId}', [AdminStudentPartRecordController::class, 'show'])->name('student-parts.show');
+    Route::put('/student-parts/{studentId}/{partNumber}', [AdminStudentPartRecordController::class, 'update'])->name('student-parts.update');
 
     // Sessions
     Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');
@@ -332,6 +333,7 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     // Student Parts Record
     Route::get('/student-parts', [ParentStudentPartRecordController::class, 'index'])->name('student-parts.index');
     Route::get('/student-parts/{studentId}', [ParentStudentPartRecordController::class, 'show'])->name('student-parts.show');
+    Route::put('/student-parts/{studentId}/{partNumber}', [ParentStudentPartRecordController::class, 'update'])->name('student-parts.update');
 
     // Billing
     Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');

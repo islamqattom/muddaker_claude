@@ -67,4 +67,29 @@ class StudentPartRecordController extends Controller
             'totalMafsilAndMutqin' => $totalMafsilAndMutqin,
         ]);
     }
+
+    public function update(Request $request, $studentId, $partNumber)
+    {
+        $user = Auth::user();
+        $parentProfile = $user->parentProfile()->firstOrFail();
+
+        $student = $parentProfile->students()->findOrFail($studentId);
+
+        $validated = $request->validate([
+            'is_completed' => 'boolean',
+            'total_errors' => 'integer|min:0',
+            'total_hesitations' => 'integer|min:0',
+            'total_score' => 'nullable|numeric|min:0|max:100',
+            'last_recitation_date' => 'nullable|date',
+        ]);
+
+        $validated['is_manual_override'] = true;
+
+        \App\Models\StudentPartRecord::updateOrCreate(
+            ['student_id' => $studentId, 'part_number' => $partNumber],
+            $validated
+        );
+
+        return redirect()->back()->with('success', 'Part record updated.');
+    }
 }
