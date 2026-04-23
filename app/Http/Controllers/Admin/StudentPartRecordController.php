@@ -15,9 +15,8 @@ class StudentPartRecordController extends Controller
 
     public function index()
     {
-        $students = Student::with(['user', 'level', 'supervisor'])
-            ->orderByHas('user', 'name')
-            ->get();
+        $students = Student::with(['user', 'level', 'supervisor'])->get()
+            ->sortBy(fn($s) => $s->user->name);
 
         return view('admin.student-parts.index', compact('students'));
     }
