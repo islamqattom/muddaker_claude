@@ -75,33 +75,28 @@
                                 $record = $records->get($part->part_number);
                                 $isCompleted = $record && $record->is_completed;
                                 $isOverride = $record && $record->is_manual_override;
+                                $sessionType = $partSessionTypes[$part->part_number] ?? null;
+                                $statusLabel = match(true) {
+                                    $sessionType === 'mafsil' => 'مفصل',
+                                    $sessionType === 'recitation' && $isCompleted => 'متقن',
+                                    $sessionType === 'recitation' && !$isCompleted => 'غير متقن',
+                                    default => 'غير متقن'
+                                };
+                                $statusClass = match($sessionType) {
+                                    'mafsil' => 'status-mafsil',
+                                    'recitation' => $isCompleted ? 'status-mutqin' : 'status-not-completed',
+                                    default => 'status-not-completed'
+                                };
                             @endphp
                             <tr class="{{ $isCompleted ? 'completed' : 'not-completed' }}">
-                                <td>{{ $part->part_number }}</td>
-                                <td>{{ $part->name }}</td>
                                 @if($part->part_number == 2)
-                                <td colspan="8" class="bg-warning text-dark">
-                                    DEBUG: record={{ json_encode($record) }} isCompleted={{ var_export($isCompleted, true) }} sessionType={{ $partSessionTypes[$part->part_number] ?? 'null' }}
+                                <td colspan="8" class="bg-warning text-dark p-3">
+                                    <strong>DEBUG:</strong> record={{ json_encode($record) }} | isCompleted={{ var_export($isCompleted, true) }} | sessionType={{ $sessionType ?? 'null' }}
                                 </td>
-                            </tr>
-                            <tr class="{{ $isCompleted ? 'completed' : 'not-completed' }}">
+                                @else
                                 <td>{{ $part->part_number }}</td>
                                 <td>{{ $part->name }}</td>
                                 <td>
-                                    @php
-                                        $sessionType = $partSessionTypes[$part->part_number] ?? null;
-                                        $statusLabel = match(true) {
-                                            $sessionType === 'mafsil' => 'مفصل',
-                                            $sessionType === 'recitation' && $isCompleted => 'متقن',
-                                            $sessionType === 'recitation' && !$isCompleted => 'غير متقن',
-                                            default => 'غير متقن'
-                                        };
-                                        $statusClass = match($sessionType) {
-                                            'mafsil' => 'status-mafsil',
-                                            'recitation' => $isCompleted ? 'status-mutqin' : 'status-not-completed',
-                                            default => 'status-not-completed'
-                                        };
-                                    @endphp
                                     <span class="{{ $statusClass }}">
                                         {{ $statusLabel }}
                                     </span>
@@ -122,6 +117,7 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
