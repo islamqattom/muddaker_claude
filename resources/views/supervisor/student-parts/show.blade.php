@@ -76,9 +76,14 @@
                                 $isCompleted = $record && $record->is_completed;
                                 $isOverride = $record && $record->is_manual_override;
                             @endphp
-                            @if($part->part_number == 2)
-                            <!-- DEBUG part 2: record={{ json_encode($record) }} isCompleted={{ $isCompleted }} -->
-                            @endif
+                            <tr class="{{ $isCompleted ? 'completed' : 'not-completed' }}">
+                                <td>{{ $part->part_number }}</td>
+                                <td>{{ $part->name }}</td>
+                                @if($part->part_number == 2)
+                                <td colspan="8" class="bg-warning text-dark">
+                                    DEBUG: record={{ json_encode($record) }} isCompleted={{ var_export($isCompleted, true) }} sessionType={{ $partSessionTypes[$part->part_number] ?? 'null' }}
+                                </td>
+                            </tr>
                             <tr class="{{ $isCompleted ? 'completed' : 'not-completed' }}">
                                 <td>{{ $part->part_number }}</td>
                                 <td>{{ $part->name }}</td>
