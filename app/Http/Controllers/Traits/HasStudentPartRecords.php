@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Traits;
 
-use App\Models\RecitationSession;
+use App\Models\QuranPage;
 use App\Models\QuranPart;
+use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Database\Eloquent\Collection;
@@ -56,19 +57,14 @@ trait HasStudentPartRecords
 
         foreach ($allSessions as $session) {
             if ($session->type === RecitationSession::TYPE_MAFSIL) {
-                // Get distinct part_ids from the session's pages via quran_pages
-                $pageNumbers = $session->pages()->pluck('page_number')->toArray();
-
+                $pageNumbers = $session->pages->pluck('page_number')->toArray();
                 if (!empty($pageNumbers)) {
-                    $partIds = \App\Models\QuranPage::whereIn('page_number', $pageNumbers)
-                        ->pluck('part_id')
-                        ->unique();
-
-                    foreach ($partIds as $partId) {
-                        $part = \App\Models\QuranPart::find($partId);
-                        if ($part) {
-                            $partSessionTypes[$part->part_number] = RecitationSession::TYPE_MAFSIL;
-                        }
+                    $partNumbers = QuranPage::whereIn('page_number', $pageNumbers)
+                        ->join('quran_parts', 'quran_pages.part_id', '=', 'quran_parts.id')
+                        ->distinct()
+                        ->pluck('quran_parts.part_number');
+                    foreach ($partNumbers as $partNumber) {
+                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
                     }
                 }
             } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
