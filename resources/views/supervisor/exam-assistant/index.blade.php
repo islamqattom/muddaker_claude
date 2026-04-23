@@ -11,124 +11,268 @@
 @push('styles')
 <style>
     .exam-card {
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+        border: 1px solid rgba(24, 43, 72, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+
+    .exam-card .card-header {
+        background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
+        color: white;
         border: none;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 16px 20px;
+    }
+
+    .exam-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 16px;
     }
 
     .verse-display {
-        background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
-        border-radius: 15px;
+        background: linear-gradient(145deg, #1a2a4a 0%, #2A4570 50%, #1e3a5f 100%);
+        border-radius: 12px;
         padding: 40px;
         color: white;
-        min-height: 200px;
+        min-height: 220px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         font-family: 'Amiri', 'Scheherazade', serif;
-        font-size: 28px;
-        line-height: 2.2;
+        font-size: 30px;
+        line-height: 2.4;
         direction: rtl;
-        box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .verse-display::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 50%);
+        animation: shimmer 8s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(10%, 10%); }
     }
 
     .verse-display .verse-text {
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        position: relative;
+        z-index: 1;
     }
 
     .verse-display .placeholder {
-        opacity: 0.6;
+        opacity: 0.7;
         font-size: 18px;
         font-family: 'Tajawal', sans-serif;
+        position: relative;
+        z-index: 1;
+    }
+
+    .verse-display .placeholder i {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; }
     }
 
     .scope-selector {
-        background: #f1f5f9;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 16px;
+        margin-bottom: 16px;
+        border: 1px solid #e2e8f0;
     }
 
-    .scope-option {
-        cursor: pointer;
-        padding: 12px 20px;
+    .juz-grid {
+        max-height: 180px;
+        overflow-y: auto;
+        border: 1px solid #e2e8f0;
         border-radius: 10px;
-        border: 2px solid transparent;
-        transition: all 0.2s;
+        padding: 12px;
         background: white;
     }
 
-    .scope-option:hover {
-        border-color: #B4802C;
+    .juz-grid::-webkit-scrollbar {
+        width: 6px;
     }
 
-    .scope-option.active {
+    .juz-grid::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+
+    .juz-grid::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+
+    .juz-item {
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .juz-item:hover {
+        border-color: #B4802C;
+        background: #fef7ed;
+    }
+
+    .juz-item.active {
         border-color: #182B48;
-        background: #182B48;
+        background: linear-gradient(135deg, #182B48, #2A4570);
         color: white;
     }
 
-    .scope-option input {
+    .juz-item input {
         display: none;
     }
 
+    .btn-select-all {
+        background: linear-gradient(135deg, #6366f1, #818cf8);
+        border: none;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-select-all:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
     .btn-generate {
-        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         border: none;
         padding: 14px 40px;
         font-size: 16px;
         font-weight: 600;
-        border-radius: 10px;
-        transition: all 0.3s;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-generate::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-generate:hover::before {
+        left: 100%;
     }
 
     .btn-generate:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(39, 174, 96, 0.4);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
     }
 
     .btn-next {
-        background: linear-gradient(135deg, #182B48, #2A4570);
+        background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
         border: none;
-        padding: 12px 30px;
+        padding: 12px 28px;
         font-size: 14px;
-        border-radius: 8px;
+        font-weight: 500;
+        border-radius: 10px;
+        transition: all 0.2s;
     }
 
-    .btn-copy {
-        background: #6c757d;
-        border: none;
-        padding: 12px 30px;
-        font-size: 14px;
-        border-radius: 8px;
+    .btn-next:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(24, 43, 72, 0.3);
     }
 
-    .verse-reference {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 14px;
-        color: #6c757d;
+    .btn-next:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     .question-item {
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         border-radius: 0;
         border-right: 3px solid transparent;
+        padding: 14px 16px;
     }
 
     .question-item:hover {
-        background: #f1f5f9;
+        background: linear-gradient(90deg, #fef7ed 0%, #f1f5f9 100%);
         border-right-color: #B4802C;
+        transform: translateX(-4px);
     }
 
-    .question-item:active {
-        background: #e2e8f0;
+    .question-item.active-review {
+        background: #fef9c3;
+        border-right-color: #f59e0b;
     }
 
-    #resultFormCard .card-header {
-        border-bottom: 1px solid #e2e8f0;
+    .question-item .order-badge {
+        font-size: 11px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .exam-stats {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        font-size: 13px;
+    }
+
+    .stat-item i {
+        font-size: 14px;
+    }
+
+    .exam-timer {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 14px;
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 8px;
+    }
+
+    .keyboard-hint {
+        font-size: 11px;
+        color: #94a3b8;
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 8px;
     }
 
     .btn-warning {
@@ -137,28 +281,30 @@
         color: white;
     }
 
+    .btn-warning:hover {
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
     .highlighted-verse {
-        background-color: #fef08a;
+        background: linear-gradient(135deg, #fef08a, #fde047);
         color: #1e293b;
         border-radius: 4px;
-        padding: 2px 6px;
+        padding: 2px 8px;
         font-weight: bold;
     }
 
     .quran-page {
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        border-radius: 0 0 15px 15px;
+        border-radius: 0 0 12px 12px;
         color: #1e293b;
     }
 
-    /* Override for injected page HTML inside card-body */
     #pageDisplay .quran-page,
     #pageDisplay .quran-page * {
         border-radius: 0 !important;
         box-shadow: none !important;
     }
 
-    /* Sticky questions list header */
     #questionsList .card-header {
         position: sticky;
         top: 0;
@@ -166,37 +312,90 @@
         background: white;
     }
 
-    /* Loading state for buttons */
     .btn-loading {
         position: relative;
         pointer-events: none;
     }
+
     .btn-loading::after {
         content: '';
         position: absolute;
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         top: 50%;
         left: 50%;
-        margin: -8px 0 0 -8px;
-        border: 2px solid rgba(255,255,255,0.3);
+        margin: -9px 0 0 -9px;
+        border: 2px solid rgba(255,255,255,0.4);
         border-top-color: white;
         border-radius: 50%;
         animation: spin 0.7s linear infinite;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Better zero-errors indicator */
     .zero-errors {
-        color: #27ae60;
+        color: #059669;
+        font-weight: 700;
+    }
+
+    .total-errors-badge {
+        background: linear-gradient(135deg, #ef4444, #f87171);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
     }
 
-    /* Question item hover */
-    .question-item .order-badge {
-        font-size: 11px;
-        padding: 4px 8px;
-        border-radius: 6px;
+    .exam-complete-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+
+    .exam-complete-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .exam-complete-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        max-width: 400px;
+        transform: scale(0.8);
+        transition: transform 0.3s;
+    }
+
+    .exam-complete-overlay.show .exam-complete-card {
+        transform: scale(1);
+    }
+
+    .success-checkmark {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #059669, #10b981);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .success-checkmark i {
+        font-size: 40px;
+        color: white;
     }
 
     @media (max-width: 768px) {
@@ -205,13 +404,18 @@
             font-size: 22px;
         }
 
-        .scope-option {
-            padding: 10px 15px;
-            font-size: 14px;
+        .juz-item {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .exam-stats {
+            flex-wrap: wrap;
+            gap: 8px;
         }
     }
 </style>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -219,13 +423,13 @@
 <div id="student-selection" class="row justify-content-center">
     <div class="col-lg-6">
         <div class="card exam-card mb-4">
-            <div class="card-header bg-white">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="fas fa-user-graduate me-2"></i>اختر الطالب</h5>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label">الطالب</label>
-                    <select id="studentSelect" class="form-select select2">
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-3">الطالب</label>
+                    <select id="studentSelect" class="form-select select2" style="font-size: 16px; padding: 12px 16px;">
                         <option value="">-- ابحث عن طالب --</option>
                         @foreach($students as $student)
                             <option value="{{ $student->id }}">{{ $student->user->name ?? '' }} - {{ $student->level->name ?? '' }}</option>
@@ -245,15 +449,25 @@
 {{-- Exam Interface (hidden until exam starts) --}}
 <div id="exam-interface" class="d-none">
     {{-- Exam Header --}}
-    <div class="row mb-3">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center gap-3">
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center flex-wrap gap-3">
                 <h4 class="mb-0"><i class="fas fa-user-graduate me-2"></i><span id="examStudentName"></span></h4>
                 <span class="badge bg-primary" id="examStatusBadge">قيد التقدم</span>
+                <div class="exam-stats ms-auto">
+                    <div class="stat-item">
+                        <i class="fas fa-list"></i>
+                        <span id="questionsCount">0</span> سؤال
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <span id="totalErrors">0</span> خطأ
+                    </div>
+                </div>
             </div>
-            <small class="text-muted" id="examDate"></small>
+            <small class="text-muted mt-1 d-block" id="examDate"></small>
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
             <button type="button" id="finishExamBtn" class="btn btn-success me-2">
                 <i class="fas fa-check-circle me-1"></i>إنهاء الاختبار
             </button>
@@ -269,21 +483,28 @@
         <div class="col-lg-7">
             {{-- Scope Selector --}}
             <div class="card exam-card mb-3">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-filter me-2"></i>إعدادات الاختبار</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">اختر الأجزاء (<span id="selectedJuzCount">0</span> محدد)</label>
-                        <div class="row g-2" style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
-                            @for($i = 1; $i <= 30; $i++)
-                                <div class="col-4 col-md-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input juz-checkbox" type="checkbox" value="{{ $i }}" id="juz{{ $i }}">
-                                        <label class="form-check-label" for="juz{{ $i }}">الجزء {{ $i }}</label>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label mb-0 fw-bold">اختر الأجزاء (<span id="selectedJuzCount">0</span> محدد)</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn-select-all" id="selectAllJuz">تحديد الكل</button>
+                                <button type="button" class="btn-select-all" id="clearAllJuz">إلغاء</button>
+                            </div>
+                        </div>
+                        <div class="juz-grid">
+                            <div class="row g-2">
+                                @for($i = 1; $i <= 30; $i++)
+                                    <div class="col-4 col-md-3">
+                                        <label class="juz-item d-block" for="juz{{ $i }}">
+                                            <input class="juz-checkbox" type="checkbox" value="{{ $i }}" id="juz{{ $i }}"> الجزء {{ $i }}
+                                        </label>
                                     </div>
-                                </div>
-                            @endfor
+                                @endfor
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -291,16 +512,16 @@
 
             {{-- Page Display --}}
             <div class="card exam-card">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-book-quran me-2"></i>صفحة القرآن</h5>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-sm btn-next text-white" id="nextQuestionBtn">
-                            <i class="fas fa-arrow-right me-1"></i>السؤال التالي
+                            <i class="fas fa-arrow-right me-1"></i>السؤال التالي<span class="keyboard-hint">N</span>
                         </button>
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    <div class="verse-display" id="pageDisplay" style="border-radius: 15px;">
+                    <div class="verse-display" id="pageDisplay">
                         <div class="placeholder">
                             <i class="fas fa-hand-pointer fa-2x mb-3 d-block"></i>
                             اضغط على "السؤال التالي" لعرض آية عشوائية
@@ -314,16 +535,16 @@
         <div class="col-lg-5">
             {{-- Result Entry Form --}}
             <div class="card exam-card mb-3" id="resultFormCard">
-                <div class="card-header bg-white">
+                <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>تسجيل النتيجة</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">عدد الأخطاء</label>
-                        <input type="number" id="errorsCount" class="form-control" min="0" value="0" placeholder="0">
+                        <label class="form-label fw-bold">عدد الأخطاء</label>
+                        <input type="number" id="errorsCount" class="form-control" min="0" value="0" placeholder="0" style="font-size: 16px; padding: 10px 14px;">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">ملاحظات</label>
+                        <label class="form-label fw-bold">ملاحظات</label>
                         <textarea id="notesInput" class="form-control" rows="3" placeholder="ملاحظات المشرف..."></textarea>
                     </div>
                     <div class="d-flex gap-2">
@@ -339,19 +560,38 @@
 
             {{-- Questions Queue --}}
             <div class="card exam-card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>الأسئلة (<span id="questionsCount">0</span>)</h5>
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>الأسئلة</h5>
                 </div>
-                <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                <div class="card-body p-0" style="max-height: 350px; overflow-y: auto;">
                     <div id="questionsList" class="list-group list-group-flush">
-                        <div class="text-center text-muted py-4" id="noQuestionsMsg">
-                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
-                            لا توجد أسئلة بعد
+                        <div class="text-center text-muted py-5" id="noQuestionsMsg">
+                            <i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+                            <p class="mb-0">لا توجد أسئلة بعد</p>
+                            <small>اضغط على "السؤال التالي" لبدء الاختبار</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+{{-- Exam Complete Overlay --}}
+<div class="exam-complete-overlay" id="examCompleteOverlay">
+    <div class="exam-complete-card">
+        <div class="success-checkmark">
+            <i class="fas fa-check"></i>
+        </div>
+        <h4 class="mb-3">تم إنهاء الاختبار!</h4>
+        <p class="text-muted mb-4">تم حفظ جميع الإجابات بنجاح</p>
+        <p class="mb-4">
+            <strong id="finalQuestionsCount">0</strong> سؤال |
+            <strong id="finalErrorsCount" class="text-danger">0</strong> خطأ
+        </p>
+        <button type="button" class="btn btn-generate text-white" onclick="location.reload()">
+            <i class="fas fa-redo me-2"></i>بدء اختبار جديد
+        </button>
     </div>
 </div>
 @endsection
@@ -363,6 +603,10 @@ $(document).ready(function() {
     let currentQuestionId = null;
     let isReviewMode = false;
     let currentVerseData = null;
+    let originalErrors = 0;
+    let originalNotes = '';
+    let questionCount = 0;
+    let totalErrorsCount = 0;
 
     // Check for in-progress exam on page load
     checkInProgressExam();
@@ -371,15 +615,35 @@ $(document).ready(function() {
     function updateJuzCount() {
         const selected = $('.juz-checkbox:checked').length;
         $('#selectedJuzCount').text(selected);
-        // Enable/disable next question button based on selection
         $('#nextQuestionBtn').prop('disabled', selected === 0);
     }
 
+    // Select All / Clear All Juz
+    $('#selectAllJuz').click(function() {
+        $('.juz-checkbox').prop('checked', true);
+        $('.juz-item').addClass('active');
+        updateJuzCount();
+    });
+
+    $('#clearAllJuz').click(function() {
+        $('.juz-checkbox').prop('checked', false);
+        $('.juz-item').removeClass('active');
+        updateJuzCount();
+    });
+
+    $('.juz-item').click(function(e) {
+        if (e.target.tagName === 'INPUT') return;
+        const checkbox = $(this).find('input[type="checkbox"]');
+        checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+        $(this).toggleClass('active', checkbox.prop('checked'));
+    });
+
     $('.juz-checkbox').on('change', updateJuzCount);
+
     // Initially disable next question button until Juz is selected
     $('#nextQuestionBtn').prop('disabled', true);
 
-    // Delegated click for question items (avoids O(n) rebind on each append)
+    // Delegated click for question items
     $('#questionsList').on('click', '.question-item', function() {
         const $el = $(this);
         enterReviewMode({
@@ -393,7 +657,7 @@ $(document).ready(function() {
         });
     });
 
-    // Student selection - use existing select2 if available, otherwise use datalist
+    // Student selection - use existing select2 if available
     if ($('.select2').length && typeof $.fn.select2 !== 'undefined') {
         $('.select2').select2({
             placeholder: '-- ابحث عن طالب --',
@@ -426,9 +690,11 @@ $(document).ready(function() {
     // Finish Exam
     $('#finishExamBtn').click(function() {
         if (!examId) return;
-        if (confirm('هل أنت متأكد من إنهاء الاختبار؟')) {
-            finishExam();
-        }
+        const msg = questionCount === 0
+            ? 'لا توجد أسئلة مسجلة. هل أنت متأكد من إنهاء الاختبار؟'
+            : 'هل أنت متأكد من إنهاء الاختبار؟';
+        if (!confirm(msg)) return;
+        finishExam();
     });
 
     // Cancel Exam
@@ -475,16 +741,27 @@ $(document).ready(function() {
         $('#student-selection').addClass('d-none');
         $('#exam-interface').removeClass('d-none');
         $('#examStudentName').text(exam.student?.user?.name || exam.student?.name || 'طالب');
-        $('#examDate').text('التاريخ: ' + exam.exam_date);
+
+        // Format exam date properly
+        let examDate = exam.exam_date;
+        if (typeof examDate === 'object' && examDate.date) {
+            examDate = examDate.date;
+        }
+        const dateObj = new Date(examDate);
+        const formattedDate = dateObj.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+        $('#examDate').text('التاريخ: ' + formattedDate);
+
         $('#examStatusBadge').removeClass('bg-success').addClass('bg-primary').text('قيد التقدم');
-        // Reset questions UI
-        $('#questionsList').html('<div class="text-center text-muted py-4" id="noQuestionsMsg"><i class="fas fa-inbox fa-2x mb-2 d-block"></i>لا توجد أسئلة بعد</div>');
+        $('#questionsList').html('<div class="text-center text-muted py-5" id="noQuestionsMsg"><i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i><p class="mb-0">لا توجد أسئلة بعد</p><small>اضغط على "السؤال التالي" لبدء الاختبار</small></div>');
         $('#questionsCount').text('0');
+        $('#totalErrors').text('0');
         $('#noQuestionsMsg').removeClass('d-none');
+        $('#finishExamBtn, #cancelExamBtn, #nextQuestionBtn, #addResultBtn').prop('disabled', false);
+        questionCount = 0;
+        totalErrorsCount = 0;
     }
 
     function loadInProgressExam(exam, questions) {
-        // Only show exam interface if exam has valid student data with user relationship
         if (!exam || !exam.id || !exam.student || !exam.student.user) {
             $('#student-selection').removeClass('d-none');
             $('#exam-interface').addClass('d-none');
@@ -522,12 +799,12 @@ $(document).ready(function() {
                     $('#notesInput').val('');
                     toastr.success('تم توليد السؤال');
                 }
-                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي');
+                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي<span class="keyboard-hint">N</span>');
             },
             error: function(xhr) {
                 const msg = xhr.responseJSON?.message || xhr.responseJSON?.error || 'حدث خطأ';
                 toastr.error(msg);
-                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي');
+                $btn.prop('disabled', false).removeClass('btn-loading').html('<i class="fas fa-arrow-right me-1"></i>السؤال التالي<span class="keyboard-hint">N</span>');
             }
         });
     }
@@ -537,8 +814,9 @@ $(document).ready(function() {
             toastr.warning('الرجاء توليد سؤال أولاً');
             return;
         }
-        const verseText = currentVerseData.ayah?.text
-            || (typeof currentVerseData.ayah === 'string' ? currentVerseData.ayah : null);
+        const ayahData = currentVerseData.ayah;
+        const verseText = ayahData?.text
+            || (typeof ayahData === 'string' ? ayahData : null);
         if (!verseText) {
             console.error('Verse text missing:', currentVerseData);
             toastr.error('بيانات الآية غير مكتملة');
@@ -550,10 +828,10 @@ $(document).ready(function() {
             _token: '{{ csrf_token() }}',
             exam_id: examId,
             surah_id: currentVerseData.surah_id,
-            ayah_id: currentVerseData.ayah_id,
-            ayah_number: currentVerseData.ayah?.ayah_number || currentVerseData.ayah_number,
-            page_number: currentVerseData.ayah?.page_number || currentVerseData.page_number,
-            juz_number: currentVerseData.ayah?.juz_number || currentVerseData.juz_number,
+            ayah_id: ayahData.id || currentVerseData.ayah_id,
+            ayah_number: ayahData.ayah_number || 0,
+            page_number: ayahData.page_number || 0,
+            juz_number: ayahData.juz_number || 0,
             verse_text: verseText,
             errors_count: $('#errorsCount').val(),
             notes: $('#notesInput').val()
@@ -576,7 +854,28 @@ $(document).ready(function() {
     function appendQuestion(q) {
         $('#noQuestionsMsg').addClass('d-none');
         $('#questionsList').append(buildQuestionItemHTML(q));
-        $('#questionsCount').text(parseInt($('#questionsCount').text()) + 1);
+        questionCount++;
+        totalErrorsCount += parseInt(q.errors_count) || 0;
+        $('#questionsCount').text(questionCount);
+        $('#totalErrors').text(totalErrorsCount);
+    }
+
+    function updateStatsOnReload() {
+        questionCount = 0;
+        totalErrorsCount = 0;
+        $('#questionsList .question-item').each(function() {
+            questionCount++;
+            totalErrorsCount += parseInt($(this).data('errors') || 0);
+        });
+        $('#questionsCount').text(questionCount);
+        $('#totalErrors').text(totalErrorsCount);
+    }
+
+    const _escapeDiv = document.createElement('div');
+    function escapeHtml(text) {
+        if (!text) return '';
+        _escapeDiv.textContent = text;
+        return _escapeDiv.innerHTML;
     }
 
     function buildQuestionItemHTML(q) {
@@ -587,12 +886,12 @@ $(document).ready(function() {
         return `
         <div class="list-group-item list-group-item-action question-item"
              data-id="${q.id}"
-             data-surah="${q.surah?.name_ar || ''}"
+             data-surah="${escapeHtml(q.surah?.name_ar || '')}"
              data-ayah="${q.ayah_number}"
              data-page="${q.page_number}"
              data-errors="${q.errors_count}"
-             data-notes="${q.notes || ''}"
-             data-text="${q.verse_text || ''}"
+             data-notes="${escapeHtml(q.notes || '')}"
+             data-text="${escapeHtml(q.verse_text || '')}"
              style="cursor:pointer;">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -610,13 +909,17 @@ $(document).ready(function() {
     }
 
     function truncateNotes(notes) {
-        return notes.substring(0, 50) + '...';
+        if (!notes) return '';
+        return notes.substring(0, 50) + (notes.length > 50 ? '...' : '');
     }
 
     function renderQuestionsList(questions) {
         if (!questions || questions.length === 0) {
             $('#noQuestionsMsg').removeClass('d-none');
+            questionCount = 0;
+            totalErrorsCount = 0;
             $('#questionsCount').text('0');
+            $('#totalErrors').text('0');
             return;
         }
 
@@ -627,10 +930,11 @@ $(document).ready(function() {
 
         $('#questionsList').html(html);
         $('#noQuestionsMsg').addClass('d-none');
-        $('#questionsCount').text(questions.length);
+        updateStatsOnReload();
     }
 
     function enterReviewMode(question) {
+        if ($('#finishExamBtn').prop('disabled')) return;
         isReviewMode = true;
         currentQuestionId = question.id;
         originalErrors = parseInt(question.errors_count) || 0;
@@ -640,6 +944,8 @@ $(document).ready(function() {
         $('#addResultBtn').removeClass('btn-generate').addClass('btn-warning').text('حفظ التعديلات');
         $('#backToExamBtn').removeClass('d-none');
         $('#resultFormCard .card-header h5').html('<i class="fas fa-edit me-2"></i>تعديل النتيجة');
+        $('.question-item.active-review').removeClass('active-review');
+        $('.question-item[data-id="' + question.id + '"]').addClass('active-review');
         toastr.info('وضعية المراجعة - عدّل وحفظ');
     }
 
@@ -651,6 +957,7 @@ $(document).ready(function() {
         $('#addResultBtn').removeClass('btn-warning').addClass('btn-generate').text('إضافة النتيجة');
         $('#backToExamBtn').addClass('d-none');
         $('#resultFormCard .card-header h5').html('<i class="fas fa-clipboard-check me-2"></i>تسجيل النتيجة');
+        $('.question-item.active-review').removeClass('active-review');
     }
 
     $('#addResultBtn').click(function() {
@@ -699,8 +1006,10 @@ $(document).ready(function() {
             window.examFinished = true;
             toastr.success('تم إنهاء الاختبار بنجاح');
             $('#examStatusBadge').removeClass('bg-primary').addClass('bg-success').text('مكتمل');
-            // Disable all interactive buttons
             $('#finishExamBtn, #cancelExamBtn, #nextQuestionBtn, #addResultBtn').prop('disabled', true);
+            $('#finalQuestionsCount').text(questionCount);
+            $('#finalErrorsCount').text(totalErrorsCount);
+            $('#examCompleteOverlay').addClass('show');
         }).fail(function(xhr) {
             const msg = xhr.responseJSON?.error || 'حدث خطأ';
             toastr.error(msg);
@@ -732,9 +1041,6 @@ $(document).ready(function() {
     });
 
     // Keyboard shortcuts
-    let originalErrors = 0;
-    let originalNotes = '';
-
     $(document).on('keydown', function(e) {
         const tag = e.target.tagName;
         const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
