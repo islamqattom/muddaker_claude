@@ -9,6 +9,9 @@
 <a href="{{ route('parent.attendance.index') }}" class="nav-link {{ request()->routeIs('parent.attendance.*') ? 'active' : '' }}">
     <i class="fas fa-calendar-check"></i> سجل الحضور
 </a>
+<a href="{{ route('parent.student-parts.index') }}" class="nav-link {{ request()->routeIs('parent.student-parts.*') ? 'active' : '' }}">
+    <i class="fas fa-book-quran"></i> أجزاء الأبناء
+</a>
 <a href="{{ route('parent.warnings.index') }}" class="nav-link {{ request()->routeIs('parent.warnings.*') ? 'active' : '' }}">
     <i class="fas fa-exclamation-triangle"></i> الإنذارات
     @php $unread = \App\Models\Warning::whereHas('student', fn($q)=>$q->whereHas('parents',fn($p)=>$p->where('user_id',auth()->id())))->where('is_read_by_parent',false)->count(); @endphp

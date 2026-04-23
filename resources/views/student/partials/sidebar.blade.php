@@ -16,6 +16,9 @@
 <a href="{{ route('student.attendance.index') }}" class="nav-link {{ request()->routeIs('student.attendance.*') ? 'active' : '' }}">
     <i class="fas fa-calendar-check"></i> سجل حضوري
 </a>
+<a href="{{ route('student.student-parts') }}" class="nav-link {{ request()->routeIs('student.student-parts') ? 'active' : '' }}">
+    <i class="fas fa-book-quran"></i> أجزائي
+</a>
 <a href="{{ route('student.reports.index') }}" class="nav-link {{ request()->routeIs('student.reports.*') ? 'active' : '' }}">
     <i class="fas fa-chart-bar"></i> تقاريري
 </a>

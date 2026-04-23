@@ -6,6 +6,9 @@
 <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
     <i class="fas fa-user-graduate"></i> الطلاب
 </a>
+<a href="{{ route('admin.student-parts.index') }}" class="nav-link {{ request()->routeIs('admin.student-parts.*') ? 'active' : '' }}">
+    <i class="fas fa-book-quran"></i> سجل أجزاء الطلاب
+</a>
 <a href="{{ route('admin.supervisors.index') }}" class="nav-link {{ request()->routeIs('admin.supervisors.*') ? 'active' : '' }}">
     <i class="fas fa-user-tie"></i> المشرفون
 </a>
