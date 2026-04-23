@@ -80,7 +80,7 @@
                                             $sessionType === 'mafsil' => 'مفصل',
                                             $sessionType === 'recitation' && $isCompleted => 'متقن',
                                             $sessionType === 'recitation' && !$isCompleted => 'غير متقن',
-                                            default => 'غير مُكمَل'
+                                            default => 'غير متقن'
                                         };
                                         $statusClass = match($sessionType) {
                                             'mafsil' => 'status-mafsil',
