@@ -27,6 +27,12 @@
 
 @section('content')
 <div class="container-fluid">
+    <!-- DEBUG -->
+    <div class="alert alert-warning mb-4">
+        <pre>{{ json_encode($debug, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+    </div>
+    <!-- END DEBUG -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2><i class="fas fa-book-quran"></i> سجل أجزاء الطالب — {{ $student->user->name }}</h2>
         <a href="{{ route('supervisor.student-parts.index') }}" class="btn btn-secondary">

@@ -43,11 +43,10 @@ class StudentPartRecordController extends Controller
 
         $totalMafsilAndMutqin = $mafsilCount + $mutqinSardCount;
 
-        // DEBUG: dump partSessionTypes and allSessions
-        \Log::debug('student-parts show', [
+        // DEBUG: dump to view
+        $debug = [
             'student_id' => $studentId,
             'allSessions_count' => $allSessions->count(),
-            'allSessions_types' => $allSessions->pluck('type')->unique()->values()->toArray(),
             'partSessionTypes' => $partSessionTypes,
             'recitation_sessions' => $allSessions->where('type', 'recitation')->map(fn($s) => [
                 'id' => $s->id,
@@ -55,7 +54,7 @@ class StudentPartRecordController extends Controller
                 'part_number' => $s->part?->part_number,
                 'status' => $s->status,
             ])->values()->toArray(),
-        ]);
+        ];
 
         return view('supervisor.student-parts.show', [
             'student' => $student,
@@ -64,6 +63,7 @@ class StudentPartRecordController extends Controller
             'partSessionTypes' => $partSessionTypes,
             'mafsilCount' => $mafsilCount,
             'totalMafsilAndMutqin' => $totalMafsilAndMutqin,
+            'debug' => $debug,
         ]);
     }
 
