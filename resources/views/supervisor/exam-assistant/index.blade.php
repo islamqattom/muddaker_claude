@@ -406,11 +406,16 @@ $(document).ready(function() {
     });
 
     function checkInProgressExam() {
-        $.get('/api/exam/in-progress', function(response) {
+        $.get('/api/exam/in-progress')
+        .done(function(response) {
+            console.log('In-progress exam check:', response);
             if (response.exam) {
                 examId = response.exam.id;
                 loadInProgressExam(response.exam, response.questions);
             }
+        })
+        .fail(function(xhr) {
+            console.error('Failed to check in-progress exam:', xhr);
         });
     }
 
@@ -430,14 +435,14 @@ $(document).ready(function() {
     function showExamInterface(exam) {
         $('#student-selection').addClass('d-none');
         $('#exam-interface').removeClass('d-none');
-        $('#examStudentName').text(exam.student?.name || 'طالب');
+        $('#examStudentName').text(exam.student?.user?.name || exam.student?.name || 'طالب');
         $('#examDate').text('التاريخ: ' + exam.exam_date);
         $('#examStatusBadge').removeClass('bg-success').addClass('bg-primary').text('قيد التقدم');
     }
 
     function loadInProgressExam(exam, questions) {
-        // Only show exam interface if exam has valid student data
-        if (!exam || !exam.id || !exam.student) {
+        // Only show exam interface if exam has valid student data with user relationship
+        if (!exam || !exam.id || !exam.student || !exam.student.user) {
             $('#student-selection').removeClass('d-none');
             $('#exam-interface').addClass('d-none');
             examId = null;
