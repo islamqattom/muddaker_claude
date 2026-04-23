@@ -15,7 +15,7 @@ class QuranExamAssistantController extends Controller
         $students = \App\Models\Student::where('supervisor_id', auth()->id())
             ->with(['user', 'level'])
             ->get()
-            ->sortBy(fn($s) => $s->user->name ?? '');
+            ->sortBy(fn($s) => $s->user?->name ?? '');
 
         return view('supervisor.exam-assistant.index', compact('surahs', 'students'));
     }

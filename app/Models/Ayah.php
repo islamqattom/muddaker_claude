@@ -17,6 +17,11 @@ class Ayah extends Model
         'juz_number',
     ];
 
+    protected static array $pageHtmlCache = [];
+
+    private const RE_HIGHLIGHT_CLEAR = '/class="ayah-text highlighted-verse"/';
+    private const RE_AYAH_MARKER = '/(data-ayah-id="%s")/';
+
     public function surah()
     {
         return $this->belongsTo(Surah::class);
@@ -26,6 +31,10 @@ class Ayah extends Model
     {
         $pageNumber = $this->page_number;
         $currentAyahId = $this->id;
+
+        if (isset(self::$pageHtmlCache[$pageNumber])) {
+            return $this->injectHighlight(self::$pageHtmlCache[$pageNumber], $currentAyahId);
+        }
 
         $pageAyahs = Ayah::where('page_number', $pageNumber)
             ->with('surah')
@@ -49,15 +58,28 @@ class Ayah extends Model
                 $currentSurah = $ayah->surah_id;
             }
 
-            $highlightClass = $ayah->id === $currentAyahId ? 'highlighted-verse' : '';
-            $html .= '<span class="ayah-text ' . $highlightClass . '" data-ayah-id="' . $ayah->id . '" data-surah="' . e($ayah->surah->name_ar) . '" data-ayah="' . $ayah->ayah_number . '" data-page="' . $ayah->page_number . '">';
+            $html .= '<span class="ayah-text" data-ayah-id="' . $ayah->id . '" data-surah="' . e($ayah->surah->name_ar) . '" data-ayah="' . $ayah->ayah_number . '" data-page="' . $ayah->page_number . '">';
             $html .= e($ayah->text) . ' ﴾' . $this->arabicNumeral($ayah->ayah_number) . '﴿ ';
             $html .= '</span>';
         }
 
         $html .= '</div></div>';
 
-        return $html;
+        self::$pageHtmlCache[$pageNumber] = $html;
+
+        return $this->injectHighlight($html, $currentAyahId);
+    }
+
+    private function injectHighlight(string $cachedHtml, int $currentAyahId): string
+    {
+        $html = preg_replace(self::RE_HIGHLIGHT_CLEAR, 'class="ayah-text"', $cachedHtml);
+        $pattern = sprintf(self::RE_AYAH_MARKER, $currentAyahId);
+        return preg_replace(
+            $pattern,
+            '$1 class="ayah-text highlighted-verse"',
+            $html,
+            1
+        );
     }
 
     private function arabicNumeral(int $num): string

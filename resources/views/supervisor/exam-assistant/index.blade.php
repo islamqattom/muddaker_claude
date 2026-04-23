@@ -599,6 +599,7 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    const csrfToken = '{{ csrf_token() }}';
     let examId = null;
     let currentQuestionId = null;
     let isReviewMode = false;
@@ -723,7 +724,7 @@ $(document).ready(function() {
         const $btn = $('#startExamBtn');
         $btn.prop('disabled', true).addClass('btn-loading').html('<i class="fas fa-spinner fa-spin me-2"></i>جاري البدء');
         $.post('/api/exam/start', {
-            _token: '{{ csrf_token() }}',
+            _token: csrfToken,
             student_id: studentId
         }, function(response) {
             examId = response.exam.id;
@@ -788,7 +789,7 @@ $(document).ready(function() {
             url: '{{ route("supervisor.exam-assistant.generate") }}',
             method: 'POST',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: csrfToken,
                 juz_list: selectedJuz,
             },
             success: function(response) {
@@ -825,7 +826,7 @@ $(document).ready(function() {
         const $btn = $('#addResultBtn');
         $btn.prop('disabled', true).addClass('btn-loading');
         $.post('/api/exam/add-question', {
-            _token: '{{ csrf_token() }}',
+            _token: csrfToken,
             exam_id: examId,
             surah_id: currentVerseData.surah_id,
             ayah_id: ayahData.id || currentVerseData.ayah_id,
@@ -910,7 +911,7 @@ $(document).ready(function() {
 
     function truncateNotes(notes) {
         if (!notes) return '';
-        return notes.substring(0, 50) + (notes.length > 50 ? '...' : '');
+        return escapeHtml(notes).substring(0, 50) + (notes.length > 50 ? '...' : '');
     }
 
     function renderQuestionsList(questions) {
@@ -975,7 +976,7 @@ $(document).ready(function() {
             url: '/api/exam/questions/' + currentQuestionId,
             method: 'PUT',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: csrfToken,
                 errors_count: $('#errorsCount').val(),
                 notes: $('#notesInput').val()
             },
@@ -1001,7 +1002,7 @@ $(document).ready(function() {
 
     function finishExam() {
         $.post('/api/exam/' + examId + '/finish', {
-            _token: '{{ csrf_token() }}'
+            _token: csrfToken
         }, function(response) {
             window.examFinished = true;
             toastr.success('تم إنهاء الاختبار بنجاح');
@@ -1021,7 +1022,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/api/exam/' + examId,
             method: 'DELETE',
-            data: { _token: '{{ csrf_token() }}' },
+            data: { _token: csrfToken },
             success: function() {
                 examId = null;
                 location.reload();

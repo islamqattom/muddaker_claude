@@ -8,6 +8,7 @@ use App\Models\ExamQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ExamController extends Controller
 {
@@ -42,6 +43,9 @@ class ExamController extends Controller
         ]);
 
         $exam = Exam::find($validated['exam_id']);
+        if ($exam->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
         if ($exam->status === 'completed') {
             return response()->json(['error' => 'Cannot add questions to a completed exam'], 422);
         }
@@ -72,6 +76,9 @@ class ExamController extends Controller
         ]);
 
         $question = ExamQuestion::findOrFail($id);
+        if ($question->exam->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         if ($question->exam->status === 'completed') {
             return response()->json(['error' => 'Cannot update questions in a completed exam'], 422);
@@ -98,6 +105,9 @@ class ExamController extends Controller
     public function getQuestions(int $examId): JsonResponse
     {
         $exam = Exam::findOrFail($examId);
+        if ($exam->supervisor_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         return response()->json([
             'exam' => $exam->load('student'),
@@ -134,8 +144,10 @@ class ExamController extends Controller
             return response()->json(['error' => 'Cannot cancel a completed exam'], 422);
         }
 
-        $exam->questions()->delete();
-        $exam->delete();
+        DB::transaction(function () use ($exam) {
+            $exam->questions()->delete();
+            $exam->delete();
+        });
 
         return response()->json(['message' => 'Exam cancelled successfully']);
     }
