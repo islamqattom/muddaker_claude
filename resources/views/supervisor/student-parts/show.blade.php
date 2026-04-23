@@ -91,7 +91,7 @@
                             <tr class="{{ $isCompleted ? 'completed' : 'not-completed' }}">
                                 @if($part->part_number == 2)
                                 <td colspan="8" class="bg-warning text-dark p-3">
-                                    <strong>DEBUG:</strong> record={{ json_encode($record) }} | isCompleted={{ var_export($isCompleted, true) }} | sessionType={{ $sessionType ?? 'null' }}
+                                    <strong>DEBUG:</strong> part={{ $part->part_number }} | record_part_number={{ $record ? $record->part_number : 'null' }} | isCompleted={{ var_export($isCompleted, true) }} | sessionType={{ $sessionType ?? 'null' }}
                                 </td>
                                 @else
                                 <td>{{ $part->part_number }}</td>
