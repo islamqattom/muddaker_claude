@@ -4,9 +4,12 @@ use App\Http\Controllers\Supervisor\StudentPartRecordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\StudentPartRecordController as AdminStudentPartRecordController;
 use App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Student;
+use App\Http\Controllers\Student\StudentPartRecordController as StudentStudentPartRecordController;
 use App\Http\Controllers\ParentPortal;
+use App\Http\Controllers\ParentPortal\StudentPartRecordController as ParentStudentPartRecordController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\NotificationController;
 
@@ -78,6 +81,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Profile
     Route::get('/profile', [Admin\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [Admin\ProfileController::class, 'update'])->name('profile.update');
+
+    // Student Parts Record
+    Route::get('/student-parts', [AdminStudentPartRecordController::class, 'index'])->name('student-parts.index');
+    Route::get('/student-parts/{studentId}', [AdminStudentPartRecordController::class, 'show'])->name('student-parts.show');
 
     // Sessions
     Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');
@@ -229,6 +236,9 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::put('/profile', [Student\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [Student\ProfileController::class, 'updatePassword'])->name('profile.password');
 
+    // Student Parts Record (own record only)
+    Route::get('/student-parts', [StudentStudentPartRecordController::class, 'show'])->name('student-parts');
+
     // Quran Reader
     Route::get('/quran', [Student\QuranReaderController::class, 'index'])->name('quran');
     Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
@@ -318,6 +328,10 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     Route::get('/profile', [ParentPortal\ProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [ParentPortal\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ParentPortal\ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Student Parts Record
+    Route::get('/student-parts', [ParentStudentPartRecordController::class, 'index'])->name('student-parts.index');
+    Route::get('/student-parts/{studentId}', [ParentStudentPartRecordController::class, 'show'])->name('student-parts.show');
 
     // Billing
     Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');
