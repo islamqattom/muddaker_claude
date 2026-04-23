@@ -37,7 +37,7 @@
                 <option value="{{ $student->id }}"
                     data-name="{{ $student->user->name }}"
                     data-level="{{ $student->level->name ?? '-' }}"
-                    data-supervisor="-"
+                    data-supervisor="{{ auth()->user()->name }}"
                     data-number="{{ $student->student_number }}">
                     {{ $student->user->name }} ({{ $student->student_number }})
                 </option>
