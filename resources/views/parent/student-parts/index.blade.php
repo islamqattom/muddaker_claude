@@ -17,19 +17,12 @@
         padding: 24px;
         margin-bottom: 24px;
     }
-    .student-selector-card h4 {
-        font-weight: 600;
-        margin-bottom: 16px;
-    }
     .student-info-card {
         background: #f8f9fa;
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 24px;
         display: none;
-    }
-    .student-info-card.active {
-        display: block;
     }
 </style>
 @endpush
@@ -49,7 +42,12 @@
         <select id="studentSelect" class="form-select" style="max-width: 400px;">
             <option value="">-- اختر الابن --</option>
             @foreach($students as $student)
-                <option value="{{ $student->id }}">{{ $student->user->name }} ({{ $student->student_number }})</option>
+                <option value="{{ $student->id }}"
+                    data-name="{{ $student->user->name }}"
+                    data-level="{{ $student->level->name ?? '-' }}"
+                    data-supervisor="{{ $student->supervisor->user->name ?? '-' }}">
+                    {{ $student->user->name }} ({{ $student->student_number }})
+                </option>
             @endforeach
         </select>
     </div>
@@ -79,19 +77,17 @@
 <script>
 $(function() {
     $('#studentSelect').on('change', function() {
-        var studentId = $(this).val();
-        if (!studentId) {
-            $('#studentInfoCard').removeClass('active');
+        var option = $(this).find(':selected');
+        if (!option.val()) {
+            $('#studentInfoCard').hide();
             return;
         }
 
-        $.get('/parent/student/' + studentId, function(student) {
-            $('#studentName').text(student.user.name);
-            $('#studentLevel').text(student.level ? student.level.name : '-');
-            $('#studentSupervisor').text(student.supervisor ? student.supervisor.user.name : '-');
-            $('#viewRecordLink').attr('href', '/parent/student-parts/' + studentId);
-            $('#studentInfoCard').addClass('active');
-        });
+        $('#studentName').text(option.data('name'));
+        $('#studentLevel').text(option.data('level'));
+        $('#studentSupervisor').text(option.data('supervisor'));
+        $('#viewRecordLink').attr('href', '/parent/student-parts/' + option.val());
+        $('#studentInfoCard').show();
     });
 });
 </script>

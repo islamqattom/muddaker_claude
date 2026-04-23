@@ -22,6 +22,19 @@
     .status-mafsil { color: #0d6efd; font-weight: bold; }
     .status-mutqin { color: #28a745; font-weight: bold; }
     .status-not-completed { color: #dc3545; font-weight: bold; }
+    .student-selector-card {
+        background: var(--primary);
+        color: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+    .student-info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
 </style>
 @endpush
 
@@ -35,17 +48,23 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="student-selector-card" style="background: var(--primary); color: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+    <div class="student-selector-card">
         <h4><i class="fas fa-search"></i> البحث عن طالب</h4>
         <select id="studentSelect" class="form-select" style="max-width: 400px;">
             <option value="">-- اختر الطالب --</option>
             @foreach($students as $student)
-                <option value="{{ $student->id }}">{{ $student->user->name }} ({{ $student->student_number }})</option>
+                <option value="{{ $student->id }}"
+                    data-name="{{ $student->user->name }}"
+                    data-level="{{ $student->level->name ?? '-' }}"
+                    data-supervisor="{{ $student->supervisor->user->name ?? '-' }}"
+                    data-number="{{ $student->student_number }}">
+                    {{ $student->user->name }} ({{ $student->student_number }})
+                </option>
             @endforeach
         </select>
     </div>
 
-    <div id="studentInfoCard" class="student-info-card" style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 24px; display: none;">
+    <div id="studentInfoCard" class="student-info-card" style="display: none;">
         <div class="row">
             <div class="col-md-3">
                 <strong>الاسم:</strong> <span id="studentName">-</span>
@@ -73,20 +92,18 @@
 <script>
 $(function() {
     $('#studentSelect').on('change', function() {
-        var studentId = $(this).val();
-        if (!studentId) {
+        var option = $(this).find(':selected');
+        if (!option.val()) {
             $('#studentInfoCard').hide();
             return;
         }
 
-        $.get('/admin/students/' + studentId + '/info', function(student) {
-            $('#studentName').text(student.name);
-            $('#studentLevel').text(student.level_name);
-            $('#studentSupervisor').text(student.supervisor_name || '-');
-            $('#studentNumber').text(student.student_number);
-            $('#viewRecordLink').attr('href', '/admin/student-parts/' + studentId);
-            $('#studentInfoCard').show();
-        });
+        $('#studentName').text(option.data('name'));
+        $('#studentLevel').text(option.data('level'));
+        $('#studentSupervisor').text(option.data('supervisor'));
+        $('#studentNumber').text(option.data('number'));
+        $('#viewRecordLink').attr('href', '/admin/student-parts/' + option.val());
+        $('#studentInfoCard').show();
     });
 });
 </script>
