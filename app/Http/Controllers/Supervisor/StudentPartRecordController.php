@@ -48,7 +48,7 @@ class StudentPartRecordController extends Controller
                     for ($i = 0; $i < $mafsilType; $i++) {
                         $partSessionTypes[$startPart + $i] = RecitationSession::TYPE_MAFSIL;
                     }
-                    $mafsilCount++;
+                    $mafsilCount += $mafsilType;
                 }
             } elseif ($session->type === RecitationSession::TYPE_RECITATION) {
                 $partNum = $session->part?->part_number;
