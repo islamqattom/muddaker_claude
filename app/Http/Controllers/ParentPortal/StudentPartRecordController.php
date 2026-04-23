@@ -16,7 +16,7 @@ class StudentPartRecordController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $parentProfile = $user->parentProfile()->with('students.user', 'students.level')->firstOrFail();
+        $parentProfile = $user->parentProfile()->with('students.user', 'students.level', 'students.supervisor')->firstOrFail();
         $students = $parentProfile->students;
 
         return view('parent.student-parts.index', compact('students'));
