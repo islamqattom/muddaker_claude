@@ -37,6 +37,17 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="alert alert-info mb-4">
+        <div class="d-flex gap-4">
+            <div>
+                <strong>عدد المفصل:</strong> {{ $mafsilCount }}
+            </div>
+            <div>
+                <strong>المفصل + المتقن:</strong> {{ $totalMafsilAndMutqin }}
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
@@ -64,8 +75,18 @@
                                 <td>{{ $part->part_number }}</td>
                                 <td>{{ $part->name }}</td>
                                 <td>
-                                    <span class="{{ $isCompleted ? 'status-completed' : 'status-not-completed' }}">
-                                        {{ $isCompleted ? 'مُكمَل' : 'غير مُكمَل' }}
+                                    @php
+                                        $sessionType = $partSessionTypes[$part->part_number] ?? null;
+                                        $statusLabel = match(true) {
+                                            $sessionType === 'mafsil' => 'مفصل',
+                                            $sessionType === 'recitation' && $isCompleted => 'متقن',
+                                            $sessionType === 'recitation' && !$isCompleted => 'غير مكمل',
+                                            default => 'غير مُكمَل'
+                                        };
+                                        $statusClass = $sessionType === 'mafsil' ? 'status-completed' : ($isCompleted ? 'status-completed' : 'status-not-completed');
+                                    @endphp
+                                    <span class="{{ $statusClass }}">
+                                        {{ $statusLabel }}
                                     </span>
                                     @if($isOverride)
                                         <span class="override-badge">يدوي</span>
@@ -110,8 +131,8 @@
                     <div class="form-group">
                         <label><strong>الحالة</strong></label>
                         <select name="is_completed" id="editIsCompleted" class="form-control">
-                            <option value="1">مُكمَل</option>
-                            <option value="0">غير مُكمَل</option>
+                            <option value="1">متقن</option>
+                            <option value="0">غير مكمل</option>
                         </select>
                     </div>
 

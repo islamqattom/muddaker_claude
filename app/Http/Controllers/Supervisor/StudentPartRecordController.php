@@ -34,10 +34,36 @@ class StudentPartRecordController extends Controller
         $records = $this->autoFillRecords($student, $allSessions);
         $parts = QuranPart::orderBy('part_number')->get();
 
+        // Build part session types map and calculate counts in single pass
+        // mafsil takes precedence when both exist for a part
+        $partSessionTypes = [];
+        $mafsilCount = 0;
+        $mutqinSardCount = 0;
+
+        foreach ($allSessions as $session) {
+            $partNum = $session->part?->part_number;
+            if ($partNum) {
+                if ($session->type === RecitationSession::TYPE_MAFSIL) {
+                    $partSessionTypes[$partNum] = RecitationSession::TYPE_MAFSIL;
+                    $mafsilCount++;
+                } elseif (!isset($partSessionTypes[$partNum])) {
+                    $partSessionTypes[$partNum] = $session->type;
+                    if ($session->type === RecitationSession::TYPE_RECITATION) {
+                        $mutqinSardCount++;
+                    }
+                }
+            }
+        }
+
+        $totalMafsilAndMutqin = $mafsilCount + $mutqinSardCount;
+
         return view('supervisor.student-parts.show', [
             'student' => $student,
             'parts' => $parts,
             'records' => $records,
+            'partSessionTypes' => $partSessionTypes,
+            'mafsilCount' => $mafsilCount,
+            'totalMafsilAndMutqin' => $totalMafsilAndMutqin,
         ]);
     }
 
