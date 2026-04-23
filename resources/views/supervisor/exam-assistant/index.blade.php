@@ -148,6 +148,7 @@
     .quran-page {
         background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         border-radius: 0 0 15px 15px;
+        color: #1e293b;
     }
 
     @media (max-width: 768px) {
