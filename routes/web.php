@@ -86,6 +86,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/student-parts', [AdminStudentPartRecordController::class, 'index'])->name('student-parts.index');
     Route::get('/student-parts/{studentId}', [AdminStudentPartRecordController::class, 'show'])->name('student-parts.show');
     Route::put('/student-parts/{studentId}/{partNumber}', [AdminStudentPartRecordController::class, 'update'])->name('student-parts.update');
+    Route::post('/student-parts/{studentId}/{partNumber}/reset', [AdminStudentPartRecordController::class, 'resetToAuto'])->name('student-parts.reset');
 
     // Sessions
     Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');

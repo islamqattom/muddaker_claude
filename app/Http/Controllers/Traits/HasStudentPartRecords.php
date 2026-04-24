@@ -8,6 +8,7 @@ use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 trait HasStudentPartRecords
 {
@@ -116,5 +117,65 @@ trait HasStudentPartRecords
             || $existing->total_hesitations != $calculated['total_hesitations']
             || $existing->total_score != $calculated['total_score']
             || $existing->is_completed != $calculated['is_completed'];
+    }
+
+    protected function updatePartRecord(int $studentId, int $partNumber, array $validated): bool
+    {
+        $part = QuranPart::where('part_number', $partNumber)->first();
+
+        if (!$part) {
+            return false;
+        }
+
+        DB::transaction(function () use ($studentId, $part, $validated, $partNumber) {
+            $sessionUpdate = [
+                'total_errors' => $validated['total_errors'],
+                'total_hesitations' => $validated['total_hesitations'],
+                'final_score' => $validated['total_score'],
+            ];
+
+            if (!empty($validated['session_date'])) {
+                $sessionUpdate['session_date'] = $validated['session_date'];
+            }
+
+            $sessionsUpdated = RecitationSession::where('student_id', $studentId)
+                ->where('part_id', $part->id)
+                ->whereIn('type', [RecitationSession::TYPE_RECITATION, RecitationSession::TYPE_MAFSIL])
+                ->limit(1)
+                ->update($sessionUpdate);
+
+            if ($sessionsUpdated === 0) {
+                StudentPartRecord::updateOrCreate(
+                    ['student_id' => $studentId, 'part_number' => $partNumber],
+                    [
+                        'is_completed' => true,
+                        'total_errors' => $validated['total_errors'],
+                        'total_hesitations' => $validated['total_hesitations'],
+                        'total_score' => $validated['total_score'],
+                        'last_recitation_date' => $validated['session_date'] ?? null,
+                        'is_manual_override' => true,
+                    ]
+                );
+            } else {
+                StudentPartRecord::where('student_id', $studentId)
+                    ->where('part_number', $partNumber)
+                    ->update(['is_manual_override' => true]);
+            }
+        });
+
+        return true;
+    }
+
+    protected function resetPartRecordToAuto(int $studentId, int $partNumber): void
+    {
+        $calculated = $this->calculatePartRecordWithGrouped(
+            $this->getSessionsForStudent($studentId)->groupBy(fn($s) => $s->part?->part_number),
+            $partNumber
+        );
+
+        StudentPartRecord::updateOrCreate(
+            ['student_id' => $studentId, 'part_number' => $partNumber],
+            array_merge($calculated, ['is_manual_override' => false])
+        );
     }
 }

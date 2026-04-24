@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasStudentPartRecords;
-use App\Models\QuranPart;
-use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Http\Request;
@@ -59,21 +57,15 @@ class StudentPartRecordController extends Controller
         $this->authorizeStudent($student);
 
         $validated = $request->validate([
-            'is_completed' => 'boolean',
             'total_errors' => 'integer|min:0',
             'total_hesitations' => 'integer|min:0',
             'total_score' => 'nullable|numeric|min:0|max:100',
-            'last_recitation_date' => 'nullable|date',
+            'session_date' => 'nullable|date',
         ]);
 
-        $validated['is_manual_override'] = true;
+        $this->updatePartRecord($studentId, $partNumber, $validated);
 
-        StudentPartRecord::updateOrCreate(
-            ['student_id' => $studentId, 'part_number' => $partNumber],
-            $validated
-        );
-
-        return redirect()->back()->with('success', 'Part record updated.');
+        return redirect()->back()->with('success', 'تم تحديث سجل التسميع.');
     }
 
     public function resetToAuto($studentId, $partNumber)

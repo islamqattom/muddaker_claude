@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasStudentPartRecords;
-use App\Models\QuranPart;
 use App\Models\Student;
+use App\Models\StudentPartRecord;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class StudentPartRecordController extends Controller
 {
@@ -51,20 +50,31 @@ class StudentPartRecordController extends Controller
         $student = Student::findOrFail($studentId);
 
         $validated = $request->validate([
-            'is_completed' => 'boolean',
             'total_errors' => 'integer|min:0',
             'total_hesitations' => 'integer|min:0',
             'total_score' => 'nullable|numeric|min:0|max:100',
-            'last_recitation_date' => 'nullable|date',
+            'session_date' => 'nullable|date',
         ]);
 
-        $validated['is_manual_override'] = true;
+        $this->updatePartRecord($studentId, $partNumber, $validated);
 
-        \App\Models\StudentPartRecord::updateOrCreate(
-            ['student_id' => $studentId, 'part_number' => $partNumber],
-            $validated
+        return redirect()->back()->with('success', 'تم تحديث سجل التسميع.');
+    }
+
+    public function resetToAuto($studentId, $partNumber)
+    {
+        $student = Student::findOrFail($studentId);
+
+        $calculated = $this->calculatePartRecordWithGrouped(
+            $allSessions = $this->getSessionsForStudent($studentId)->groupBy(fn($s) => $s->part?->part_number),
+            $partNumber
         );
 
-        return redirect()->back()->with('success', 'Part record updated.');
+        StudentPartRecord::updateOrCreate(
+            ['student_id' => $studentId, 'part_number' => $partNumber],
+            array_merge($calculated, ['is_manual_override' => false])
+        );
+
+        return redirect()->back()->with('success', 'Part record reset to auto-calculated.');
     }
 }

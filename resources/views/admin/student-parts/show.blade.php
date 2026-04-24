@@ -132,14 +132,6 @@
                     <input type="hidden" name="part_number" id="editPartNumber">
 
                     <div class="form-group">
-                        <label><strong>الحالة</strong></label>
-                        <select name="is_completed" id="editIsCompleted" class="form-control">
-                            <option value="1">متقن</option>
-                            <option value="0">غير متقن</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label><strong>إجمالي الأخطاء</strong></label>
                         <input type="number" name="total_errors" id="editErrors" class="form-control" min="0">
                     </div>
@@ -155,13 +147,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label><strong>تاريخ آخر تسميع</strong></label>
-                        <input type="date" name="last_recitation_date" id="editDate" class="form-control">
+                        <label><strong>تاريخ التسميع</strong></label>
+                        <input type="date" name="session_date" id="editDate" class="form-control">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> حفظ
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="resetBtn">
+                        <i class="fas fa-undo"></i> إعادة للاحتساب التلقائي
                     </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                 </div>
@@ -180,14 +175,23 @@ $(function() {
 
         $('#modalPartNumber').text(part);
         $('#editPartNumber').val(part);
-        $('#editIsCompleted').val(record.is_completed ? '1' : '0');
         $('#editErrors').val(record.total_errors || 0);
         $('#editHesitations').val(record.total_hesitations || 0);
         $('#editScore').val(record.total_score || '');
-        $('#editDate').val(record.last_recitation_date || '');
+        var dateVal = record.last_recitation_date ? record.last_recitation_date.substring(0, 10) : '';
+        $('#editDate').val(dateVal);
 
         var studentId = {{ $student->id }};
         $('#editForm').attr('action', '/admin/student-parts/' + studentId + '/' + part);
+
+        $('#resetBtn').off('click').on('click', function() {
+            if (confirm('هل تريد إعادة الجزء للاحتساب التلقائي؟')) {
+                var form = $('<form>').attr('method', 'POST')
+                    .attr('action', '/admin/student-parts/' + studentId + '/' + part + '/reset');
+                form.append($('<input>').attr({name: '_token', value: $('meta[name="csrf-token"]').attr('content')}));
+                form.appendTo('body').submit();
+            }
+        });
     });
 });
 </script>
