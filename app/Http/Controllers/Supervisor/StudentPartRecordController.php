@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Traits\HasStudentPartRecords;
+use App\Models\QuranPart;
 use App\Models\Student;
 use App\Models\StudentPartRecord;
 use Illuminate\Http\Request;
