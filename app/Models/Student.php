@@ -165,4 +165,12 @@ class Student extends Model
         $passed = $this->recitationSessions()->where('status', 'passed')->count();
         return round(($passed / $total) * 100, 1);
     }
+
+    private const ARABIC_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+    public static function getArabicDay($date): string
+    {
+        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+        return self::ARABIC_DAYS[$dateObj->dayOfWeek];
+    }
 }
