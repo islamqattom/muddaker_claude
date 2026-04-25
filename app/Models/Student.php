@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use App\Traits\HasArabicDay;
 
 class Student extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, Auditable, HasArabicDay;
 
     protected $fillable = [
         'user_id', 'supervisor_id', 'level_id', 'student_number',
@@ -164,13 +165,5 @@ class Student extends Model
         if ($total === 0) return 0;
         $passed = $this->recitationSessions()->where('status', 'passed')->count();
         return round(($passed / $total) * 100, 1);
-    }
-
-    private const ARABIC_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-
-    public static function getArabicDay($date): string
-    {
-        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
-        return self::ARABIC_DAYS[$dateObj->dayOfWeek];
     }
 }

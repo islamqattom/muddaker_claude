@@ -23,6 +23,24 @@ class RecitationController extends Controller
         'pages.*.hesitations' => 'required|integer|min:0',
     ];
 
+    /**
+     * Calculate total errors and hesitations from pages array
+     */
+    private function calculateTotals(array $pages, string $type): array
+    {
+        $totalErrors = 0;
+        $totalHesitations = 0;
+        foreach ($pages as $page) {
+            $totalHesitations += $page['hesitations'];
+            if ($type === RecitationSession::TYPE_RECITATION) {
+                $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
+            } else {
+                $totalErrors += $page['errors'];
+            }
+        }
+        return ['errors' => $totalErrors, 'hesitations' => $totalHesitations];
+    }
+
     public function index()
     {
         $supervisorId = Auth::id();
@@ -228,7 +246,7 @@ class RecitationController extends Controller
 
             // Validate selected parts count
             if (count($selectedParts) != $partsCount) {
-                return back()->withErrors(['selected_parts' => 'يجب اختيار exactly ' . $partsCount . ' أجزاء']);
+                return back()->withErrors(['selected_parts' => 'يجب اختيار ' . $partsCount . ' أجزاء']);
             }
 
             // Ensure all selected parts are integers to prevent SQL injection
@@ -237,7 +255,7 @@ class RecitationController extends Controller
             // Validate selected parts exist
             $parts = QuranPart::whereIn('part_number', $selectedParts)
                 ->distinct()
-                ->orderByRaw("FIELD(part_number, " . implode(',', $selectedParts) . ")")
+                ->orderByRaw("FIELD(part_number, " . implode(',', array_fill(0, count($selectedParts), '?')) . ")", $selectedParts)
                 ->get();
 
             if ($parts->count() != $partsCount) {
@@ -305,17 +323,9 @@ class RecitationController extends Controller
 
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
-                $totalErrors = 0;
-                $totalHesitations = 0;
-
-                foreach ($pages as $page) {
-                    $totalHesitations += $page['hesitations'];
-                    if ($request->type === RecitationSession::TYPE_RECITATION) {
-                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                    } else {
-                        $totalErrors += $page['errors'];
-                    }
-                }
+                $totals = $this->calculateTotals($pages, $request->type);
+                $totalErrors = $totals['errors'];
+                $totalHesitations = $totals['hesitations'];
 
                 $maxScore = null;
                 $finalScore = null;
@@ -391,17 +401,9 @@ class RecitationController extends Controller
 
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
-                $totalErrors = 0;
-                $totalHesitations = 0;
-
-                foreach ($pages as $page) {
-                    $totalHesitations += $page['hesitations'];
-                    if ($request->type === RecitationSession::TYPE_RECITATION) {
-                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                    } else {
-                        $totalErrors += $page['errors'];
-                    }
-                }
+                $totals = $this->calculateTotals($pages, $request->type);
+                $totalErrors = $totals['errors'];
+                $totalHesitations = $totals['hesitations'];
 
                 $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
                 $finalScore = $maxScore ? RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations) : null;
@@ -570,20 +572,10 @@ class RecitationController extends Controller
         try {
             $session = DB::transaction(function() use ($request) {
                 $pages = $request->input('pages');
-                $totalErrors = 0;
-                $totalHesitations = 0;
+                $totals = $this->calculateTotals($pages, $request->type);
+                $totalErrors = $totals['errors'];
+                $totalHesitations = $totals['hesitations'];
                 $maxScore = 100;
-
-                // Calculate totals
-                foreach ($pages as $page) {
-                    $totalHesitations += $page['hesitations'];
-                    // For recitation type: 3 hesitations = 1 error
-                    if ($request->type === RecitationSession::TYPE_RECITATION) {
-                        $totalErrors += $page['errors'] + floor($page['hesitations'] / 3);
-                    } else {
-                        $totalErrors += $page['errors'];
-                    }
-                }
 
                 // Calculate score
                 $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);

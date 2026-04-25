@@ -56,7 +56,7 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/live-recita
 });
 
 // Exam API
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::post('/exam/start', [ExamController::class, 'start']);
     Route::post('/exam/add-question', [ExamController::class, 'addQuestion']);
     Route::put('/exam/questions/{id}', [ExamController::class, 'updateQuestion']);

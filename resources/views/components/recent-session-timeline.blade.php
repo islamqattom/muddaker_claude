@@ -10,7 +10,7 @@
             @forelse($sessions as $session)
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="badge bg-secondary me-2">{{ __($session['type'] ?? 'unknown') }}</span>
+                        <span class="badge bg-secondary me-2">{{ e(__($session['type'] ?? 'unknown')) }}</span>
                         <small class="text-muted">{{ $session['date'] ?? '' }}</small>
                     </div>
                     <div>

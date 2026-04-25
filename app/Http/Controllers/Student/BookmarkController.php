@@ -51,6 +51,7 @@ class BookmarkController extends Controller
         ]);
 
         $validated['student_id'] = $student->id;
+        $validated['note'] = strip_tags($validated['note'] ?? '');
 
         // Ensure category belongs to this student
         if (!empty($validated['category_id'])) {

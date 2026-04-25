@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use App\Traits\HasArabicDay;
 
 class Warning extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, Auditable, HasArabicDay;
 
     protected $fillable = [
         'student_id', 'issued_by', 'warning_number', 'type', 'title',
@@ -46,16 +47,6 @@ class Warning extends Model
         });
     }
 
-    /**
-     * Get Arabic day name from date
-     */
-    public static function getArabicDay($date): string
-    {
-        $days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
-        return $days[$dateObj->dayOfWeek];
-    }
-
     public function student()
     {
         return $this->belongsTo(Student::class);
@@ -78,8 +69,10 @@ class Warning extends Model
 
     public static function generateWarningNumber(): string
     {
-        $year = date('Y');
-        $count = self::whereYear('created_at', $year)->count() + 1;
-        return 'WARN-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        return \DB::transaction(function () {
+            $year = date('Y');
+            $count = self::whereYear('created_at', $year)->lockForUpdate()->count() + 1;
+            return 'WARN-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+        });
     }
 }

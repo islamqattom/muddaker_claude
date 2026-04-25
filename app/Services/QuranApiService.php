@@ -114,7 +114,7 @@ class QuranApiService
                     'surah' => $surah,
                     'verse' => $verse,
                     'status' => $response->status(),
-                    'body' => $response->response->body(),
+                    'body' => $response->body(),
                 ]);
                 throw new \Exception("Failed to fetch verse {$surah}:{$verse}");
             }

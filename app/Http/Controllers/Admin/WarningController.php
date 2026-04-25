@@ -35,6 +35,11 @@ class WarningController extends Controller
 
     public function destroy(Warning $warning)
     {
+        // Authorization: ensure warning belongs to a student under this admin's supervision
+        $student = $warning->student;
+        if (!$student || $student->supervisor_id !== auth()->id()) {
+            abort(403, 'Unauthorized action');
+        }
         $warning->delete();
         return redirect()->route('admin.warnings.index')->with('success', 'تم حذف الإنذار');
     }

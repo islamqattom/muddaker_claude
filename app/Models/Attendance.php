@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use App\Traits\HasArabicDay;
 
 class Attendance extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, Auditable, HasArabicDay;
 
     protected $fillable = [
         'student_id', 'supervisor_id', 'date', 'day', 'status',
@@ -28,16 +29,6 @@ class Attendance extends Model
                 $model->day = self::getArabicDay($model->date);
             }
         });
-    }
-
-    /**
-     * Get Arabic day name from date
-     */
-    public static function getArabicDay($date): string
-    {
-        $days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
-        return $days[$dateObj->dayOfWeek];
     }
 
     public function student()

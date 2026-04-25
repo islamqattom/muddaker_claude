@@ -6,7 +6,9 @@ return [
     | Web Push VAPID Keys
     |--------------------------------------------------------------------------
     |
-    | Generate keys using: php -r "require 'vendor/autoload.php'; use Minishlink\WebPush\VAPID; print_r(VAPID::createVapidKeys());"
+    | VAPID keys should be set via environment variables:
+    | VAPID_PUBLIC_KEY
+    | VAPID_PRIVATE_KEY
     |
     */
     'vapid' => [

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;
+use App\Traits\HasArabicDay;
 
 class RecitationSession extends Model
 {
-    use HasFactory, Auditable;
+    use HasFactory, Auditable, HasArabicDay;
 
     public const TYPE_NEW_MEMORIZATION = 'new_memorization';
     public const TYPE_REVIEW = 'review';
@@ -57,16 +58,6 @@ class RecitationSession extends Model
                 $model->day = self::getArabicDay($model->session_date);
             }
         });
-    }
-
-    /**
-     * Get Arabic day name from date
-     */
-    public static function getArabicDay($date): string
-    {
-        $days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        $dateObj = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
-        return $days[$dateObj->dayOfWeek];
     }
 
     public function student()
@@ -166,12 +157,12 @@ class RecitationSession extends Model
             return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
         } elseif ($totalEquivalent < 2) {
             return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
-        } elseif (($totalEquivalent == 2 && $hesitations == 0) || ($hesitations == 6 && $totalEquivalent == 2) || ($hesitations == 3 && $totalEquivalent == 2)) {
-            // أحمر: 2 خطأ بدون تردد، أو 6 تردد فقط، أو 3 تردد + 1 خطأ
-            return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
         } elseif ($totalEquivalent == 2 && $hesitations >= 1) {
-            // أسود: 2 خطأ + 1 تردد أو أكثر
+            // أسود: 2 خطأ + 1 تردد أو أكثر (يتضمن 6 تردد = 2 خطأ مكافئ)
             return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
+        } elseif ($totalEquivalent == 2 && $hesitations == 0) {
+            // أحمر: خطأين بدون تردد
+            return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
         } elseif ($totalEquivalent >= 3) {
             // 3 خطأ equivalent أو أكثر
             return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
@@ -185,7 +176,7 @@ class RecitationSession extends Model
         $errorDeduction = $errors * 3;
         $hesitationDeduction = round(floor($hesitations / 3) + (($hesitations % 3) * 0.33), 2);
         $totalDeduction = $errorDeduction + $hesitationDeduction;
-        return max(0, 100 - $totalDeduction);
+        return max(0, $maxScore - $totalDeduction);
     }
 
     /**
