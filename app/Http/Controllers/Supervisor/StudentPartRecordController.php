@@ -62,6 +62,7 @@ class StudentPartRecordController extends Controller
             'total_hesitations' => 'integer|min:0',
             'total_score' => 'nullable|numeric|min:0|max:100',
             'session_date' => 'nullable|date',
+            'mastery_status' => 'nullable|string|in:' . StudentPartRecord::MASTERY_MASTERED . ',' . StudentPartRecord::MASTERY_NOT_MASTERED,
         ]);
 
         $this->updatePartRecord($studentId, $partNumber, $validated);
@@ -73,18 +74,9 @@ class StudentPartRecordController extends Controller
     {
         $student = Student::findOrFail($studentId);
         $this->authorizeStudent($student);
+        $this->resetPartRecordToAuto($studentId, $partNumber);
 
-        $calculated = $this->calculatePartRecordWithGrouped(
-            $allSessions = $this->getSessionsForStudent($studentId)->groupBy(fn($s) => $s->part?->part_number),
-            $partNumber
-        );
-
-        StudentPartRecord::updateOrCreate(
-            ['student_id' => $studentId, 'part_number' => $partNumber],
-            array_merge($calculated, ['is_manual_override' => false])
-        );
-
-        return redirect()->back()->with('success', 'Part record reset to auto-calculated.');
+        return redirect()->back()->with('success', 'تم إعادة الجزء للاحتساب التلقائي.');
     }
 
     private function authorizeStudent(Student $student): void

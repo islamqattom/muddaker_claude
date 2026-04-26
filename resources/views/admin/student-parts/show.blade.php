@@ -150,6 +150,14 @@
                         <label><strong>تاريخ التسميع</strong></label>
                         <input type="date" name="session_date" id="editDate" class="form-control">
                     </div>
+
+                    <div class="form-group">
+                        <label><strong>حالة الإتقان</strong></label>
+                        <select name="mastery_status" id="editMasteryStatus" class="form-control">
+                            <option value="متقن">متقن</option>
+                            <option value="غير متقن">غير متقن</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
@@ -180,6 +188,7 @@ $(function() {
         $('#editScore').val(record.total_score || '');
         var dateVal = record.last_recitation_date ? record.last_recitation_date.substring(0, 10) : '';
         $('#editDate').val(dateVal);
+        $('#editMasteryStatus').val(record.mastery_status || 'غير متقن');
 
         var studentId = {{ $student->id }};
         $('#editForm').attr('action', '/admin/student-parts/' + studentId + '/' + part);

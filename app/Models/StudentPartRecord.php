@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StudentPartRecord extends Model
 {
+    public const MASTERY_MASTERED = 'متقن';
+    public const MASTERY_NOT_MASTERED = 'غير متقن';
+
     protected $fillable = [
         'student_id',
         'part_number',
@@ -16,6 +19,7 @@ class StudentPartRecord extends Model
         'total_score',
         'last_recitation_date',
         'is_manual_override',
+        'mastery_status',
     ];
 
     protected $casts = [
