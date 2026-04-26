@@ -17,9 +17,11 @@ use App\Http\Controllers\NotificationController;
 Route::get('/', fn() => redirect()->route('login'));
 
 // Auth Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::middleware('throttle:5,1')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+});
 
 // Push subscription routes (authenticated)
 Route::middleware('auth')->group(function () {

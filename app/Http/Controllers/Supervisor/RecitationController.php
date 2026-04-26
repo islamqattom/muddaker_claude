@@ -23,6 +23,8 @@ class RecitationController extends Controller
         'pages.*.hesitations' => 'required|integer|min:0',
     ];
 
+    private const MAFSIL_MAX_SCORE = 100;
+
     /**
      * Calculate total errors and hesitations from pages array
      */
@@ -233,7 +235,7 @@ class RecitationController extends Controller
 
         $student = Student::with('level')->where('supervisor_id', Auth::id())->findOrFail($request->student_id);
         $mafsilType = $request->mafsil_type;
-        $maxScore = 100; // Always use 100
+        $maxScore = self::MAFSIL_MAX_SCORE;
         $passingPercentage = RecitationSession::getMafsilPassingPercentage($mafsilType);
         $partsCount = $mafsilType;
 
@@ -252,11 +254,13 @@ class RecitationController extends Controller
             // Ensure all selected parts are integers to prevent SQL injection
             $selectedParts = array_map('intval', $selectedParts);
 
-            // Validate selected parts exist
+            // Validate selected parts exist using a safe query
             $parts = QuranPart::whereIn('part_number', $selectedParts)
-                ->distinct()
-                ->orderByRaw("FIELD(part_number, " . implode(',', array_fill(0, count($selectedParts), '?')) . ")", $selectedParts)
-                ->get();
+                ->get()
+                ->sortBy(function ($part) use ($selectedParts) {
+                    return array_search($part->part_number, $selectedParts);
+                })
+                ->values();
 
             if ($parts->count() != $partsCount) {
                 return back()->withErrors(['selected_parts' => 'الأجزاء المختارة غير صالحة']);

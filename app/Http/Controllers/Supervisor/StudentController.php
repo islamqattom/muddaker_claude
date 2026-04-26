@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
 use App\Models\{Student, User, Level};
 use App\Services\AnalyticsService;
+use App\Traits\AvatarUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller {
+    use AvatarUpload;
     public function index() {
         $query = Student::where('supervisor_id', Auth::id())->with('user', 'level');
 
@@ -53,17 +55,10 @@ class StudentController extends Controller {
         $avatarPath = null;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
             try {
-                $filename = uniqid('avatar_') . '.' . $file->extension();
-                $destinationPath = storage_path('app/public/avatars');
-                if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0755, true);
-                }
-                $file->move($destinationPath, $filename);
-                $avatarPath = 'avatars/' . $filename;
+                $avatarPath = $this->uploadAvatar($request);
             } catch (\Exception $e) {
-                Log::error('Image upload failed: ' . $e->getMessage() . ' | File: ' . $file->getClientOriginalName());
+                Log::error('Image upload failed: ' . $e->getMessage() . ' | File: ' . $request->file('image')->getClientOriginalName());
                 $uploadError = 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.';
             }
         }
@@ -136,26 +131,11 @@ class StudentController extends Controller {
         $newAvatarPath = null;
 
         if ($request->hasFile('image')) {
-            // Delete old avatar if exists
             if ($student->user->avatar) {
-                try {
-                    $oldPath = storage_path('app/public/' . $student->user->avatar);
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
-                } catch (\Exception $e) {
-                    Log::error('Failed to delete old avatar: ' . $e->getMessage());
-                }
+                $this->deleteAvatar($student->user->avatar);
             }
             try {
-                $file = $request->file('image');
-                $filename = uniqid('avatar_') . '.' . $file->extension();
-                $destinationPath = storage_path('app/public/avatars');
-                if (!file_exists($destinationPath)) {
-                    mkdir($destinationPath, 0755, true);
-                }
-                $file->move($destinationPath, $filename);
-                $newAvatarPath = 'avatars/' . $filename;
+                $newAvatarPath = $this->uploadAvatar($request);
             } catch (\Exception $e) {
                 Log::error('Image upload failed: ' . $e->getMessage());
                 return back()->withInput()->with('error', 'فشل في رفع الصورة. يرجى المحاولة مرة أخرى.');
@@ -237,7 +217,7 @@ class StudentController extends Controller {
     public function search(Request $request)
     {
         $query = $request->get('q', '');
-        $students = Student::with('user')
+        $students = Student::with(['user', 'level', 'supervisor.user'])
             ->where('supervisor_id', Auth::id())
             ->whereHas('user', function($q) use ($query) {
                 $q->where('name', 'like', '%' . $query . '%')
