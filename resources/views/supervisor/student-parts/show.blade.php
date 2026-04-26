@@ -76,19 +76,21 @@
                     <tbody>
                         @foreach($parts as $part)
                             @php
-                                $record = $records->get($part->part_number);
                                 $isCompleted = $record && $record->is_completed;
                                 $isOverride = $record && $record->is_manual_override;
                                 $sessionType = $partSessionTypes[$part->part_number] ?? null;
+                                $recordMasteryStatus = $record->mastery_status ?? null;
                                 $statusLabel = match(true) {
+                                    $isOverride && $recordMasteryStatus === 'متقن' => 'متقن',
+                                    $isOverride && $recordMasteryStatus === 'غير متقن' => 'غير متقن',
                                     $sessionType === 'mafsil' => 'مفصل',
                                     $sessionType === 'recitation' && $isCompleted => 'متقن',
                                     $sessionType === 'recitation' && !$isCompleted => 'غير متقن',
                                     default => 'غير متقن'
                                 };
-                                $statusClass = match($sessionType) {
-                                    'mafsil' => 'status-mafsil',
-                                    'recitation' => $isCompleted ? 'status-mutqin' : 'status-not-completed',
+                                $statusClass = match($statusLabel) {
+                                    'مفصل' => 'status-mafsil',
+                                    'متقن' => 'status-mutqin',
                                     default => 'status-not-completed'
                                 };
                             @endphp
