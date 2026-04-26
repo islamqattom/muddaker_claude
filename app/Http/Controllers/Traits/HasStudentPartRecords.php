@@ -89,8 +89,9 @@ trait HasStudentPartRecords
     protected function calculatePartRecordWithGrouped($sessionsByPart, int $partNumber): array
     {
         $partSessions = $sessionsByPart->get($partNumber, collect());
+        $hasPassedSessions = !$partSessions->isEmpty();
 
-        if ($partSessions->isEmpty()) {
+        if (!$hasPassedSessions) {
             return [
                 'is_completed' => false,
                 'total_errors' => 0,
@@ -98,6 +99,7 @@ trait HasStudentPartRecords
                 'total_score' => null,
                 'last_recitation_date' => null,
                 'is_manual_override' => false,
+                'mastery_status' => StudentPartRecord::MASTERY_NOT_MASTERED,
             ];
         }
 
@@ -108,6 +110,7 @@ trait HasStudentPartRecords
             'total_score' => $partSessions->avg('final_score'),
             'last_recitation_date' => $partSessions->max('session_date'),
             'is_manual_override' => false,
+            'mastery_status' => StudentPartRecord::MASTERY_MASTERED,
         ];
     }
 
@@ -116,51 +119,25 @@ trait HasStudentPartRecords
         return $existing->total_errors != $calculated['total_errors']
             || $existing->total_hesitations != $calculated['total_hesitations']
             || $existing->total_score != $calculated['total_score']
-            || $existing->is_completed != $calculated['is_completed'];
+            || $existing->is_completed != $calculated['is_completed']
+            || $existing->mastery_status != $calculated['mastery_status'];
     }
 
     protected function updatePartRecord(int $studentId, int $partNumber, array $validated): bool
     {
-        $part = QuranPart::where('part_number', $partNumber)->first();
-
-        if (!$part) {
-            return false;
-        }
-
-        DB::transaction(function () use ($studentId, $part, $validated, $partNumber) {
-            $sessionUpdate = [
-                'total_errors' => $validated['total_errors'],
-                'total_hesitations' => $validated['total_hesitations'],
-                'final_score' => $validated['total_score'],
-            ];
-
-            if (!empty($validated['session_date'])) {
-                $sessionUpdate['session_date'] = $validated['session_date'];
-            }
-
-            $sessionsUpdated = RecitationSession::where('student_id', $studentId)
-                ->where('part_id', $part->id)
-                ->whereIn('type', [RecitationSession::TYPE_RECITATION, RecitationSession::TYPE_MAFSIL])
-                ->limit(1)
-                ->update($sessionUpdate);
-
-            if ($sessionsUpdated === 0) {
-                StudentPartRecord::updateOrCreate(
-                    ['student_id' => $studentId, 'part_number' => $partNumber],
-                    [
-                        'is_completed' => true,
-                        'total_errors' => $validated['total_errors'],
-                        'total_hesitations' => $validated['total_hesitations'],
-                        'total_score' => $validated['total_score'],
-                        'last_recitation_date' => $validated['session_date'] ?? null,
-                        'is_manual_override' => true,
-                    ]
-                );
-            } else {
-                StudentPartRecord::where('student_id', $studentId)
-                    ->where('part_number', $partNumber)
-                    ->update(['is_manual_override' => true]);
-            }
+        DB::transaction(function () use ($studentId, $partNumber, $validated) {
+            StudentPartRecord::updateOrCreate(
+                ['student_id' => $studentId, 'part_number' => $partNumber],
+                [
+                    'is_completed' => true,
+                    'total_errors' => $validated['total_errors'] ?? 0,
+                    'total_hesitations' => $validated['total_hesitations'] ?? 0,
+                    'total_score' => $validated['total_score'] ?? null,
+                    'last_recitation_date' => $validated['session_date'] ?? null,
+                    'is_manual_override' => true,
+                    'mastery_status' => $validated['mastery_status'] ?? StudentPartRecord::MASTERY_NOT_MASTERED,
+                ]
+            );
         });
 
         return true;
