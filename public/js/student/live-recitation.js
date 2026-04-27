@@ -118,8 +118,9 @@ class LiveRecitationController {
                 body: JSON.stringify({ mode: mode, start_page: startPage, end_page: endPage })
             });
             const data = await response.json();
+            console.log('API Response:', response.status, data);
             if (!data.success) {
-                this.showError(data.error || 'فشل في بدء جلسة التسميع');
+                this.showError(data.error || data.errors || 'فشل في بدء جلسة التسميع');
                 this.startBtn.disabled = false;
                 return;
             }
