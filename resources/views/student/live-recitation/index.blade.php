@@ -185,6 +185,6 @@ $apiToken = $token ? $token->token : null;
 </style>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="{{ asset('js/student/live-recitation.js') }}"></script>
-@endsection
+@endpush
