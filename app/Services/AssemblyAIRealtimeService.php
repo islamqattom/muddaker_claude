@@ -33,7 +33,6 @@ class AssemblyAIRealtimeService
             return ['success' => false, 'error' => 'AssemblyAI API key not configured'];
         }
 
-        // Max expiration is 600 seconds
         $expiresIn = min($expiresIn, 600);
 
         try {
