@@ -138,10 +138,6 @@ class LiveRecitationController {
                 audioUrls: data.data.audio_urls,
                 websocketToken: data.data.websocket_token
             };
-                id: data.data.session_id,
-                audioUrls: data.data.audio_urls,
-                websocketToken: data.data.websocket_token
-            };
             this.currentVerseIndex = 0;
             this.totalErrors = 0;
             this.transcriptText = '';
