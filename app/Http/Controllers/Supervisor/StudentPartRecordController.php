@@ -38,9 +38,7 @@ class StudentPartRecordController extends Controller
         $partSessionTypes = $this->buildPartSessionTypes($allSessions);
 
         $mafsilCount = collect($partSessionTypes)->filter(fn($type) => $type === \App\Models\RecitationSession::TYPE_MAFSIL)->count();
-        $mutqinSardCount = collect($partSessionTypes)->filter(fn($type) => $type === \App\Models\RecitationSession::TYPE_RECITATION)->count();
-
-        $totalMafsilAndMutqin = $mafsilCount + $mutqinSardCount;
+        $totalMafsilAndMutqin = $this->countMafsilAndMutqin($records, $partSessionTypes);
 
         return view('supervisor.student-parts.show', [
             'student' => $student,

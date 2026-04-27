@@ -155,4 +155,39 @@ trait HasStudentPartRecords
             array_merge($calculated, ['is_manual_override' => false])
         );
     }
+
+    protected function getDisplayedMasteryStatus(?string $sessionType, $record): string
+    {
+        $isOverride = $record && $record->is_manual_override;
+        $recordMasteryStatus = $record->mastery_status ?? null;
+
+        if ($isOverride && $recordMasteryStatus === StudentPartRecord::MASTERY_MASTERED) {
+            return StudentPartRecord::MASTERY_MASTERED;
+        }
+        if ($isOverride && $recordMasteryStatus === StudentPartRecord::MASTERY_NOT_MASTERED) {
+            return StudentPartRecord::MASTERY_NOT_MASTERED;
+        }
+        if ($sessionType === RecitationSession::TYPE_MAFSIL) {
+            return 'مفصل';
+        }
+        if ($sessionType === RecitationSession::TYPE_RECITATION) {
+            return $record && $record->is_completed
+                ? StudentPartRecord::MASTERY_MASTERED
+                : StudentPartRecord::MASTERY_NOT_MASTERED;
+        }
+        return StudentPartRecord::MASTERY_NOT_MASTERED;
+    }
+
+    protected function countMafsilAndMutqin(\Illuminate\Support\Collection $records, array $partSessionTypes): int
+    {
+        $count = 0;
+        foreach ($records as $partNumber => $record) {
+            $sessionType = $partSessionTypes[$partNumber] ?? null;
+            $status = $this->getDisplayedMasteryStatus($sessionType, $record);
+            if ($status === 'مفصل' || $status === StudentPartRecord::MASTERY_MASTERED) {
+                $count++;
+            }
+        }
+        return $count;
+    }
 }
