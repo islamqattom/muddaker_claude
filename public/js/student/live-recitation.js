@@ -17,12 +17,19 @@ class LiveRecitationController {
         this.similarityThreshold = 80;
         this.apiToken = '';
         this.faultAudio = new Audio('/sounds/fault.mp3');
+        this.faultAudio.onerror = () => {
+            console.warn('Fault sound file not found, continuing without audio feedback');
+            this.faultAudio = null;
+        };
         this.verseCardsCache = null;
         this.silenceRafId = null;
         this.isEnding = false;
         this.lastProcessedVerseIndex = -1;
         this.errorCountForCurrentVerse = 0;
         this.maxErrorsPerVerse = 3;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 3;
+        this.reconnectDelay = 1000;
         this.init();
     }
 
@@ -37,6 +44,7 @@ class LiveRecitationController {
         this.nextVerseBtn = document.getElementById('nextVerse');
         this.statusEl = document.getElementById('recitationStatus');
         this.progressEl = document.getElementById('recitationProgress');
+        this.versesCountEl = document.getElementById('versesCount');
         this.errorCountEl = document.getElementById('errorCount');
         this.currentVerseEl = document.getElementById('currentVerse');
         this.transcriptEl = document.getElementById('transcript');
@@ -60,14 +68,119 @@ class LiveRecitationController {
         this.startBtn.addEventListener('click', () => this.startRecitation());
         this.stopBtn.addEventListener('click', () => this.stopRecitation());
         this.nextVerseBtn.addEventListener('click', () => this.nextVerse());
+
+        // Cache frequently accessed DOM elements
+        this.pageInputsContainer = document.getElementById('pageInputs');
+        this.endPageInputContainer = document.getElementById('endPageInput');
+        this.surahInputsContainer = document.getElementById('surahInputs');
+        this.verseRangeInputsContainer = document.getElementById('verseRangeInputs');
+        this.progressBarEl = document.getElementById('progressBar');
+        this.toastContainerEl = document.getElementById('toastContainer');
+        this.statusIndicatorEl = document.getElementById('statusIndicator');
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isRecording && !this.isEnding) {
+                this.stopRecitation();
+            }
+            if ((e.key === ' ' || e.key === 'Enter') && !this.isRecording && document.activeElement === this.startBtn) {
+                e.preventDefault();
+                this.startRecitation();
+            }
+        });
+
+        // Threshold slider display
+        const thresholdInput = document.getElementById('similarityThreshold');
+        const thresholdValue = document.getElementById('thresholdValue');
+        if (thresholdInput && thresholdValue) {
+            thresholdInput.addEventListener('input', () => {
+                thresholdValue.textContent = thresholdInput.value + '%';
+            });
+        }
+
+        // Clear transcript button
+        const clearTranscriptBtn = document.getElementById('clearTranscript');
+        if (clearTranscriptBtn) {
+            clearTranscriptBtn.addEventListener('click', () => {
+                this.transcriptText = '';
+                this.transcriptEl.innerHTML = '<span class="text-muted">جارى الاستماع...</span>';
+            });
+        }
     }
 
     togglePageInputs() {
-        if (this.modeSelect.value === 'range') {
-            this.endPageInputContainer.classList.remove('d-none');
-        } else {
+        const mode = this.modeSelect.value;
+
+        if (mode === 'page') {
+            this.pageInputsContainer.classList.remove('d-none');
             this.endPageInputContainer.classList.add('d-none');
+            this.surahInputsContainer.classList.add('d-none');
+            this.verseRangeInputsContainer.classList.add('d-none');
+        } else if (mode === 'range') {
+            this.pageInputsContainer.classList.remove('d-none');
+            this.endPageInputContainer.classList.remove('d-none');
+            this.surahInputsContainer.classList.add('d-none');
+            this.verseRangeInputsContainer.classList.add('d-none');
+        } else if (mode === 'surah') {
+            this.pageInputsContainer.classList.add('d-none');
+            this.endPageInputContainer.classList.add('d-none');
+            this.surahInputsContainer.classList.remove('d-none');
+            this.verseRangeInputsContainer.classList.remove('d-none');
+            this.loadSurahList();
         }
+    }
+
+    loadSurahList() {
+        const surahSelect = document.getElementById('surahSelect');
+        if (surahSelect.options.length > 1) return; // Already loaded
+
+        const surahs = [
+            { number: 1, name: 'الفاتحة'}, { number: 2, name: 'البقرة'}, { number: 3, name: 'آل عمران'},
+            { number: 4, name: 'النساء'}, { number: 5, name: 'المائدة'}, { number: 6, name: 'الأنعام'},
+            { number: 7, name: 'الأعراف'}, { number: 8, name: 'الأنفال'}, { number: 9, name: 'التوبة'},
+            { number: 10, name: 'يونس'}, { number: 11, name: 'هود'}, { number: 12, name: 'يوسف'},
+            { number: 13, name: 'الرعد'}, { number: 14, name: 'إبراهيم'}, { number: 15, name: 'الحجر'},
+            { number: 16, name: 'النحل'}, { number: 17, name: 'الإسراء'}, { number: 18, name: 'الكهف'},
+            { number: 19, name: 'مريم'}, { number: 20, name: 'طه'}, { number: 21, name: 'الأنبياء'},
+            { number: 22, name: 'الحج'}, { number: 23, name: 'المؤمنون'}, { number: 24, name: 'النور'},
+            { number: 25, name: 'الفرقان'}, { number: 26, name: 'الشعراء'}, { number: 27, name: 'النمل'},
+            { number: 28, name: 'القصص'}, { number: 29, name: 'العنكبوت'}, { number: 30, name: 'الروم'},
+            { number: 31, name: 'لقمان'}, { number: 32, name: 'السجدة'}, { number: 33, name: 'الأحزاب'},
+            { number: 34, name: 'سبأ'}, { number: 35, name: 'فاطر'}, { number: 36, name: 'يس'},
+            { number: 37, name: 'الصافات'}, { number: 38, name: 'ص'}, { number: 39, name: 'الزمر'},
+            { number: 40, name: 'غافر'}, { number: 41, name: 'فصلت'}, { number: 42, name: 'الشورى'},
+            { number: 43, name: 'الزخرف'}, { number: 44, name: 'الدخان'}, { number: 45, name: 'الجاثية'},
+            { number: 46, name: 'الأحقاف'}, { number: 47, name: 'محمد'}, { number: 48, name: 'الفتح'},
+            { number: 49, name: 'الحجرات'}, { number: 50, name: 'ق'}, { number: 51, name: 'الذاريات'},
+            { number: 52, name: 'الطور'}, { number: 53, name: 'النجم'}, { number: 54, name: 'القمر'},
+            { number: 55, name: 'الرحمن'}, { number: 56, name: 'الواقعة'}, { number: 57, name: 'الحديد'},
+            { number: 58, name: 'المجادلة'}, { number: 59, name: 'الحشر'}, { number: 60, name: 'الممتحنة'},
+            { number: 61, name: 'الصف'}, { number: 62, name: 'الجمعة'}, { number: 63, name: 'المنافقون'},
+            { number: 64, name: 'التغابن'}, { number: 65, name: 'الطلاق'}, { number: 66, name: 'التحريم'},
+            { number: 67, name: 'الملك'}, { number: 68, name: 'القلم'}, { number: 69, name: 'الحاقة'},
+            { number: 70, name: 'المعارج'}, { number: 71, name: 'نوح'}, { number: 72, name: 'الجن'},
+            { number: 73, name: 'المزمل'}, { number: 74, name: 'المدثر'}, { number: 75, name: 'القيامة'},
+            { number: 76, name: 'الإنسان'}, { number: 77, name: 'المرسلات'}, { number: 78, name: 'النبأ'},
+            { number: 79, name: 'النازعات'}, { number: 80, name: 'عبس'}, { number: 81, name: 'التكوير'},
+            { number: 82, name: 'الإنفطار'}, { number: 83, name: 'المطففين'}, { number: 84, name: 'الإنشقاق'},
+            { number: 85, name: 'البروج'}, { number: 86, name: 'الطارق'}, { number: 87, name: 'الأعلى'},
+            { number: 88, name: 'الغاشية'}, { number: 89, name: 'الفجر'}, { number: 90, name: 'البلد'},
+            { number: 91, name: 'الشمس'}, { number: 92, name: 'الليل'}, { number: 93, name: 'الضحى'},
+            { number: 94, name: 'الشرح'}, { number: 95, name: 'التين'}, { number: 96, name: 'العلق'},
+            { number: 97, name: 'القدر'}, { number: 98, name: 'البينة'}, { number: 99, name: 'الزلزلة'},
+            { number: 100, name: 'العاديات'}, { number: 101, name: 'القارعة'}, { number: 102, name: 'التكاثر'},
+            { number: 103, name: 'العصر'}, { number: 104, name: 'الهمزة'}, { number: 105, name: 'الفيل'},
+            { number: 106, name: 'قريش'}, { number: 107, name: 'الماعون'}, { number: 108, name: 'الكوثر'},
+            { number: 109, name: 'الكافرون'}, { number: 110, name: 'النصر'}, { number: 111, name: 'المسد'},
+            { number: 112, name: 'الإخلاص'}, { number: 113, name: 'الفلق'}, { number: 114, name: 'الناس'}
+        ];
+
+        surahs.forEach(surah => {
+            const option = document.createElement('option');
+            option.value = surah.number;
+            option.textContent = surah.number + '. ' + surah.name;
+            surahSelect.appendChild(option);
+        });
     }
 
     async startRecitation() {
@@ -76,6 +189,12 @@ class LiveRecitationController {
         const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
         this.similarityThreshold = parseInt(this.similarityThresholdInput.value);
         this.startBtn.disabled = true;
+
+        // Update status indicator
+        this.updateStatusIndicator('connecting');
+
+        // Reset reconnect attempts
+        this.reconnectAttempts = 0;
         this.updateStatus('جارى البدء...');
 
         // Check if we have API token (from meta tag or previous fetch)
@@ -106,14 +225,31 @@ class LiveRecitationController {
         }
 
         try {
+            const requestBody = { mode: mode };
+
+            if (mode === 'page') {
+                requestBody.start_page = startPage;
+                requestBody.end_page = startPage;
+            } else if (mode === 'range') {
+                requestBody.start_page = startPage;
+                requestBody.end_page = endPage;
+            } else if (mode === 'surah') {
+                const surahSelect = document.getElementById('surahSelect');
+                const verseStart = parseInt(document.getElementById('verseStart').value);
+                const verseEnd = parseInt(document.getElementById('verseEnd').value);
+                requestBody.surah = parseInt(surahSelect.value);
+                requestBody.verse_start = verseStart;
+                requestBody.verse_end = verseEnd;
+            }
+
             const response = await fetch('/api/student/live-recitation/start', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
-                body: JSON.stringify({ mode: mode, start_page: startPage, end_page: endPage })
+                body: JSON.stringify(requestBody)
             });
             const data = await response.json();
 
@@ -181,6 +317,7 @@ class LiveRecitationController {
         }
 
         this.ws.onopen = () => {
+            this.updateStatusIndicator('active');
             this.updateStatus('متصل - جارى الاستماع...');
             this.isRecording = true;
             this.startRecording();
@@ -202,6 +339,12 @@ class LiveRecitationController {
             this.stopSilenceDetection();
             if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
                 this.mediaRecorder.stop();
+            }
+            // Attempt reconnection if not ending and under max attempts
+            if (!this.isEnding && this.reconnectAttempts < this.maxReconnectAttempts) {
+                this.reconnectAttempts++;
+                this.updateStatus('جارٍ إعادة الاتصال... (' + this.reconnectAttempts + '/' + this.maxReconnectAttempts + ')');
+                setTimeout(() => this.connectWebSocket(), this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1));
             }
         };
     }
@@ -395,16 +538,36 @@ class LiveRecitationController {
             const card = document.createElement('div');
             card.className = 'verse-card' + (index === 0 ? ' active-verse' : '');
             card.dataset.index = index;
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', 'آية ' + (index + 1) + ' من ' + verse.surah + ':' + verse.verse_number);
+
+            // Click handler for manual navigation
+            card.addEventListener('click', () => {
+                if (!this.isEvaluating && !this.isEnding) {
+                    this.currentVerseIndex = index;
+                    this.highlightVerse(index);
+                    this.updateProgress();
+                }
+            });
+
+            // Keyboard handler
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
 
             const header = document.createElement('div');
             header.className = 'd-flex justify-content-between align-items-center mb-2';
 
             const badge = document.createElement('span');
-            badge.className = 'badge bg-secondary';
+            badge.className = 'badge verse-badge bg-secondary';
             badge.textContent = verse.surah + ':' + verse.verse_number;
 
             const counter = document.createElement('span');
-            counter.className = 'text-muted';
+            counter.className = 'verse-counter';
             counter.textContent = (index + 1) + ' / ' + this.verses.length;
 
             header.appendChild(badge);
@@ -560,7 +723,7 @@ class LiveRecitationController {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -590,7 +753,7 @@ class LiveRecitationController {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -622,7 +785,11 @@ class LiveRecitationController {
 
     updateTranscript(text) {
         if (text && text.trim().length > 0) {
-            this.transcriptEl.innerHTML = '<span class="text-success">' + text + '</span>';
+            const span = document.createElement('span');
+            span.className = 'text-success';
+            span.textContent = text;
+            this.transcriptEl.innerHTML = '';
+            this.transcriptEl.appendChild(span);
         } else {
             this.transcriptEl.innerHTML = '<span class="text-muted">جارى الاستماع...</span>';
         }
@@ -644,14 +811,44 @@ class LiveRecitationController {
 
     updateProgress() {
         this.progressEl.textContent = this.currentVerseIndex + ' / ' + this.verses.length;
+        this.versesCountEl.textContent = this.verses.length;
+
+        if (this.progressBarEl && this.verses.length > 0) {
+            const percentage = (this.currentVerseIndex / this.verses.length) * 100;
+            this.progressBarEl.style.width = percentage + '%';
+            this.progressBarEl.setAttribute('aria-valuenow', Math.round(percentage));
+        }
     }
 
     updateStatus(text) {
         this.statusEl.textContent = text;
     }
 
+    updateStatusIndicator(state) {
+        const indicator = document.getElementById('statusIndicator');
+        if (!indicator) return;
+        indicator.className = 'status-indicator ' + state;
+    }
+
     showError(message) {
-        alert(message);
+        if (!this.toastContainerEl) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-error';
+        toast.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + this.escapeHtml(message) + '</span>';
+        this.toastContainerEl.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
 
@@ -684,7 +881,7 @@ class LiveRecitationController {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-CSRF-TOKEN': this.getCsrfToken()
+                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
             });
@@ -716,14 +913,16 @@ class LiveRecitationController {
         this.startBtn.disabled = false;
         this.stopBtn.classList.add('d-none');
         this.nextVerseBtn.classList.add('d-none');
+        this.updateStatusIndicator('');
         this.updateStatus('في انتظار البدء');
-        this.currentVerseEl.innerHTML = '<div class="text-muted p-5"><i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i><h5>اضغط "ابدأ التسميع" للبدء</h5><p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p></div>';
+        this.currentVerseEl.innerHTML = '<div class="idle-state"><i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i><h5>اضغط "ابدأ التسميع" للبدء</h5><p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p></div>';
         this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
         this.sessionId = null;
         this.verses = [];
         this.currentVerseIndex = 0;
         this.totalErrors = 0;
         this.verseCardsCache = null;
+        this.audioChunks = [];
         this.isEvaluating = false;
         this.isEnding = false;
         this.lastProcessedVerseIndex = -1;
