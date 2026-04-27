@@ -76,6 +76,7 @@
                     <tbody>
                         @foreach($parts as $part)
                             @php
+                                $record = $records->get($part->part_number);
                                 $isCompleted = $record && $record->is_completed;
                                 $isOverride = $record && $record->is_manual_override;
                                 $sessionType = $partSessionTypes[$part->part_number] ?? null;
