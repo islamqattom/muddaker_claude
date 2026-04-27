@@ -71,8 +71,6 @@ class LiveRecitationController {
     }
 
     async startRecitation() {
-        console.log('startRecitation() called');
-
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
         const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
@@ -118,15 +116,28 @@ class LiveRecitationController {
                 body: JSON.stringify({ mode: mode, start_page: startPage, end_page: endPage })
             });
             const data = await response.json();
-            console.log('API Response:', response.status, data);
+
             if (!data.success) {
                 this.showError(data.error || data.errors || 'فشل في بدء جلسة التسميع');
                 this.startBtn.disabled = false;
                 return;
             }
+
+            // Validate API response has required data
+            if (!data.data || !data.data.verses || !Array.isArray(data.data.verses) || data.data.verses.length === 0) {
+                console.error('Invalid API response - missing verses:', data);
+                this.showError('لم يتم العثور على آيات للنطاق المحدد');
+                this.startBtn.disabled = false;
+                return;
+            }
+
             this.sessionId = data.data.session_id;
             this.verses = data.data.verses;
             this.currentSession = {
+                id: data.data.session_id,
+                audioUrls: data.data.audio_urls,
+                websocketToken: data.data.websocket_token
+            };
                 id: data.data.session_id,
                 audioUrls: data.data.audio_urls,
                 websocketToken: data.data.websocket_token
@@ -173,7 +184,6 @@ class LiveRecitationController {
         }
 
         this.ws.onopen = () => {
-            console.log('WebSocket connected');
             this.updateStatus('متصل - جارى الاستماع...');
             this.isRecording = true;
             this.startRecording();
@@ -191,7 +201,6 @@ class LiveRecitationController {
             this.showError('خطأ في الاتصال');
         };
         this.ws.onclose = () => {
-            console.log('WebSocket closed');
             this.isRecording = false;
             this.stopSilenceDetection();
             if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
@@ -357,14 +366,8 @@ class LiveRecitationController {
     }
 
     highlightVerse(index) {
-        // Use cached verse cards if available, otherwise query
-        const verseCards = this.verseCardsCache || document.querySelectorAll('.verse-card');
-        verseCards.forEach((card, i) => {
-            if (i === index) {
-                card.classList.add('active-verse');
-            } else {
-                card.classList.remove('active-verse');
-            }
+        this.verseCardsCache.forEach((card, i) => {
+            card.classList.toggle('active-verse', i === index);
         });
     }
 
@@ -376,17 +379,18 @@ class LiveRecitationController {
     }
 
     setVerseErrorState(index, duration = 1500) {
-        const verseCards = this.verseCardsCache || document.querySelectorAll('.verse-card');
-        if (verseCards[index]) {
-            verseCards[index].classList.add('error-verse');
+        if (this.verseCardsCache[index]) {
+            this.verseCardsCache[index].classList.add('error-verse');
             setTimeout(() => {
-                verseCards[index].classList.remove('error-verse');
+                this.verseCardsCache[index].classList.remove('error-verse');
             }, duration);
         }
     }
 
     initializeVersesDisplay() {
-        // Display all verses at once with highlighting for the current verse
+        if (!this.verses || this.verses.length === 0) return;
+        if (!this.currentVerseEl) return;
+
         const container = document.createElement('div');
         container.className = 'verses-container';
 
