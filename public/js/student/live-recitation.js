@@ -19,6 +19,10 @@ class LiveRecitationController {
         this.faultAudio = new Audio('/sounds/fault.mp3');
         this.verseCardsCache = null;
         this.silenceRafId = null;
+        this.isEnding = false;
+        this.lastProcessedVerseIndex = -1;
+        this.errorCountForCurrentVerse = 0;
+        this.maxErrorsPerVerse = 3;
         this.init();
     }
 
@@ -114,6 +118,9 @@ class LiveRecitationController {
             this.currentVerseIndex = 0;
             this.totalErrors = 0;
             this.transcriptText = '';
+            this.isEnding = false;
+            this.lastProcessedVerseIndex = -1;
+            this.errorCountForCurrentVerse = 0;
             this.updateProgress();
             this.initializeVersesDisplay();
             this.highlightVerse(0);
@@ -245,7 +252,7 @@ class LiveRecitationController {
     }
 
     onSilenceDetected() {
-        if (this.isEvaluating || this.currentVerseIndex >= this.verses.length) return;
+        if (this.isEvaluating || this.isEnding || this.currentVerseIndex >= this.verses.length) return;
         this.isEvaluating = true;
         // Don't stop recording, just evaluate current transcript and continue
         this.evaluateCurrentVerse();
@@ -314,6 +321,8 @@ class LiveRecitationController {
             // Only auto-advance by ONE verse at a time to ensure validation
             if (bestMatchIndex === this.currentVerseIndex + 1) {
                 this.currentVerseIndex = bestMatchIndex;
+                this.lastProcessedVerseIndex = bestMatchIndex;
+                this.errorCountForCurrentVerse = 0;
                 this.updateProgress();
                 this.updateProgressOnServer(bestSimilarity);
 
@@ -401,6 +410,12 @@ class LiveRecitationController {
     }
 
     async evaluateCurrentVerse() {
+        // Skip if ending or if we've already processed this verse
+        if (this.isEnding || this.currentVerseIndex <= this.lastProcessedVerseIndex) {
+            this.isEvaluating = false;
+            return;
+        }
+
         // Only evaluate if we have a transcript
         if (!this.transcriptText || this.transcriptText.trim().length === 0) {
             this.isEvaluating = false;
@@ -412,11 +427,29 @@ class LiveRecitationController {
         const similarity = this.calculateSimilarity(this.transcriptText, expectedText);
 
         if (similarity < this.similarityThreshold) {
+            this.errorCountForCurrentVerse++;
             await this.recordError(verse, similarity);
             this.showErrorState(verse);
             this.playFaultSound();
+
+            // Auto-advance after max errors on same verse
+            if (this.errorCountForCurrentVerse >= this.maxErrorsPerVerse) {
+                this.lastProcessedVerseIndex = this.currentVerseIndex;
+                if (this.currentVerseIndex < this.verses.length - 1) {
+                    this.currentVerseIndex++;
+                    this.errorCountForCurrentVerse = 0;
+                    this.highlightVerse(this.currentVerseIndex);
+                    this.updateProgress();
+                } else {
+                    this.finishRecitation();
+                    this.isEvaluating = false;
+                    return;
+                }
+            }
         } else {
             // Successfully recited - auto advance to next verse
+            this.lastProcessedVerseIndex = this.currentVerseIndex;
+            this.errorCountForCurrentVerse = 0;
             if (this.currentVerseIndex < this.verses.length - 1) {
                 this.currentVerseIndex++;
                 this.highlightVerse(this.currentVerseIndex);
@@ -424,6 +457,7 @@ class LiveRecitationController {
             } else {
                 // Last verse completed
                 this.finishRecitation();
+                this.isEvaluating = false;
                 return;
             }
         }
@@ -433,7 +467,7 @@ class LiveRecitationController {
         this.transcriptText = '';
 
         setTimeout(() => {
-            if (this.isRecording && this.currentVerseIndex < this.verses.length) {
+            if (this.isRecording && !this.isEnding && this.currentVerseIndex < this.verses.length) {
                 if (this.mediaRecorder.state === 'inactive') {
                     this.mediaRecorder.start(1000);
                 }
@@ -491,8 +525,8 @@ class LiveRecitationController {
         text = text.replace(/[آأإا]/g, 'ا');
         // Normalize ya-al-maqsura: ى -> ي
         text = text.replace(/ى/g, 'ي');
-        // Remove zero-width joiners and similar
-        text = text.replace(/[​-‍‎‏]/g, '');
+        // Remove zero-width non-joiner (U+200C) and zero-width joiner (U+200D)
+        text = text.replace(/[‌‍]/g, '');
         // Normalize whitespace
         text = text.replace(/\s+/g, ' ');
         return text.trim();
@@ -578,8 +612,11 @@ class LiveRecitationController {
     }
 
     nextVerse() {
+        if (this.isEvaluating || this.isEnding) return;
         if (this.currentVerseIndex < this.verses.length - 1) {
             this.currentVerseIndex++;
+            this.lastProcessedVerseIndex = this.currentVerseIndex;
+            this.errorCountForCurrentVerse = 0;
             this.updateProgress();
             this.highlightVerse(this.currentVerseIndex);
             this.transcriptText = '';
@@ -601,9 +638,7 @@ class LiveRecitationController {
     }
 
 
-    async stopRecitation() {
-        if (!this.sessionId) return;
-        this.isRecording = false;
+    cleanupRecording() {
         this.stopSilenceDetection();
 
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
@@ -618,6 +653,14 @@ class LiveRecitationController {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
         }
+    }
+
+    async stopRecitation() {
+        if (!this.sessionId) return;
+
+        this.isEnding = true;
+        this.isRecording = false;
+        this.cleanupRecording();
 
         try {
             const response = await fetch(`/api/student/live-recitation/session/${this.sessionId}/end`, {
@@ -646,11 +689,10 @@ class LiveRecitationController {
     }
 
     finishRecitation() {
+        this.isEnding = true;
         this.isRecording = false;
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.close();
-        }
-        this.stopRecitation();
+        this.cleanupRecording();
+        this.resetUI();
     }
 
     resetUI() {
@@ -665,6 +707,10 @@ class LiveRecitationController {
         this.currentVerseIndex = 0;
         this.totalErrors = 0;
         this.verseCardsCache = null;
+        this.isEvaluating = false;
+        this.isEnding = false;
+        this.lastProcessedVerseIndex = -1;
+        this.errorCountForCurrentVerse = 0;
     }
 
     showReport(report) {
