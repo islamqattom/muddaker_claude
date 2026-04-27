@@ -73,13 +73,6 @@ class LiveRecitationController {
     async startRecitation() {
         console.log('startRecitation() called');
 
-        // Validate DOM elements exist
-        if (!this.modeSelect || !this.startPageInput || !this.startBtn) {
-            console.error('DOM elements not initialized:', { modeSelect: this.modeSelect, startPageInput: this.startPageInput, startBtn: this.startBtn });
-            alert('خطأ في تحميل الصفحة - يرجى تحديث الصفحة');
-            return;
-        }
-
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
         const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
