@@ -40,10 +40,22 @@ class LiveRecitationController {
         this.errorCountEl = document.getElementById('errorCount');
         this.currentVerseEl = document.getElementById('currentVerse');
         this.transcriptEl = document.getElementById('transcript');
+
         // Cache CSRF token once
         this.csrfToken = document.querySelector('meta[name=csrf-token]')?.content || '';
         // Read API token from meta tag if available
         this.apiToken = document.querySelector('meta[name=api-token]')?.content || '';
+
+        // Validate critical elements
+        if (!this.startBtn || !this.modeSelect || !this.startPageInput) {
+            console.error('Failed to initialize LiveRecitationController: missing critical DOM elements', {
+                startBtn: this.startBtn,
+                modeSelect: this.modeSelect,
+                startPageInput: this.startPageInput
+            });
+            return;
+        }
+
         this.modeSelect.addEventListener('change', () => this.togglePageInputs());
         this.startBtn.addEventListener('click', () => this.startRecitation());
         this.stopBtn.addEventListener('click', () => this.stopRecitation());
@@ -59,6 +71,15 @@ class LiveRecitationController {
     }
 
     async startRecitation() {
+        console.log('startRecitation() called');
+
+        // Validate DOM elements exist
+        if (!this.modeSelect || !this.startPageInput || !this.startBtn) {
+            console.error('DOM elements not initialized:', { modeSelect: this.modeSelect, startPageInput: this.startPageInput, startBtn: this.startBtn });
+            alert('خطأ في تحميل الصفحة - يرجى تحديث الصفحة');
+            return;
+        }
+
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
         const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
@@ -74,8 +95,10 @@ class LiveRecitationController {
                     headers: {
                         'Accept': 'application/json',
                     },
-                    credentials: 'include',
                 });
+                if (!tokenResponse.ok) {
+                    throw new Error('Token request failed: ' + tokenResponse.status);
+                }
                 const tokenData = await tokenResponse.json();
                 if (!tokenData.success || !tokenData.token) {
                     this.showError('فشل في الحصول على رمز الدخول');
@@ -85,7 +108,7 @@ class LiveRecitationController {
                 this.apiToken = tokenData.token;
             } catch (error) {
                 console.error('Failed to get API token:', error);
-                this.showError('فشل في الاتصال بالخادم');
+                this.showError('فشل في الاتصال بالخادم: ' + error.message);
                 this.startBtn.disabled = false;
                 return;
             }
@@ -99,7 +122,6 @@ class LiveRecitationController {
                     'Authorization': 'Bearer ' + this.apiToken,
                     'X-CSRF-TOKEN': this.getCsrfToken()
                 },
-                credentials: 'include',
                 body: JSON.stringify({ mode: mode, start_page: startPage, end_page: endPage })
             });
             const data = await response.json();
@@ -129,7 +151,7 @@ class LiveRecitationController {
             this.connectWebSocket();
         } catch (error) {
             console.error('Error starting recitation:', error);
-            this.showError('حدث خطأ أثناء بدء التسميع');
+            this.showError('حدث خطأ أثناء بدء التسميع: ' + error.message);
             this.startBtn.disabled = false;
         }
     }
