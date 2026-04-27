@@ -26,17 +26,20 @@ class AssemblyAIRealtimeService
      * @param int $expiresIn Token expiration in seconds (default 3600)
      * @return array{success: bool, token?: string, websocket_url?: string, error?: string}
      */
-    public function getWebSocketToken(int $expiresIn = 3600): array
+    public function getWebSocketToken(int $expiresIn = 600): array
     {
         if (empty($this->apiKey)) {
             Log::warning('AssemblyAI API key not configured');
             return ['success' => false, 'error' => 'AssemblyAI API key not configured'];
         }
 
+        // Max expiration is 600 seconds
+        $expiresIn = min($expiresIn, 600);
+
         try {
             $response = Http::withToken($this->apiKey)
-                ->post('https://api.assemblyai.com/v2/realtime/token', [
-                    'expires_in' => $expiresIn,
+                ->get('https://streaming.assemblyai.com/v3/token', [
+                    'expires_in_seconds' => $expiresIn,
                 ]);
 
             if (!$response->successful()) {
@@ -52,7 +55,7 @@ class AssemblyAIRealtimeService
             return [
                 'success' => true,
                 'token' => $data['token'] ?? null,
-                'websocket_url' => $data['websocket_url'] ?? null,
+                'websocket_url' => 'wss://api.assemblyai.com/v2/realtime/ws',
             ];
         } catch (\Exception $e) {
             Log::error('AssemblyAI token error', ['error' => $e->getMessage()]);
