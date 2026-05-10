@@ -143,25 +143,47 @@
                 <span>إجراءات سريعة</span>
             </div>
         </div>
-        <div class="card-body-custom">
-            <div class="actions-grid">
-                <a href="{{ route('admin.students.create') }}" class="action-btn primary">
-                    <div class="action-icon"><i class="fas fa-user-plus"></i></div>
-                    <span>إضافة طالب</span>
-                </a>
-                <a href="{{ route('admin.supervisors.create') }}" class="action-btn secondary">
-                    <div class="action-icon"><i class="fas fa-user-tie"></i></div>
-                    <span>إضافة مشرف</span>
-                </a>
-                <a href="{{ route('admin.reports.recitation') }}" class="action-btn info">
-                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
-                    <span>تقرير التسميع</span>
-                </a>
-                <a href="{{ route('admin.reports.attendance') }}" class="action-btn success">
-                    <div class="action-icon"><i class="fas fa-calendar-check"></i></div>
-                    <span>تقرير الحضور</span>
-                </a>
-            </div>
+        <div class="qa-body">
+            <a href="{{ route('admin.students.create') }}" class="qa-item">
+                <div class="qa-item-icon primary">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="qa-item-content">
+                    <span class="qa-item-title">إضافة طالب</span>
+                    <span class="qa-item-desc">تسجيل طالب جديد</span>
+                </div>
+                <i class="fas fa-arrow-left qa-arrow"></i>
+            </a>
+            <a href="{{ route('admin.supervisors.create') }}" class="qa-item">
+                <div class="qa-item-icon purple">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="qa-item-content">
+                    <span class="qa-item-title">إضافة مشرف</span>
+                    <span class="qa-item-desc">تعيين مشرف جديد</span>
+                </div>
+                <i class="fas fa-arrow-left qa-arrow"></i>
+            </a>
+            <a href="{{ route('admin.reports.recitation') }}" class="qa-item">
+                <div class="qa-item-icon info">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="qa-item-content">
+                    <span class="qa-item-title">تقرير التسميع</span>
+                    <span class="qa-item-desc">عرض تقرير جلسات التسميع</span>
+                </div>
+                <i class="fas fa-arrow-left qa-arrow"></i>
+            </a>
+            <a href="{{ route('admin.reports.attendance') }}" class="qa-item">
+                <div class="qa-item-icon success">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="qa-item-content">
+                    <span class="qa-item-title">تقرير الحضور</span>
+                    <span class="qa-item-desc">عرض تقرير الحضور والغياب</span>
+                </div>
+                <i class="fas fa-arrow-left qa-arrow"></i>
+            </a>
         </div>
     </div>
 </div>
@@ -892,6 +914,93 @@
     font-size: 40px;
     color: #d4a030;
     opacity: 0.5;
+}
+
+/* Quick Actions Modern Style */
+.qa-body {
+    padding: 15px 18px;
+}
+
+.qa-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+}
+
+.qa-item:last-child {
+    margin-bottom: 0;
+}
+
+.qa-item:hover {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.04) 0%, rgba(42, 69, 112, 0.07) 100%);
+    border-color: rgba(212, 160, 48, 0.15);
+}
+
+.qa-item:hover .qa-arrow {
+    transform: translateX(-5px);
+    color: #d4a030;
+}
+
+.qa-item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.qa-item-icon.primary {
+    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
+    color: #d4a030;
+    box-shadow: 0 4px 15px rgba(24, 43, 72, 0.25);
+}
+
+.qa-item-icon.purple {
+    background: linear-gradient(135deg, rgba(142, 68, 173, 0.15) 0%, rgba(155, 89, 182, 0.2) 100%);
+    color: #8e44ad;
+}
+
+.qa-item-icon.success {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.15) 0%, rgba(46, 204, 113, 0.2) 100%);
+    color: #27ae60;
+}
+
+.qa-item-icon.info {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(41, 128, 185, 0.2) 100%);
+    color: #3498db;
+}
+
+.qa-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.qa-item-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #182B48;
+}
+
+.qa-item-desc {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.qa-arrow {
+    font-size: 12px;
+    color: #bdc3c7;
+    transition: all 0.3s ease;
 }
 </style>
 

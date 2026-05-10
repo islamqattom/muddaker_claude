@@ -57,33 +57,54 @@
 <div class="row g-4 mt-1">
     <!-- Quick Actions -->
     <div class="col-lg-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h6><i class="fas fa-bolt me-2"></i>الإجراءات السريعة</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-12 col-md-6">
-                        <a href="{{ route('supervisor.attendance.index') }}" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-calendar-check me-2"></i>تسجيل الحضور والغياب
-                        </a>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-primary w-100">
-                            <i class="fas fa-microphone me-2"></i>بدء جلسة تسميع
-                        </a>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <a href="{{ route('supervisor.warnings.create') }}" class="btn btn-outline-warning w-100">
-                            <i class="fas fa-exclamation-triangle me-2"></i>إصدار إنذار
-                        </a>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <a href="{{ route('supervisor.reports.index') }}" class="btn btn-outline-info w-100">
-                            <i class="fas fa-chart-bar me-2"></i>التقارير
-                        </a>
-                    </div>
+        <div class="quick-actions-card">
+            <div class="qa-header">
+                <div class="qa-header-icon">
+                    <i class="fas fa-bolt"></i>
                 </div>
+                <h5>الإجراءات السريعة</h5>
+            </div>
+            <div class="qa-body">
+                <a href="{{ route('supervisor.attendance.index') }}" class="qa-item">
+                    <div class="qa-item-icon success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="qa-item-content">
+                        <span class="qa-item-title">تسجيل الحضور</span>
+                        <span class="qa-item-desc">تسجيل حضور وغياب الطلاب</span>
+                    </div>
+                    <i class="fas fa-arrow-left qa-arrow"></i>
+                </a>
+                <a href="{{ route('supervisor.recitation.index') }}" class="qa-item primary-accent">
+                    <div class="qa-item-icon primary">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="qa-item-content">
+                        <span class="qa-item-title">بدء جلسة تسميع</span>
+                        <span class="qa-item-desc">تسميع جديد أو مراجعة</span>
+                    </div>
+                    <i class="fas fa-arrow-left qa-arrow"></i>
+                </a>
+                <a href="{{ route('supervisor.warnings.create') }}" class="qa-item">
+                    <div class="qa-item-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="qa-item-content">
+                        <span class="qa-item-title">إصدار إنذار</span>
+                        <span class="qa-item-desc">إنذار طالب بسبب غياب أو تأخر</span>
+                    </div>
+                    <i class="fas fa-arrow-left qa-arrow"></i>
+                </a>
+                <a href="{{ route('supervisor.reports.index') }}" class="qa-item">
+                    <div class="qa-item-icon info">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="qa-item-content">
+                        <span class="qa-item-title">التقارير</span>
+                        <span class="qa-item-desc">عرض تقارير الحضور والتسميع</span>
+                    </div>
+                    <i class="fas fa-arrow-left qa-arrow"></i>
+                </a>
             </div>
         </div>
     </div>
@@ -116,8 +137,8 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div style="width:32px;height:32px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">
-                                            {{ mb_substr($student->user->name, 0, 1) }}
+                                        <div class="user-avatar-sm">
+                                            <i class="fas fa-user"></i>
                                         </div>
                                         {{ $student->user->name }}
                                     </div>
@@ -243,3 +264,158 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+/* Quick Actions Card */
+.quick-actions-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f4f8;
+    overflow: hidden;
+    height: 100%;
+}
+
+.qa-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 22px;
+    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
+    position: relative;
+}
+
+.qa-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
+}
+
+.qa-header-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(212, 160, 48, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d4a030;
+    font-size: 18px;
+}
+
+.qa-header h5 {
+    color: #fff;
+    font-weight: 700;
+    font-size: 17px;
+    margin: 0;
+}
+
+.qa-body {
+    padding: 12px;
+}
+
+.qa-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
+}
+
+.qa-item:last-child {
+    margin-bottom: 0;
+}
+
+.qa-item:hover {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.06) 100%);
+    border-color: rgba(212, 160, 48, 0.15);
+}
+
+.qa-item:hover .qa-arrow {
+    transform: translateX(-5px);
+    color: #d4a030;
+}
+
+.qa-item.primary-accent {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.05) 0%, rgba(42, 69, 112, 0.08) 100%);
+    border-color: rgba(212, 160, 48, 0.2);
+}
+
+.qa-item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.qa-item-icon.success {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.15) 0%, rgba(46, 204, 113, 0.2) 100%);
+    color: #27ae60;
+}
+
+.qa-item-icon.primary {
+    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
+    color: #d4a030;
+    box-shadow: 0 4px 15px rgba(24, 43, 72, 0.25);
+}
+
+.qa-item-icon.warning {
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.15) 0%, rgba(230, 126, 34, 0.2) 100%);
+    color: #f39c12;
+}
+
+.qa-item-icon.info {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.15) 0%, rgba(41, 128, 185, 0.2) 100%);
+    color: #3498db;
+}
+
+.qa-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.qa-item-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #182B48;
+}
+
+.qa-item-desc {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.qa-arrow {
+    font-size: 12px;
+    color: #bdc3c7;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .qa-item {
+        padding: 12px;
+    }
+
+    .qa-item-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+</style>
+@endpush
