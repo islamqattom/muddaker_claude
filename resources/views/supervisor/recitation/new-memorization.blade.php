@@ -9,460 +9,436 @@
 
 @push('styles')
 <style>
-.recitation-session {
+.rec-session {
     --gold: #d4a030;
     --gold-light: #e6b84d;
     --navy: #182B48;
     --navy-light: #2A4570;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --purple: #8e44ad;
 }
 
-.recitation-session .page-card {
-    border: 1px solid rgba(24, 43, 72, 0.08);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.recitation-session .page-card:hover {
-    border-color: var(--gold);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.recitation-session .page-card .card-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
-    padding: 12px 16px;
-}
-
-.recitation-session .result-indicator {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.recitation-session .color-green { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
-.recitation-session .color-orange { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
-.recitation-session .color-red { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
-.recitation-session .color-black { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; }
-.recitation-session .color-gray { background: linear-gradient(135deg, #ecf0f1, #d5dbdb); color: #7f8c8d; }
-
-.recitation-session .input-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.recitation-session .input-btn:hover {
-    transform: scale(1.05);
-}
-
-.recitation-session .counter-input {
-    width: 56px;
-    height: 40px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    text-align: center;
-    border: 1px solid #e9ecef;
-}
-
-.recitation-session .counter-input:focus {
-    border-color: var(--navy);
-}
-
-.recitation-session .student-header-card {
+.rec-session .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 14px;
-    overflow: hidden;
-    margin-bottom: 20px;
+    border-radius: 20px;
+    padding: 20px 28px;
+    margin-bottom: 24px;
     position: relative;
+    overflow: hidden;
 }
 
-.recitation-session .student-header-card::before {
+.rec-session .page-hero::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
 }
 
-.recitation-session .student-header-content {
-    position: relative;
-    z-index: 1;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-}
+.rec-session .hero-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 
-.recitation-session .student-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.recitation-session .student-avatar {
-    width: 48px;
-    height: 48px;
+.rec-session .hero-icon {
+    width: 56px; height: 56px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(212, 160, 48, 0.3);
-}
-
-.recitation-session .student-name {
-    color: white;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.recitation-session .student-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.recitation-session .summary-card {
-    background: white;
     border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: white;
+    box-shadow: 0 6px 20px rgba(212,160,48,0.35);
+}
+
+.rec-session .student-info { display: flex; align-items: center; gap: 14px; }
+
+.rec-session .student-avatar {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: white;
+    box-shadow: 0 4px 12px rgba(212,160,48,0.3);
+}
+
+.rec-session .student-name { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
+
+.rec-session .hero-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.rec-session .compact-badge {
+    font-size: 11px; padding: 5px 12px; border-radius: 8px;
+}
+
+.rec-session .type-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 12px;
+    font-size: 13px; font-weight: 600;
+}
+
+.rec-session .type-badge.new_memorization { background: rgba(39,174,96,0.25); color: var(--success); }
+.rec-session .type-badge.review { background: rgba(52,152,219,0.25); color: var(--info); }
+.rec-session .type-badge.unmastered { background: rgba(243,156,18,0.25); color: var(--warning); }
+
+.rec-session .session-info-badge {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    padding: 8px 16px; border-radius: 12px;
+    font-size: 13px;
+    backdrop-filter: blur(5px);
+}
+
+.rec-session .quran-verse {
+    font-family: 'Amiri', serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(212,160,48,0.2);
+    margin-top: 16px;
+    position: relative; z-index: 1;
+}
+
+.rec-session .page-card {
+    border: 1px solid rgba(24,43,72,0.08);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
 }
 
-.recitation-session .summary-header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+.rec-session .page-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.rec-session .page-card-header {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(24,43,72,0.04);
 }
 
-.recitation-session .summary-stat {
-    padding: 14px;
+.rec-session .page-title { display: flex; align-items: center; gap: 12px; }
+
+.rec-session .result-indicator {
+    width: 38px; height: 38px;
     border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.rec-session .color-green { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+.rec-session .color-orange { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+.rec-session .color-red { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+.rec-session .color-black { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; }
+.rec-session .color-gray { background: linear-gradient(135deg, #ecf0f1, #d5dbdb); color: #7f8c8d; }
+
+.rec-session .color-badge {
+    padding: 6px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 600;
+}
+
+.rec-session .page-card-body { padding: 18px; }
+
+.rec-session .input-btn {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.rec-session .input-btn:hover { transform: scale(1.05); }
+.rec-session .input-btn.btn-danger { background: rgba(220,38,38,0.1); color: var(--danger); }
+.rec-session .input-btn.btn-danger:hover { background: var(--danger); color: white; }
+.rec-session .input-btn.btn-warning { background: rgba(217,119,6,0.1); color: var(--warning); }
+.rec-session .input-btn.btn-warning:hover { background: var(--warning); color: white; }
+
+.rec-session .counter-input {
+    width: 60px; height: 42px;
+    border-radius: 10px;
+    font-size: 16px; font-weight: 700;
+    text-align: center;
+    border: 2px solid rgba(24,43,72,0.08);
+    transition: all 0.3s ease;
+}
+
+.rec-session .counter-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212,160,48,0.15);
+}
+
+.rec-session .summary-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
+
+.rec-session .summary-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 16px 20px;
+}
+
+.rec-session .summary-stat {
+    padding: 16px;
+    border-radius: 12px;
     text-align: center;
     transition: all 0.3s ease;
 }
 
-.recitation-session .summary-stat:hover {
-    transform: translateY(-2px);
-}
+.rec-session .summary-stat:hover { transform: translateY(-2px); }
 
-.recitation-session .summary-stat .stat-value {
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1;
+.rec-session .summary-stat .stat-value {
+    font-size: 26px; font-weight: 800; line-height: 1;
     margin-bottom: 4px;
 }
 
-.recitation-session .summary-stat .stat-label {
+.rec-session .summary-stat .stat-label {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.recitation-session .overall-result {
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 14px;
+.rec-session .overall-result {
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 15px;
     font-weight: 700;
     text-align: center;
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
-.recitation-session .save-btn {
+.rec-session .save-btn {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 12px 32px;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 14px; font-weight: 700;
     color: white;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(24, 43, 72, 0.3);
+    box-shadow: 0 4px 15px rgba(24,43,72,0.3);
 }
 
-.recitation-session .save-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(24, 43, 72, 0.4);
-}
+.rec-session .save-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(24,43,72,0.4); }
 
-.recitation-session .btn-outline-secondary {
-    border: 1px solid #e9ecef;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: 600;
+.rec-session .btn-outline-secondary {
+    border: 1px solid rgba(24,43,72,0.1);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 13px; font-weight: 600;
+    color: var(--navy);
+    background: white;
     transition: all 0.3s ease;
 }
 
-.recitation-session .btn-outline-secondary:hover {
-    background: #f8f9fa;
-    border-color: #ced4da;
-}
+.rec-session .btn-outline-secondary:hover { background: rgba(24,43,72,0.05); border-color: var(--navy); }
 
-.recitation-session .islamic-border {
-    position: relative;
-}
-
-.recitation-session .islamic-border::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-}
-
-.recitation-session .quran-verse-header {
-    font-family: 'Amiri', serif;
+.rec-session .notes-textarea {
+    border: 2px solid rgba(24,43,72,0.08);
+    border-radius: 12px;
+    padding: 12px 16px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    text-align: center;
-    padding: 8px 20px;
-    background: rgba(0,0,0,0.1);
-    border-top: 1px solid rgba(212, 160, 48, 0.2);
+    transition: all 0.3s ease;
 }
 
-.recitation-session .compact-badge {
-    font-size: 11px;
-    padding: 4px 10px;
-    border-radius: 6px;
+.rec-session .notes-textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212,160,48,0.15);
 }
 
 @media (max-width: 768px) {
-    .recitation-session .student-header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .recitation-session .student-info {
-        flex-direction: column;
-    }
-
-    .recitation-session .student-name {
-        font-size: 16px;
-    }
-
-    .recitation-session .summary-stat .stat-value {
-        font-size: 20px;
-    }
-
-    .recitation-session .result-indicator {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-    }
+    .rec-session .hero-content { flex-direction: column; text-align: center; }
+    .rec-session .student-info { flex-direction: column; }
+    .rec-session .hero-meta { justify-content: center; }
+    .rec-session .summary-stat .stat-value { font-size: 22px; }
 }
 </style>
 @endpush
 
 @section('content')
-<div class="recitation-session">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-
-            <div class="student-header-card islamic-border">
-                <div class="student-header-content">
-                    <div class="student-info">
-                        <div class="student-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div>
-                            <h2 class="student-name">{{ $student->user->name }}</h2>
-                            <div class="student-meta">
-                                <span class="badge bg-warning text-dark compact-badge">
-                                    <i class="fas fa-layer-group me-1"></i>
-                                    {{ $student->level->name }}
-                                </span>
-                                @if($student->student_number)
-                                <span class="text-white opacity-75 small">
-                                    <i class="fas fa-id-card me-1"></i>
-                                    {{ $student->student_number }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-white text-start">
-                        <span class="badge bg-white text-primary compact-badge px-3">
-                            <i class="fas fa-book-open me-1"></i>حفظ جديد
-                        </span>
-                        <div class="mt-2 opacity-75 small">
-                            <i class="fas fa-book me-1"></i>
-                            الجزء {{ $part->part_number }} |
-                            <i class="fas fa-file-alt me-1"></i>
-                            {{ $pagesCount }} صفحات
-                            @if($continuationPart)
-                                <span class="text-warning">+ الجزء {{ $continuationPart->part_number }}</span>
-                            @endif
-                        </div>
-                    </div>
+<div class="rec-session">
+    <div class="page-hero">
+        <div class="hero-content">
+            <div class="student-info">
+                <div class="student-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                <div class="quran-verse-header">
-                    <i class="fas fa-book-quran me-2"></i>
-                    {{ 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا' }}
+                <div>
+                    <h2 class="student-name">{{ $student->user->name }}</h2>
+                    <div class="hero-meta">
+                        <span class="compact-badge bg-warning text-dark">
+                            <i class="fas fa-layer-group me-1"></i>
+                            {{ $student->level->name }}
+                        </span>
+                        @if($student->student_number)
+                        <span class="text-white opacity-75 small">
+                            <i class="fas fa-id-card me-1"></i>
+                            {{ $student->student_number }}
+                        </span>
+                        @endif
+                    </div>
                 </div>
             </div>
-
-            <form id="recitationForm">
-                @csrf
-                <input type="hidden" name="student_id" value="{{ $student->id }}">
-                <input type="hidden" name="type" value="new_memorization">
-                <input type="hidden" name="part_id" value="{{ $part->id }}">
-                <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
-
-                @foreach($pages as $index => $pageNum)
-                <div class="card mb-3 page-card islamic-border" id="page-card-{{ $index }}">
-                    <div class="card-header d-flex justify-content-between align-items-center" id="page-header-{{ $index }}">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="result-indicator color-gray" id="color-indicator-{{ $index }}">
-                                <i class="fas fa-hourglass-half"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">
-                                    <i class="fas fa-file-alt me-1 text-primary"></i>
-                                    صفحة <span class="text-primary">{{ $pageNum }}</span>
-                                </h6>
-                                <small class="text-muted">{{ $index + 1 }} / {{ count($pages) }}</small>
-                            </div>
-                        </div>
-                        <div class="color-badge" id="color-badge-{{ $index }}">
-                            <span class="badge bg-secondary compact-badge">في الانتظار</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-3">
-                        <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
-
-                        <div class="row g-2 align-items-end">
-                            <div class="col-4">
-                                <label class="form-label fw-bold text-danger small mb-1">
-                                    <i class="fas fa-times-circle me-1"></i>الأخطاء
-                                </label>
-                                <div class="d-flex align-items-center justify-content-center gap-2">
-                                    <button type="button" class="btn btn-outline-danger input-btn" onclick="adjustValue('errors-{{ $index }}', -1)">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number"
-                                           name="pages[{{ $index }}][errors]"
-                                           id="errors-{{ $index }}"
-                                           class="form-control counter-input text-center fw-bold"
-                                           value="0" min="0" max="20"
-                                           oninput="updatePageColor({{ $index }})">
-                                    <button type="button" class="btn btn-outline-danger input-btn" onclick="adjustValue('errors-{{ $index }}', 1)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <label class="form-label fw-bold text-warning small mb-1">
-                                    <i class="fas fa-question-circle me-1"></i>الترددات
-                                </label>
-                                <div class="d-flex align-items-center justify-content-center gap-2">
-                                    <button type="button" class="btn btn-outline-warning input-btn" onclick="adjustValue('hesitations-{{ $index }}', -1)">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number"
-                                           name="pages[{{ $index }}][hesitations]"
-                                           id="hesitations-{{ $index }}"
-                                           class="form-control counter-input text-center fw-bold"
-                                           value="0" min="0" max="50"
-                                           oninput="updatePageColor({{ $index }})">
-                                    <button type="button" class="btn btn-outline-warning input-btn" onclick="adjustValue('hesitations-{{ $index }}', 1)">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-4 text-center">
-                                <div class="result-indicator color-gray mx-auto" id="result-box-{{ $index }}">
-                                    <i class="fas fa-question"></i>
-                                </div>
-                                <div class="mt-1 fw-bold small" id="result-text-{{ $index }}">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-
-                <div class="summary-card mb-3" id="summaryCard" style="display:none;">
-                    <div class="summary-header">
-                        <h5 class="mb-0 text-white"><i class="fas fa-chart-bar me-2"></i>ملخص الجلسة</h5>
-                    </div>
-                    <div class="card-body p-3">
-                        <div class="row g-2 text-center">
-                            <div class="col-6 col-md-3">
-                                <div class="summary-stat bg-danger bg-opacity-10">
-                                    <div class="stat-value text-danger" id="sum-errors">0</div>
-                                    <div class="stat-label text-muted">الأخطاء</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="summary-stat bg-warning bg-opacity-10">
-                                    <div class="stat-value text-warning" id="sum-hesitations">0</div>
-                                    <div class="stat-label text-muted">الترددات</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="summary-stat bg-success bg-opacity-10">
-                                    <div class="stat-value text-success" id="sum-passed">0</div>
-                                    <div class="stat-label text-muted">ناجحة</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="summary-stat bg-dark bg-opacity-10">
-                                    <div class="stat-value text-dark" id="sum-failed">0</div>
-                                    <div class="stat-label text-muted">راسبة</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="overall-result" id="overall-result"></div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold mb-2">
-                        <i class="fas fa-sticky-note text-secondary me-1"></i>
-                        ملاحظات (اختياري)
-                    </label>
-                    <textarea name="notes" class="form-control" rows="2" placeholder="أي ملاحظات حول الجلسة..."></textarea>
-                </div>
-
-                <div class="d-flex flex-wrap gap-2 justify-content-between mt-4">
-                    <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-right me-2"></i>رجوع
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary px-3" style="border-radius: 10px; font-size: 13px;" onclick="submitSessionIncomplete()">
-                            <i class="fas fa-times-circle me-2"></i>
-                            لم يكمل
-                        </button>
-                        <button type="button" class="save-btn" onclick="submitSession()">
-                            <i class="fas fa-save me-2"></i>
-                            حفظ الجلسة
-                        </button>
-                    </div>
-                </div>
-            </form>
-
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="type-badge new_memorization">
+                    <i class="fas fa-book-open"></i>حفظ جديد
+                </span>
+                <span class="session-info-badge">
+                    <i class="fas fa-book me-1"></i>الجزء {{ $part->part_number }}
+                    <span class="opacity-50 mx-1">|</span>
+                    <i class="fas fa-file-alt me-1"></i>{{ $pagesCount }} صفحة
+                </span>
+            </div>
+        </div>
+        <div class="quran-verse">
+            <i class="fas fa-book-quran me-2"></i>
+            {{ 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا' }}
         </div>
     </div>
+
+    <form id="recitationForm">
+        @csrf
+        <input type="hidden" name="student_id" value="{{ $student->id }}">
+        <input type="hidden" name="type" value="new_memorization">
+        <input type="hidden" name="part_id" value="{{ $part->id }}">
+        <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
+
+        @foreach($pages as $index => $pageNum)
+        <div class="page-card" id="page-card-{{ $index }}">
+            <div class="page-card-header">
+                <div class="page-title">
+                    <div class="result-indicator color-gray" id="color-indicator-{{ $index }}">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold" style="color: var(--navy);">
+                            <i class="fas fa-file-alt me-2 text-primary"></i>
+                            صفحة <span class="text-primary">{{ $pageNum }}</span>
+                        </h6>
+                        <small class="text-muted">{{ $index + 1 }} / {{ count($pages) }}</small>
+                    </div>
+                </div>
+                <div class="color-badge" id="color-badge-{{ $index }}">
+                    <span class="badge bg-secondary" style="font-size: 11px; padding: 5px 12px; border-radius: 8px;">في الانتظار</span>
+                </div>
+            </div>
+            <div class="page-card-body">
+                <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
+
+                <div class="row g-4 align-items-end">
+                    <div class="col-4">
+                        <label class="form-label fw-bold text-danger mb-2" style="font-size: 13px;">
+                            <i class="fas fa-times-circle me-1"></i>الأخطاء
+                        </label>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button type="button" class="input-btn btn-danger" onclick="adjustValue('errors-{{ $index }}', -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number"
+                                   name="pages[{{ $index }}][errors]"
+                                   id="errors-{{ $index }}"
+                                   class="form-control counter-input text-center fw-bold"
+                                   value="0" min="0" max="20"
+                                   oninput="updatePageColor({{ $index }})">
+                            <button type="button" class="input-btn btn-danger" onclick="adjustValue('errors-{{ $index }}', 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label fw-bold text-warning mb-2" style="font-size: 13px;">
+                            <i class="fas fa-question-circle me-1"></i>الترددات
+                        </label>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button type="button" class="input-btn btn-warning" onclick="adjustValue('hesitations-{{ $index }}', -1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number"
+                                   name="pages[{{ $index }}][hesitations]"
+                                   id="hesitations-{{ $index }}"
+                                   class="form-control counter-input text-center fw-bold"
+                                   value="0" min="0" max="50"
+                                   oninput="updatePageColor({{ $index }})">
+                            <button type="button" class="input-btn btn-warning" onclick="adjustValue('hesitations-{{ $index }}', 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="result-indicator color-gray mx-auto" id="result-box-{{ $index }}" style="width: 48px; height: 48px; font-size: 18px;">
+                            <i class="fas fa-question"></i>
+                        </div>
+                        <div class="mt-2 fw-bold" id="result-text-{{ $index }}" style="color: #95a5a6; font-size: 13px;">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+
+        <div class="summary-card" id="summaryCard" style="display:none;">
+            <div class="summary-header">
+                <h5 class="mb-0 text-white"><i class="fas fa-chart-bar me-2"></i>ملخص الجلسة</h5>
+            </div>
+            <div class="card-body p-3">
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="summary-stat bg-danger bg-opacity-10">
+                            <div class="stat-value text-danger" id="sum-errors">0</div>
+                            <div class="stat-label text-muted">الأخطاء</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="summary-stat bg-warning bg-opacity-10">
+                            <div class="stat-value text-warning" id="sum-hesitations">0</div>
+                            <div class="stat-label text-muted">الترددات</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="summary-stat bg-success bg-opacity-10">
+                            <div class="stat-value text-success" id="sum-passed">0</div>
+                            <div class="stat-label text-muted">ناجحة</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="summary-stat bg-dark bg-opacity-10">
+                            <div class="stat-value text-dark" id="sum-failed">0</div>
+                            <div class="stat-label text-muted">راسبة</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overall-result" id="overall-result"></div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold mb-2" style="color: var(--navy);">
+                <i class="fas fa-sticky-note me-2" style="color: var(--gold);"></i>
+                ملاحظات (اختياري)
+            </label>
+            <textarea name="notes" class="form-control notes-textarea" rows="3" placeholder="أي ملاحظات حول الجلسة..."></textarea>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3 justify-content-between mt-4">
+            <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right me-2"></i>رجوع
+            </a>
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-secondary px-4" style="border-radius: 12px; font-size: 13px; font-weight: 600;" onclick="submitSessionIncomplete()">
+                    <i class="fas fa-times-circle me-2"></i>
+                    لم يكمل
+                </button>
+                <button type="button" class="save-btn" onclick="submitSession()">
+                    <i class="fas fa-save me-2"></i>
+                    حفظ الجلسة
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 @endsection
 
@@ -505,13 +481,17 @@ function updatePageColor(index) {
 
     const badge = document.getElementById('color-badge-' + index);
     const bgColor = colorClass === 'color-orange' ? '#f39c12' : colorClass === 'color-green' ? '#27ae60' : colorClass === 'color-red' ? '#e74c3c' : colorClass === 'color-black' ? '#2c3e50' : '#6c757d';
-    badge.innerHTML = `<span class="badge compact-badge" style="background:${bgColor};color:white;">${label}</span>`;
+    badge.innerHTML = '<span class="badge" style="background:' + bgColor + '; color: white; font-size: 11px; padding: 5px 12px; border-radius: 8px;">' + label + '</span>';
 
     const resultBox = document.getElementById('result-box-' + index);
-    resultBox.className = 'result-indicator ' + colorClass;
+    resultBox.className = 'result-indicator ' + colorClass + ' mx-auto';
+    resultBox.style.width = '48px';
+    resultBox.style.height = '48px';
+    resultBox.style.fontSize = '18px';
     resultBox.innerHTML = '<i class="fas ' + icon + '"></i>';
 
     document.getElementById('result-text-' + index).textContent = label;
+    document.getElementById('result-text-' + index).style.color = bgColor;
 
     updateSummary();
 }

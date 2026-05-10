@@ -1,36 +1,264 @@
 @extends('layouts.app')
-
-@section('title', 'إنذار جديد')
-@section('page-title', 'إنذار جديد')
+@section('title', 'إضافة إنذار')
+@section('page-title', 'إضافة إنذار')
 @section('role-label', 'مشرف')
 
 @section('sidebar-menu')
-    @include('supervisor.partials.sidebar')
+@include('supervisor.partials.sidebar')
 @endsection
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('supervisor.dashboard') }}">الرئيسية</a></li>
     <li class="breadcrumb-item"><a href="{{ route('supervisor.warnings.index') }}">الإنذارات</a></li>
-    <li class="breadcrumb-item active">إنذار جديد</li>
+    <li class="breadcrumb-item active">إضافة إنذار</li>
 @endsection
 
 @section('content')
+<style>
+:root {
+    --primary: #182B48;
+    --primary-light: #2A4570;
+    --primary-lighter: #3D5A80;
+    --gold: #d4a030;
+    --gold-dark: #B4802C;
+    --gold-light: #E8C45A;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --purple: #8e44ad;
+    --bg-main: #f8fafc;
+    --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
+}
+
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.header-content { display: flex; align-items: center; gap: 20px; }
+.header-icon {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--gold);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+}
+.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
+.header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
+
+.form-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+.form-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 22px 28px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(26,51,86,0.05) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; font-size: 17px; color: var(--primary);
+}
+.form-header i { color: var(--gold); font-size: 20px; }
+.form-body { padding: 25px 28px; }
+
+.form-group { margin-bottom: 20px; }
+.form-label {
+    font-weight: 600; color: #5a6c7d;
+    margin-bottom: 10px; display: block;
+    font-size: 14px;
+}
+.form-label i { color: var(--gold); margin-left: 6px; }
+.form-label .required { color: var(--danger); }
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
+}
+.form-control.is-invalid, .form-select.is-invalid {
+    border-color: var(--danger);
+}
+.invalid-feedback { color: var(--danger); font-size: 13px; margin-top: 5px; }
+
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(24,43,72,0.1), transparent);
+    margin: 25px 0;
+}
+
+.data-section {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border: 1px solid rgba(24,43,72,0.08);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.data-section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 15px;
+    font-weight: 700; color: var(--primary);
+    font-size: 15px;
+}
+.data-section-header i { color: var(--gold); }
+
+.data-table {
+    width: 100%; border-collapse: collapse;
+}
+.data-table th {
+    padding: 10px 12px;
+    font-size: 11px; font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    background: rgba(24,43,72,0.05);
+    border-bottom: 1px solid rgba(24,43,72,0.08);
+}
+.data-table td {
+    padding: 10px 12px;
+    font-size: 13px; color: #5a6c7d;
+    text-align: center;
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+}
+.data-table tbody tr:hover { background: rgba(212,160,48,0.03); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+.btn-fetch {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
+    color: #fff; border: none; border-radius: 10px;
+    font-weight: 600; font-size: 13px;
+    transition: all 0.3s ease;
+}
+.btn-fetch:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
+
+.sidebar-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+}
+.sidebar-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.05) 0%, rgba(26,51,86,0.08) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; font-size: 17px; color: var(--primary);
+}
+.sidebar-header i { color: var(--gold); font-size: 18px; }
+.sidebar-body { padding: 22px 25px; }
+
+.student-preview {
+    background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
+    border: 2px solid rgba(24,43,72,0.08);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.student-avatar {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--purple) 0%, #7d3c98 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 28px; color: #fff;
+}
+.student-name { font-size: 17px; font-weight: 700; color: var(--primary); }
+.student-number { font-size: 13px; color: #95a5a6; }
+
+.stat-box {
+    background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.stat-box.warning-type { background: rgba(243,156,18,0.1); border: 1px solid rgba(243,156,18,0.2); }
+.stat-box.info-type { background: rgba(52,152,219,0.1); border: 1px solid rgba(52,152,219,0.2); }
+.stat-box .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 5px; }
+.stat-box .stat-value.success { color: var(--success); }
+.stat-box .stat-value.danger { color: var(--danger); }
+.stat-box .stat-label { font-size: 12px; color: #6c7a89; }
+
+.action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 20px; border-radius: 12px;
+    font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    border: none; cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    width: 100%;
+}
+.action-btn.submit {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+.action-btn.submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(24,43,72,0.35); }
+.action-btn.cancel {
+    background: transparent;
+    color: #7f8c8d; border: 2px solid #e9ecef;
+}
+.action-btn.cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+@media (max-width: 992px) {
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-content { margin-bottom: 15px; }
+}
+</style>
+
 <form action="{{ route('supervisor.warnings.store') }}" method="POST" id="warningForm">
     @csrf
     <input type="hidden" name="attendance_data" id="attendanceData">
     <input type="hidden" name="recitation_data" id="recitationData">
     <input type="hidden" name="test_data" id="testData">
-    <div class="row">
-        <!-- Student Selection -->
+
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="header-text">
+                <h4>إضافة إنذار جديد</h4>
+                <p>إصدار إنذار لطالب في جمعية تحفيظ القرآن الكريم</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
         <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-user-graduate me-2"></i>معلومات الطالب</h6>
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>معلومات الطالب</span>
                 </div>
-                <div class="card-body">
+                <div class="form-body">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">اختر الطالب <span class="text-danger">*</span></label>
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>اختر الطالب
+                                <span class="required">*</span>
+                            </label>
                             <select name="student_id" id="studentSelect" class="form-select @error('student_id') is-invalid @enderror" required>
                                 <option value="">-- اختر الطالب --</option>
                                 @foreach($students as $student)
@@ -44,7 +272,10 @@
                             @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">نوع الإنذار <span class="text-danger">*</span></label>
+                            <label class="form-label">
+                                <i class="fas fa-exclamation-circle"></i>نوع الإنذار
+                                <span class="required">*</span>
+                            </label>
                             <select name="type" id="typeSelect" class="form-select @error('type') is-invalid @enderror" required onchange="toggleWarningFields()">
                                 <option value="">-- اختر النوع --</option>
                                 <option value="attendance" {{ old('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
@@ -56,10 +287,12 @@
                             @enderror
                         </div>
                     </div>
-
-                    <div class="row mt-2">
+                    <div class="row g-3 mt-2">
                         <div class="col-md-4">
-                            <label class="form-label">تاريخ الإنذار <span class="text-danger">*</span></label>
+                            <label class="form-label">
+                                <i class="fas fa-calendar-day"></i>تاريخ الإنذار
+                                <span class="required">*</span>
+                            </label>
                             <input type="date" name="issue_date" class="form-control @error('issue_date') is-invalid @enderror" value="{{ old('issue_date', date('Y-m-d')) }}" required>
                             @error('issue_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -69,39 +302,40 @@
                 </div>
             </div>
 
-            <!-- Attendance Data Section -->
-            <div class="card mb-4" id="attendanceDataSection" style="display: none;">
-                <div class="card-header bg-warning bg-opacity-10">
-                    <h6 class="mb-0 text-warning"><i class="fas fa-calendar-alt me-2"></i>سجل الحضور (اختياري)</h6>
+            <div class="form-card" id="attendanceDataSection" style="display: none;">
+                <div class="form-header">
+                    <i class="fas fa-calendar-alt" style="color: var(--warning);"></i>
+                    <span>سجل الحضور (اختياري)</span>
                 </div>
-                <div class="card-body">
+                <div class="form-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-sm-6">
-                            <label class="form-label">بدء من تاريخ</label>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-calendar"></i>بدء من تاريخ</label>
                             <input type="date" class="form-control" id="attendanceFromDate" value="{{ date('Y-m-01') }}">
                         </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-warning" onclick="fetchAttendance()">
-                                <i class="fas fa-search me-1"></i>بحث
+                        <div class="col-md-4">
+                            <button type="button" class="btn-fetch" onclick="fetchAttendance()">
+                                <i class="fas fa-search"></i>بحث
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3 table-responsive" id="attendanceTableContainer" style="display: none;">
-                        <table class="table table-sm table-bordered" id="attendanceTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>اليوم</th>
-                                    <th>التاريخ</th>
-                                    <th>الحالة</th>
-                                    <th>وقت الحضور</th>
-                                    <th>الملاحظات</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendanceTableBody">
-                            </tbody>
-                        </table>
-                        <div class="text-muted small">
+                    <div class="mt-3" id="attendanceTableContainer" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="data-table" id="attendanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>اليوم</th>
+                                        <th>التاريخ</th>
+                                        <th>الحالة</th>
+                                        <th>وقت الحضور</th>
+                                        <th>الملاحظات</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-muted small mt-2">
                             <i class="fas fa-info-circle me-1"></i>
                             يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
                         </div>
@@ -112,41 +346,41 @@
                 </div>
             </div>
 
-            <!-- Recitation Data Section -->
-            <div class="card mb-4" id="recitationDataSection" style="display: none;">
-                <div class="card-header bg-info bg-opacity-10">
-                    <h6 class="mb-0 text-info"><i class="fas fa-microphone-alt me-2"></i>سجل التسميع (اختياري)</h6>
+            <div class="form-card" id="recitationDataSection" style="display: none;">
+                <div class="form-header">
+                    <i class="fas fa-microphone" style="color: var(--info);"></i>
+                    <span>سجل التسميع (اختياري)</span>
                 </div>
-                <div class="card-body">
+                <div class="form-body">
                     <div class="row g-3 align-items-end">
-                        <div class="col-sm-6">
-                            <label class="form-label">بدء من تاريخ</label>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-calendar"></i>بدء من تاريخ</label>
                             <input type="date" class="form-control" id="recitationFromDate" value="{{ date('Y-m-01') }}">
                         </div>
-                        <div class="col-sm-auto">
-                            <button type="button" class="btn btn-info" onclick="fetchRecitations()">
-                                <i class="fas fa-search me-1"></i>بحث
+                        <div class="col-md-4">
+                            <button type="button" class="btn-fetch" onclick="fetchRecitations()">
+                                <i class="fas fa-search"></i>بحث
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3 table-responsive" id="recitationTableContainer" style="display: none;">
-                        <table class="table table-sm table-bordered" id="recitationTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>اليوم</th>
-                                    <th>التاريخ</th>
-                                    <th>نوع التسميع</th>
-                                    <th>المطلوب تسميعه</th>
-                                    <th>الصفحات التي نجح بها</th>
-                                    <th>الصفحات التي رسب بها</th>
-                                    <th>الملاحظات</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="recitationTableBody">
-                            </tbody>
-                        </table>
-                        <div class="text-muted small">
+                    <div class="mt-3" id="recitationTableContainer" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="data-table" id="recitationTable">
+                                <thead>
+                                    <tr>
+                                        <th>اليوم</th>
+                                        <th>التاريخ</th>
+                                        <th>نوع التسميع</th>
+                                        <th>المطلوب</th>
+                                        <th>نجح</th>
+                                        <th>رسب</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recitationTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-muted small mt-2">
                             <i class="fas fa-info-circle me-1"></i>
                             يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
                         </div>
@@ -157,136 +391,142 @@
                 </div>
             </div>
 
-            <!-- Tests Data Section -->
-            <div class="card mb-4" id="testDataSection">
-                <div class="card-header bg-primary bg-opacity-10">
-                    <h6 class="mb-0 text-primary"><i class="fas fa-clipboard-list me-2"></i>الاختبارات</h6>
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>الاختبارات</span>
                 </div>
-                <div class="card-body">
+                <div class="form-body">
                     <div class="table-responsive">
-                        <table class="table table-sm table-bordered" id="testTable">
-                            <thead class="table-light">
+                        <table class="data-table" id="testTable">
+                            <thead>
                                 <tr>
                                     <th style="width: 45%;">الاختبار</th>
                                     <th style="width: 45%;">ملاحظات</th>
                                     <th style="width: 10%;"></th>
                                 </tr>
                             </thead>
-                            <tbody id="testTableBody">
-                            </tbody>
+                            <tbody id="testTableBody"></tbody>
                         </table>
                     </div>
-                    <button type="button" class="btn btn-sm btn-primary mt-2" onclick="addTestRow()">
-                        <i class="fas fa-plus me-1"></i>إضافة صف
+                    <button type="button" class="btn-fetch mt-2" onclick="addTestRow()">
+                        <i class="fas fa-plus"></i>إضافة صف
                     </button>
-                    <div class="text-muted small mt-2">
-                        <i class="fas fa-info-circle me-1"></i>
-                        يمكنك إضافة صفوف متعددة للاختبارات
-                    </div>
                 </div>
             </div>
 
-            <!-- Warning Content -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>محتوى الإنذار</h6>
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="fas fa-file-alt"></i>
+                    <span>محتوى الإنذار</span>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">عنوان الإنذار <span class="text-danger">*</span></label>
+                <div class="form-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-heading"></i>عنوان الإنذار
+                            <span class="required">*</span>
+                        </label>
                         <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="مثال: إنذار غياب متكرر" required>
                         @error('title')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">محتوى الإنذار <span class="text-danger">*</span></label>
-                        <textarea name="content" rows="6" class="form-control @error('content') is-invalid @enderror" placeholder="اكتب تفاصيل الإنذار..." required>{{ old('content') }}</textarea>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-file-alt"></i>محتوى الإنذار
+                            <span class="required">*</span>
+                        </label>
+                        <textarea name="content" rows="5" class="form-control @error('content') is-invalid @enderror" placeholder="اكتب تفاصيل الإنذار..." required>{{ old('content') }}</textarea>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">ملاحظات إضافية</label>
+                    <div class="form-group mb-0">
+                        <label class="form-label"><i class="fas fa-sticky-note"></i>ملاحظات إضافية</label>
                         <textarea name="additional_notes" rows="3" class="form-control" placeholder="أي ملاحظات إضافية...">{{ old('additional_notes') }}</textarea>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar - Stats Preview -->
         <div class="col-lg-4">
-            <div class="card sticky-top" style="top: 20px;">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>معاينة</h6>
+            <div class="sidebar-card">
+                <div class="sidebar-header">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>معاينة وإحصائيات</span>
                 </div>
-                <div class="card-body">
+                <div class="sidebar-body">
                     @if($selectedStudent)
-                        <div class="text-center mb-4">
-                            <img src="{{ $selectedStudent->user->avatar_url }}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
-                            <h5>{{ $selectedStudent->user->name }}</h5>
-                            <p class="text-muted mb-1">{{ $selectedStudent->student_number }}</p>
-                            <span class="badge bg-light text-dark">{{ $selectedStudent->level->name ?? '-' }}</span>
+                        <div class="student-preview">
+                            <div class="student-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="student-name">{{ $selectedStudent->user->name }}</div>
+                            <div class="student-number">{{ $selectedStudent->student_number }}</div>
                         </div>
 
                         @if($attendanceStats)
-                            <div class="alert alert-warning">
-                                <h6 class="alert-heading"><i class="fas fa-calendar me-2"></i>إحصائيات الحضور</h6>
-                                <div class="row text-center g-2">
+                            <div class="stat-box warning-type">
+                                <div class="stat-label" style="color: var(--warning); margin-bottom: 10px;">
+                                    <i class="fas fa-calendar-times me-1"></i>إحصائيات الحضور
+                                </div>
+                                <div class="row g-2">
                                     <div class="col-6">
-                                        <div class="text-success fw-bold">{{ $attendanceStats['present'] }}</div>
-                                        <small>حاضر</small>
+                                        <div class="stat-value success">{{ $attendanceStats['present'] }}</div>
+                                        <div class="stat-label">حاضر</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="text-danger fw-bold">{{ $attendanceStats['absent'] }}</div>
-                                        <small>غائب</small>
+                                        <div class="stat-value danger">{{ $attendanceStats['absent'] }}</div>
+                                        <div class="stat-label">غائب</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="text-warning fw-bold">{{ $attendanceStats['late'] }}</div>
-                                        <small>متأخر</small>
+                                        <div class="stat-value" style="color: var(--warning);">{{ $attendanceStats['late'] }}</div>
+                                        <div class="stat-label">متأخر</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="fw-bold">{{ $attendanceStats['total'] }}</div>
-                                        <small>الإجمالي</small>
+                                        <div class="stat-value">{{ $attendanceStats['total'] }}</div>
+                                        <div class="stat-label">الإجمالي</div>
                                     </div>
                                 </div>
                             </div>
                         @endif
 
                         @if($recitationStats)
-                            <div class="alert alert-info">
-                                <h6 class="alert-heading"><i class="fas fa-microphone me-2"></i>إحصائيات التسميع</h6>
-                                <div class="row text-center g-2">
+                            <div class="stat-box info-type">
+                                <div class="stat-label" style="color: var(--info); margin-bottom: 10px;">
+                                    <i class="fas fa-microphone me-1"></i>إحصائيات التسميع
+                                </div>
+                                <div class="row g-2">
                                     <div class="col-6">
-                                        <div class="fw-bold">{{ $recitationStats['total'] }}</div>
-                                        <small>الإجمالي</small>
+                                        <div class="stat-value">{{ $recitationStats['total'] }}</div>
+                                        <div class="stat-label">الإجمالي</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="text-success fw-bold">{{ $recitationStats['passed'] }}</div>
-                                        <small>ناجح</small>
+                                        <div class="stat-value success">{{ $recitationStats['passed'] }}</div>
+                                        <div class="stat-label">ناجح</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="text-danger fw-bold">{{ $recitationStats['failed'] }}</div>
-                                        <small>راسب</small>
+                                        <div class="stat-value danger">{{ $recitationStats['failed'] }}</div>
+                                        <div class="stat-label">راسب</div>
                                     </div>
                                 </div>
                             </div>
                         @endif
                     @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-user-graduate fa-2x mb-2 d-block"></i>
+                        <div style="text-align: center; padding: 30px 0; color: #95a5a6;">
+                            <i class="fas fa-user-graduate fa-2x mb-2 d-block" style="opacity: 0.4;"></i>
                             <p>اختر طالباً لعرض الإحصائيات</p>
                         </div>
                     @endif
 
-                    <hr>
+                    <div class="section-divider"></div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-save me-2"></i>إصدار الإنذار
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button type="submit" class="action-btn submit">
+                            <i class="fas fa-save"></i>إصدار الإنذار
                         </button>
-                        <a href="{{ route('supervisor.warnings.index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-right me-2"></i>إلغاء
+                        <a href="{{ route('supervisor.warnings.index') }}" class="action-btn cancel">
+                            <i class="fas fa-arrow-right"></i>إلغاء
                         </a>
                     </div>
                 </div>
@@ -294,6 +534,37 @@
         </div>
     </div>
 </form>
+
+<template id="attendanceRowTemplate">
+    <tr>
+        <td class="att-day"></td>
+        <td class="att-date"></td>
+        <td class="att-status"></td>
+        <td class="att-time"></td>
+        <td class="att-notes"></td>
+        <td>
+            <button type="button" class="btn btn-sm" style="background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;" onclick="deleteAttendanceRow(__INDEX__)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
+
+<template id="recitationRowTemplate">
+    <tr>
+        <td class="rec-day"></td>
+        <td class="rec-date"></td>
+        <td class="rec-type"></td>
+        <td class="rec-total"></td>
+        <td class="rec-passed"></td>
+        <td class="rec-failed"></td>
+        <td>
+            <button type="button" class="btn btn-sm" style="background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;" onclick="deleteRecitationRow(__INDEX__)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+</template>
 @endsection
 
 @push('scripts')
@@ -307,202 +578,60 @@ function toggleWarningFields() {
     const attendanceDataSection = document.getElementById('attendanceDataSection');
     const recitationDataSection = document.getElementById('recitationDataSection');
 
-    // Show attendance table for attendance or general types
     attendanceDataSection.style.display = (type === 'attendance' || type === 'general') ? 'block' : 'none';
-
-    // Show recitation table for recitation or general types
     recitationDataSection.style.display = (type === 'recitation' || type === 'general') ? 'block' : 'none';
 }
 
-// Auto-fetch stats when student is selected
 document.getElementById('studentSelect').addEventListener('change', function() {
     const studentId = this.value;
     if (studentId) {
-        fetchStudentStats(studentId);
-    } else {
-        clearStudentStats();
+        window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
     }
 });
 
-// Fetch student stats via AJAX
-function fetchStudentStats(studentId) {
-    const url = '{{ route("supervisor.warnings.studentStats", ":student") }}'.replace(':student', studentId);
+document.addEventListener('DOMContentLoaded', function() {
+    const studentSelect = document.getElementById('studentSelect');
+    const studentId = studentSelect.value;
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                toastr.error(data.error);
-                return;
-            }
-            updateStudentPreview(data);
-        })
-        .catch(error => {
-            console.error('Error fetching student stats:', error);
-            toastr.error('حدث خطأ أثناء جلب بيانات الطالب');
-        });
-}
-
-// Update the sidebar with student stats
-function updateStudentPreview(data) {
-    const previewCard = document.querySelector('.sticky-top .card-body');
-    const studentInfo = previewCard.querySelector('.text-center.mb-4');
-    if (studentInfo) {
-        studentInfo.remove();
+    if (studentId && !document.getElementById('attendanceStats') && !document.querySelector('.alert-warning')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('student_id')) {
+            window.location = '{{ route("supervisor.warnings.create") }}?student_id=' + studentId;
+        }
     }
-    const alerts = previewCard.querySelectorAll('.alert');
-    alerts.forEach(el => el.remove());
+});
 
-    const hr = previewCard.querySelector('hr');
-    if (hr) {
-        hr.remove();
-    }
+function setText(el, text) { el.textContent = text || '-'; }
 
-    previewCard.insertBefore(createStudentPreviewHTML(data), previewCard.firstChild);
+function createTextSpan(text) {
+    const span = document.createElement('span');
+    span.textContent = text || '-';
+    return span;
 }
 
-function createStudentPreviewHTML(data) {
-    const s = data.student;
-    const a = data.attendance_stats;
-    const r = data.recitation_stats;
-
-    const wrapper = document.createElement('div');
-
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'text-center mb-4';
-    infoDiv.innerHTML = `
-        <img src="${s.avatar_url}" alt="Avatar" class="rounded-circle mb-2" style="width:60px;height:60px;object-fit:cover;">
-        <h5>${escapeHtml(s.name)}</h5>
-        <p class="text-muted mb-1">${escapeHtml(s.student_number)}</p>
-        <span class="badge bg-light text-dark">${escapeHtml(s.level_name)}</span>
-    `;
-    wrapper.appendChild(infoDiv);
-
-    if (a && a.total > 0) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-warning';
-        alertDiv.innerHTML = `
-            <h6 class="alert-heading"><i class="fas fa-calendar me-2"></i>إحصائيات الحضور</h6>
-            <div class="row text-center g-2">
-                <div class="col-6">
-                    <div class="text-success fw-bold">${a.present}</div>
-                    <small>حاضر</small>
-                </div>
-                <div class="col-6">
-                    <div class="text-danger fw-bold">${a.absent}</div>
-                    <small>غائب</small>
-                </div>
-                <div class="col-6">
-                    <div class="text-warning fw-bold">${a.late}</div>
-                    <small>متأخر</small>
-                </div>
-                <div class="col-6">
-                    <div class="fw-bold">${a.total}</div>
-                    <small>الإجمالي</small>
-                </div>
-            </div>
-        `;
-        wrapper.appendChild(alertDiv);
-    }
-
-    if (r && r.total > 0) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-info';
-        alertDiv.innerHTML = `
-            <h6 class="alert-heading"><i class="fas fa-microphone me-2"></i>إحصائيات التسميع</h6>
-            <div class="row text-center g-2">
-                <div class="col-6">
-                    <div class="fw-bold">${r.total}</div>
-                    <small>الإجمالي</small>
-                </div>
-                <div class="col-6">
-                    <div class="text-success fw-bold">${r.passed}</div>
-                    <small>ناجح</small>
-                </div>
-                <div class="col-6">
-                    <div class="text-danger fw-bold">${r.failed}</div>
-                    <small>راسب</small>
-                </div>
-            </div>
-        `;
-        wrapper.appendChild(alertDiv);
-    }
-
-    return wrapper;
-}
-
-function clearStudentStats() {
-    const previewCard = document.querySelector('.sticky-top .card-body');
-    const studentInfo = previewCard.querySelector('.text-center.mb-4');
-    if (studentInfo) studentInfo.remove();
-    const alerts = previewCard.querySelectorAll('.alert');
-    alerts.forEach(el => el.remove());
-}
-
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Fetch attendance data via AJAX
 function fetchAttendance() {
     const studentId = document.getElementById('studentSelect').value;
-    if (!studentId) {
-        toastr.warning('يرجى اختيار طالب أولاً');
-        return;
-    }
+    if (!studentId) { alert('يرجى اختيار طالب أولاً'); return; }
 
     const fromDate = document.getElementById('attendanceFromDate').value;
     const url = '{{ route("supervisor.warnings.attendance", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
-    const tableContainer = document.getElementById('attendanceTableContainer');
-    if (!tableContainer) return;
-    const originalContent = tableContainer.innerHTML;
-    tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
     fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                tableContainer.innerHTML = originalContent;
-                toastr.error(data.error);
-                return;
-            }
-            const isEmpty = Array.isArray(data) && data.length === 0;
-            if (isEmpty) toastr.info('لا توجد سجلات حضور للفترة المحددة');
-            attendanceData = isEmpty ? [] : (Array.isArray(data) ? data : []);
-            const attendanceSection = document.getElementById('attendanceDataSection');
-            if (attendanceSection) attendanceSection.style.display = 'block';
-            tableContainer.innerHTML = originalContent;
+            if (data.error) { alert(data.error); return; }
+            attendanceData = data;
             renderAttendanceTable();
             updateHiddenInputs();
         })
-        .catch(error => {
-            console.error('Error fetching attendance:', error);
-            tableContainer.innerHTML = originalContent;
-            toastr.error('حدث خطأ أثناء جلب بيانات الحضور. يرجى المحاولة مرة أخرى.');
-        });
+        .catch(error => { console.error('Error:', error); alert('حدث خطأ أثناء جلب بيانات الحضور'); });
 }
 
-// Render attendance table
 function renderAttendanceTable() {
     const tbody = document.getElementById('attendanceTableBody');
     const container = document.getElementById('attendanceTableContainer');
     const noDataMsg = document.getElementById('noAttendanceMessage');
-
-    // Guard: if elements don't exist (e.g., hidden section not rendered), skip
-    if (!tbody || !container || !noDataMsg) return;
+    const template = document.getElementById('attendanceRowTemplate');
 
     tbody.innerHTML = '';
 
@@ -515,43 +644,26 @@ function renderAttendanceTable() {
     container.style.display = 'block';
     noDataMsg.style.display = 'none';
 
-    const statusLabels = {
-        'present': 'حاضر',
-        'absent': 'غائب',
-        'late': 'متأخر',
-        'excused': 'غائب بعذر',
-        'holiday': 'عطلة'
-    };
+    const statusLabels = { 'present': 'حاضر', 'absent': 'غائب', 'late': 'متأخر', 'excused': 'غائب بعذر', 'holiday': 'عطلة' };
+    const statusColors = { 'present': 'success', 'absent': 'danger', 'late': 'warning', 'excused': 'info', 'holiday': 'secondary' };
 
     attendanceData.forEach(function(record, index) {
-        const row = document.createElement('tr');
-        // Format date to show only date part (without time)
-        const formattedDate = record.date ? (record.date.includes('T') ? record.date.split('T')[0] : record.date) : '-';
-        row.innerHTML = `
-            <td>${escapeHtml(record.day || '-')}</td>
-            <td>${escapeHtml(formattedDate)}</td>
-            <td><span class="badge bg-${getStatusColor(record.status)}">${escapeHtml(statusLabels[record.status] || record.status)}</span></td>
-            <td>${escapeHtml(record.arrival_time || '-')}</td>
-            <td>${escapeHtml(record.notes || '-')}</td>
-            <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="deleteAttendanceRow(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-}
+        const clone = template.content.cloneNode(true);
+        const tr = clone.querySelector('tr');
+        clone.querySelector('.btn').setAttribute('onclick', 'deleteAttendanceRow(' + index + ')');
+        setText(clone.querySelector('.att-day'), record.day);
+        setText(clone.querySelector('.att-date'), record.date ? record.date.split('T')[0] : '-');
+        setText(clone.querySelector('.att-time'), record.arrival_time || '-');
+        setText(clone.querySelector('.att-notes'), record.notes ||'-');
 
-function getStatusColor(status) {
-    const colors = {
-        'present': 'success',
-        'absent': 'danger',
-        'late': 'warning',
-        'excused': 'info',
-        'holiday': 'secondary'
-    };
-    return colors[status] || 'secondary';
+        const statusCell = clone.querySelector('.att-status');
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-' + (statusColors[record.status] || 'secondary');
+        badge.textContent = statusLabels[record.status] || record.status || '-';
+        statusCell.appendChild(badge);
+
+        tbody.appendChild(clone);
+    });
 }
 
 function deleteAttendanceRow(index) {
@@ -560,58 +672,29 @@ function deleteAttendanceRow(index) {
     updateHiddenInputs();
 }
 
-// Fetch recitation data via AJAX
 function fetchRecitations() {
     const studentId = document.getElementById('studentSelect').value;
-    if (!studentId) {
-        toastr.warning('يرجى اختيار طالب أولاً');
-        return;
-    }
+    if (!studentId) { alert('يرجى اختيار طالب أولاً'); return; }
 
     const fromDate = document.getElementById('recitationFromDate').value;
     const url = '{{ route("supervisor.warnings.recitations", ":student") }}'.replace(':student', studentId) + '?from_date=' + fromDate;
-    const tableContainer = document.getElementById('recitationTableContainer');
-    if (!tableContainer) return;
-    const originalContent = tableContainer.innerHTML;
-    tableContainer.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><div class="mt-2">جاري التحميل...</div></div>';
 
     fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                tableContainer.innerHTML = originalContent;
-                toastr.error(data.error);
-                return;
-            }
-            const isEmpty = Array.isArray(data) && data.length === 0;
-            if (isEmpty) toastr.info('لا توجد سجلات تسميع للفترة المحددة');
-            recitationData = isEmpty ? [] : (Array.isArray(data) ? data : []);
-            const recitationSection = document.getElementById('recitationDataSection');
-            if (recitationSection) recitationSection.style.display = 'block';
-            tableContainer.innerHTML = originalContent;
+            if (data.error) { alert(data.error); return; }
+            recitationData = data;
             renderRecitationTable();
             updateHiddenInputs();
         })
-        .catch(error => {
-            console.error('Error fetching recitations:', error);
-            tableContainer.innerHTML = originalContent;
-            toastr.error('حدث خطأ أثناء جلب بيانات التسميع. يرجى المحاولة مرة أخرى.');
-        });
+        .catch(error => { console.error('Error:', error); alert('حدث خطأ أثناء جلب بيانات التسميع'); });
 }
 
-// Render recitation table
 function renderRecitationTable() {
     const tbody = document.getElementById('recitationTableBody');
     const container = document.getElementById('recitationTableContainer');
     const noDataMsg = document.getElementById('noRecitationMessage');
-
-    // Guard: if elements don't exist (e.g., hidden section not rendered), skip
-    if (!tbody || !container || !noDataMsg) return;
+    const template = document.getElementById('recitationRowTemplate');
 
     tbody.innerHTML = '';
 
@@ -624,59 +707,34 @@ function renderRecitationTable() {
     container.style.display = 'block';
     noDataMsg.style.display = 'none';
 
-    const typeLabels = {
-        'new_memorization': 'حفظ جديد',
-        'review': 'مراجعة',
-        'unmastered': 'حفظ غير متقن',
-        'recitation': 'سرد',
-        'mafsil': 'مفصل',
-        'not_recitate': 'لم يسمع'
-    };
+    const typeLabels = { 'new_memorization': 'حفظ جديد', 'review': 'مراجعة', 'unmastered': 'حفظ غير متقن', 'recitation': 'سرد', 'mafsil': 'مفصل', 'not_recitate': 'لم يسمع' };
 
     recitationData.forEach(function(record, index) {
-        const row = document.createElement('tr');
-        // Format date to show only date part (without time)
-        const formattedDate = record.session_date ? (record.session_date.includes('T') ? record.session_date.split('T')[0] : record.session_date) : '-';
-        // Get existing notes or empty string for manual entry
-        const existingNotes = record.notes || '';
-        // Use passed_pages and failed_pages from API (calculated from pages table)
-        const passedPages = record.passed_pages || 0;
-        const failedPages = record.failed_pages || 0;
-        const totalPages = record.total_pages || 0;
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('.btn').setAttribute('onclick', 'deleteRecitationRow(' + index + ')');
+        setText(clone.querySelector('.rec-day'), record.day);
+        setText(clone.querySelector('.rec-date'), record.session_date ? record.session_date.split('T')[0] : '-');
+        setText(clone.querySelector('.rec-type'), typeLabels[record.type] || record.type || '-');
+        setText(clone.querySelector('.rec-total'), record.total_pages || 0);
+        setText(clone.querySelector('.rec-passed'), record.passed_pages || 0);
+        setText(clone.querySelector('.rec-failed'), record.failed_pages || 0);
 
-        row.innerHTML = `
-            <td>${escapeHtml(record.day || '-')}</td>
-            <td>${escapeHtml(formattedDate)}</td>
-            <td>${escapeHtml(typeLabels[record.type] || record.type)}</td>
-            <td>${totalPages}</td>
-            <td>${passedPages}</td>
-            <td>${failedPages}</td>
-            <td>
-                <input type="text" class="form-control form-control-sm"
-                    placeholder="أضف ملاحظات..."
-                    value="${escapeHtml(existingNotes)}"
-                    onchange="updateRecitationNotes(${index}, this.value)">
-            </td>
-            <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="deleteRecitationRow(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+        const notesCell = clone.querySelector('.rec-notes') || clone.querySelector('td:nth-child(7)');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control form-control-sm';
+        input.style.cssText = 'border-radius: 8px; font-size: 12px;';
+        input.placeholder = 'ملاحظات...';
+        input.value = record.notes || '';
+        input.addEventListener('change', function() { updateRecitationNotes(index, input.value); });
+        notesCell.appendChild(input);
+
+        tbody.appendChild(clone);
     });
 }
 
-function updateRecitationNotes(index, notes) {
-    recitationData[index].notes = notes;
-    updateHiddenInputs();
-}
-
-function deleteRecitationRow(index) {
-    recitationData.splice(index, 1);
-    renderRecitationTable();
-    updateHiddenInputs();
-}
+function updateRecitationNotes(index, notes) { recitationData[index].notes = notes; updateHiddenInputs(); }
+function deleteRecitationRow(index) { recitationData.splice(index, 1); renderRecitationTable(); updateHiddenInputs(); }
 
 function updateHiddenInputs() {
     document.getElementById('attendanceData').value = JSON.stringify(attendanceData);
@@ -684,79 +742,82 @@ function updateHiddenInputs() {
     document.getElementById('testData').value = JSON.stringify(testData);
 }
 
-// Add a new test row
 function addTestRow() {
     const tbody = document.getElementById('testTableBody');
     const rowIndex = testData.length;
-
     testData.push({ test: '', notes: '' });
 
-    const row = document.createElement('tr');
-    row.id = 'testRow_' + rowIndex;
-    row.innerHTML = `
-        <td>
-            <input type="text" class="form-control form-control-sm"
-                placeholder="أدخل اسم الاختبار..."
-                onchange="updateTestRow(${rowIndex}, 'test', this.value)">
-        </td>
-        <td>
-            <input type="text" class="form-control form-control-sm"
-                placeholder="أضف ملاحظات..."
-                onchange="updateTestRow(${rowIndex}, 'notes', this.value)">
-        </td>
-        <td>
-            <button type="button" class="btn btn-sm btn-danger" onclick="deleteTestRow(${rowIndex})">
-                <i class="fas fa-trash"></i>
-            </button>
-        </td>
-    `;
-    tbody.appendChild(row);
+    const tr = document.createElement('tr');
+    tr.id = 'testRow_' + rowIndex;
+
+    const td1 = document.createElement('td');
+    const input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.className = 'form-control form-control-sm';
+    input1.style.cssText = 'border-radius: 8px;';
+    input1.placeholder = 'أدخل اسم الاختبار...';
+    input1.addEventListener('change', function() { updateTestRow(rowIndex, 'test', input1.value); });
+    td1.appendChild(input1);
+
+    const td2 = document.createElement('td');
+    const input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.className = 'form-control form-control-sm';
+    input2.style.cssText = 'border-radius: 8px;';
+    input2.placeholder = 'أضف ملاحظات...';
+    input2.addEventListener('change', function() { updateTestRow(rowIndex, 'notes', input2.value); });
+    td2.appendChild(input2);
+
+    const td3 = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn-sm';
+    delBtn.style.cssText = 'background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;';
+    delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+    delBtn.addEventListener('click', function() { deleteTestRow(rowIndex); });
+    td3.appendChild(delBtn);
+
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+    tbody.appendChild(tr);
 }
 
-function updateTestRow(index, field, value) {
-    if (testData[index]) {
-        testData[index][field] = value;
-        updateHiddenInputs();
-    }
-}
-
-function deleteTestRow(index) {
-    testData.splice(index, 1);
-    renderTestTable();
-    updateHiddenInputs();
-}
+function updateTestRow(index, field, value) { if (testData[index]) { testData[index][field] = value; updateHiddenInputs(); } }
+function deleteTestRow(index) { testData.splice(index, 1); renderTestTable(); updateHiddenInputs(); }
 
 function renderTestTable() {
     const tbody = document.getElementById('testTableBody');
     tbody.innerHTML = '';
-
     testData.forEach(function(item, index) {
-        const row = document.createElement('tr');
-        row.id = 'testRow_' + index;
-        row.innerHTML = `
-            <td>
-                <input type="text" class="form-control form-control-sm"
-                    placeholder="أدخل اسم الاختبار..."
-                    value="${escapeHtml(item.test || '')}"
-                    onchange="updateTestRow(${index}, 'test', this.value)">
-            </td>
-            <td>
-                <input type="text" class="form-control form-control-sm"
-                    placeholder="أضف ملاحظات..."
-                    value="${escapeHtml(item.notes || '')}"
-                    onchange="updateTestRow(${index}, 'notes', this.value)">
-            </td>
-            <td>
-                <button type="button" class="btn btn-sm btn-danger" onclick="deleteTestRow(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+        const tr = document.createElement('tr');
+        tr.id = 'testRow_' + index;
+
+        [ { field: 'test', placeholder: 'أدخل اسم الاختبار...' }, { field: 'notes', placeholder: 'أضف ملاحظات...' } ].forEach(function(inputConfig) {
+            const td = document.createElement('td');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'form-control form-control-sm';
+            input.style.cssText = 'border-radius: 8px;';
+            input.placeholder = inputConfig.placeholder;
+            input.value = item[inputConfig.field] || '';
+            input.addEventListener('change', function() { updateTestRow(index, inputConfig.field, input.value); });
+            td.appendChild(input);
+            tr.appendChild(td);
+        });
+
+        const td3 = document.createElement('td');
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'btn btn-sm';
+        delBtn.style.cssText = 'background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;';
+        delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        delBtn.addEventListener('click', function() { deleteTestRow(index); });
+        td3.appendChild(delBtn);
+        tr.appendChild(td3);
+
+        tbody.appendChild(tr);
     });
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleWarningFields();
     updateHiddenInputs();
