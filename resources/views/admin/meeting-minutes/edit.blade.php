@@ -16,286 +16,309 @@
 
 @section('content')
 <style>
-    .section-card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border: 1px solid #f0f0f0;
-        margin-bottom: 20px;
-        overflow: hidden;
-    }
-    .section-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    .section-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 16px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .section-header h5 {
-        margin: 0;
-        font-weight: 600;
-    }
-    .section-body {
-        padding: 20px;
-    }
-    .form-section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #444;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid #667eea;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .form-section-title i {
-        color: #667eea;
-    }
-    .form-control, .form-select {
-        border-radius: 10px;
-        border: 1px solid #e0e0e0;
-        padding: 10px 14px;
-        transition: all 0.3s ease;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
-    }
-    .form-label {
-        font-weight: 500;
-        color: #555;
-        margin-bottom: 8px;
-    }
-    .supervisor-item {
-        background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        border: 1px solid #e8ecf4;
-        transition: all 0.3s ease;
-    }
-    .supervisor-item:hover {
-        border-color: #667eea;
-        transform: translateX(-2px);
-    }
-    .supervisor-item.excluded {
-        opacity: 0.5;
-        background: #f5f5f5;
-    }
-    .manual-attendee-item {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 12px;
-        margin-bottom: 8px;
-    }
-    .agenda-card {
-        background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
-        border: 1px solid #e8ecf4;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    .agenda-card:hover {
-        border-color: #667eea;
-        box-shadow: 0 4px 12px rgba(102,126,234,0.15);
-    }
-    .badge-custom {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 500;
-    }
-    .task-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
-        border: 1px solid #e8ecf4;
-        transition: all 0.3s ease;
-    }
-    .task-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transform: translateY(-2px);
-    }
-    .axis-row {
-        background: #fafafa;
-        border-radius: 10px;
-        margin-bottom: 8px;
-        padding: 8px;
-    }
-    .axis-row input, .axis-row textarea {
-        border-radius: 8px;
-    }
-    .student-table {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-    .student-table thead {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    .student-table thead th {
-        font-weight: 600;
-        border: none;
-        padding: 14px 12px;
-    }
-    .student-row {
-        transition: all 0.3s ease;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .student-row:hover {
-        background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
-    }
-    .student-row td {
-        padding: 14px 12px;
-        vertical-align: middle;
-    }
-    .avatar-circle {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 8px;
-    }
-    .avatar-purple {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-    }
-    .avatar-gray {
-        background: linear-gradient(135deg, #868f96 0%, #596164 100%);
-        color: white;
-    }
-    .attendance-indicator {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-    }
-    .attendance-bar {
-        width: 60px;
-        height: 6px;
-        background: #e0e0e0;
-        border-radius: 3px;
-        overflow: hidden;
-    }
-    .attendance-bar-fill {
-        height: 100%;
-        border-radius: 3px;
-        transition: width 0.5s ease;
-    }
-    .recitation-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 15px;
-        font-size: 0.8rem;
-        margin: 2px;
-    }
-    .assignment-row-custom {
-        background: #f8f9fa;
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 10px;
-        border: 1px solid #e8ecf4;
-    }
-    .agenda-note-card {
-        background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 10px;
-        border: 1px solid #e8ecf4;
-    }
-    .btn-primary-custom {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-primary-custom:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(102,126,234,0.4);
-    }
-    .btn-secondary-custom {
-        background: #f0f0f0;
-        border: none;
-        border-radius: 10px;
-        padding: 12px 24px;
-        font-weight: 600;
-        color: #666;
-        transition: all 0.3s ease;
-    }
-    .btn-secondary-custom:hover {
-        background: #e0e0e0;
-        color: #333;
-    }
-    .btn-add {
-        background: transparent;
-        border: 2px dashed #667eea;
-        border-radius: 10px;
-        color: #667eea;
-        padding: 10px 20px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    .btn-add:hover {
-        background: rgba(102,126,234,0.1);
-        border-style: solid;
-    }
-    .divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
-        margin: 20px 0;
-    }
-    .empty-state {
-        text-align: center;
-        padding: 30px;
-        color: #999;
-    }
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 10px;
-        opacity: 0.3;
-    }
+:root {
+    --primary: #182B48;
+    --primary-light: #2A4570;
+    --primary-lighter: #3D5A80;
+    --gold: #d4a030;
+    --gold-dark: #B4802C;
+    --gold-light: #E8C45A;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --purple: #8e44ad;
+    --bg-main: #f8fafc;
+    --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
+}
+
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.header-content { display: flex; align-items: center; gap: 20px; }
+.header-icon {
+    width: 65px; height: 65px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--gold);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+}
+.header-text h4 { color: var(--primary); font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
+.header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
+
+.form-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 30px;
+    border-bottom: 1px solid #f0f4f8;
+}
+.form-section:last-child { border-bottom: none; }
+.section-title {
+    font-size: 18px; font-weight: 700; color: var(--primary);
+    margin-bottom: 20px; padding-bottom: 15px;
+    border-bottom: 3px solid var(--gold);
+    display: flex; align-items: center; gap: 12px;
+}
+.section-title i { color: var(--gold); font-size: 22px; }
+.section-title span::before { content: '◆'; color: var(--gold); margin-left: 10px; font-size: 10px; }
+
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.form-group { margin-bottom: 5px; }
+.form-label {
+    font-weight: 600; color: #5a6c7d;
+    margin-bottom: 10px; display: block;
+    font-size: 14px;
+}
+.form-label i { color: var(--gold); margin-left: 6px; }
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
+}
+
+.supervisor-item {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-radius: 14px; padding: 16px 20px;
+    margin-bottom: 12px;
+    border: 2px solid rgba(24,43,72,0.06);
+    transition: all 0.3s ease;
+}
+.supervisor-item:hover {
+    border-color: var(--gold);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 15px rgba(24,43,72,0.08);
+}
+.supervisor-item.excluded { opacity: 0.5; background: #f5f5f5; }
+
+.avatar-circle {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+}
+.avatar-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--gold);
+}
+.avatar-secondary {
+    background: linear-gradient(135deg, var(--purple) 0%, #7d3c98 100%);
+    color: #fff;
+}
+.supervisor-name { font-weight: 600; color: var(--primary); }
+.supervisor-role { font-size: 12px; color: #95a5a6; }
+
+.toggle-btn {
+    padding: 8px 16px; border-radius: 10px;
+    font-size: 12px; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: all 0.3s ease;
+}
+.toggle-exclude { background: rgba(192,57,43,0.1); color: var(--danger); }
+.toggle-exclude:hover { background: var(--danger); color: #fff; }
+.supervisor-item.excluded .toggle-exclude { background: var(--success); color: #fff; }
+
+.manual-attendee-row {
+    background: #f8f9fa; border-radius: 12px; padding: 12px;
+    margin-bottom: 10px; border: 2px dashed #e9ecef;
+}
+.btn-add {
+    background: transparent;
+    border: 2px dashed var(--gold);
+    border-radius: 12px;
+    color: var(--gold);
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-add:hover { background: rgba(212,160,48,0.08); border-style: solid; }
+.btn-add i { font-size: 14px; }
+
+.agenda-card {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border: 2px solid rgba(24,43,72,0.06);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+}
+.agenda-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 15px rgba(212,160,48,0.1);
+}
+.badge-custom {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--gold);
+    padding: 8px 16px; border-radius: 20px;
+    font-weight: 600; font-size: 13px;
+}
+
+.task-card {
+    background: #fff; border-radius: 14px; padding: 18px;
+    margin-bottom: 14px; border: 2px solid rgba(24,43,72,0.06);
+    transition: all 0.3s ease;
+}
+.task-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(24,43,72,0.1); }
+
+.axis-row {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-radius: 12px; margin-bottom: 10px; padding: 12px;
+    border: 1px solid rgba(24,43,72,0.05);
+}
+
+.student-table {
+    border-radius: 14px; overflow: hidden;
+    border: 2px solid rgba(24,43,72,0.06);
+}
+.student-table thead {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff;
+}
+.student-table thead th {
+    font-weight: 700; border: none; padding: 16px 12px;
+    font-size: 13px; text-align: center; vertical-align: middle;
+    white-space: nowrap;
+}
+.student-row {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f4f8;
+}
+.student-row:hover { background: linear-gradient(135deg, rgba(212,160,48,0.05) 0%, rgba(180,128,44,0.08) 100%); }
+.student-row td { padding: 12px 10px; vertical-align: middle; text-align: center; }
+
+.attendance-indicator { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.attendance-bar { width: 70px; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
+.attendance-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+.recitation-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 15px;
+    font-size: 0.8rem; margin: 2px;
+    background: linear-gradient(135deg, rgba(212,160,48,0.1) 0%, rgba(180,128,44,0.15) 100%);
+}
+
+.assignment-row {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-radius: 14px; padding: 16px;
+    margin-bottom: 12px; border: 2px solid rgba(24,43,72,0.06);
+}
+
+.agenda-note-card {
+    background: linear-gradient(135deg, rgba(212,160,48,0.05) 0%, rgba(180,128,44,0.08) 100%);
+    border-radius: 14px; padding: 16px;
+    margin-bottom: 12px; border: 2px solid rgba(212,160,48,0.1);
+}
+
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 25px 0;
+}
+
+.btn-save {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; border: none; border-radius: 14px;
+    font-weight: 700; font-size: 15px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+.btn-save:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(24,43,72,0.35); }
+.btn-save i { color: var(--gold); }
+.btn-cancel {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px;
+    background: transparent;
+    color: #7f8c8d; border: 2px solid #e9ecef; border-radius: 14px;
+    font-weight: 600; font-size: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: 'Tajawal', sans-serif;
+}
+.btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+.section-badge {
+    background: var(--gold); color: #fff;
+    padding: 4px 12px; border-radius: 15px;
+    font-size: 12px; font-weight: 600;
+    margin-right: 10px;
+}
+.status-badge-sm {
+    padding: 5px 12px; border-radius: 15px;
+    font-size: 11px; font-weight: 600;
+}
+.badge-warning { background: rgba(243,156,18,0.15); color: var(--warning); }
+.badge-success { background: rgba(39,174,96,0.15); color: var(--success); }
+.badge-info { background: rgba(52,152,219,0.15); color: var(--info); }
+.badge-danger { background: rgba(192,57,43,0.15); color: var(--danger); }
 </style>
 
-<div class="section-card">
-    <div class="section-header">
-        <i class="fas fa-edit"></i>
-        <h5>تعديل محضر اجتماع</h5>
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="fas fa-edit"></i>
+        </div>
+        <div class="header-text">
+            <h4>تعديل محضر اجتماع</h4>
+            <p>تعديل بيانات محضر جلسة جمعية تحفيظ القرآن الكريم</p>
+        </div>
     </div>
-    <div class="section-body">
-        <form method="POST" action="{{ route('admin.meeting-minutes.update', $meetingMinute->id) }}">
-            @csrf
-            @method('PUT')
+</div>
 
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <label class="form-label">تاريخ الاجتماع <span class="text-danger">*</span></label>
+<div class="form-container">
+    <form method="POST" action="{{ route('admin.meeting-minutes.update', $meetingMinute->id) }}">
+        @csrf
+        @method('PUT')
+
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-calendar-alt"></i>
+                <span>معلومات الاجتماع</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-calendar-day"></i>تاريخ الاجتماع</label>
                     <input type="date" name="meeting_date" class="form-control @error('meeting_date') is-invalid @enderror" value="{{ old('meeting_date', $meetingMinute->meeting_date->toDateString()) }}" required>
                     @error('meeting_date')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
             </div>
+        </div>
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-users"></i>
+                <span>الحضور</span>
+            </div>
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="form-section-title">
-                        <i class="fas fa-users"></i>
-                        <span>الحضور</span>
-                    </div>
+                <div class="col-lg-6">
+                    <h6 class="mb-3" style="color: var(--primary); font-weight: 600;">
+                        <i class="fas fa-user-tie" style="color: var(--gold); margin-left: 8px;"></i>
+                        المشرفون
+                    </h6>
                     <div id="supervisors-list">
                         @php
                             $excludedIds = old('excluded_supervisors', $meetingMinute->excluded_supervisors ?? []);
@@ -311,12 +334,12 @@
                             <div class="supervisor-item {{ $isExcluded ? 'excluded' : '' }}" data-supervisor-id="{{ $supervisor->id }}">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-circle avatar-purple">
+                                        <div class="avatar-circle avatar-primary">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
-                                        <div>
+                                        <div class="me-3">
                                             <span class="fw-semibold supervisor-name" style="{{ $isExcluded ? 'text-decoration: line-through; color: #999;' : '' }}">{{ $supervisor->name }}</span>
-                                            <span class="text-muted small d-block">{{ $supervisor->role === 'admin' ? 'مدير' : 'مشرف' }}</span>
+                                            <span class="text-muted small d-block supervisor-role">{{ $supervisor->role === 'admin' ? 'مدير' : 'مشرف' }}</span>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -324,7 +347,7 @@
                                             <option value="1" {{ $isPresent ? 'selected' : '' }}>حاضر</option>
                                             <option value="0" {{ !$isPresent ? 'selected' : '' }}>غائب</option>
                                         </select>
-                                        <button type="button" class="btn btn-sm toggle-exclude {{ $isExcluded ? 'btn-success' : 'btn-outline-danger' }}" onclick="toggleExclude(this)">
+                                        <button type="button" class="toggle-btn toggle-exclude" onclick="toggleExclude(this)">
                                             <i class="fas fa-{{ $isExcluded ? 'check' : 'times' }}"></i>
                                             {{ $isExcluded ? 'مُدرج' : 'استبعاد' }}
                                         </button>
@@ -339,33 +362,35 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-section-title">
-                        <i class="fas fa-user-plus"></i>
-                        <span>إضافة حضور يدوي</span>
-                    </div>
+                <div class="col-lg-6">
+                    <h6 class="mb-3" style="color: var(--primary); font-weight: 600;">
+                        <i class="fas fa-user-plus" style="color: var(--gold); margin-left: 8px;"></i>
+                        إضافة حضور يدوي
+                    </h6>
                     <div id="manual-attendees-container">
                         @php $manualAttendees = old('manual_attendees', $meetingMinute->manual_attendees ?? [['name' => '']]); @endphp
                         @foreach($manualAttendees as $i => $attendee)
-                        <div class="manual-attendee-row mb-2">
+                        <div class="manual-attendee-row">
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="text" name="manual_attendees[{{ $i }}][name]" class="form-control" placeholder="اسم الحضور" value="{{ $attendee['name'] ?? '' }}">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 40px;">
-                                    <i class="fas fa-trash"></i>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 42px; border-radius: 10px;">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
                         </div>
                         @endforeach
                     </div>
-                    <button type="button" class="btn btn-add w-100 mt-2" onclick="addManualAttendee()">
-                        <i class="fas fa-plus me-2"></i>إضافة حضور
+                    <button type="button" class="btn-add w-100 mt-3" onclick="addManualAttendee()">
+                        <i class="fas fa-plus"></i>إضافة حضور
                     </button>
                 </div>
             </div>
+        </div>
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="form-section-title">
+        <div class="form-section">
+            <div class="section-title">
                 <i class="fas fa-list-ul"></i>
                 <span>جدول الأعمال</span>
             </div>
@@ -390,14 +415,14 @@
                 @foreach($agendaItems as $i => $item)
                 <div class="col-md-6 agenda-item" data-index="{{ $i }}">
                     <div class="agenda-card p-3 h-100">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="badge-custom agenda-number">{{ $i + 1 }}</span>
                             @if($i >= 6)
-                            <button type="button" class="btn btn-sm btn-outline-danger remove-agenda">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius: 8px;">
                                 <i class="fas fa-times"></i>
                             </button>
                             @else
-                            <span class="badge bg-secondary">افتراضي</span>
+                            <span class="section-badge">افتراضي</span>
                             @endif
                         </div>
                         <input type="text" name="agenda[]" class="form-control agenda-input" placeholder="البند {{ $i + 1 }}" value="{{ is_array($item) ? ($item['text'] ?? '') : $item }}">
@@ -405,33 +430,35 @@
                 </div>
                 @endforeach
             </div>
-            <button type="button" class="btn btn-add mt-3" onclick="addAgendaItem()">
-                <i class="fas fa-plus me-2"></i>إضافة بند جديد
+            <button type="button" class="btn-add mt-4" onclick="addAgendaItem()">
+                <i class="fas fa-plus"></i>إضافة بند جديد
             </button>
+        </div>
 
-            @if(isset($changedTasks) && $changedTasks->count() > 0)
-            <div class="divider"></div>
-            <div class="form-section-title">
-                <i class="fas fa-sync-alt" style="color: #f59e0b;"></i>
+        @if(isset($changedTasks) && $changedTasks->count() > 0)
+        <div class="divider"></div>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-sync-alt" style="color: var(--warning);"></i>
                 <span>التكليفات المتغيرة</span>
-                <span class="badge bg-warning text-dark ms-2">{{ $changedTasks->count() }}</span>
+                <span class="section-badge">{{ $changedTasks->count() }}</span>
             </div>
             <div class="row g-3">
                 @foreach($changedTasks as $task)
                 <div class="col-md-6">
                     <div class="task-card">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <span class="fw-semibold">{{ $task->title }}</span>
+                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->title }}</span>
                                 <span class="text-muted small d-block">
                                     {{ $task->assignee->name ?? '-' }}
                                     @if($task->meetingMinute)
-                                        <span class="mx-1">•</span>
+                                        <span class="mx-2">•</span>
                                         {{ $task->meetingMinute->meeting_date->format('Y/m/d') }}
                                     @endif
                                 </span>
                             </div>
-                            <span class="badge bg-{{ $task->status_color }} task-status-badge">{{ $task->status_label }}</span>
+                            <span class="status-badge-sm badge-{{ $task->status_color }}">{{ $task->status_label }}</span>
                         </div>
                         <select name="task_status[{{ $task->id }}]" class="form-select form-select-sm" onchange="updateTaskStatusColor(this)">
                             <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
@@ -443,31 +470,33 @@
                 </div>
                 @endforeach
             </div>
-            @endif
+        </div>
+        @endif
 
-            @if(isset($tasksFromAllMeetings) && $tasksFromAllMeetings->count() > 0)
-            <div class="divider"></div>
-            <div class="form-section-title">
-                <i class="fas fa-tasks" style="color: #10b981;"></i>
+        @if(isset($tasksFromAllMeetings) && $tasksFromAllMeetings->count() > 0)
+        <div class="divider"></div>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-tasks" style="color: var(--success);"></i>
                 <span>متابعة التكليفات</span>
-                <span class="badge bg-success text-white ms-2">{{ $tasksFromAllMeetings->count() }}</span>
+                <span class="section-badge">{{ $tasksFromAllMeetings->count() }}</span>
             </div>
             <div class="row g-3">
                 @foreach($tasksFromAllMeetings as $task)
                 <div class="col-md-6">
                     <div class="task-card">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <span class="fw-semibold">{{ $task->title }}</span>
+                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->title }}</span>
                                 <span class="text-muted small d-block">
                                     {{ $task->assignee->name ?? '-' }}
                                     @if($task->meetingMinute)
-                                        <span class="mx-1">•</span>
+                                        <span class="mx-2">•</span>
                                         {{ $task->meetingMinute->meeting_date->format('Y/m/d') }}
                                     @endif
                                 </span>
                             </div>
-                            <span class="badge bg-{{ $task->status_color }} task-status-badge">{{ $task->status_label }}</span>
+                            <span class="status-badge-sm badge-{{ $task->status_color }}">{{ $task->status_label }}</span>
                         </div>
                         <select name="task_status[{{ $task->id }}]" class="form-select form-select-sm" onchange="updateTaskStatusColor(this)">
                             <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
@@ -479,15 +508,17 @@
                 </div>
                 @endforeach
             </div>
-            @endif
+        </div>
+        @endif
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="form-section-title">
-                <i class="fas fa-calendar-alt" style="color: #8b5cf6;"></i>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-calendar-week" style="color: var(--purple);"></i>
                 <span>برنامج الدّوام</span>
             </div>
-            <div class="row g-2" id="program-axes-body">
+            <div id="program-axes-body">
                 @php
                     $defaultAxes = [
                         'التّمهيدية',
@@ -501,38 +532,41 @@
                     ];
                     $savedAxes = old('program_axes_names', $meetingMinute->program_axes_names ?? $defaultAxes);
                 @endphp
-                @foreach($savedAxes as $i => $axis)
-                <div class="col-md-6">
-                    <div class="axis-row">
-                        <div class="row g-2">
-                            <div class="col-4">
-                                <input type="text" name="program_axes_names[]" class="form-control form-control-sm" value="{{ $axis }}" placeholder="المحور">
-                            </div>
-                            <div class="col-8">
-                                <textarea name="program_axes[]" class="form-control form-control-sm" rows="2" placeholder="التفاصيل">{{ old('program_axes.' . $i, $meetingMinute->program_axes[$i] ?? '') }}</textarea>
+                <div class="row g-2">
+                    @foreach($savedAxes as $i => $axis)
+                    <div class="col-md-6">
+                        <div class="axis-row">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-4">
+                                    <input type="text" name="program_axes_names[]" class="form-control form-control-sm" value="{{ $axis }}" placeholder="المحور">
+                                </div>
+                                <div class="col-8">
+                                    <textarea name="program_axes[]" class="form-control form-control-sm" rows="2" placeholder="التفاصيل">{{ old('program_axes.' . $i, $meetingMinute->program_axes[$i] ?? '') }}</textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
             </div>
+        </div>
 
-            @if(isset($supervisorStudents) && $supervisorStudents->count() > 0)
-            <div class="divider"></div>
-
-            <div class="form-section-title">
+        @if(isset($supervisorStudents) && $supervisorStudents->count() > 0)
+        <div class="divider"></div>
+        <div class="form-section">
+            <div class="section-title">
                 <i class="fas fa-user-graduate" style="color: #ec4899;"></i>
                 <span>ملخص متابعة الطلاب</span>
             </div>
-            <div class="table-responsive student-table">
-                <table class="table table-hover mb-0">
+            <div class="table-responsive">
+                <table class="table student-table mb-0">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 50px;">#</th>
-                            <th>المشرف</th>
-                            <th>الطالب</th>
-                            <th class="text-center">الحضور</th>
-                            <th class="text-center">التسميع</th>
+                            <th class="text-center" style="width: 60px;">#</th>
+                            <th class="text-center">المشرف</th>
+                            <th class="text-center">الطالب</th>
+                            <th class="text-center" style="width: 120px;">الحضور</th>
+                            <th class="text-center" style="min-width: 200px;">التسميع</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -541,60 +575,63 @@
                             @php $studentCount = count($supervisor->students_with_data); @endphp
                             @foreach($supervisor->students_with_data as $studentIndex => $student)
                             <tr class="student-row">
-                                <td class="text-center">
-                                    <span class="badge rounded-circle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 28px; height: 28px; line-height: 28px;">{{ $rowIndex }}</span>
+                                <td class="text-center align-middle">
+                                    <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--gold); width: 32px; height: 32px; font-size: 13px; font-weight: 700;">{{ $rowIndex }}</span>
                                 </td>
                                 @if($studentIndex == 0)
-                                <td rowspan="{{ $studentCount }}">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-circle avatar-purple">
+                                <td class="text-center align-middle" rowspan="{{ $studentCount }}">
+                                    <div class="supervisor-cell d-flex align-items-center justify-content-center gap-2 py-2">
+                                        <div class="avatar-circle avatar-primary flex-shrink-0">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
-                                        <span class="fw-medium">{{ $supervisor->name }}</span>
+                                        <span class="fw-bold" style="color: var(--primary);">{{ $supervisor->name }}</span>
                                     </div>
                                 </td>
                                 @endif
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-circle avatar-gray">
-                                            <i class="fas fa-user"></i>
+                                <td class="text-center align-middle">
+                                    <div class="student-cell d-flex align-items-center justify-content-center gap-2 py-2">
+                                        <div class="avatar-circle avatar-secondary flex-shrink-0">
+                                            <i class="fas fa-user-graduate"></i>
                                         </div>
-                                        <span>{{ $student->user->name ?? '-' }}</span>
+                                        <span style="color: var(--primary); font-weight: 600;">{{ $student->user->name ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center align-middle">
                                     @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
                                         @php
                                             $present = $student->last_three_attendances->whereIn('status', ['present', 'late'])->count();
                                             $total = $student->last_three_attendances->count();
                                             $rate = $present / $total;
-                                            $colorClass = $rate >= 1 ? 'success' : ($rate >= 0.66 ? 'warning' : 'danger');
-                                            $colorHex = $rate >= 1 ? '#10b981' : ($rate >= 0.66 ? '#f59e0b' : '#ef4444');
+                                            $colorHex = $rate >= 1 ? '#27ae60' : ($rate >= 0.66 ? '#f39c12' : '#c0392b');
                                         @endphp
-                                        <div class="attendance-indicator">
-                                            <div class="attendance-bar">
-                                                <div class="attendance-bar-fill" style="width: {{ $rate * 100 }}%; background: {{ $colorHex }};"></div>
+                                        <div class="attendance-wrapper d-flex flex-column align-items-center gap-2">
+                                            <div class="attendance-bar" style="width: 80px; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                <div class="attendance-bar-fill" style="width: {{ $rate * 100 }}%; background: {{ $colorHex }}; height: 100%; border-radius: 4px;"></div>
                                             </div>
-                                            <span class="badge" style="background: {{ $colorHex }}; color: white;">{{ $present }}/{{ $total }}</span>
+                                            <span class="badge fw-bold" style="background: {{ $colorHex }}; color: #fff; font-size: 12px; padding: 4px 10px;">{{ $present }}/{{ $total }}</span>
                                         </div>
                                     @else
                                         <span class="text-muted">—</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center align-middle">
                                     @if($student->last_two_recitations && $student->last_two_recitations->count() > 0)
-                                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                        <div class="recitations-wrapper d-flex flex-column gap-2">
                                             @foreach($student->last_two_recitations as $recitation)
-                                            <div class="recitation-badge" style="background: rgba(102,126,234,0.1); border: 1px solid {{ $recitation->status_color }};">
-                                                <span style="color: {{ $recitation->status_color }};">{{ $recitation->type_label }}</span>
-                                                <a href="{{ route('admin.sessions.show', $recitation->id) }}" target="_blank" class="text-{{ $recitation->status_color }} ms-1">
-                                                    <i class="fas fa-eye"></i>
+                                            <div class="recitation-card d-flex align-items-center gap-2" style="background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%); border: 1px solid rgba(24,43,72,0.1); border-radius: 10px; padding: 10px 12px;">
+                                                <span class="recitation-type fw-bold" style="color: var(--primary); font-size: 13px; flex: 1;">{{ $recitation->type_label }}</span>
+                                                <span class="status-indicator d-inline-flex align-items-center gap-2" style="color: {{ $recitation->status_color }}; font-size: 12px; font-weight: 600;">
+                                                    <span style="width: 8px; height: 8px; background: {{ $recitation->status_color }}; border-radius: 50%;"></span>
+                                                    {{ $recitation->status_label }}
+                                                </span>
+                                                <a href="{{ route('admin.sessions.show', $recitation->id) }}" target="_blank" class="view-btn d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 6px; color: #fff; text-decoration: none; transition: all 0.3s ease;">
+                                                    <i class="fas fa-eye" style="font-size: 10px;"></i>
                                                 </a>
                                             </div>
                                             @endforeach
                                         </div>
                                     @else
-                                        <span class="text-muted">—</span>
+                                        <span class="text-muted" style="font-size: 13px;">—</span>
                                     @endif
                                 </td>
                             </tr>
@@ -604,18 +641,20 @@
                     </tbody>
                 </table>
             </div>
-            @endif
+        </div>
+        @endif
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="form-section-title">
-                <i class="fas fa-clipboard-list" style="color: #3b82f6;"></i>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-clipboard-list" style="color: var(--info);"></i>
                 <span>التكليفات الجديدة</span>
             </div>
             <div id="assignments-container">
                 @php $savedAssignments = old('assignments', [['supervisor_id' => '', 'task' => '']]); @endphp
                 @foreach($savedAssignments as $i => $assignment)
-                <div class="assignment-row-custom" data-index="{{ $i }}">
+                <div class="assignment-row" data-index="{{ $i }}">
                     <div class="row g-3">
                         <div class="col-md-4">
                             <select name="assignments[{{ $i }}][supervisor_id]" class="form-select">
@@ -631,21 +670,23 @@
                             <input type="text" name="assignments[{{ $i }}][task]" class="form-control" placeholder="وصف التكليف" value="{{ $assignment['task'] ?? '' }}">
                         </div>
                         <div class="col-md-2">
-                            <button type="button" class="btn btn-outline-danger w-100 remove-assignment">
-                                <i class="fas fa-trash"></i>
+                            <button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius: 10px;">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 @endforeach
             </div>
-            <button type="button" class="btn btn-add mt-3" onclick="addAssignment()">
-                <i class="fas fa-plus me-2"></i>إضافة تكليف
+            <button type="button" class="btn-add mt-3" onclick="addAssignment()">
+                <i class="fas fa-plus"></i>إضافة تكليف
             </button>
+        </div>
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="form-section-title">
+        <div class="form-section">
+            <div class="section-title">
                 <i class="fas fa-file-alt" style="color: #06b6d4;"></i>
                 <span>تفاصيل بنود جدول الأعمال</span>
             </div>
@@ -675,32 +716,33 @@
                     @endif
                 @endforeach
             </div>
+        </div>
 
-            <div class="divider"></div>
+        <div class="divider"></div>
 
-            <div class="d-flex gap-3 justify-content-center">
-                <button type="submit" class="btn btn-primary-custom">
-                    <i class="fas fa-save me-2"></i>تحديث المحضر
+        <div class="form-section text-center">
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i>تحديث المحضر
                 </button>
-                <a href="{{ route('admin.meeting-minutes.show', $meetingMinute->id) }}" class="btn btn-secondary-custom">
-                    <i class="fas fa-times me-2"></i>إلغاء
+                <a href="{{ route('admin.meeting-minutes.show', $meetingMinute->id) }}" class="btn-cancel">
+                    <i class="fas fa-times"></i>إلغاء
                 </a>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
-@endsection
 
 @push('scripts')
 <script>
 function addManualAttendee() {
     var container = $('#manual-attendees-container');
     var count = container.find('.manual-attendee-row').length;
-    var html = '<div class="manual-attendee-row mb-2">' +
+    var html = '<div class="manual-attendee-row">' +
         '<div class="d-flex gap-2 align-items-center">' +
         '<input type="text" name="manual_attendees[' + count + '][name]" class="form-control" placeholder="اسم الحضور">' +
-        '<button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 40px;">' +
-        '<i class="fas fa-trash"></i>' +
+        '<button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 42px; border-radius: 10px;">' +
+        '<i class="fas fa-trash-alt"></i>' +
         '</button>' +
         '</div>' +
         '</div>';
@@ -712,9 +754,9 @@ function addAgendaItem() {
     var count = container.find('.agenda-item').length;
     var html = '<div class="col-md-6 agenda-item" data-index="' + count + '">' +
         '<div class="agenda-card p-3 h-100">' +
-        '<div class="d-flex align-items-center justify-content-between mb-2">' +
+        '<div class="d-flex align-items-center justify-content-between mb-3">' +
         '<span class="badge-custom agenda-number">' + (count + 1) + '</span>' +
-        '<button type="button" class="btn btn-outline-danger btn-sm remove-agenda">' +
+        '<button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius: 8px;">' +
         '<i class="fas fa-times"></i>' +
         '</button>' +
         '</div>' +
@@ -742,13 +784,13 @@ function toggleExclude(btn) {
 
     if (item.hasClass('excluded')) {
         item.removeClass('excluded');
-        $(btn).removeClass('btn-success').addClass('btn-outline-danger');
+        $(btn).removeClass('btn-success').addClass('toggle-exclude');
         $(btn).html('<i class="fas fa-times"></i> استبعاد');
         excludeInput.prop('disabled', true);
         nameSpan.css('text-decoration', '').css('color', '');
     } else {
         item.addClass('excluded');
-        $(btn).addClass('btn-success').removeClass('btn-outline-danger');
+        $(btn).addClass('btn-success').removeClass('toggle-exclude');
         $(btn).html('<i class="fas fa-check"></i> مُدرج');
         excludeInput.prop('disabled', false);
         nameSpan.css('text-decoration', 'line-through').css('color', '#999');
@@ -757,7 +799,7 @@ function toggleExclude(btn) {
 
 function renumberAssignments() {
     var idx = 0;
-    $('#assignments-container .assignment-row-custom').each(function() {
+    $('#assignments-container .assignment-row').each(function() {
         $(this).attr('data-index', idx);
         $(this).find('select').attr('name', 'assignments[' + idx + '][supervisor_id]');
         $(this).find('input[type="text"]').attr('name', 'assignments[' + idx + '][task]');
@@ -767,13 +809,13 @@ function renumberAssignments() {
 
 function addAssignment() {
     var container = $('#assignments-container');
-    var count = container.find('.assignment-row-custom').length;
+    var count = container.find('.assignment-row').length;
     var supervisors = @json($supervisors);
     var options = '<option value="">-- المشرف --</option>';
     supervisors.forEach(function(s) {
         options += '<option value="' + s.id + '">' + s.name + '</option>';
     });
-    var html = '<div class="assignment-row-custom" data-index="' + count + '">' +
+    var html = '<div class="assignment-row" data-index="' + count + '">' +
         '<div class="row g-3">' +
         '<div class="col-md-4">' +
         '<select name="assignments[' + count + '][supervisor_id]" class="form-select">' + options + '</select>' +
@@ -782,8 +824,8 @@ function addAssignment() {
         '<input type="text" name="assignments[' + count + '][task]" class="form-control" placeholder="وصف التكليف">' +
         '</div>' +
         '<div class="col-md-2">' +
-        '<button type="button" class="btn btn-outline-danger w-100 remove-assignment">' +
-        '<i class="fas fa-trash"></i>' +
+        '<button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius: 10px;">' +
+        '<i class="fas fa-trash-alt"></i>' +
         '</button>' +
         '</div>' +
         '</div>' +
@@ -804,9 +846,9 @@ function updateTaskStatusColor(select) {
         'completed': 'مكتمل',
         'cancelled': 'ملغي'
     };
-    var badge = select.closest('.task-card').find('.task-status-badge');
+    var badge = select.closest('.task-card').find('.status-badge-sm');
     var newStatus = select.value;
-    badge.removeClass('bg-warning bg-info bg-success bg-danger').addClass('bg-' + statusColors[newStatus]);
+    badge.removeClass('badge-warning badge-info badge-success badge-danger').addClass('badge-' + statusColors[newStatus]);
     badge.text(statusLabels[newStatus]);
 }
 
@@ -820,8 +862,9 @@ $(document).on('click', '.remove-agenda', function() {
 });
 
 $(document).on('click', '.remove-assignment', function() {
-    $(this).closest('.assignment-row-custom').remove();
+    $(this).closest('.assignment-row').remove();
     renumberAssignments();
 });
 </script>
 @endpush
+@endsection

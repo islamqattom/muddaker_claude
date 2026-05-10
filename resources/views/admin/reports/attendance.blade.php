@@ -14,11 +14,233 @@
 @endsection
 
 @section('content')
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="GET" action="{{ route('admin.reports.attendance') }}" class="row g-3 align-items-end">
+<style>
+:root {
+    --primary: #182B48;
+    --primary-light: #2A4570;
+    --primary-lighter: #3D5A80;
+    --gold: #d4a030;
+    --gold-dark: #B4802C;
+    --gold-light: #E8C45A;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --purple: #8e44ad;
+    --bg-main: #f8fafc;
+    --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
+}
+
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.header-content { display: flex; align-items: center; gap: 20px; }
+.header-icon {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--gold);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+}
+.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
+.header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
+
+.filter-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.filter-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 25px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; color: var(--primary);
+}
+.filter-header i { color: var(--gold); font-size: 18px; }
+.filter-header span::before { content: '◆'; color: var(--gold); margin-left: 8px; font-size: 10px; }
+.filter-form { padding: 25px; }
+.filter-form .form-control, .filter-form .form-select {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+}
+.filter-form .form-control:focus, .filter-form .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
+}
+.btn-search {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; border: none; border-radius: 12px;
+    font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+}
+.btn-search:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
+.btn-export {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
+    color: #fff; border-radius: 12px;
+    text-decoration: none; font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+}
+.btn-export:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(192,57,43,0.3); color: #fff; }
+
+.result-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+}
+.result-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 22px 28px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(26,51,86,0.05) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; font-size: 17px; color: var(--primary);
+}
+.result-header i { color: var(--gold); font-size: 20px; }
+.count-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
+    color: #fff;
+}
+
+.results-table {
+    width: 100%; border-collapse: collapse;
+}
+.results-table thead {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff;
+}
+.results-table th {
+    padding: 16px 18px;
+    font-size: 12px; font-weight: 700;
+    text-align: center;
+    border: none;
+}
+.results-table td {
+    padding: 16px 18px;
+    font-size: 14px; color: #5a6c7d;
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    text-align: center;
+    vertical-align: middle;
+}
+.results-table tbody tr { transition: all 0.3s ease; }
+.results-table tbody tr:hover { background: linear-gradient(135deg, rgba(212,160,48,0.05) 0%, rgba(180,128,44,0.08) 100%); }
+.results-table tbody tr:last-child td { border-bottom: none; }
+
+.student-cell {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.student-avatar {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--purple) 0%, #7d3c98 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px;
+}
+.student-name { font-weight: 700; color: var(--primary); }
+
+.row-number {
+    width: 35px; height: 35px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    margin: 0 auto;
+}
+
+.status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+}
+.status-badge.present { background: rgba(39,174,96,0.15); color: var(--success); }
+.status-badge.absent { background: rgba(192,57,43,0.15); color: var(--danger); }
+.status-badge.late { background: rgba(243,156,18,0.15); color: var(--warning); }
+.status-badge.excused { background: rgba(52,152,219,0.15); color: var(--info); }
+.status-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+.pagination-section { display: flex; justify-content: center; margin-top: 35px; }
+.pagination-section .pagination { gap: 8px; }
+.pagination-section .page-link {
+    padding: 10px 18px; border-radius: 12px; font-size: 14px;
+    border: 2px solid #e9ecef; color: var(--primary);
+    transition: all 0.3s ease;
+}
+.pagination-section .page-link:hover { border-color: var(--gold); color: var(--gold); }
+.pagination-section .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-color: var(--primary); color: #fff;
+}
+
+.empty-state-card {
+    text-align: center;
+    padding: 70px 30px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+.empty-icon {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.08) 0%, rgba(42,69,112,0.12) 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 42px; color: var(--gold);
+    border: 3px solid rgba(212,160,48,0.15);
+}
+.empty-state-card h5 { color: var(--primary); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-card p { color: #95a5a6; margin-bottom: 25px; font-size: 15px; }
+
+@media (max-width: 992px) {
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-content { margin-bottom: 15px; }
+}
+</style>
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="header-text">
+            <h4>تقرير الحضور</h4>
+            <p>سجلات الحضور والانصراف</p>
+        </div>
+    </div>
+</div>
+
+<div class="filter-card">
+    <div class="filter-header">
+        <i class="fas fa-filter"></i>
+        <span>بحث وتصفية السجلات</span>
+    </div>
+    <form method="GET" class="filter-form">
+        <div class="row g-3">
             <div class="col-md-2">
-                <label class="form-label">المشرف</label>
                 <select name="supervisor_id" class="form-select" id="supervisorSelect" onchange="filterStudents()">
                     <option value="">-- جميع المشرفين --</option>
                     @foreach($supervisors as $supervisor)
@@ -29,7 +251,6 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">الطالب</label>
                 <select name="student_id" class="form-select" id="studentSelect">
                     <option value="">-- جميع الطلاب --</option>
                     @foreach($students as $student)
@@ -42,7 +263,6 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">الفترة</label>
                 <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">
                     <option value="all" {{ request('period') == 'all' ? 'selected' : '' }}>الكل</option>
                     <option value="today" {{ request('period') == 'today' ? 'selected' : '' }}>اليوم</option>
@@ -52,53 +272,51 @@
                 </select>
             </div>
             <div class="col-md-2" id="fromDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
-                <label class="form-label">من تاريخ</label>
                 <input type="date" name="from_date" class="form-control" value="{{ request('from_date', $fromDate ? $fromDate->format('Y-m-d') : now()->startOfMonth()->toDateString()) }}">
             </div>
             <div class="col-md-2" id="toDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
-                <label class="form-label">إلى تاريخ</label>
                 <input type="date" name="to_date" class="form-control" value="{{ request('to_date', $toDate ? $toDate->format('Y-m-d') : now()->toDateString()) }}">
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
+            <div class="col-md-1">
+                <button type="submit" class="btn-search w-100">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
             @if($attendances->isNotEmpty())
-            <div class="col-md-2">
-                <a href="{{ route('admin.reports.attendance', array_merge(request()->except('export'), ['export' => 'pdf'])) }}" class="btn btn-outline-danger w-100" target="_blank">
+            <div class="col-md-1">
+                <a href="{{ route('admin.reports.attendance', array_merge(request()->except('export'), ['export' => 'pdf'])) }}" class="btn-export w-100" target="_blank">
                     <i class="fas fa-file-pdf"></i>
                 </a>
             </div>
             @endif
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="mb-0">
-            <i class="fas fa-calendar-check me-2"></i>
-            سجلات الحضور
-        </h6>
-        <span class="badge bg-info">{{ $attendances->total() }} سجل</span>
+<div class="result-card">
+    <div class="result-header">
+        <i class="fas fa-list"></i>
+        <span>سجلات الحضور</span>
+        <span class="count-badge">{{ $attendances->total() }} سجل</span>
     </div>
-    <div class="card-body p-0">
+    <div style="padding: 0;">
         @if($attendances->isEmpty())
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-calendar-check fa-3x mb-3 d-block"></i>
-                <p>لا توجد سجلات حضور في هذه الفترة</p>
+            <div class="empty-state-card">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-minus"></i>
+                </div>
+                <h5>لا توجد سجلات حضور</h5>
+                <p>لم يتم تسجيل حضور في هذه الفترة</p>
             </div>
         @else
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
+                <table class="results-table">
+                    <thead>
                         <tr>
-                            <th width="60">#</th>
-                            <th>اسم الطالب</th>
+                            <th style="width: 60px;">#</th>
+                            <th>الطالب</th>
                             <th>المشرف</th>
                             <th>التاريخ</th>
-                            <th>اليوم</th>
                             <th>وقت الحضور</th>
                             <th>وقت الانصراف</th>
                             <th>الحالة</th>
@@ -107,29 +325,42 @@
                     <tbody>
                         @foreach($attendances as $index => $attendance)
                         <tr>
-                            <td>{{ $attendances->firstItem() + $index }}</td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ $attendance->student->user->avatar_url ?? asset('images/default-avatar.png') }}" alt="Avatar" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">
-                                    <span>{{ $attendance->student->user->name ?? '-' }}</span>
+                                <span class="row-number">{{ $attendances->firstItem() + $index }}</span>
+                            </td>
+                            <td>
+                                <div class="student-cell">
+                                    <div class="student-avatar">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                    <span class="student-name">{{ $attendance->student->user->name ?? '-' }}</span>
                                 </div>
                             </td>
-                            <td>{{ $attendance->supervisor->name ?? '-' }}</td>
-                            <td>{{ $attendance->date ?? '-' }}</td>
-                            <td><span class="badge bg-secondary">{{ $attendance->day }}</span></td>
+                            <td style="font-weight: 600; color: var(--primary);">{{ $attendance->supervisor->name ?? '-' }}</td>
+                            <td style="font-weight: 600;">{{ $attendance->date ?? '-' }}</td>
                             <td>{{ $attendance->arrival_time ?? '-' }}</td>
                             <td>{{ $attendance->departure_time ?? '-' }}</td>
                             <td>
                                 @if($attendance->status === 'present')
-                                    <span class="badge bg-success">حاضر</span>
+                                    <span class="status-badge present">
+                                        <i class="fas fa-check"></i>حاضر
+                                    </span>
                                 @elseif($attendance->status === 'absent')
-                                    <span class="badge bg-danger">غائب</span>
+                                    <span class="status-badge absent">
+                                        <i class="fas fa-times"></i>غائب
+                                    </span>
                                 @elseif($attendance->status === 'late')
-                                    <span class="badge bg-warning text-dark">متأخر</span>
+                                    <span class="status-badge late">
+                                        <i class="fas fa-clock"></i>متأخر
+                                    </span>
                                 @elseif($attendance->status === 'excused')
-                                    <span class="badge bg-info">معذور</span>
+                                    <span class="status-badge excused">
+                                        <i class="fas fa-check-circle"></i>معذور
+                                    </span>
                                 @else
-                                    <span class="badge bg-secondary">{{ $attendance->status }}</span>
+                                    <span class="status-badge" style="background: rgba(149,165,166,0.15); color: #95a5a6;">
+                                        {{ $attendance->status }}
+                                    </span>
                                 @endif
                             </td>
                         </tr>
@@ -138,13 +369,12 @@
                 </table>
             </div>
 
-            <div class="p-3 border-top">
-                {{ $attendances->links() }}
+            <div class="pagination-section" style="padding: 20px 25px; border-top: 1px solid rgba(24,43,72,0.05);">
+                {{ $attendances->withQueryString()->links() }}
             </div>
         @endif
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script>
@@ -189,3 +419,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+@endsection

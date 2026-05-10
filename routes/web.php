@@ -94,6 +94,25 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/sessions', [Admin\SessionController::class, 'index'])->name('sessions.index');
     Route::get('/sessions/{session}', [Admin\SessionController::class, 'show'])->name('sessions.show');
 
+    // Meeting Minutes
+    Route::prefix('meeting-minutes')->name('meeting-minutes.')->group(function () {
+        Route::get('/', [Admin\MeetingMinuteController::class, 'index'])->name('index');
+        Route::get('/create', [Admin\MeetingMinuteController::class, 'create'])->name('create');
+        Route::post('/', [Admin\MeetingMinuteController::class, 'store'])->name('store');
+        Route::get('/{meetingMinute}', [Admin\MeetingMinuteController::class, 'show'])->name('show');
+        Route::get('/{meetingMinute}/edit', [Admin\MeetingMinuteController::class, 'edit'])->name('edit');
+        Route::put('/{meetingMinute}', [Admin\MeetingMinuteController::class, 'update'])->name('update');
+        Route::delete('/{meetingMinute}', [Admin\MeetingMinuteController::class, 'destroy'])->name('destroy');
+        Route::post('/{meetingMinute}/approve', [Admin\MeetingMinuteController::class, 'approve'])->name('approve');
+        Route::post('/{meetingMinute}/archive', [Admin\MeetingMinuteController::class, 'archive'])->name('archive');
+    });
+
+    // Tasks
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        Route::get('/', [Admin\TaskController::class, 'index'])->name('index');
+        Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
+    });
+
     // Audit Logs
     Route::resource('audit-logs', Admin\AuditLogController::class)->only(['index', 'show']);
     Route::get('/audit-logs/export', [Admin\AuditLogController::class, 'export'])->name('audit-logs.export');
@@ -208,6 +227,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Quran Exam Assistant
     Route::get('/exam-assistant', [Supervisor\QuranExamAssistantController::class, 'index'])->name('exam-assistant.index');
     Route::post('/exam-assistant/generate', [Supervisor\QuranExamAssistantController::class, 'generateQuestion'])->name('exam-assistant.generate');
+
+    // Tasks (تكليفات)
+    Route::get('/tasks', [Supervisor\TaskController::class, 'index'])->name('tasks.index');
+    Route::put('/tasks/{task}/status', [Supervisor\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 });
 
 // ============================

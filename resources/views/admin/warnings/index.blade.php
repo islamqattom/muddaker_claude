@@ -13,118 +13,367 @@
 @endsection
 
 @section('content')
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-end">
-            <div class="row g-3 align-items-end flex-grow-1">
-                <div class="col-md-3">
-                    <label class="form-label">نوع الإنذار</label>
-                    <select class="form-select" onchange="window.location='{{ route('admin.warnings.index') }}?type='+this.value">
-                        <option value="">جميع الأنواع</option>
-                        <option value="attendance" {{ request('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
-                        <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>إنذار تسميع</option>
-                        <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>إنذار عام</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <a href="{{ route('admin.warnings.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i>
-                    إضافة إنذار
-                </a>
-            </div>
+<style>
+:root {
+    --primary: #182B48;
+    --primary-light: #2A4570;
+    --primary-lighter: #3D5A80;
+    --gold: #d4a030;
+    --gold-dark: #B4802C;
+    --gold-light: #E8C45A;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --purple: #8e44ad;
+    --bg-main: #f8fafc;
+    --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
+    --card-shadow-hover: 0 12px 40px rgba(24, 43, 72, 0.15);
+}
+
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.header-content { display: flex; align-items: center; gap: 20px; }
+.header-icon {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--gold);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+}
+.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
+.header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
+
+.add-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; border-radius: 14px;
+    text-decoration: none; font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+.add-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(24,43,72,0.35); color: #fff; }
+.add-btn i { color: var(--gold); }
+
+.filter-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.filter-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 25px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; color: var(--primary);
+}
+.filter-header i { color: var(--gold); font-size: 18px; }
+.filter-header span::before { content: '◆'; color: var(--gold); margin-left: 8px; font-size: 10px; }
+.filter-form { padding: 25px; }
+.filter-form .form-select {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+}
+.filter-form .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
+}
+
+.warnings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+.warning-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+.warning-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--danger), #c0392b, var(--danger));
+}
+.warning-card:hover { transform: translateY(-8px); box-shadow: var(--card-shadow-hover); }
+.warning-card:hover::before { height: 7px; }
+.warning-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 25px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+.warning-date {
+    display: flex; align-items: center; gap: 12px;
+    color: #fff; font-weight: 700; font-size: 17px;
+}
+.warning-date i { color: var(--gold); font-size: 20px; }
+.type-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 25px;
+    font-size: 12px; font-weight: 600;
+    backdrop-filter: blur(5px);
+}
+.type-badge.attendance { background: rgba(243,156,18,0.25); color: #f1c40f; border: 1px solid rgba(243,156,18,0.3); }
+.type-badge.recitation { background: rgba(52,152,219,0.25); color: #5dade2; border: 1px solid rgba(52,152,219,0.3); }
+.type-badge.general { background: rgba(149,165,166,0.25); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }
+.type-badge i { font-size: 11px; }
+
+.warning-body { padding: 22px 25px; }
+.warning-student { display: flex; align-items: center; gap: 15px; margin-bottom: 18px; }
+.student-avatar {
+    width: 50px; height: 50px;
+    background: linear-gradient(135deg, var(--purple) 0%, #7d3c98 100%);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px;
+}
+.student-info { flex: 1; }
+.student-name { font-weight: 700; color: var(--primary); font-size: 16px; }
+.student-number { font-size: 12px; color: #95a5a6; }
+
+.warning-number {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(24,43,72,0.06);
+    font-size: 13px; color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.warning-number i { color: var(--gold); font-size: 14px; }
+
+.warning-title {
+    font-size: 15px; font-weight: 700;
+    color: var(--primary); margin-bottom: 10px;
+}
+
+.warning-meta { display: flex; gap: 15px; flex-wrap: wrap; }
+.meta-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #6c7a89;
+}
+.meta-item i { color: var(--gold); font-size: 12px; }
+
+.warning-footer {
+    display: flex; gap: 10px;
+    padding: 18px 25px;
+    border-top: 1px solid #f0f4f8;
+    background: #fafbfc;
+}
+.action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 15px; border-radius: 12px;
+    text-decoration: none; font-weight: 600; font-size: 13px;
+    transition: all 0.3s ease;
+    border: none; cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+}
+.action-btn.view {
+    background: linear-gradient(135deg, rgba(52,152,219,0.1) 0%, rgba(41,128,185,0.15) 100%);
+    color: #3498db;
+    border: 1px solid rgba(52,152,219,0.2);
+}
+.action-btn.view:hover {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+}
+.action-btn.delete {
+    background: linear-gradient(135deg, rgba(192,57,43,0.1) 0%, rgba(173,51,38,0.15) 100%);
+    color: #c0392b;
+    border: 1px solid rgba(192,57,43,0.2);
+}
+.action-btn.delete:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(192,57,43,0.3);
+}
+
+.pagination-section { display: flex; justify-content: center; margin-top: 35px; }
+.pagination-section .pagination { gap: 8px; }
+.pagination-section .page-link {
+    padding: 10px 18px; border-radius: 12px; font-size: 14px;
+    border: 2px solid #e9ecef; color: var(--primary);
+    transition: all 0.3s ease;
+}
+.pagination-section .page-link:hover { border-color: var(--gold); color: var(--gold); }
+.pagination-section .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-color: var(--primary); color: #fff;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+
+.empty-state-card {
+    text-align: center;
+    padding: 70px 30px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+}
+.empty-icon {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.08) 0%, rgba(42,69,112,0.12) 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 42px; color: var(--gold);
+    border: 3px solid rgba(212,160,48,0.15);
+}
+.empty-state-card h5 { color: var(--primary); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-card p { color: #95a5a6; margin-bottom: 25px; font-size: 15px; }
+
+@media (max-width: 768px) {
+    .warnings-grid { grid-template-columns: 1fr; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-content { margin-bottom: 15px; }
+}
+</style>
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="header-text">
+            <h4>الإنذارات</h4>
+            <p>سجل ومتابعة إنذارات الطلاب</p>
         </div>
     </div>
+    <a href="{{ route('admin.warnings.create') }}" class="add-btn">
+        <i class="fas fa-plus-circle"></i>
+        إضافة إنذار
+    </a>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h6 class="mb-0">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            سجل الإنذارات
-        </h6>
+<div class="filter-card">
+    <div class="filter-header">
+        <i class="fas fa-filter"></i>
+        <span>تصفية الإنذارات</span>
     </div>
-    <div class="card-body p-0">
-        @if($warnings->isEmpty())
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-exclamation-circle fa-3x mb-3 d-block"></i>
-                <p>لا توجد إنذارات مسجلة</p>
+    <form method="GET" class="filter-form">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <select class="form-select" onchange="window.location='{{ route('admin.warnings.index') }}?type='+this.value">
+                    <option value="">جميع الأنواع</option>
+                    <option value="attendance" {{ request('type') == 'attendance' ? 'selected' : '' }}>إنذار حضور</option>
+                    <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>إنذار تسميع</option>
+                    <option value="general" {{ request('type') == 'general' ? 'selected' : '' }}>إنذار عام</option>
+                </select>
             </div>
-        @else
-            <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th width="60">#</th>
-                            <th>اسم الطالب</th>
-                            <th>المشرف</th>
-                            <th>نوع الإنذار</th>
-                            <th>العنوان</th>
-                            <th>التاريخ</th>
-                            <th>اليوم</th>
-                            <th>الرقم</th>
-                            <th width="150">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($warnings as $index => $warning)
-                        <tr>
-                            <td>{{ $warnings->firstItem() + $index }}</td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <img src="{{ $warning->student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">
-                                    <div>
-                                        <div class="fw-semibold">{{ $warning->student->user->name }}</div>
-                                        <small class="text-muted">{{ $warning->student->student_number }}</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ $warning->issuedBy->name }}</td>
-                            <td>
-                                @if($warning->type === 'attendance')
-                                    <span class="badge bg-warning text-dark">
-                                        <i class="fas fa-calendar-times me-1"></i>حضور
-                                    </span>
-                                @elseif($warning->type === 'recitation')
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-microphone me-1"></i>تسميع
-                                    </span>
-                                @else
-                                    <span class="badge bg-secondary">
-                                        <i class="fas fa-exclamation-circle me-1"></i>عام
-                                    </span>
-                                @endif
-                            </td>
-                            <td>{{ $warning->title }}</td>
-                            <td>{{ $warning->issue_date->format('d/m/Y') }}</td>
-                            <td><span class="badge bg-secondary">{{ $warning->issue_day }}</span></td>
-                            <td>
-                                <code class="small">{{ $warning->warning_number }}</code>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ route('admin.warnings.show', $warning->id) }}" class="btn btn-sm btn-outline-primary" title="عرض">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <form action="{{ route('admin.warnings.destroy', $warning->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الإنذار؟')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="p-3 border-top">
-                {{ $warnings->links() }}
-            </div>
-        @endif
-    </div>
+        </div>
+    </form>
 </div>
+
+@if($warnings->isEmpty())
+    <div class="empty-state-card">
+        <div class="empty-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h5>لا توجد إنذارات مسجلة</h5>
+        <p>لم يتم إصدار أي إنذار للطلاب حتى الآن</p>
+        <a href="{{ route('admin.warnings.create') }}" class="add-btn" style="display: inline-flex; margin: 0 auto;">
+            <i class="fas fa-plus-circle"></i>
+            إضافة إنذار جديد
+        </a>
+    </div>
+@else
+    <div class="warnings-grid">
+        @foreach($warnings as $warning)
+        <div class="warning-card">
+            <div class="warning-header">
+                <div class="warning-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ $warning->issue_date->format('Y/m/d') }}
+                </div>
+                <div class="type-badge {{ $warning->type }}">
+                    @if($warning->type === 'attendance')
+                        <i class="fas fa-calendar-times"></i>حضور
+                    @elseif($warning->type === 'recitation')
+                        <i class="fas fa-microphone"></i>تسميع
+                    @else
+                        <i class="fas fa-exclamation-circle"></i>عام
+                    @endif
+                </div>
+            </div>
+            <div class="warning-body">
+                <div class="warning-student">
+                    <div class="student-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="student-info">
+                        <div class="student-name">{{ $warning->student->user->name }}</div>
+                        <div class="student-number">{{ $warning->student->student_number }}</div>
+                    </div>
+                </div>
+
+                <div class="warning-number">
+                    <i class="fas fa-hashtag"></i>
+                    رقم الإنذار: {{ $warning->warning_number }}
+                </div>
+
+                <div class="warning-title">{{ $warning->title }}</div>
+
+                <div class="warning-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-user-tie"></i>
+                        {{ $warning->issuedBy->name }}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-calendar-day"></i>
+                        {{ $warning->issue_day }}
+                    </span>
+                </div>
+            </div>
+            <div class="warning-footer">
+                <a href="{{ route('admin.warnings.show', $warning->id) }}" class="action-btn view">
+                    <i class="fas fa-eye"></i>
+                    <span>عرض</span>
+                </a>
+                <form action="{{ route('admin.warnings.destroy', $warning->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الإنذار؟')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="action-btn delete">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>حذف</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="pagination-section">
+        {{ $warnings->links() }}
+    </div>
+@endif
 @endsection

@@ -1,11 +1,10 @@
 @extends('layouts.app')
-
 @section('title', 'محاضر الاجتماعات')
 @section('page-title', 'محاضر الاجتماعات')
 @section('role-label', 'مدير')
 
 @section('sidebar-menu')
-    @include('admin.partials.sidebar')
+@include('admin.partials.sidebar')
 @endsection
 
 @section('breadcrumb')
@@ -14,103 +13,532 @@
 @endsection
 
 @section('content')
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">
-            <i class="fas fa-calendar-minus me-2"></i>
-            محاضر الاجتماعات
-        </h5>
-        <a href="{{ route('admin.meeting-minutes.create') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus me-1"></i> إضافة محضر
-        </a>
+<style>
+:root {
+    --primary: #182B48;
+    --primary-light: #2A4570;
+    --primary-lighter: #3D5A80;
+    --gold: #d4a030;
+    --gold-dark: #B4802C;
+    --gold-light: #E8C45A;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+    --bg-main: #f8fafc;
+    --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
+    --card-shadow-hover: 0 12px 40px rgba(24, 43, 72, 0.15);
+}
+
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.header-content { display: flex; align-items: center; gap: 20px; }
+.header-icon {
+    width: 70px; height: 70px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--gold);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+    position: relative;
+    overflow: hidden;
+}
+.header-icon::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -50%;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(212,160,48,0.15) 0%, transparent 70%);
+}
+.header-icon i { position: relative; z-index: 1; }
+.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
+.header-text p::before {
+    content: '✦';
+    color: var(--gold);
+    margin-left: 8px;
+}
+.add-btn {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; border-radius: 14px;
+    text-decoration: none; font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+.add-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(24,43,72,0.35);
+    color: #fff;
+}
+.add-btn i { color: var(--gold); }
+.add-btn:hover i { animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.stat-card {
+    position: relative;
+    padding: 25px;
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+.stat-card:hover { transform: translateY(-8px) scale(1.02); }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+}
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
+}
+.stat-card.primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); }
+.stat-card.warning { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
+.stat-card.success { background: linear-gradient(135deg, var(--success) 0%, #219a52 100%); }
+.stat-card.info { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+.stat-icon {
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #fff;
+    backdrop-filter: blur(5px);
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-icon i { color: var(--gold); }
+.stat-content { flex: 1; position: relative; z-index: 1; }
+.stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 6px; }
+.stat-label { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; letter-spacing: 0.5px; }
+.stat-decoration {
+    position: absolute;
+    bottom: 15px; left: 15px;
+    font-size: 50px; opacity: 0.1; color: #fff;
+}
+
+.filter-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.filter-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 25px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-bottom: 1px solid rgba(24,43,72,0.05);
+    font-weight: 700; color: var(--primary);
+}
+.filter-header i { color: var(--gold); font-size: 18px; }
+.filter-header span::before { content: '◆'; color: var(--gold); margin-left: 8px; font-size: 10px; }
+.filter-form { padding: 25px; }
+.filter-form .row { gap: 15px; }
+.filter-form .form-control, .filter-form .form-select {
+    border-radius: 12px;
+    border: 2px solid #e9ecef;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+}
+.filter-form .form-control:focus, .filter-form .form-select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
+}
+.btn-search {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff; border: none; border-radius: 12px;
+    font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+}
+.btn-search:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
+.btn-reset {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 18px;
+    background: transparent;
+    color: #7f8c8d; border: 2px solid #e9ecef; border-radius: 12px;
+    font-weight: 600; font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: 'Tajawal', sans-serif;
+}
+.btn-reset:hover { border-color: var(--primary); color: var(--primary); }
+
+.meetings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+.meeting-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+.meeting-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
+}
+.meeting-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-shadow-hover);
+}
+.meeting-card:hover::before { height: 8px; }
+.meeting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 25px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+.meeting-date {
+    display: flex; align-items: center; gap: 12px;
+    color: #fff; font-weight: 700; font-size: 17px;
+}
+.meeting-date i { color: var(--gold); font-size: 20px; }
+.status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 25px;
+    font-size: 12px; font-weight: 600;
+    backdrop-filter: blur(5px);
+}
+.status-badge.draft { background: rgba(243,156,18,0.25); color: #f1c40f; border: 1px solid rgba(243,156,18,0.3); }
+.status-badge.approved { background: rgba(39,174,96,0.25); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+.status-badge.archived { background: rgba(149,165,166,0.25); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }
+.status-badge i { font-size: 11px; }
+
+.meeting-body { padding: 22px 25px; }
+.meeting-meta {
+    display: flex; gap: 25px; margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.meta-item {
+    display: flex; align-items: center; gap: 8px;
+    color: #7f8c8d; font-size: 14px;
+}
+.meta-item i { color: var(--gold); font-size: 14px; }
+.meta-item span { font-weight: 500; color: #5a6c7d; }
+
+.meeting-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
+    border-radius: 12px;
+    font-size: 13px; color: var(--primary);
+    font-weight: 600;
+    border: 1px solid rgba(24,43,72,0.06);
+}
+.stat-item i { color: var(--gold); font-size: 14px; }
+.stat-item .stat-value { color: var(--gold-dark); font-weight: 700; }
+
+.meeting-actions {
+    display: flex; gap: 10px;
+    padding: 18px 25px;
+    border-top: 1px solid #f0f4f8;
+    background: #fafbfc;
+}
+.action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 15px; border-radius: 12px;
+    text-decoration: none; font-weight: 600; font-size: 13px;
+    transition: all 0.3s ease;
+    border: none; cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+}
+.action-btn.view {
+    background: linear-gradient(135deg, rgba(52,152,219,0.1) 0%, rgba(41,128,185,0.15) 100%);
+    color: #3498db;
+    border: 1px solid rgba(52,152,219,0.2);
+}
+.action-btn.view:hover {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+}
+.action-btn.edit {
+    background: linear-gradient(135deg, rgba(243,156,18,0.1) 0%, rgba(230,126,34,0.15) 100%);
+    color: #e67e22;
+    border: 1px solid rgba(243,156,18,0.2);
+}
+.action-btn.edit:hover {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230,126,34,0.3);
+}
+.action-btn.delete {
+    background: linear-gradient(135deg, rgba(192,57,43,0.1) 0%, rgba(173,51,38,0.15) 100%);
+    color: #c0392b;
+    border: 1px solid rgba(192,57,43,0.2);
+}
+.action-btn.delete:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(192,57,43,0.3);
+}
+
+.pagination-section { display: flex; justify-content: center; margin-top: 35px; }
+.pagination-section .pagination { gap: 8px; }
+.pagination-section .page-link {
+    padding: 10px 18px; border-radius: 12px; font-size: 14px;
+    border: 2px solid #e9ecef; color: var(--primary);
+    transition: all 0.3s ease;
+}
+.pagination-section .page-link:hover { border-color: var(--gold); color: var(--gold); }
+.pagination-section .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-color: var(--primary); color: #fff;
+    box-shadow: 0 4px 15px rgba(24,43,72,0.25);
+}
+
+.empty-state-card {
+    text-align: center;
+    padding: 70px 30px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(24,43,72,0.05);
+}
+.empty-icon {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, rgba(24,43,72,0.08) 0%, rgba(42,69,112,0.12) 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 42px; color: var(--gold);
+    border: 3px solid rgba(212,160,48,0.15);
+}
+.empty-state-card h5 { color: var(--primary); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-card p { color: #95a5a6; margin-bottom: 25px; font-size: 15px; }
+
+@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .meetings-grid { grid-template-columns: 1fr; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .header-content { margin-bottom: 15px; }
+}
+</style>
+
+{{-- Page Header --}}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="header-text">
+            <h4>محاضر الاجتماعات</h4>
+            <p>إدارة وتتبع محاضر جلسات جمعية تحفيظ القرآن الكريم</p>
+        </div>
     </div>
-    <div class="card-body">
-        <form method="GET" class="mb-4">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <select name="status" class="form-select">
-                        <option value="">جميع الحالات</option>
-                        <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>مسودة</option>
-                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>معتمد</option>
-                        <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>مؤرشف</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}" placeholder="من تاريخ">
-                </div>
-                <div class="col-md-3">
-                    <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}" placeholder="إلى تاريخ">
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-secondary">
-                        <i class="fas fa-search me-1"></i> بحث
-                    </button>
-                    <a href="{{ route('admin.meeting-minutes.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-redo"></i>
-                    </a>
-                </div>
-            </div>
-        </form>
+    <a href="{{ route('admin.meeting-minutes.create') }}" class="add-btn">
+        <i class="fas fa-plus-circle"></i>
+        إضافة محضر جديد
+    </a>
+</div>
 
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>التاريخ</th>
-                        <th>الوقت</th>
-                        <th>الحالة</th>
-                        <th>المنشئ</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($meetingMinutes as $minute)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $minute->meeting_date->format('Y/m/d') }}</td>
-                        <td>{{ $minute->meeting_time ?? '-' }}</td>
-                        <td>
-                            <span class="badge bg-{{ $minute->status_color }}">{{ $minute->status_label }}</span>
-                        </td>
-                        <td>{{ $minute->creator->name ?? '-' }}</td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ route('admin.meeting-minutes.show', $minute->id) }}" class="btn btn-outline-primary" title="عرض">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.meeting-minutes.edit', $minute->id) }}" class="btn btn-outline-secondary" title="تعديل">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                @if($minute->status === 'draft')
-                                    <form method="POST" action="{{ route('admin.meeting-minutes.destroy', $minute->id) }}" class="d-inline" onsubmit="return confirm('هل تريد حذف هذا المحضر؟')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            <i class="fas fa-calendar-minus fa-2x mb-2 d-block"></i>
-                            لا توجد محاضر اجتماعات
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+{{-- Stats Cards --}}
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $meetingMinutes->total() }}</div>
+            <div class="stat-label">إجمالي المحاضر</div>
         </div>
-
-        @if($meetingMinutes->hasPages())
-        <div class="mt-4">
-            {{ $meetingMinutes->links() }}
+        <div class="stat-decoration"><i class="fas fa-copy"></i></div>
+    </div>
+    <div class="stat-card warning">
+        <div class="stat-icon"><i class="fas fa-pen-fancy"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $meetingMinutes->where('status', 'draft')->count() }}</div>
+            <div class="stat-label">مسودات</div>
         </div>
-        @endif
+        <div class="stat-decoration"><i class="fas fa-edit"></i></div>
+    </div>
+    <div class="stat-card success">
+        <div class="stat-icon"><i class="fas fa-stamp"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $meetingMinutes->where('status', 'approved')->count() }}</div>
+            <div class="stat-label">معتمدة</div>
+        </div>
+        <div class="stat-decoration"><i class="fas fa-check"></i></div>
+    </div>
+    <div class="stat-card info">
+        <div class="stat-icon"><i class="fas fa-box-archive"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $meetingMinutes->where('status', 'archived')->count() }}</div>
+            <div class="stat-label">مؤرشفة</div>
+        </div>
+        <div class="stat-decoration"><i class="fas fa-archive"></i></div>
     </div>
 </div>
+
+{{-- Filter Card --}}
+<div class="filter-card">
+    <div class="filter-header">
+        <i class="fas fa-filter"></i>
+        <span>بحث وتصفية المحاضر</span>
+    </div>
+    <form method="GET" class="filter-form">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">جميع الحالات</option>
+                    <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>مسودة</option>
+                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>معتمد</option>
+                    <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>مؤرشف</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}" placeholder="من تاريخ">
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}" placeholder="إلى تاريخ">
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn-search">
+                    <i class="fas fa-search"></i> بحث
+                </button>
+                <a href="{{ route('admin.meeting-minutes.index') }}" class="btn-reset">
+                    <i class="fas fa-redo"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{{-- Meetings Grid --}}
+@if($meetingMinutes->isEmpty())
+    <div class="empty-state-card">
+        <div class="empty-icon">
+            <i class="fas fa-calendar-minus"></i>
+        </div>
+        <h5>لا توجد محاضر اجتماعات</h5>
+        <p>ابدأ بإضافة محضر اجتماع جديد لجمعية تحفيظ القرآن الكريم</p>
+        <a href="{{ route('admin.meeting-minutes.create') }}" class="btn-search">
+            <i class="fas fa-plus me-2"></i>إضافة محضر
+        </a>
+    </div>
+@else
+    <div class="meetings-grid">
+        @foreach($meetingMinutes as $minute)
+        <div class="meeting-card">
+            <div class="meeting-header">
+                <div class="meeting-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ $minute->meeting_date->format('Y/m/d') }}
+                </div>
+                <div class="status-badge {{ $minute->status }}">
+                    @if($minute->status === 'draft')
+                        <i class="fas fa-pen"></i>مسودة
+                    @elseif($minute->status === 'approved')
+                        <i class="fas fa-check-circle"></i>معتمد
+                    @else
+                        <i class="fas fa-archive"></i>مؤرشف
+                    @endif
+                </div>
+            </div>
+            <div class="meeting-body">
+                <div class="meeting-meta">
+                    @if($minute->meeting_time)
+                    <span class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ $minute->meeting_time }}</span>
+                    </span>
+                    @endif
+                    <span class="meta-item">
+                        <i class="fas fa-user-shield"></i>
+                        <span>{{ $minute->creator->name ?? '-' }}</span>
+                    </span>
+                </div>
+
+                @php
+                    $attendeesData = $minute->attendees ?? [];
+                    $manualAttendees = $minute->manual_attendees ?? [];
+                    $totalAttendees = (is_array($attendeesData) ? count(array_filter($attendeesData, fn($a) => $a['is_present'] ?? false)) : 0) + (is_array($manualAttendees) ? count(array_filter($manualAttendees, fn($a) => !empty($a['name']))) : 0);
+                    $tasksCount = $minute->tasks ? $minute->tasks->count() : 0;
+                @endphp
+
+                <div class="meeting-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span class="stat-value">{{ $totalAttendees }}</span> حضور
+                    </div>
+                    @if($tasksCount > 0)
+                    <div class="stat-item">
+                        <i class="fas fa-tasks"></i>
+                        <span class="stat-value">{{ $tasksCount }}</span> تكليف
+                    </div>
+                    @endif
+                </div>
+            </div>
+            <div class="meeting-actions">
+                <a href="{{ route('admin.meeting-minutes.show', $minute->id) }}" class="action-btn view">
+                    <i class="fas fa-eye"></i>
+                    <span>عرض</span>
+                </a>
+                <a href="{{ route('admin.meeting-minutes.edit', $minute->id) }}" class="action-btn edit">
+                    <i class="fas fa-edit"></i>
+                    <span>تعديل</span>
+                </a>
+                @if($minute->status === 'draft')
+                <form action="{{ route('admin.meeting-minutes.destroy', $minute->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل تريد حذف هذا المحضر؟')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="action-btn delete">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>حذف</span>
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <div class="pagination-section">
+        {{ $meetingMinutes->withQueryString()->links() }}
+    </div>
+@endif
+
 @endsection
