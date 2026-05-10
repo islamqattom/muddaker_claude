@@ -26,7 +26,7 @@ class WarningDraftCreated extends Notification
         $ruleName = $this->draft->warningRule?->name ?? 'قاعدة الإنذار';
 
         return [
-            'type' => 'warning_draft_ready',
+            'type' => 'warning_draft',
             'warning_draft_id' => $this->draft->id,
             'student_id' => $this->draft->student_id,
             'message' => "تنبيه جديد: تم إنشاء مسودة إنذار لـ {$studentName} بناءً على قاعدة \"{$ruleName}\"",

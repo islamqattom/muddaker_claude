@@ -41,7 +41,7 @@
                 <i class="fas fa-list me-1"></i> @lang('All')
             </a>
         </li>
-        @foreach(['warning_draft', 'warning', 'recitation_session', 'attendance', 'milestone'] as $type)
+        @foreach(['warning_draft', 'warning', 'recitation_session', 'attendance', 'milestone', 'meeting_task'] as $type)
             <li class="nav-item">
                 <a class="nav-link {{ request('filter') === $type ? 'active' : '' }}"
                    href="{{ route('notifications.index', ['filter' => $type]) }}">
@@ -55,6 +55,8 @@
                         <i class="fas fa-calendar-check me-1"></i>
                     @elseif($type === 'milestone')
                         <i class="fas fa-trophy me-1"></i>
+                    @elseif($type === 'meeting_task')
+                        <i class="fas fa-tasks me-1"></i>
                     @endif
                     @lang(ucfirst(str_replace('_', ' ', $type)))
                 </a>
@@ -84,6 +86,7 @@
                     @elseif($notification->type === 'recitation_session') recitation
                     @elseif($notification->type === 'attendance') attendance
                     @elseif($notification->type === 'milestone') milestone
+                    @elseif($notification->type === 'meeting_task') milestone
                     @endif">
                     @if($notification->type === 'warning_draft')
                         <i class="fas fa-edit"></i>
@@ -95,6 +98,8 @@
                         <i class="fas fa-calendar-check"></i>
                     @elseif($notification->type === 'milestone')
                         <i class="fas fa-trophy"></i>
+                    @elseif($notification->type === 'meeting_task')
+                        <i class="fas fa-tasks"></i>
                     @else
                         <i class="fas fa-bell"></i>
                     @endif
@@ -219,6 +224,11 @@
 .notif-icon-wrapper.milestone {
     background: linear-gradient(135deg, rgba(212, 160, 48, 0.15), rgba(180, 128, 44, 0.2));
     color: #d4a030;
+}
+
+.notif-icon-wrapper.meeting_task {
+    background: linear-gradient(135deg, rgba(142, 68, 173, 0.15), rgba(125, 60, 152, 0.2));
+    color: #8e44ad;
 }
 
 .notif-item-modern:hover .notif-icon-wrapper {

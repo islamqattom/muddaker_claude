@@ -9,6 +9,7 @@ use App\Models\MeetingTask;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
+use App\Notifications\NewMeetingTaskAssigned;
 use Illuminate\Http\Request;
 
 class MeetingMinuteController extends Controller
@@ -118,9 +119,10 @@ class MeetingMinuteController extends Controller
 
         $meetingMinute = MeetingMinute::create([
             'meeting_date' => $validated['meeting_date'],
-            'meeting_time' => $validated['meeting_time'] ?? null,
-            'location' => $validated['location'] ?? null,
+            'meeting_time' => $validated['meeting_time'] ?? now()->format('H:i:s'),
+            'location' => $validated['location'] ?? '',
             'attendees' => $validated['attendees'] ?? [],
+            'absent' => [],
             'agenda' => $validated['agenda'] ?? [],
             'decisions' => $validated['decisions'] ?? null,
             'recommendations' => $validated['recommendations'] ?? null,
@@ -148,13 +150,25 @@ class MeetingMinuteController extends Controller
         if (!empty($validated['assignments'])) {
             foreach ($validated['assignments'] as $assignment) {
                 if (!empty($assignment['task']) && !empty($assignment['supervisor_id'])) {
-                    MeetingTask::create([
+                    $task = MeetingTask::create([
                         'meeting_minute_id' => $meetingMinute->id,
                         'assignee_id' => $assignment['supervisor_id'],
                         'assigned_by' => auth()->id(),
                         'title' => $assignment['task'],
                         'status' => 'pending',
                     ]);
+
+                    $assignee = User::find($assignment['supervisor_id']);
+                    if ($assignee) {
+                        \App\Models\Notification::create([
+                            'user_id' => $assignee->id,
+                            'title' => 'تكليف جديد',
+                            'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
+                            'type' => 'meeting_task',
+                            'link' => route('admin.meeting-minutes.show', $meetingMinute->id),
+                            'is_read' => false,
+                        ]);
+                    }
                 }
             }
         }
@@ -265,8 +279,8 @@ class MeetingMinuteController extends Controller
 
         $meetingMinute->update([
             'meeting_date' => $validated['meeting_date'],
-            'meeting_time' => $validated['meeting_time'] ?? null,
-            'location' => $validated['location'] ?? null,
+            'meeting_time' => $validated['meeting_time'] ?? now()->format('H:i:s'),
+            'location' => $validated['location'] ?? '',
             'attendees' => $validated['attendees'] ?? [],
             'agenda' => $validated['agenda'] ?? [],
             'decisions' => $validated['decisions'] ?? null,
@@ -293,13 +307,25 @@ class MeetingMinuteController extends Controller
         if (!empty($validated['assignments'])) {
             foreach ($validated['assignments'] as $assignment) {
                 if (!empty($assignment['task']) && !empty($assignment['supervisor_id'])) {
-                    MeetingTask::create([
+                    $task = MeetingTask::create([
                         'meeting_minute_id' => $meetingMinute->id,
                         'assignee_id' => $assignment['supervisor_id'],
                         'assigned_by' => auth()->id(),
                         'title' => $assignment['task'],
                         'status' => 'pending',
                     ]);
+
+                    $assignee = User::find($assignment['supervisor_id']);
+                    if ($assignee) {
+                        \App\Models\Notification::create([
+                            'user_id' => $assignee->id,
+                            'title' => 'تكليف جديد',
+                            'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
+                            'type' => 'meeting_task',
+                            'link' => route('admin.meeting-minutes.show', $meetingMinute->id),
+                            'is_read' => false,
+                        ]);
+                    }
                 }
             }
         }

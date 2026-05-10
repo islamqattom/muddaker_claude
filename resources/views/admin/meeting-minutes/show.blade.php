@@ -168,7 +168,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     transition: all 0.3s ease;
 }
 .agenda-item:hover { transform: translateX(-3px); background: linear-gradient(135deg, rgba(212,160,48,0.1) 0%, rgba(180,128,44,0.12) 100%); }
-.agenda-item::before { content: counter(item); counter-increment: item; }
 
 .note-card {
     background: #fff; border-radius: 14px;
@@ -422,10 +421,19 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         @endif
 
         @php
-            $programAxes = $meetingMinute->program_axes ?? [];
-            if (is_string($programAxes)) { $programAxes = json_decode($programAxes, true) ?? []; }
-            $defaultAxes = ['التّمهيدية' => '', 'المتوسّطة' => '', 'المتقدّمة' => '', 'التّفسير' => '', 'السّيرة' => '', 'الفقه' => '', 'النّحو' => '', 'اليوم الآخر' => ''];
-            $axes = !empty($programAxes) ? array_merge($defaultAxes, $programAxes) : $defaultAxes;
+            $programAxesNames = $meetingMinute->program_axes_names ?? [];
+            if (is_string($programAxesNames)) { $programAxesNames = json_decode($programAxesNames, true) ?? []; }
+            $programAxesDetails = $meetingMinute->program_axes ?? [];
+            if (is_string($programAxesDetails)) { $programAxesDetails = json_decode($programAxesDetails, true) ?? []; }
+            $axes = [];
+            $maxLen = max(count($programAxesNames), count($programAxesDetails));
+            for ($i = 0; $i < $maxLen; $i++) {
+                $name = $programAxesNames[$i] ?? '';
+                $details = $programAxesDetails[$i] ?? '';
+                if (!empty($name)) {
+                    $axes[$name] = $details;
+                }
+            }
         @endphp
         <div class="section-card">
             <div class="section-header">
@@ -436,7 +444,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <table class="program-table">
                     <tbody>
                         @foreach($axes as $axisName => $axisDetails)
-                        @if($axisName !== '')
                         <tr>
                             <td class="axis-name">{{ $axisName }}</td>
                             <td class="axis-details">
@@ -447,7 +454,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                 @endif
                             </td>
                         </tr>
-                        @endif
                         @endforeach
                     </tbody>
                 </table>

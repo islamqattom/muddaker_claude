@@ -271,6 +271,87 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .badge-success { background: rgba(39,174,96,0.15); color: var(--success); }
 .badge-info { background: rgba(52,152,219,0.15); color: var(--info); }
 .badge-danger { background: rgba(192,57,43,0.15); color: var(--danger); }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .header-content {
+        width: 100%;
+    }
+    .form-section {
+        padding: 20px 15px;
+    }
+    .form-section .section-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .supervisor-item {
+        padding: 12px 15px;
+    }
+    .supervisor-item .d-flex {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start !important;
+    }
+    .supervisor-item .d-flex.gap-2 {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .btn-add {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    .btn-save, .btn-cancel {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    .d-flex.gap-3.justify-content-center.flex-wrap {
+        flex-direction: column;
+    }
+    .divider {
+        margin: 15px 0;
+    }
+    .axis-row .row.g-2 {
+        flex-direction: column;
+    }
+    .axis-row .col-4,
+    .axis-row .col-8 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+    .axis-row {
+        margin-bottom: 15px;
+    }
+    .assignment-row .row.g-3 > div {
+        margin-bottom: 10px;
+    }
+    .assignment-row .row.g-3 {
+        flex-direction: column;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .student-table {
+        font-size: 12px;
+        min-width: 500px;
+    }
+    .student-table thead th,
+    .student-table tbody td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+}
 </style>
 
 <div class="page-header">
@@ -750,7 +831,8 @@ function addManualAttendee() {
 function addAgendaItem() {
     var container = $('#agenda-container');
     var count = container.find('.agenda-item').length;
-    var html = '<div class="col-md-6 agenda-item" data-index="' + count + '">' +
+    var newIndex = count;
+    var html = '<div class="col-md-6 agenda-item" data-index="' + newIndex + '">' +
         '<div class="agenda-card p-3 h-100">' +
         '<div class="d-flex align-items-center justify-content-between mb-3">' +
         '<span class="badge-custom agenda-number">' + (count + 1) + '</span>' +
@@ -763,7 +845,32 @@ function addAgendaItem() {
         '</div>';
     container.append(html);
     renumberAgenda();
+
+    var notesContainer = $('#agenda-notes-container');
+    var notesHtml = '<div class="agenda-note-card" data-index="' + newIndex + '" data-item-text="">' +
+        '<div class="row g-3 align-items-center">' +
+        '<div class="col-md-3">' +
+        '<span class="badge-custom"></span>' +
+        '</div>' +
+        '<div class="col-md-9">' +
+        '<textarea name="agenda_notes[' + newIndex + ']" class="form-control" rows="2" placeholder="أدخل التفاصيل..."></textarea>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    notesContainer.append(notesHtml);
+
+    container.find('.agenda-item[data-index="' + newIndex + '"] .agenda-input').focus();
 }
+
+$(document).on('input', '.agenda-input', function() {
+    var itemText = $(this).val();
+    var index = $(this).closest('.agenda-item').attr('data-index');
+    var noteCard = $('.agenda-note-card[data-index="' + index + '"]');
+    if (noteCard.length) {
+        noteCard.find('.badge-custom').first().text(itemText);
+        noteCard.attr('data-item-text', itemText);
+    }
+});
 
 function renumberAgenda() {
     var idx = 1;
@@ -771,6 +878,22 @@ function renumberAgenda() {
         $(this).find('.agenda-number').text(idx);
         $(this).find('.agenda-input').attr('placeholder', 'البند ' + idx);
         $(this).attr('data-index', idx - 1);
+        idx++;
+    });
+    renumberAgendaNotes();
+}
+
+function renumberAgendaNotes() {
+    var idx = 0;
+    $('.agenda-item').each(function() {
+        var itemText = $(this).find('.agenda-input').val() || 'البند ' + (idx + 1);
+        var noteCard = $('.agenda-note-card[data-index="' + $(this).attr('data-index') + '"]');
+        if (noteCard.length) {
+            noteCard.attr('data-index', idx);
+            noteCard.find('.badge-custom').first().text(itemText);
+            noteCard.find('textarea').attr('name', 'agenda_notes[' + idx + ']');
+            noteCard.attr('data-item-text', itemText);
+        }
         idx++;
     });
 }
@@ -842,7 +965,7 @@ function updateTaskStatusColor(select) {
         'completed': 'مكتمل',
         'cancelled': 'ملغي'
     };
-    var badge = select.closest('.task-card').find('.status-badge-sm');
+    var badge = $(select).closest('.task-card').find('.status-badge-sm');
     var newStatus = select.value;
     badge.removeClass('badge-warning badge-info badge-success badge-danger').addClass('badge-' + statusColors[newStatus]);
     badge.text(statusLabels[newStatus]);
@@ -853,7 +976,9 @@ $(document).on('click', '.remove-manual-attendee', function() {
 });
 
 $(document).on('click', '.remove-agenda', function() {
+    var index = $(this).closest('.agenda-item').attr('data-index');
     $(this).closest('.agenda-item').remove();
+    $('.agenda-note-card[data-index="' + index + '"]').remove();
     renumberAgenda();
 });
 
