@@ -8,7 +8,12 @@ use Illuminate\Support\Facades\Log;
 class ProfileController extends Controller {
     public function index() {
         $user = Auth::user();
-        return view('admin.profile.index', compact('user'));
+        $stats = [
+            'total_students' => $user->created_at ? 0 : 0,
+            'total_supervisors' => 0,
+            'total_sessions' => 0,
+        ];
+        return view('admin.profile.index', compact('user', 'stats'));
     }
 
     public function update(Request $request) {
