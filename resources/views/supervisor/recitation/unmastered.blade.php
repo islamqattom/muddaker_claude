@@ -7,168 +7,459 @@
     @include('supervisor.partials.sidebar')
 @endsection
 
+@push('styles')
+<style>
+.recitation-unmastered {
+    --gold: #d4a030;
+    --gold-light: #e6b84d;
+    --navy: #182B48;
+    --navy-light: #2A4570;
+}
+
+.recitation-unmastered .page-card {
+    border: 1px solid rgba(24, 43, 72, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.recitation-unmastered .page-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.recitation-unmastered .page-card .card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+    padding: 12px 16px;
+}
+
+.recitation-unmastered .result-indicator {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.recitation-unmastered .color-green { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+.recitation-unmastered .color-orange { background: linear-gradient(135deg, #f39c12, #e67e22); color: white; }
+.recitation-unmastered .color-red { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+.recitation-unmastered .color-black { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; }
+.recitation-unmastered .color-gray { background: linear-gradient(135deg, #ecf0f1, #d5dbdb); color: #7f8c8d; }
+
+.recitation-unmastered .input-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.recitation-unmastered .input-btn:hover {
+    transform: scale(1.05);
+}
+
+.recitation-unmastered .counter-input {
+    width: 56px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+.recitation-unmastered .counter-input:focus {
+    border-color: var(--navy);
+}
+
+.recitation-unmastered .student-header-card {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.recitation-unmastered .student-header-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.recitation-unmastered .student-header-content {
+    position: relative;
+    z-index: 1;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.recitation-unmastered .student-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.recitation-unmastered .student-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.recitation-unmastered .student-name {
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.recitation-unmastered .student-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recitation-unmastered .summary-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.recitation-unmastered .summary-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    padding: 14px 18px;
+}
+
+.recitation-unmastered .summary-stat {
+    padding: 14px;
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.recitation-unmastered .summary-stat:hover {
+    transform: translateY(-2px);
+}
+
+.recitation-unmastered .summary-stat .stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.recitation-unmastered .summary-stat .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recitation-unmastered .overall-result {
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 12px;
+}
+
+.recitation-unmastered .save-btn {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(24, 43, 72, 0.3);
+}
+
+.recitation-unmastered .save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(24, 43, 72, 0.4);
+}
+
+.recitation-unmastered .btn-outline-secondary {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.recitation-unmastered .btn-outline-secondary:hover {
+    background: #f8f9fa;
+    border-color: #ced4da;
+}
+
+.recitation-unmastered .islamic-border {
+    position: relative;
+}
+
+.recitation-unmastered .islamic-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.recitation-unmastered .quran-verse-header {
+    font-family: 'Amiri', serif;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    padding: 8px 20px;
+    background: rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(212, 160, 48, 0.2);
+}
+
+.recitation-unmastered .compact-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+    .recitation-unmastered .student-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .recitation-unmastered .student-info {
+        flex-direction: column;
+    }
+
+    .recitation-unmastered .student-name {
+        font-size: 16px;
+    }
+
+    .recitation-unmastered .summary-stat .stat-value {
+        font-size: 20px;
+    }
+
+    .recitation-unmastered .result-indicator {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+</style>
+@endpush
+
 @section('content')
-<div class="row justify-content-center">
-<div class="col-lg-9">
+<div class="recitation-unmastered">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-<!-- Session Header -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row g-3 align-items-center">
-            <div class="col-md-6">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="user-avatar" style="width:50px;height:50px;font-size:20px;">
-                        <i class="fas fa-user"></i>
+            <div class="student-header-card islamic-border">
+                <div class="student-header-content">
+                    <div class="student-info">
+                        <div class="student-avatar">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h2 class="student-name">{{ $student->user->name }}</h2>
+                            <div class="student-meta">
+                                <span class="badge bg-warning text-dark compact-badge">
+                                    <i class="fas fa-layer-group me-1"></i>
+                                    {{ $student->level->name }}
+                                </span>
+                                @if($student->student_number)
+                                <span class="text-white opacity-75 small">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    {{ $student->student_number }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h5 class="mb-0">{{ $student->user->name }}</h5>
-                        <small class="text-muted">{{ $student->level->name }} | {{ $student->student_number }}</small>
+                    <div class="text-white text-start">
+                        <span class="badge bg-warning text-dark compact-badge px-3">
+                            <i class="fas fa-exclamation-triangle me-1"></i>حفظ غير متقن
+                        </span>
+                        <div class="mt-2 opacity-75 small">
+                            <i class="fas fa-book me-1"></i>
+                            الجزء {{ $part->part_number }} |
+                            <i class="fas fa-file-alt me-1"></i>
+                            {{ $pagesCount }} صفحات
+                        </div>
                     </div>
                 </div>
+                <div class="quran-verse-header">
+                    <i class="fas fa-book-quran me-2"></i>
+                    {{ 'وَلَا يَكْذِبُونَ عَلَيْهِ' }}
+                </div>
             </div>
-            <div class="col-md-6 text-md-end">
-                <span class="badge bg-primary fs-6 px-3 py-2">
-                    <i class="fas fa-book-open me-2"></i>حفظ جديد
-                </span>
-                <span class="badge bg-secondary fs-6 px-3 py-2 me-2">
-                    الجزء {{ $part->part_number }} | {{ $pagesCount }} صفحات
-                </span>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Recitation Form -->
-<form id="recitationForm">
-    @csrf
-    <input type="hidden" name="student_id" value="{{ $student->id }}">
-    <input type="hidden" name="type" value="unmastered">
-    <input type="hidden" name="part_id" value="{{ $part->id }}">
-    <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
+            <form id="recitationForm">
+                @csrf
+                <input type="hidden" name="student_id" value="{{ $student->id }}">
+                <input type="hidden" name="type" value="unmastered">
+                <input type="hidden" name="part_id" value="{{ $part->id }}">
+                <input type="hidden" name="session_date" value="{{ request('session_date', date('Y-m-d')) }}">
 
-    <!-- Pages -->
-    @foreach($pages as $index => $pageNum)
-    <div class="card mb-3 page-card" id="page-card-{{ $index }}">
-        <div class="card-header d-flex justify-content-between align-items-center" id="page-header-{{ $index }}">
-            <div class="d-flex align-items-center gap-3">
-                <div class="page-color-indicator" id="color-indicator-{{ $index }}"
-                     style="width:30px;height:30px;border-radius:50%;background:#dee2e6;border:2px solid #adb5bd;transition:all 0.3s;"></div>
-                <h6 class="mb-0">
-                    <i class="fas fa-file-alt me-2"></i>
-                    صفحة رقم <strong>{{ $pageNum }}</strong>
-                    <small class="text-muted">({{ $index + 1 }} من {{ count($pages) }})</small>
-                </h6>
-            </div>
-            <div class="color-badge" id="color-badge-{{ $index }}">
-                <span class="badge bg-secondary">في الانتظار</span>
-            </div>
-        </div>
-        <div class="card-body">
-            <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
+                @foreach($pages as $index => $pageNum)
+                <div class="card mb-3 page-card islamic-border" id="page-card-{{ $index }}">
+                    <div class="card-header d-flex justify-content-between align-items-center" id="page-header-{{ $index }}">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="result-indicator color-gray" id="color-indicator-{{ $index }}">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">
+                                    <i class="fas fa-file-alt me-1 text-warning"></i>
+                                    صفحة <span class="text-warning">{{ $pageNum }}</span>
+                                </h6>
+                                <small class="text-muted">{{ $index + 1 }} / {{ count($pages) }}</small>
+                            </div>
+                        </div>
+                        <div class="color-badge" id="color-badge-{{ $index }}">
+                            <span class="badge bg-secondary compact-badge">في الانتظار</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
 
-            <div class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">
-                        <i class="fas fa-times-circle text-danger me-1"></i>
-                        عدد الأخطاء
+                        <div class="row g-2 align-items-end">
+                            <div class="col-4">
+                                <label class="form-label fw-bold text-danger small mb-1">
+                                    <i class="fas fa-times-circle me-1"></i>الأخطاء
+                                </label>
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <button type="button" class="btn btn-outline-danger input-btn" onclick="adjustValue('errors-{{ $index }}', -1)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number"
+                                           name="pages[{{ $index }}][errors]"
+                                           id="errors-{{ $index }}"
+                                           class="form-control counter-input text-center fw-bold"
+                                           value="0" min="0" max="20"
+                                           oninput="updatePageColor({{ $index }})">
+                                    <button type="button" class="btn btn-outline-danger input-btn" onclick="adjustValue('errors-{{ $index }}', 1)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label fw-bold text-warning small mb-1">
+                                    <i class="fas fa-question-circle me-1"></i>الترددات
+                                </label>
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <button type="button" class="btn btn-outline-warning input-btn" onclick="adjustValue('hesitations-{{ $index }}', -1)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number"
+                                           name="pages[{{ $index }}][hesitations]"
+                                           id="hesitations-{{ $index }}"
+                                           class="form-control counter-input text-center fw-bold"
+                                           value="0" min="0" max="50"
+                                           oninput="updatePageColor({{ $index }})">
+                                    <button type="button" class="btn btn-outline-warning input-btn" onclick="adjustValue('hesitations-{{ $index }}', 1)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="result-indicator color-gray mx-auto" id="result-box-{{ $index }}">
+                                    <i class="fas fa-question"></i>
+                                </div>
+                                <div class="mt-1 fw-bold small" id="result-text-{{ $index }}">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+
+                <div class="summary-card mb-3" id="summaryCard" style="display:none;">
+                    <div class="summary-header">
+                        <h5 class="mb-0 text-white"><i class="fas fa-chart-bar me-2"></i>ملخص الجلسة</h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="row g-2 text-center">
+                            <div class="col-6 col-md-3">
+                                <div class="summary-stat bg-danger bg-opacity-10">
+                                    <div class="stat-value text-danger" id="sum-errors">0</div>
+                                    <div class="stat-label text-muted">الأخطاء</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="summary-stat bg-warning bg-opacity-10">
+                                    <div class="stat-value text-warning" id="sum-hesitations">0</div>
+                                    <div class="stat-label text-muted">الترددات</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="summary-stat bg-success bg-opacity-10">
+                                    <div class="stat-value text-success" id="sum-passed">0</div>
+                                    <div class="stat-label text-muted">ناجحة</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="summary-stat bg-dark bg-opacity-10">
+                                    <div class="stat-value text-dark" id="sum-failed">0</div>
+                                    <div class="stat-label text-muted">راسبة</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overall-result" id="overall-result"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold mb-2">
+                        <i class="fas fa-sticky-note text-secondary me-1"></i>
+                        ملاحظات (اختياري)
                     </label>
-                    <div class="input-group">
-                        <button type="button" class="btn btn-outline-danger" onclick="adjustValue('errors-{{ $index }}', -1)">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <input type="number"
-                               name="pages[{{ $index }}][errors]"
-                               id="errors-{{ $index }}"
-                               class="form-control text-center fw-bold fs-4"
-                               value="0" min="0" max="20"
-                               oninput="updatePageColor({{ $index }})">
-                        <button type="button" class="btn btn-outline-danger" onclick="adjustValue('errors-{{ $index }}', 1)">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
+                    <textarea name="notes" class="form-control" rows="2" placeholder="أي ملاحظات حول الجلسة..."></textarea>
                 </div>
-                <div class="col-md-5">
-                    <label class="form-label fw-bold">
-                        <i class="fas fa-question-circle text-warning me-1"></i>
-                        عدد الترددات
-                    </label>
-                    <div class="input-group">
-                        <button type="button" class="btn btn-outline-warning" onclick="adjustValue('hesitations-{{ $index }}', -1)">
-                            <i class="fas fa-minus"></i>
+
+                <div class="d-flex flex-wrap gap-2 justify-content-between mt-4">
+                    <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>رجوع
+                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary px-3" style="border-radius: 10px; font-size: 13px;" onclick="submitSessionIncomplete()">
+                            <i class="fas fa-times-circle me-2"></i>
+                            لم يكمل
                         </button>
-                        <input type="number"
-                               name="pages[{{ $index }}][hesitations]"
-                               id="hesitations-{{ $index }}"
-                               class="form-control text-center fw-bold fs-4"
-                               value="0" min="0" max="50"
-                               oninput="updatePageColor({{ $index }})">
-                        <button type="button" class="btn btn-outline-warning" onclick="adjustValue('hesitations-{{ $index }}', 1)">
-                            <i class="fas fa-plus"></i>
+                        <button type="button" class="save-btn" onclick="submitSession()">
+                            <i class="fas fa-save me-2"></i>
+                            حفظ الجلسة
                         </button>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="p-2 rounded text-center fw-bold" id="result-box-{{ $index }}" style="min-height:50px;display:flex;align-items:center;justify-content:center;background:#f0f4f8;font-size:13px;transition:all 0.3s;">
-                        —
-                    </div>
-                </div>
-            </div>
+            </form>
+
         </div>
     </div>
-    @endforeach
-
-    <!-- Summary Card -->
-    <div class="card mb-4" id="summaryCard" style="display:none;">
-        <div class="card-header">
-            <h6><i class="fas fa-chart-bar me-2"></i>ملخص الجلسة</h6>
-        </div>
-        <div class="card-body">
-            <div class="row g-3 text-center">
-                <div class="col-3">
-                    <div class="text-danger fw-bold fs-3" id="sum-errors">0</div>
-                    <small>إجمالي الأخطاء</small>
-                </div>
-                <div class="col-3">
-                    <div class="text-warning fw-bold fs-3" id="sum-hesitations">0</div>
-                    <small>إجمالي الترددات</small>
-                </div>
-                <div class="col-3">
-                    <div class="text-success fw-bold fs-3" id="sum-passed">0</div>
-                    <small>صفحات ناجحة</small>
-                </div>
-                <div class="col-3">
-                    <div class="text-dark fw-bold fs-3" id="sum-failed">0</div>
-                    <small>صفحات راسبة</small>
-                </div>
-            </div>
-            <div class="mt-3 p-3 rounded text-center fw-bold fs-5" id="overall-result">
-            </div>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">ملاحظات (اختياري)</label>
-        <textarea name="notes" class="form-control" rows="2" placeholder="أي ملاحظات حول الجلسة..."></textarea>
-    </div>
-
-    <div class="d-flex gap-3 justify-content-between">
-        <a href="{{ route('supervisor.recitation.index') }}" class="btn btn-outline-secondary btn-lg px-4">
-            <i class="fas fa-arrow-right me-2"></i>رجوع
-        </a>
-        <div class="d-flex gap-3">
-            <button type="button" class="btn btn-secondary btn-lg" onclick="submitSessionIncomplete()">
-                <i class="fas fa-times-circle me-2"></i>
-                لم يكمل
-            </button>
-            <button type="button" class="btn btn-primary btn-lg px-5" onclick="submitSession()">
-                <i class="fas fa-save me-2"></i>
-                حفظ الجلسة
-            </button>
-        </div>
-    </div>
-</form>
-
-</div>
 </div>
 @endsection
 
@@ -181,7 +472,6 @@ function adjustValue(id, delta) {
     let val = parseInt(input.value) + delta;
     val = Math.max(parseInt(input.min), Math.min(parseInt(input.max || 999), val));
     input.value = val;
-    // Extract index from id
     const idx = id.split('-').pop();
     updatePageColor(idx);
 }
@@ -189,41 +479,36 @@ function adjustValue(id, delta) {
 function updatePageColor(index) {
     const errors = parseInt(document.getElementById('errors-' + index).value) || 0;
     const hesitations = parseInt(document.getElementById('hesitations-' + index).value) || 0;
-
-    // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ دائماً
     const totalEquivalent = errors + Math.floor(hesitations / 3);
 
-    let color, label, bgColor, passed;
-
+    let colorClass, label, icon;
     if (totalEquivalent < 1) {
-        // أقل من 1 خطأ equivalent = أخضر
-        color = '#27ae60'; label = 'ممتاز 🟢'; bgColor = '#d5f5e3'; passed = true;
+        colorClass = 'color-green'; label = 'ممتاز'; icon = 'fa-check';
     } else if (totalEquivalent < 2) {
-        // من 1 إلى أقل من 2 = برتقالي
-        color = '#f39c12'; label = 'جيد 🟠'; bgColor = '#fef9e7'; passed = true;
+        colorClass = 'color-orange'; label = 'جيد'; icon = 'fa-minus';
     } else if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
-        // أحمر: 2 خطأ بدون ترديد فقط، أو 2 equivalent مع 6 ترديدات، أو 2 equivalent مع 3 ترديدات
-        color = '#e74c3c'; label = 'ضعيف 🔴'; bgColor = '#fadbd8'; passed = true;
+        colorClass = 'color-red'; label = 'ضعيف'; icon = 'fa-times';
     } else if (totalEquivalent === 2 && hesitations >= 1) {
-        // أسود: 2 خطأ + 1 ترديد أو أكثر
-        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
+        colorClass = 'color-black'; label = 'راسب'; icon = 'fa-ban';
     } else if (totalEquivalent >= 3) {
-        // 3 خطأ equivalent أو أكثر = أسود
-        color = '#2c3e50'; label = 'راسب ⚫'; bgColor = '#d5d8dc'; passed = false;
+        colorClass = 'color-black'; label = 'راسب'; icon = 'fa-ban';
     } else {
-        color = '#27ae60'; label = 'ممتاز 🟢'; bgColor = '#d5f5e3'; passed = true;
+        colorClass = 'color-green'; label = 'ممتاز'; icon = 'fa-check';
     }
 
-    document.getElementById('color-indicator-' + index).style.background = color;
-    document.getElementById('color-indicator-' + index).style.borderColor = color;
+    const indicator = document.getElementById('color-indicator-' + index);
+    indicator.className = 'result-indicator ' + colorClass;
+    indicator.innerHTML = '<i class="fas ' + icon + '"></i>';
 
     const badge = document.getElementById('color-badge-' + index);
-    badge.innerHTML = `<span class="badge" style="background:${color};color:${color === '#f39c12' ? '#000' : '#fff'}">${label}</span>`;
+    const bgColor = colorClass === 'color-orange' ? '#f39c12' : colorClass === 'color-green' ? '#27ae60' : colorClass === 'color-red' ? '#e74c3c' : colorClass === 'color-black' ? '#2c3e50' : '#6c757d';
+    badge.innerHTML = `<span class="badge compact-badge" style="background:${bgColor};color:white;">${label}</span>`;
 
     const resultBox = document.getElementById('result-box-' + index);
-    resultBox.style.background = bgColor;
-    resultBox.style.color = color;
-    resultBox.textContent = label;
+    resultBox.className = 'result-indicator ' + colorClass;
+    resultBox.innerHTML = '<i class="fas ' + icon + '"></i>';
+
+    document.getElementById('result-text-' + index).textContent = label;
 
     updateSummary();
 }
@@ -237,14 +522,14 @@ function updateSummary() {
         totalErrors += errors;
         totalHesitations += hesitations;
 
-        // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ
         const totalEquivalent = errors + Math.floor(hesitations / 3);
         if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
             passed++;
+        } else if ((totalEquivalent === 2 && hesitations >= 1) || totalEquivalent >= 3) {
+            failed++;
+        } else {
+            passed++;
         }
-        // الأسود: 2 خطأ + 1 ترديد أو أكثر (معادل >= 2 مع ترديدات)، أو 3+ أخطاء معادلة
-        else if ((totalEquivalent === 2 && hesitations >= 1) || totalEquivalent >= 3) failed++;
-        else passed++;
     }
 
     document.getElementById('sum-errors').textContent = totalErrors;
@@ -255,35 +540,31 @@ function updateSummary() {
 
     const overallResult = document.getElementById('overall-result');
     if (failed === 0) {
-        overallResult.className = 'mt-3 p-3 rounded text-center fw-bold fs-5 bg-success text-white';
-        overallResult.textContent = '✅ ناجح في الجلسة';
+        overallResult.className = 'overall-result text-white';
+        overallResult.style.background = 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)';
+        overallResult.innerHTML = '<i class="fas fa-check-circle me-2"></i>ناجح في الجلسة';
     } else {
-        overallResult.className = 'mt-3 p-3 rounded text-center fw-bold fs-5 bg-danger text-white';
-        overallResult.textContent = `❌ راسب - ${failed} صفحة راسبة`;
+        overallResult.className = 'overall-result text-white';
+        overallResult.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+        overallResult.innerHTML = '<i class="fas fa-times-circle me-2"></i>راسب - ' + failed + ' صفحة راسبة';
     }
 }
 
 function submitSession() {
     const form = document.getElementById('recitationForm');
     const data = new FormData(form);
-    // Ensure page errors and hesitations are integers
     for (let [key, value] of data.entries()) {
         if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
             data.set(key, parseInt(value, 10) || 0);
         }
     }
 
-    // Validate all pages have been entered
     let allFilled = true;
     for (let i = 0; i < pageCount; i++) {
-        const errors = document.getElementById('errors-' + i)?.value;
-        if (errors === null || errors === '') { allFilled = false; break; }
+        if (!document.getElementById('errors-' + i)?.value) { allFilled = false; break; }
     }
 
-    if (!allFilled) {
-        toastr.warning('يرجى ملء بيانات جميع الصفحات');
-        return;
-    }
+    if (!allFilled) { toastr.warning('يرجى ملء بيانات جميع الصفحات'); return; }
 
     $.ajax({
         url: '{{ route('supervisor.recitation.save') }}',
@@ -297,24 +578,18 @@ function submitSession() {
         },
         error: function(xhr) {
             let errorMsg = 'حدث خطأ أثناء الحفظ';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
-            }
+            if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
+            else if (xhr.responseJSON && xhr.responseJSON.errors) errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
             toastr.error(errorMsg);
         }
     });
 }
 
 function submitSessionIncomplete() {
-    if (!confirm('هل أنت متأكد من حفظ هذه الجلسة على أنها لم يكمل؟')) {
-        return;
-    }
+    if (!confirm('هل أنت متأكد من حفظ هذه الجلسة على أنها لم يكمل؟')) return;
 
     const form = document.getElementById('recitationForm');
     const data = new FormData(form);
-    // Ensure page errors and hesitations are integers
     for (let [key, value] of data.entries()) {
         if (key.includes('[errors]') || key.includes('[hesitations]') || key.includes('[page_number]')) {
             data.set(key, parseInt(value, 10) || 0);
@@ -334,11 +609,8 @@ function submitSessionIncomplete() {
         },
         error: function(xhr) {
             let errorMsg = 'حدث خطأ أثناء الحفظ';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMsg = xhr.responseJSON.message;
-            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
-                errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
-            }
+            if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
+            else if (xhr.responseJSON && xhr.responseJSON.errors) errorMsg = Object.values(xhr.responseJSON.errors).flat().join('\n');
             toastr.error(errorMsg);
         }
     });

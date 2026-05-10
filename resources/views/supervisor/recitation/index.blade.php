@@ -8,177 +8,547 @@
     @include('supervisor.partials.sidebar')
 @endsection
 
+@php
+$sessionTypes = [
+    ['value' => 'new_memorization', 'label' => 'حفظ جديد', 'icon' => 'fa-book-open', 'color' => 'primary', 'desc' => 'تسميع حفظ جديد للطالب'],
+    ['value' => 'review', 'label' => 'مراجعة', 'icon' => 'fa-redo', 'color' => 'success', 'desc' => 'مراجعة ما تم حفظه سابقاً'],
+    ['value' => 'unmastered', 'label' => 'حفظ غير متقن', 'icon' => 'fa-exclamation-triangle', 'color' => 'warning', 'desc' => 'إعادة التسميع للصفحات الضعيفة'],
+    ['value' => 'recitation', 'label' => 'سرد', 'icon' => 'fa-scroll', 'color' => 'info', 'desc' => 'تلاوة الجزء كاملاً من أوله لآخره'],
+    ['value' => 'mafsil', 'label' => 'مفصل', 'icon' => 'fa-star', 'color' => 'danger', 'desc' => 'اختبار المفصل (3-30 جزء)'],
+    ['value' => 'not_recitate', 'label' => 'لم يسمع', 'icon' => 'fa-times-circle', 'color' => 'secondary', 'desc' => 'تسجيل عدم التسميع'],
+];
+@endphp
+
+@push('styles')
+<style>
+.recitation-index {
+    --gold: #d4a030;
+    --gold-light: #e6b84d;
+    --navy: #182B48;
+    --navy-light: #2A4570;
+}
+
+.recitation-index .hero-section {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.recitation-index .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.recitation-index .hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.recitation-index .hero-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 6px 18px rgba(212, 160, 48, 0.35);
+    flex-shrink: 0;
+}
+
+.recitation-index .hero-title {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.recitation-index .hero-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    margin: 0;
+}
+
+.recitation-index .session-type-card {
+    border: 1px solid rgba(24, 43, 72, 0.06);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    height: 100%;
+}
+
+.recitation-index .session-type-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: var(--gold);
+}
+
+.recitation-index .session-type-card.active {
+    border-color: var(--navy);
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
+}
+
+.recitation-index .session-type-card .type-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin: 0 auto 10px;
+    transition: all 0.3s ease;
+}
+
+.recitation-index .session-type-card:hover .type-icon {
+    transform: scale(1.08);
+}
+
+.recitation-index .session-type-card .type-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+}
+
+.recitation-index .session-type-card .type-desc {
+    font-size: 11px;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.recitation-index .form-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.recitation-index .form-card .card-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 16px 20px;
+    border: none;
+}
+
+.recitation-index .form-card .card-header h5 {
+    color: white;
+    font-weight: 700;
+    margin: 0;
+    font-size: 15px;
+}
+
+.recitation-index .student-card {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
+    border: 1px solid rgba(24, 43, 72, 0.06);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.recitation-index .student-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.recitation-index .student-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.recitation-index .student-stat .stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.recitation-index .student-stat .stat-label {
+    font-size: 10px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recitation-index .options-panel {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.03) 100%);
+    border: 1px solid rgba(24, 43, 72, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 14px;
+}
+
+.recitation-index .color-guide-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.recitation-index .color-guide-card .card-header {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    padding: 14px 18px;
+}
+
+.recitation-index .color-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f4f8;
+    transition: background 0.2s;
+}
+
+.recitation-index .color-item:last-child {
+    border-bottom: none;
+}
+
+.recitation-index .color-item:hover {
+    background: #fafbfc;
+}
+
+.recitation-index .color-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.recitation-index .sessions-list {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.recitation-index .sessions-list .card-header {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    padding: 14px 18px;
+}
+
+.recitation-index .session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f4f8;
+    transition: all 0.2s;
+}
+
+.recitation-index .session-item:last-child {
+    border-bottom: none;
+}
+
+.recitation-index .session-item:hover {
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.03) 100%);
+}
+
+.recitation-index .session-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 14px;
+}
+
+.recitation-index .session-info h6 {
+    font-weight: 600;
+    color: var(--navy);
+    margin: 0 0 2px;
+    font-size: 13px;
+}
+
+.recitation-index .session-info small {
+    color: #7f8c8d;
+    font-size: 11px;
+}
+
+.recitation-index .quran-verse {
+    font-family: 'Amiri', serif;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 8px;
+    text-align: center;
+}
+
+.recitation-index .start-btn {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(24, 43, 72, 0.3);
+}
+
+.recitation-index .start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(24, 43, 72, 0.35);
+}
+
+.recitation-index .compact-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .recitation-index .hero-section {
+        padding: 18px;
+    }
+
+    .recitation-index .hero-title {
+        font-size: 17px;
+    }
+
+    .recitation-index .hero-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .recitation-index .student-stats {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .recitation-index .student-stat {
+        flex: 1 1 70px;
+    }
+
+    .recitation-index .student-stat .stat-value {
+        font-size: 18px;
+    }
+}
+</style>
+@endpush
+
 @section('content')
-<div class="row g-4">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-header">
-                <h6><i class="fas fa-user-graduate me-2"></i>اختر الطالب ونوع التسميع</h6>
+<div class="recitation-index">
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-icon">
+                        <i class="fas fa-book-quran"></i>
+                    </div>
+                    <div>
+                        <h1 class="hero-title">جلسة تسميع</h1>
+                        <p class="hero-subtitle">ابدأ جلسة جديدة مع طالب</p>
+                        <p class="quran-verse">وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</p>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form id="sessionStartForm">
-                    <div class="mb-3">
-                        <label class="form-label">الطالب <span class="text-danger">*</span></label>
-                        <select name="student_id" id="studentSelect" class="form-select" required onchange="loadStudentInfo()">
-                            <option value="">-- اختر الطالب --</option>
-                            @foreach($students as $student)
-                                <option value="{{ $student->id }}"
-                                    data-level="{{ $student->level->name ?? '' }}"
-                                    data-memorization="{{ $student->level->new_memorization_pages ?? 3 }}"
-                                    data-review="{{ $student->level->review_pages ?? 6 }}"
-                                    data-part="{{ $student->current_part }}"
-                                    data-page="{{ $student->current_page }}">
-                                    {{ $student->user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
 
-                    <!-- Student Info Preview -->
-                    <div id="studentInfo" class="d-none mb-3 p-3 bg-light rounded">
-                        <div class="row g-2 text-center">
-                            <div class="col-4">
-                                <div class="fw-bold text-primary" id="si-level">-</div>
-                                <small class="text-muted">المستوى</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="fw-bold text-success" id="si-memorization">-</div>
-                                <small class="text-muted">صفحات الحفظ</small>
-                            </div>
-                            <div class="col-4">
-                                <div class="fw-bold text-info" id="si-review">-</div>
-                                <small class="text-muted">صفحات المراجعة</small>
-                            </div>
+            <div class="form-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-plus-circle me-2"></i>معلومات الجلسة</h5>
+                </div>
+                <div class="card-body p-3">
+                    <form id="sessionStartForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold mb-2 small">
+                                <i class="fas fa-user-graduate text-primary me-1"></i>
+                                اختر الطالب
+                            </label>
+                            <select name="student_id" id="studentSelect" class="form-select form-select-lg select2" required onchange="loadStudentInfo()">
+                                <option value="">-- ابحث عن طالب --</option>
+                                @foreach($students as $student)
+                                    <option value="{{ $student->id }}"
+                                        data-level="{{ $student->level->name ?? '' }}"
+                                        data-memorization="{{ $student->level->new_memorization_pages ?? 3 }}"
+                                        data-review="{{ $student->level->review_pages ?? 6 }}"
+                                        data-part="{{ $student->current_part }}"
+                                        data-page="{{ $student->current_page }}">
+                                        {{ $student->user->name }}
+                                        @if($student->student_number)
+                                            ({{ $student->student_number }})
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">تاريخ التسميع <span class="text-muted">(اتركه فارغاً للتاريخ الحالي)</span></label>
-                        <input type="date" name="session_date" id="sessionDate" class="form-control" value="{{ date('Y-m-d') }}">
-                    </div>
+                        <div id="studentInfo" class="student-card d-none">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="session-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1" id="si-name">-</h6>
+                                    <span class="badge bg-primary compact-badge" id="si-level">-</span>
+                                </div>
+                            </div>
+                            <div class="student-stats">
+                                <div class="student-stat">
+                                    <div class="stat-value text-primary" id="si-memorization">-</div>
+                                    <div class="stat-label">صفحة حفظ</div>
+                                </div>
+                                <div class="student-stat">
+                                    <div class="stat-value text-success" id="si-review">-</div>
+                                    <div class="stat-label">صفحة مراجعة</div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">نوع التسميع <span class="text-danger">*</span></label>
-                        <div class="row g-2" id="sessionTypes">
-                            @php
-                            $types = [
-                                ['value' => 'new_memorization', 'label' => 'حفظ جديد', 'icon' => 'fa-book-open', 'color' => 'primary'],
-                                ['value' => 'review', 'label' => 'مراجعة', 'icon' => 'fa-redo', 'color' => 'success'],
-                                ['value' => 'unmastered', 'label' => 'حفظ غير متقن', 'icon' => 'fa-exclamation', 'color' => 'warning'],
-                                ['value' => 'recitation', 'label' => 'سرد', 'icon' => 'fa-scroll', 'color' => 'info'],
-                                ['value' => 'mafsil', 'label' => 'مفصل', 'icon' => 'fa-star', 'color' => 'danger'],
-                                ['value' => 'not_recitate', 'label' => 'لم يسمع', 'icon' => 'fa-times-circle', 'color' => 'secondary'],
-                            ];
-                            @endphp
-                            @foreach($types as $type)
-                            <div class="col-6">
-                                <input type="radio" class="btn-check" name="type" id="type-{{ $type['value'] }}"
-                                       value="{{ $type['value'] }}" onchange="showTypeOptions('{{ $type['value'] }}')">
-                                <label class="btn btn-outline-{{ $type['color'] }} w-100 py-3" for="type-{{ $type['value'] }}">
-                                    <i class="fas {{ $type['icon'] }} d-block mb-1 fs-5"></i>
-                                    {{ $type['label'] }}
-                                </label>
-                            </div>
-                            @endforeach
+                        <div class="mb-3">
+                            <label class="form-label fw-bold mb-2 small">
+                                <i class="fas fa-calendar-alt text-primary me-1"></i>
+                                تاريخ التسميع
+                            </label>
+                            <input type="date" name="session_date" id="sessionDate" class="form-control" value="{{ date('Y-m-d') }}">
                         </div>
-                    </div>
 
-                    <!-- Dynamic Options -->
-                    <div id="options-new_memorization" class="d-none session-options">
-                        <div class="row g-2">
-                            <div class="col-8">
-                                <label class="form-label">الجزء</label>
-                                <select name="part_id_new" class="form-select" onchange="updatePartInfo('new', this.value)">
-                                    @foreach($parts as $part)
-                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-4">
-                                <label class="form-label">رقم الصفحة</label>
-                                <select name="page_number_new" class="form-select" id="page_number_new" required onchange="checkRemainingPages('new')">
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Continuation Part (hidden by default) -->
-                        <div id="continuation_part_new_wrapper" class="row g-2 mt-2 d-none">
-                            <div class="col-12">
-                                <label class="form-label text-info">الجزء المكمل (لإكمال الصفحات المتبقية)</label>
-                                <select name="continuation_part_new" class="form-select" id="continuation_part_new">
-                                    <option value="">-- اختر الجزء المكمل --</option>
-                                    @foreach($parts as $part)
-                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
-                                    @endforeach
-                                </select>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold mb-2 small">
+                                <i class="fas fa-list-ul text-primary me-1"></i>
+                                نوع التسميع
+                            </label>
+                            <div class="row g-2" id="sessionTypes">
+                                @foreach($sessionTypes as $type)
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-{{ $type['value'] }}"
+                                           value="{{ $type['value'] }}" onchange="showTypeOptions('{{ $type['value'] }}')">
+                                    <label class="session-type-card" for="type-{{ $type['value'] }}">
+                                        <div class="type-icon bg-{{ $type['color'] }} bg-opacity-10 text-{{ $type['color'] }}">
+                                            <i class="fas {{ $type['icon'] }}"></i>
+                                        </div>
+                                        <div class="type-label">{{ $type['label'] }}</div>
+                                        <p class="type-desc">{{ $type['desc'] }}</p>
+                                    </label>
+                                </div>
+                                @endforeach
                             </div>
                         </div>
-                        <!-- Add Pages Button -->
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('new_memorization')">
-                                <i class="fas fa-plus me-1"></i>إضافة صفحات
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('new_memorization')">
-                                <i class="fas fa-redo me-1"></i>صفحات معادة
-                            </button>
-                        </div>
-                    </div>
 
-                    <div id="options-review" class="d-none session-options">
-                        <div class="row g-2">
-                            <div class="col-8">
-                                <label class="form-label">الجزء</label>
-                                <select name="part_id_review" class="form-select" onchange="updatePartInfo('review', this.value)">
-                                    @foreach($parts as $part)
-                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
-                                    @endforeach
-                                </select>
+                        <div id="options-new_memorization" class="options-panel session-options d-none">
+                            <h6 class="mb-2"><i class="fas fa-book-open text-primary me-1"></i>خيارات الحفظ الجديد</h6>
+                            <div class="row g-2 mb-2">
+                                <div class="col-8">
+                                    <label class="form-label small fw-bold">الجزء</label>
+                                    <select name="part_id_new" class="form-select form-select-sm" onchange="updatePartInfo('new', this.value)">
+                                        @foreach($parts as $part)
+                                            <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">
+                                                الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">الصفحة</label>
+                                    <select name="page_number_new" class="form-select form-select-sm" id="page_number_new" required onchange="checkRemainingPages('new')">
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-4">
-                                <label class="form-label">رقم الصفحة</label>
-                                <select name="page_number_review" class="form-select" id="page_number_review" required onchange="checkRemainingPages('review')">
-                                </select>
+                            <div id="continuation_part_new_wrapper" class="row g-2 d-none">
+                                <div class="col-12">
+                                    <label class="form-label small text-info fw-bold">الجزء المكمل</label>
+                                    <select name="continuation_part_new" class="form-select form-select-sm" id="continuation_part_new">
+                                        <option value="">-- اختر --</option>
+                                        @foreach($parts as $part)
+                                            <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('new_memorization')">
+                                    <i class="fas fa-plus me-1"></i>إضافة
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('new_memorization')">
+                                    <i class="fas fa-redo me-1"></i>معادة
+                                </button>
                             </div>
                         </div>
-                        <!-- Continuation Part (hidden by default) -->
-                        <div id="continuation_part_review_wrapper" class="row g-2 mt-2 d-none">
-                            <div class="col-12">
-                                <label class="form-label text-info">الجزء المكمل (لإكمال الصفحات المتبقية)</label>
-                                <select name="continuation_part_review" class="form-select" id="continuation_part_review">
-                                    <option value="">-- اختر الجزء المكمل --</option>
-                                    @foreach($parts as $part)
-                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Add Pages & Repeated Pages Buttons -->
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('review')">
-                                <i class="fas fa-plus me-1"></i>إضافة صفحات
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('review')">
-                                <i class="fas fa-redo me-1"></i>صفحات معادة
-                            </button>
-                        </div>
-                    </div>
 
-                    <div id="options-unmastered" class="d-none session-options">
-                        <div class="row g-2">
-                            <div class="col-8">
-                                <label class="form-label">الجزء</label>
-                                <select name="part_id_unmastered" class="form-select" onchange="updatePartInfo('unmastered', this.value)">
-                                    @foreach($parts as $part)
-                                        <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
-                                    @endforeach
-                                </select>
+                        <div id="options-review" class="options-panel session-options d-none">
+                            <h6 class="mb-3"><i class="fas fa-redo text-success me-2"></i>خيارات المراجعة</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-8">
+                                    <label class="form-label small fw-bold">الجزء</label>
+                                    <select name="part_id_review" class="form-select" onchange="updatePartInfo('review', this.value)">
+                                        @foreach($parts as $part)
+                                            <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">
+                                                الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">رقم الصفحة</label>
+                                    <select name="page_number_review" class="form-select" id="page_number_review" required onchange="checkRemainingPages('review')">
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-4">
-                                <label class="form-label">رقم الصفحة</label>
-                                <select name="page_number_unmastered" class="form-select" id="page_number_unmastered" required>
-                                </select>
+                            <div id="continuation_part_review_wrapper" class="row g-3 d-none">
+                                <div class="col-12">
+                                    <label class="form-label small text-info fw-bold">الجزء المكمل</label>
+                                    <select name="continuation_part_review" class="form-select" id="continuation_part_review">
+                                        <option value="">-- اختر الجزء المكمل --</option>
+                                        @foreach($parts as $part)
+                                            <option value="{{ $part->id }}">الجزء {{ $part->part_number }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">عدد الصفحات</label>
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('review')">
+                                    <i class="fas fa-plus me-1"></i>إضافة صفحات
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('review')">
+                                    <i class="fas fa-redo me-1"></i>صفحات معادة
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="options-unmastered" class="options-panel session-options d-none">
+                            <h6 class="mb-3"><i class="fas fa-exclamation-triangle text-warning me-2"></i>خيارات الحفظ غير المتقن</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-8">
+                                    <label class="form-label small fw-bold">الجزء</label>
+                                    <select name="part_id_unmastered" class="form-select" onchange="updatePartInfo('unmastered', this.value)">
+                                        @foreach($parts as $part)
+                                            <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}" data-end-page="{{ $part->end_page }}">
+                                                الجزء {{ $part->part_number }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label small fw-bold">رقم الصفحة</label>
+                                    <select name="page_number_unmastered" class="form-select" id="page_number_unmastered" required>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">عدد الصفحات</label>
                                 <div class="btn-group w-100">
                                     @foreach([5, 10, 15, 20] as $count)
                                     <input type="radio" class="btn-check" name="unmastered_count" id="uc-{{ $count }}" value="{{ $count }}" {{ $count === 5 ? 'checked' : '' }}>
@@ -186,180 +556,211 @@
                                     @endforeach
                                 </div>
                             </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('unmastered')">
+                                    <i class="fas fa-plus me-1"></i>إضافة صفحات
+                                </button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('unmastered')">
+                                    <i class="fas fa-redo me-1"></i>صفحات معادة
+                                </button>
+                            </div>
                         </div>
-                        <!-- Add Pages Button -->
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('unmastered')">
-                                <i class="fas fa-plus me-1"></i>إضافة صفحات
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-sm" onclick="openRepeatedPagesModal('unmastered')">
-                                <i class="fas fa-redo me-1"></i>صفحات معادة
-                            </button>
-                        </div>
-                    </div>
 
-                    <div id="options-recitation" class="d-none session-options">
-                        <div class="col-12">
-                            <label class="form-label">اختر الجزء للسرد</label>
-                            <select name="part_id_recitation" class="form-select">
-                                @foreach($parts as $part)
-                                    <option value="{{ $part->id }}" data-start-page="{{ $part->start_page }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
+                        <div id="options-recitation" class="options-panel session-options d-none">
+                            <h6 class="mb-3"><i class="fas fa-scroll text-info me-2"></i>خيارات السرد</h6>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">اختر الجزء</label>
+                                <select name="part_id_recitation" class="form-select">
+                                    @foreach($parts as $part)
+                                        <option value="{{ $part->id }}">الجزء {{ $part->part_number }} (ص {{ $part->start_page }} - {{ $part->end_page }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="options-mafsil" class="options-panel session-options d-none">
+                            <h6 class="mb-3"><i class="fas fa-star text-danger me-2"></i>خيارات المفصل</h6>
+                            <label class="form-label small fw-bold mb-2">نوع المفصل</label>
+                            <div class="row g-2">
+                                @php $mafsilTypes = [[3, '90%'], [6, '90%'], [10, '80%'], [15, '80%'], [20, '75%'], [25, '75%'], [30, '75%']]; @endphp
+                                @foreach($mafsilTypes as [$num, $score])
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="mafsil_type" id="mt-{{ $num }}" value="{{ $num }}">
+                                    <label class="btn btn-outline-danger w-100 py-3" for="mt-{{ $num }}">
+                                        <div class="fw-bold fs-4">{{ $num }}</div>
+                                        <small>الرسوب &lt; {{ $score }}</small>
+                                    </label>
+                                </div>
                                 @endforeach
-                            </select>
+                            </div>
+                        </div>
+
+                        <div id="options-not_recitate" class="options-panel session-options d-none">
+                            <div class="alert alert-secondary mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                سيتم تسجيل الطالب على أنه لم يسمع بدون تقييم أي صفحات
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="button" class="start-btn w-100" onclick="startSession()">
+                                <i class="fas fa-play me-2"></i>
+                                بدء الجلسة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="color-guide-card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0 text-white"><i class="fas fa-palette me-2"></i>دليل التقييم</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-6">
+                            <div class="color-item">
+                                <div class="color-dot" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #27ae60; font-size: 13px;">ممتاز</div>
+                                    <small class="text-muted">0 خطأ أو ترددين كحد أقصى</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="color-item">
+                                <div class="color-dot" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+                                    <i class="fas fa-minus"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #f39c12; font-size: 13px;">جيد</div>
+                                    <small class="text-muted">1 خطأ أو 3-5 ترددات</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="color-item">
+                                <div class="color-dot" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #e74c3c; font-size: 13px;">ضعيف</div>
+                                    <small class="text-muted">2 خطأ بدون ترددات</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="color-item">
+                                <div class="color-dot" style="background: linear-gradient(135deg, #2c3e50, #34495e);">
+                                    <i class="fas fa-ban"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #2c3e50; font-size: 13px;">راسب</div>
+                                    <small class="text-muted">2 خطأ + تردد أو 3+ أخطاء</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="options-mafsil" class="d-none session-options">
-                        <label class="form-label">نوع المفصل</label>
-                        <div class="row g-2">
-                            @php $mafsilTypes = [
-                                [3, '90%'], [6, '90%'], [10, '80%'],
-                                [15, '80%'], [20, '75%'], [25, '75%'], [30, '75%']
-                            ]; @endphp
-                            @foreach($mafsilTypes as [$num, $score])
+                    <div class="p-3 bg-light border-top">
+                        <h6 class="text-primary mb-2" style="font-size: 12px;"><i class="fas fa-star me-1"></i>المفاصل وعلاماتها:</h6>
+                        <div class="row g-2 text-center">
                             <div class="col-4">
-                                <input type="radio" class="btn-check" name="mafsil_type" id="mt-{{ $num }}" value="{{ $num }}">
-                                <label class="btn btn-outline-danger w-100 py-2" for="mt-{{ $num }}">
-                                    <div class="fw-bold">{{ $num }}</div>
-                                    <small>علامة الرسوب أقل من: {{ $score }}</small>
-                                </label>
+                                <div class="p-2 bg-white rounded shadow-sm">
+                                    <strong class="text-danger" style="font-size: 11px;">مفصل 3 و 6</strong>
+                                    <div class="text-success fw-bold mt-1" style="font-size: 11px;">الرسوب أقل من 90%</div>
+                                </div>
                             </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <div id="options-not_recitate" class="d-none session-options">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            سيتم تسجيل الطالب على أنه لم يسمع بدون تقييم أي صفحات
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <button type="button" class="btn btn-primary w-100 py-3 fs-5" onclick="startSession()">
-                            <i class="fas fa-play me-2"></i>
-                            بدء الجلسة
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Color Guide -->
-    <div class="col-md-7">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h6><i class="fas fa-info-circle me-2"></i>نظام الألوان والتقييم</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <div class="p-3 rounded text-white" style="background:#27ae60;">
-                            <div class="fw-bold fs-5 mb-1">
-                                <span class="color-dot" style="background:#fff;"></span> أخضر - ممتاز
+                            <div class="col-4">
+                                <div class="p-2 bg-white rounded shadow-sm">
+                                    <strong class="text-danger" style="font-size: 11px;">مفصل 10 و 15</strong>
+                                    <div class="text-warning fw-bold mt-1" style="font-size: 11px;">الرسوب أقل من 80%</div>
+                                </div>
                             </div>
-                            <div style="font-size:13px;">لم يخطئ الطالب أو تردد بحد أقصى ترددين</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="p-3 rounded text-dark" style="background:#f39c12;">
-                            <div class="fw-bold fs-5 mb-1">
-                                <span class="color-dot" style="background:#fff;"></span> برتقالي - جيد
+                            <div class="col-4">
+                                <div class="p-2 bg-white rounded shadow-sm">
+                                    <strong class="text-danger" style="font-size: 11px;">مفصل 20 و 25 و 30</strong>
+                                    <div class="text-danger fw-bold mt-1" style="font-size: 11px;">الرسوب أقل من 75%</div>
+                                </div>
                             </div>
-                            <div style="font-size:13px;">خطأ واحد أو من 3 إلى 5 ترددات</div>
                         </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="p-3 rounded text-white" style="background:#c0392b;">
-                            <div class="fw-bold fs-5 mb-1">
-                                <span class="color-dot" style="background:#fff;"></span> أحمر - ضعيف
-                            </div>
-                            <div style="font-size:13px;">خطآن أو ما يعادلهما من الترددات</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="p-3 rounded text-white" style="background:#2c3e50;">
-                            <div class="fw-bold fs-5 mb-1">
-                                <span class="color-dot" style="background:#fff;"></span> أسود - راسب
-                            </div>
-                            <div style="font-size:13px;">خطآن + تردد واحد أو أكثر = رسوب</div>
+                        <div class="mt-2 text-center text-muted small">
+                            <i class="fas fa-calculator me-1"></i>
+                            خطأ = -3 علامات | كل 3 ترددات = -1 علامة
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <style>
-                    .color-dot {
-                        display: inline-block;
-                        width: 14px;
-                        height: 14px;
-                        border-radius: 50%;
-                        margin-left: 8px;
-                        vertical-align: middle;
-                    }
-                </style>
-
-                <div class="mt-3 p-3 bg-light rounded">
-                    <h6 class="text-primary">المفاصل وعلاماتها:</h6>
-                    <table class="table table-sm mb-0">
-                        <tr><td><strong>مفصل 3 و6</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-success">90%</span></td></tr>
-                        <tr><td><strong>مفصل 10 و15</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-warning text-dark">80%</span></td></tr>
-                        <tr><td><strong>مفصل 20 و25 و30</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-danger">75%</span></td></tr>
-                    </table>
-                    <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
+            <div class="sessions-list">
+                <div class="card-header">
+                    <h5 class="mb-0 text-white"><i class="fas fa-list me-2"></i>جلسات اليوم</h5>
                 </div>
-            </div>
-        </div>
-
-        <!-- Today's Sessions -->
-        <div class="card">
-            <div class="card-header">
-                <h6><i class="fas fa-list me-2"></i>جلسات اليوم</h6>
-            </div>
-            <div class="card-body p-0">
                 @php
                     $todaySessions = \App\Models\RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', auth()->id()))
                         ->whereDate('session_date', today())
                         ->with(['student.user', 'part'])
                         ->latest()
-                        ->take(5)
+                        ->take(8)
                         ->get();
                 @endphp
+
                 @forelse($todaySessions as $session)
-                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fw-semibold">{{ $session->student->user->name }}</div>
-                        <small class="text-muted">
-                            {{ $session->type_label }}
-                            @if($session->part) - الجزء {{ $session->part->part_number }} @endif
-                        </small>
+                <div class="session-item">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="session-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="session-info">
+                            <h6>{{ $session->student->user->name }}</h6>
+                            <small>
+                                {{ $session->type_label }}
+                                @if($session->part) - الجزء {{ $session->part->part_number }} @endif
+                            </small>
+                        </div>
                     </div>
                     <div class="text-end">
-                        <span class="badge bg-{{ $session->status_color }}">{{ $session->status_label }}</span>
-                        <div class="text-muted" style="font-size:11px;">
-                            {{ $session->total_errors }} خطأ | {{ $session->total_hesitations }} تردد
+                        <span class="badge rounded-pill bg-{{ $session->status_color }}">{{ $session->status_label }}</span>
+                        <div class="mt-1">
+                            <span class="text-danger small">{{ $session->total_errors }} خطأ</span>
+                            <span class="text-warning small me-2">{{ $session->total_hesitations }} تردد</span>
                         </div>
                     </div>
                 </div>
                 @empty
-                <div class="p-4 text-center text-muted">لا توجد جلسات اليوم</div>
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3 d-block opacity-50"></i>
+                    <p class="text-muted mb-0">لا توجد جلسات اليوم</p>
+                </div>
                 @endforelse
+
+                @if($todaySessions->count() > 0)
+                <div class="p-3 text-center border-top">
+                    <a href="{{ route('supervisor.recitation.history') }}" class="btn btn-outline-primary btn-sm">
+                        عرض كل الجلسات <i class="fas fa-arrow-left me-1"></i>
+                    </a>
+                </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal for Not Recitate -->
-<div class="modal fade" id="notRecitateModal" tabindex="-1" aria-labelledby="notRecitateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- Not Recitate Modal -->
+<div class="modal fade" id="notRecitateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="notRecitateModalLabel">لم يسمع</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title"><i class="fas fa-times-circle text-secondary me-2"></i>لم يسمع</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="notRecitateForm" method="POST" action="{{ route('supervisor.recitation.save-not-recitate') }}">
                 @csrf
-                <div class="modal-body">
+                <div class="modal-body pt-2">
                     <input type="hidden" name="student_id" id="notRecitateStudentId">
                     <input type="hidden" name="session_date" id="notRecitateSessionDate">
                     <div class="mb-3">
@@ -367,7 +768,7 @@
                         <textarea name="reason" class="form-control" rows="3" placeholder="أدخل سبب عدم التسميع"></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer border-0">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <button type="submit" class="btn btn-primary">حفظ</button>
                 </div>
@@ -376,18 +777,16 @@
     </div>
 </div>
 
-<!-- Modal for Adding Pages (إضافة صفحات) -->
-<div class="modal fade" id="addPagesModal" tabindex="-1" aria-labelledby="addPagesModalLabel" aria-hidden="true">
+<!-- Add Pages Modal -->
+<div class="modal fade" id="addPagesModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addPagesModalLabel">إضافة صفحات</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"><i class="fas fa-plus text-primary me-2"></i>إضافة صفحات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div id="additionalPagesContainer">
-                    <!-- Dynamic rows will be added here -->
-                </div>
+                <div id="additionalPagesContainer"></div>
                 <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addAdditionalPageRow()">
                     <i class="fas fa-plus me-1"></i>إضافة صف
                 </button>
@@ -400,19 +799,17 @@
     </div>
 </div>
 
-<!-- Modal for Repeated Pages (صفحات معادة) -->
-<div class="modal fade" id="repeatedPagesModal" tabindex="-1" aria-labelledby="repeatedPagesModalLabel" aria-hidden="true">
+<!-- Repeated Pages Modal -->
+<div class="modal fade" id="repeatedPagesModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="repeatedPagesModalLabel">صفحات معادة</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"><i class="fas fa-redo text-success me-2"></i>صفحات معادة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div id="repeatedPagesContainer">
-                    <!-- Dynamic rows will be added here -->
-                </div>
-                <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addRepeatedPageRow()">
+                <div id="repeatedPagesContainer"></div>
+                <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="addRepeatedPageRow(currentSessionType)">
                     <i class="fas fa-plus me-1"></i>إضافة صف
                 </button>
             </div>
@@ -427,31 +824,23 @@
 
 @push('scripts')
 <script>
-// تهيئة حقول أرقام الصفحات عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    // تهيئة حقول الصفحات لكل نوع
     ['new', 'review', 'unmastered'].forEach(function(type) {
         const select = document.querySelector(`select[name="part_id_${type}"]`);
-        if (select) {
-            updatePartInfo(type, select.value);
-        }
+        if (select) updatePartInfo(type, select.value);
     });
 });
 
 function updatePartInfo(type, partId) {
     const partSelect = document.querySelector(`select[name="part_id_${type}"]`);
     const pageSelect = document.getElementById(`page_number_${type}`);
-
     if (!partSelect || !pageSelect) return;
 
     const selectedOption = partSelect.options[partSelect.selectedIndex];
     const startPage = parseInt(selectedOption.dataset.startPage);
     const endPage = parseInt(selectedOption.dataset.endPage);
 
-    // مسح الخيارات الحالية
     pageSelect.innerHTML = '';
-
-    // إنشاء خيارات الصفحات
     for (let page = startPage; page <= endPage; page++) {
         const option = document.createElement('option');
         option.value = page;
@@ -459,29 +848,20 @@ function updatePartInfo(type, partId) {
         pageSelect.appendChild(option);
     }
 
-    // تعيين الخاصية min و max للتحقق
     pageSelect.dataset.minPage = startPage;
     pageSelect.dataset.maxPage = endPage;
-
-    // التحقق من الصفحات المتبقية بعد تحديث الصفحة
     checkRemainingPages(type);
 }
 
 function checkRemainingPages(type) {
     const studentSelect = document.getElementById('studentSelect');
     const selectedOption = studentSelect.options[studentSelect.selectedIndex];
-
     if (!studentSelect.value) return;
 
-    // الحصول على عدد الصفحات المطلوبة حسب النوع
     let requiredPages = 0;
-    if (type === 'new') {
-        requiredPages = parseInt(selectedOption.dataset.memorization) || 3;
-    } else if (type === 'review') {
-        requiredPages = parseInt(selectedOption.dataset.review) || 6;
-    }
+    if (type === 'new') requiredPages = parseInt(selectedOption.dataset.memorization) || 3;
+    else if (type === 'review') requiredPages = parseInt(selectedOption.dataset.review) || 6;
 
-    // الحصول على معلومات الجزء المحدد
     const partSelect = document.querySelector(`select[name="part_id_${type}"]`);
     const pageSelect = document.getElementById(`page_number_${type}`);
     const continuationWrapper = document.getElementById(`continuation_part_${type}_wrapper`);
@@ -491,16 +871,11 @@ function checkRemainingPages(type) {
     const selectedPartOption = partSelect.options[partSelect.selectedIndex];
     const endPage = parseInt(selectedPartOption.dataset.endPage);
     const selectedPage = parseInt(pageSelect.value);
-
-    // حساب الصفحات المتبقية في الجزء الحالي
     const remainingPages = endPage - selectedPage + 1;
 
-    // إذا كانت الصفحات المتبقية أقل من المطلوبة، إظهار اختيار الجزء المكمل
-    if (remainingPages < requiredPages) {
-        continuationWrapper.classList.remove('d-none');
-    } else {
+    if (remainingPages < requiredPages) continuationWrapper.classList.remove('d-none');
+    else {
         continuationWrapper.classList.add('d-none');
-        // إعادة تعيين القيمة
         const continuationSelect = document.getElementById(`continuation_part_${type}`);
         if (continuationSelect) continuationSelect.value = '';
     }
@@ -512,9 +887,10 @@ function loadStudentInfo() {
     const info = document.getElementById('studentInfo');
 
     if (select.value) {
+        document.getElementById('si-name').textContent = option.text;
         document.getElementById('si-level').textContent = option.dataset.level || '-';
-        document.getElementById('si-memorization').textContent = option.dataset.memorization + ' صفحات';
-        document.getElementById('si-review').textContent = option.dataset.review + ' صفحات';
+        document.getElementById('si-memorization').textContent = option.dataset.memorization + ' ';
+        document.getElementById('si-review').textContent = option.dataset.review + ' ';
         info.classList.remove('d-none');
     } else {
         info.classList.add('d-none');
@@ -526,23 +902,15 @@ function showTypeOptions(type) {
     const opt = document.getElementById('options-' + type);
     if (opt) {
         opt.classList.remove('d-none');
-        // تهيئة أرقام الصفحات عند إظهار الخيارات
-        if (type === 'new_memorization') {
-            updatePartInfo('new', document.querySelector('select[name="part_id_new"]').value);
-        } else if (type === 'review') {
-            updatePartInfo('review', document.querySelector('select[name="part_id_review"]').value);
-        } else if (type === 'unmastered') {
-            updatePartInfo('unmastered', document.querySelector('select[name="part_id_unmastered"]').value);
-        }
+        if (type === 'new_memorization') updatePartInfo('new', document.querySelector('select[name="part_id_new"]').value);
+        else if (type === 'review') updatePartInfo('review', document.querySelector('select[name="part_id_review"]').value);
+        else if (type === 'unmastered') updatePartInfo('unmastered', document.querySelector('select[name="part_id_unmastered"]').value);
     }
 }
 
-// Store additional/repeated pages data
 let additionalPagesData = [];
 let repeatedPagesData = [];
 let currentSessionType = '';
-
-// Parts data for dropdowns
 const partsData = @json($parts);
 
 function openAddPagesModal(type) {
@@ -550,10 +918,8 @@ function openAddPagesModal(type) {
     additionalPagesData = [];
     const container = document.getElementById('additionalPagesContainer');
     container.innerHTML = '';
-    // Add first row by default
     addAdditionalPageRow();
-    const modal = new bootstrap.Modal(document.getElementById('addPagesModal'));
-    modal.show();
+    new bootstrap.Modal(document.getElementById('addPagesModal')).show();
 }
 
 function addAdditionalPageRow() {
@@ -563,23 +929,20 @@ function addAdditionalPageRow() {
     row.className = 'row g-2 mb-2 align-items-end additional-page-row';
     row.id = rowId;
 
-    // Build part options
     let partOptions = '<option value="">-- اختر الجزء --</option>';
     partsData.forEach(part => {
-        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}">الجزء ${part.part_number} (ص ${part.start_page} - ${part.end_page})</option>`;
+        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}">الجزء ${part.part_number}</option>`;
     });
 
     row.innerHTML = `
         <div class="col-5">
-            <label class="form-label mb-1">الجزء</label>
             <select name="part_id_add" class="form-select form-select-sm" onchange="updatePageOptions('${rowId}', this.value)">
                 ${partOptions}
             </select>
         </div>
         <div class="col-4">
-            <label class="form-label mb-1">الصفحة</label>
             <select name="page_number_add" class="form-select form-select-sm" id="page_${rowId}">
-                <option value="">-- اختر الجزء أولاً --</option>
+                <option value="">-- اختر الصفحة --</option>
             </select>
         </div>
         <div class="col-2">
@@ -615,8 +978,7 @@ function updatePageOptions(rowId, partId) {
 }
 
 function removePageRow(rowId) {
-    const row = document.getElementById(rowId);
-    row.remove();
+    document.getElementById(rowId).remove();
 }
 
 function applyAdditionalPages() {
@@ -626,9 +988,7 @@ function applyAdditionalPages() {
     rows.forEach(row => {
         const partId = row.querySelector('select[name="part_id_add"]').value;
         const pageNumber = row.querySelector('select[name="page_number_add"]').value;
-        if (partId && pageNumber) {
-            additionalPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
-        }
+        if (partId && pageNumber) additionalPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
     });
 
     if (additionalPagesData.length === 0) {
@@ -640,16 +1000,13 @@ function applyAdditionalPages() {
     toastr.success('تمت إضافة ' + additionalPagesData.length + ' صفحة');
 }
 
-// Repeated Pages Modal Functions
 function openRepeatedPagesModal(type) {
     currentSessionType = type;
     repeatedPagesData = [];
     const container = document.getElementById('repeatedPagesContainer');
     container.innerHTML = '';
-    // Add first row by default
     addRepeatedPageRow(type);
-    const modal = new bootstrap.Modal(document.getElementById('repeatedPagesModal'));
-    modal.show();
+    new bootstrap.Modal(document.getElementById('repeatedPagesModal')).show();
 }
 
 function addRepeatedPageRow(type) {
@@ -659,31 +1016,24 @@ function addRepeatedPageRow(type) {
     row.className = 'row g-2 mb-2 align-items-end repeated-page-row';
     row.id = rowId;
 
-    // Determine which part selector to use based on type
     let currentPartId = '';
-    if (type === 'review') {
-        currentPartId = document.querySelector('select[name="part_id_review"]')?.value || '';
-    } else if (type === 'new_memorization') {
-        currentPartId = document.querySelector('select[name="part_id_new"]')?.value || '';
-    } else if (type === 'unmastered') {
-        currentPartId = document.querySelector('select[name="part_id_unmastered"]')?.value || '';
-    }
+    if (type === 'review') currentPartId = document.querySelector('select[name="part_id_review"]')?.value || '';
+    else if (type === 'new_memorization') currentPartId = document.querySelector('select[name="part_id_new"]')?.value || '';
+    else if (type === 'unmastered') currentPartId = document.querySelector('select[name="part_id_unmastered"]')?.value || '';
 
     let partOptions = '<option value="">-- اختر الجزء --</option>';
     partsData.forEach(part => {
         const selected = part.id == currentPartId ? 'selected' : '';
-        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}" ${selected}>الجزء ${part.part_number} (ص ${part.start_page} - ${part.end_page})</option>`;
+        partOptions += `<option value="${part.id}" data-start-page="${part.start_page}" data-end-page="${part.end_page}" ${selected}>الجزء ${part.part_number}</option>`;
     });
 
     row.innerHTML = `
         <div class="col-5">
-            <label class="form-label mb-1">الجزء</label>
             <select name="part_id_repeat" class="form-select form-select-sm" onchange="updateRepeatedPageOptions('${rowId}', this.value)">
                 ${partOptions}
             </select>
         </div>
         <div class="col-4">
-            <label class="form-label mb-1">الصفحة</label>
             <select name="page_number_repeat" class="form-select form-select-sm" id="page_repeat_${rowId}">
                 <option value="">-- اختر الصفحة --</option>
             </select>
@@ -696,10 +1046,7 @@ function addRepeatedPageRow(type) {
     `;
     container.appendChild(row);
 
-    // If current part is selected, populate pages
-    if (currentPartId) {
-        updateRepeatedPageOptions(rowId, currentPartId);
-    }
+    if (currentPartId) updateRepeatedPageOptions(rowId, currentPartId);
 }
 
 function updateRepeatedPageOptions(rowId, partId) {
@@ -726,8 +1073,7 @@ function updateRepeatedPageOptions(rowId, partId) {
 }
 
 function removeRepeatedPageRow(rowId) {
-    const row = document.getElementById(rowId);
-    row.remove();
+    document.getElementById(rowId).remove();
 }
 
 function applyRepeatedPages() {
@@ -737,9 +1083,7 @@ function applyRepeatedPages() {
     rows.forEach(row => {
         const partId = row.querySelector('select[name="part_id_repeat"]').value;
         const pageNumber = row.querySelector('select[name="page_number_repeat"]').value;
-        if (partId && pageNumber) {
-            repeatedPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
-        }
+        if (partId && pageNumber) repeatedPagesData.push({ part_id: partId, page_number: parseInt(pageNumber) });
     });
 
     if (repeatedPagesData.length === 0) {
@@ -757,82 +1101,46 @@ function startSession() {
     const sessionDateInput = document.getElementById('sessionDate');
     const sessionDate = sessionDateInput.value || new Date().toISOString().split('T')[0];
 
-    if (!studentId) {
-        toastr.warning('يرجى اختيار الطالب');
-        return;
-    }
-    if (!typeEl) {
-        toastr.warning('يرجى اختيار نوع التسميع');
-        return;
-    }
+    if (!studentId) { toastr.warning('يرجى اختيار الطالب'); return; }
+    if (!typeEl) { toastr.warning('يرجى اختيار نوع التسميع'); return; }
 
     const type = typeEl.value;
     let url = '';
-
-    // Build additional params
-    let additionalPagesParam = '';
-    if (additionalPagesData.length > 0) {
-        additionalPagesParam = '&additional_pages=' + encodeURIComponent(JSON.stringify(additionalPagesData));
-    }
-
-    // Build repeated pages params (for review, new_memorization, unmastered)
-    let repeatedPagesParam = '';
-    if (repeatedPagesData.length > 0 && (type === 'review' || type === 'new_memorization' || type === 'unmastered')) {
-        repeatedPagesParam = '&repeated_pages=' + encodeURIComponent(JSON.stringify(repeatedPagesData));
-    }
+    let additionalPagesParam = additionalPagesData.length > 0 ? '&additional_pages=' + encodeURIComponent(JSON.stringify(additionalPagesData)) : '';
+    let repeatedPagesParam = repeatedPagesData.length > 0 && (type === 'review' || type === 'new_memorization' || type === 'unmastered') ? '&repeated_pages=' + encodeURIComponent(JSON.stringify(repeatedPagesData)) : '';
 
     if (type === 'new_memorization') {
         const partId = document.querySelector('select[name="part_id_new"]').value;
         const pageNumber = document.getElementById('page_number_new').value;
-        // التحقق من نطاق الصفحة
         const pageSelect = document.getElementById('page_number_new');
-        const minPage = parseInt(pageSelect.dataset.minPage);
-        const maxPage = parseInt(pageSelect.dataset.maxPage);
         const page = parseInt(pageNumber);
-
-        if (page < minPage || page > maxPage) {
-            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+        if (page < parseInt(pageSelect.dataset.minPage) || page > parseInt(pageSelect.dataset.maxPage)) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + pageSelect.dataset.minPage + ' و ' + pageSelect.dataset.maxPage);
             return;
         }
-        // التحقق من الجزء المكمل
         const continuationPart = document.querySelector('select[name="continuation_part_new"]')?.value;
-        let continuationParam = '';
-        if (continuationPart) {
-            continuationParam = `&continuation_part_id=${continuationPart}`;
-        }
+        let continuationParam = continuationPart ? `&continuation_part_id=${continuationPart}` : '';
         url = `{{ route('supervisor.recitation.new-memorization') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParam}${additionalPagesParam}${repeatedPagesParam}`;
     } else if (type === 'review') {
         const partId = document.querySelector('select[name="part_id_review"]').value;
         const pageNumber = document.getElementById('page_number_review').value;
-        // التحقق من نطاق الصفحة
         const pageSelect = document.getElementById('page_number_review');
-        const minPage = parseInt(pageSelect.dataset.minPage);
-        const maxPage = parseInt(pageSelect.dataset.maxPage);
         const page = parseInt(pageNumber);
-
-        if (page < minPage || page > maxPage) {
-            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+        if (page < parseInt(pageSelect.dataset.minPage) || page > parseInt(pageSelect.dataset.maxPage)) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + pageSelect.dataset.minPage + ' و ' + pageSelect.dataset.maxPage);
             return;
         }
-        // التحقق من الجزء المكمل
         const continuationPartReview = document.querySelector('select[name="continuation_part_review"]')?.value;
-        let continuationParamReview = '';
-        if (continuationPartReview) {
-            continuationParamReview = `&continuation_part_id=${continuationPartReview}`;
-        }
+        let continuationParamReview = continuationPartReview ? `&continuation_part_id=${continuationPartReview}` : '';
         url = `{{ route('supervisor.recitation.review') }}?student_id=${studentId}&part_id=${partId}&page_number=${pageNumber}&session_date=${sessionDate}${continuationParamReview}${additionalPagesParam}${repeatedPagesParam}`;
     } else if (type === 'unmastered') {
         const partId = document.querySelector('select[name="part_id_unmastered"]').value;
         const pageNumber = document.getElementById('page_number_unmastered').value;
         const count = document.querySelector('input[name="unmastered_count"]:checked')?.value || 5;
-        // التحقق من نطاق الصفحة
         const pageSelect = document.getElementById('page_number_unmastered');
-        const minPage = parseInt(pageSelect.dataset.minPage);
-        const maxPage = parseInt(pageSelect.dataset.maxPage);
         const page = parseInt(pageNumber);
-
-        if (page < minPage || page > maxPage) {
-            toastr.warning('رقم الصفحة يجب أن يكون بين ' + minPage + ' و ' + maxPage);
+        if (page < parseInt(pageSelect.dataset.minPage) || page > parseInt(pageSelect.dataset.maxPage)) {
+            toastr.warning('رقم الصفحة يجب أن يكون بين ' + pageSelect.dataset.minPage + ' و ' + pageSelect.dataset.maxPage);
             return;
         }
         url = `{{ route('supervisor.recitation.unmastered') }}?student_id=${studentId}&part_id=${partId}&pages_count=${count}&page_number=${pageNumber}&session_date=${sessionDate}${additionalPagesParam}${repeatedPagesParam}`;
@@ -844,11 +1152,9 @@ function startSession() {
         if (!mafsilType) { toastr.warning('يرجى اختيار نوع المفصل'); return; }
         url = `{{ route('supervisor.recitation.mafsil') }}?student_id=${studentId}&mafsil_type=${mafsilType}&session_date=${sessionDate}`;
     } else if (type === 'not_recitate') {
-        // Show modal for not_recitate
         document.getElementById('notRecitateStudentId').value = studentId;
         document.getElementById('notRecitateSessionDate').value = sessionDate;
-        const modal = new bootstrap.Modal(document.getElementById('notRecitateModal'));
-        modal.show();
+        new bootstrap.Modal(document.getElementById('notRecitateModal')).show();
         return;
     }
 
