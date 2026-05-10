@@ -1,45 +1,58 @@
 <span class="nav-section-title">الرئيسية</span>
 <a href="{{ route('student.dashboard') }}" class="nav-link {{ request()->routeIs('student.dashboard') ? 'active' : '' }}">
-    <i class="fas fa-home"></i> لوحتي الشخصية
+    <div class="icon-wrapper"><i class="fas fa-home"></i></div>
+    <span>لوحتي الشخصية</span>
 </a>
-<span class="nav-section-title mt-2">القرآن الكريم</span>
+<span class="nav-section-title">القرآن الكريم</span>
 <a href="{{ route('student.quran') }}" class="nav-link {{ request()->routeIs('student.quran*') ? 'active' : '' }}">
-    <i class="fas fa-book-quran"></i> قراءة القرآن
+    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
+    <span>قراءة القرآن</span>
 </a>
 <a href="{{ route('student.live-recitation') }}" class="nav-link {{ request()->routeIs('student.live-recitation*') ? 'active' : '' }}">
-    <i class="fas fa-microphone-alt"></i> التسميع المباشر
+    <div class="icon-wrapper"><i class="fas fa-microphone-alt"></i></div>
+    <span>التسميع المباشر</span>
 </a>
-<span class="nav-section-title mt-2">المتابعة</span>
+<span class="nav-section-title">المتابعة</span>
 <a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
-    <i class="fas fa-microphone"></i> جلسات التسميع
+    <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>
+    <span>جلسات التسميع</span>
 </a>
 <a href="{{ route('student.attendance.index') }}" class="nav-link {{ request()->routeIs('student.attendance.*') ? 'active' : '' }}">
-    <i class="fas fa-calendar-check"></i> سجل حضوري
+    <div class="icon-wrapper"><i class="fas fa-calendar-check"></i></div>
+    <span>سجل حضوري</span>
 </a>
 <a href="{{ route('student.student-parts') }}" class="nav-link {{ request()->routeIs('student.student-parts') ? 'active' : '' }}">
-    <i class="fas fa-book-quran"></i> أجزائي
+    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
+    <span>أجزائي</span>
 </a>
 <a href="{{ route('student.reports.index') }}" class="nav-link {{ request()->routeIs('student.reports.*') ? 'active' : '' }}">
-    <i class="fas fa-chart-bar"></i> تقاريري
+    <div class="icon-wrapper"><i class="fas fa-chart-bar"></i></div>
+    <span>تقاريري</span>
 </a>
 <a href="{{ route('student.warnings.index') }}" class="nav-link {{ request()->routeIs('student.warnings.*') ? 'active' : '' }}">
-    <i class="fas fa-exclamation-triangle"></i> الإنذارات
+    <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
+    <span>الإنذارات</span>
 </a>
-<span class="nav-section-title mt-2">التقدم والإنجازات</span>
+<span class="nav-section-title">التقدم والإنجازات</span>
 <a href="{{ route('student.progress') }}" class="nav-link {{ request()->routeIs('student.progress*') ? 'active' : '' }}">
-    <i class="fas fa-chart-line"></i> تقدمي
+    <div class="icon-wrapper"><i class="fas fa-chart-line"></i></div>
+    <span>تقدمي</span>
 </a>
 <a href="{{ route('student.achievements') }}" class="nav-link {{ request()->routeIs('student.achievements*') ? 'active' : '' }}">
-    <i class="fas fa-trophy"></i> إنجازاتي
+    <div class="icon-wrapper"><i class="fas fa-trophy"></i></div>
+    <span>إنجازاتي</span>
 </a>
 <a href="{{ route('student.bookmarks') }}" class="nav-link {{ request()->routeIs('student.bookmarks*') ? 'active' : '' }}">
-    <i class="fas fa-bookmark"></i> علاماتي
+    <div class="icon-wrapper"><i class="fas fa-bookmark"></i></div>
+    <span>علاماتي</span>
 </a>
-<span class="nav-section-title mt-2">المساعدة</span>
+<span class="nav-section-title">المساعدة</span>
 <a href="{{ route('student.memorization') }}" class="nav-link {{ request()->routeIs('student.memorization') ? 'active' : '' }}">
-    <i class="fas fa-book-open"></i> طرق الحفظ
+    <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
+    <span>طرق الحفظ</span>
 </a>
-<span class="nav-section-title mt-2">الإعدادات</span>
+<span class="nav-section-title">الإعدادات</span>
 <a href="{{ route('student.profile.index') }}" class="nav-link {{ request()->routeIs('student.profile.*') ? 'active' : '' }}">
-    <i class="fas fa-user-cog"></i> ملفي الشخصي
+    <div class="icon-wrapper"><i class="fas fa-user-cog"></i></div>
+    <span>ملفي الشخصي</span>
 </a>

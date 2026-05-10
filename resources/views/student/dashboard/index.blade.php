@@ -9,173 +9,608 @@
 @endsection
 
 @section('content')
-<!-- Welcome Banner -->
-<div class="card mb-4" style="background: linear-gradient(135deg, #182B48, #2A4570); color: #fff; border:none;">
-    <div class="card-body py-3 px-3">
-        <div class="row align-items-center">
-            <div class="col-8">
-                <h5 class="mb-1">مرحباً {{ $student->user->name }}</h5>
-                <p class="mb-0 opacity-75" style="font-size:13px;">{{ $student->level->name ?? '' }}</p>
+
+<div class="welcome-section mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <div class="welcome-card">
+                <div class="welcome-icon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="welcome-content">
+                    <h4>مرحباً {{ $student->user->name }}</h4>
+                    <p>{{ $student->level->name ?? '' }}</p>
+                </div>
             </div>
-            <div class="col-4 text-end">
-                <div style="font-size: 2rem; opacity: 0.3;"><i class="fas fa-quran"></i></div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="date-badge">
+                <i class="fas fa-calendar-alt me-2"></i>
+                <span id="currentDate"></span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Color Guide -->
-<div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h6><i class="fas fa-info-circle me-2"></i>نظام الألوان والتقييم</h6>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="p-3 rounded text-white" style="background:#27ae60;">
-                            <div class="fw-bold fs-5 mb-1">🟢 أخضر - ممتاز</div>
-                            <div style="font-size:13px;">لم يخطئ الطالب أو تردد بحد أقصى ترددين</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="p-3 rounded text-dark" style="background:#f39c12;">
-                            <div class="fw-bold fs-5 mb-1">🟠 برتقالي - جيد</div>
-                            <div style="font-size:13px;">خطأ واحد أو من 3 إلى 5 ترددات</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="p-3 rounded text-white" style="background:#c0392b;">
-                            <div class="fw-bold fs-5 mb-1">🔴 أحمر - ضعيف</div>
-                            <div style="font-size:13px;">خطآن أو ما يعادلهما من الترددات</div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="p-3 rounded text-white" style="background:#2c3e50;">
-                            <div class="fw-bold fs-5 mb-1">⚫ أسود - راسب</div>
-                            <div style="font-size:13px;">خطآن + تردد واحد أو أكثر = رسوب</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3 p-3 bg-light rounded">
-                    <h6 class="text-primary">المفاصل وعلاماتها:</h6>
-                    <table class="table table-sm mb-0">
-                        <tr><td><strong>مفصل 3 و6</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-success">90%</span></td></tr>
-                        <tr><td><strong>مفصل 10 و15</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-warning text-dark">80%</span></td></tr>
-                        <tr><td><strong>مفصل 20 و25 و30</strong></td><td>علامة الرسوب أقل من: <span class="badge bg-danger">75%</span></td></tr>
-                    </table>
-                    <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
+<div class="color-guide-card mb-4">
+    <div class="card-header-custom">
+        <div class="card-title">
+            <i class="fas fa-info-circle"></i>
+            <span>دليل الألوان والتقييم</span>
+        </div>
+    </div>
+    <div class="card-body-custom">
+        <div class="color-grid">
+            <div class="color-item success">
+                <div class="color-indicator"></div>
+                <div class="color-content">
+                    <div class="fw-bold">ممتاز</div>
+                    <div class="color-desc">لم يخطئ أو تردد بحد أقصى ترددين</div>
                 </div>
             </div>
+            <div class="color-item warning">
+                <div class="color-indicator"></div>
+                <div class="color-content">
+                    <div class="fw-bold">جيد</div>
+                    <div class="color-desc">خطأ واحد أو من 3 إلى 5 ترددات</div>
+                </div>
+            </div>
+            <div class="color-item danger">
+                <div class="color-indicator"></div>
+                <div class="color-content">
+                    <div class="fw-bold">ضعيف</div>
+                    <div class="color-desc">خطآن أو ما يعادلهما من الترددات</div>
+                </div>
+            </div>
+            <div class="color-item dark">
+                <div class="color-indicator"></div>
+                <div class="color-content">
+                    <div class="fw-bold">راسب</div>
+                    <div class="color-desc">خطآن + تردد واحد أو أكثر</div>
+                </div>
+            </div>
+        </div>
+        <div class="mafsil-guide mt-3">
+            <h6><i class="fas fa-book-quran me-2"></i>المفاصل وعلاماتها:</h6>
+            <div class="mafsil-grid">
+                <div class="mafsil-item">
+                    <span class="mafsil-name">مفصل 3 و6</span>
+                    <span class="badge-modern danger">رسوب أقل من 90%</span>
+                </div>
+                <div class="mafsil-item">
+                    <span class="mafsil-name">مفصل 10 و15</span>
+                    <span class="badge-modern warning">رسوب أقل من 80%</span>
+                </div>
+                <div class="mafsil-item">
+                    <span class="mafsil-name">مفصل 20 و25 و30</span>
+                    <span class="badge-modern danger">رسوب أقل من 75%</span>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">خطأ = -3 علامات | كل 3 ترددات = -1 علامة</small>
         </div>
     </div>
 </div>
 
-<!-- Stats -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-success fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['present'] }}</div>
-            <small class="text-muted">حضور</small>
+<div class="stats-grid">
+    <div class="stat-card-modern success">
+        <div class="stat-card-bg"></div>
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $attendanceStats['present'] }}</div>
+            <div class="stat-label">حضور</div>
+        </div>
+        <div class="stat-decoration">
+            <i class="fas fa-user-check"></i>
         </div>
     </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-danger fw-bold" style="font-size:1.5rem;">{{ $attendanceStats['absent'] }}</div>
-            <small class="text-muted">غياب</small>
+
+    <div class="stat-card-modern danger">
+        <div class="stat-card-bg"></div>
+        <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $attendanceStats['absent'] }}</div>
+            <div class="stat-label">غياب</div>
+        </div>
+        <div class="stat-decoration">
+            <i class="fas fa-user-times"></i>
         </div>
     </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-primary fw-bold" style="font-size:1.5rem;">{{ $sessionStats['total'] }}</div>
-            <small class="text-muted">جلسات</small>
+
+    <div class="stat-card-modern primary">
+        <div class="stat-card-bg"></div>
+        <div class="stat-icon">
+            <i class="fas fa-microphone"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $sessionStats['total'] }}</div>
+            <div class="stat-label">جلسات</div>
+        </div>
+        <div class="stat-decoration">
+            <i class="fas fa-quran"></i>
         </div>
     </div>
-    <div class="col-6 col-lg-3">
-        <div class="card text-center p-3">
-            <div class="text-warning fw-bold" style="font-size:1.5rem;">{{ $sessionStats['saved_parts'] }}</div>
-            <small class="text-muted">الأجزاء المحفوظة</small>
+
+    <div class="stat-card-modern warning">
+        <div class="stat-card-bg"></div>
+        <div class="stat-icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ $sessionStats['saved_parts'] }}</div>
+            <div class="stat-label">الأجزاء المحفوظة</div>
+        </div>
+        <div class="stat-decoration">
+            <i class="fas fa-award"></i>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Recent Sessions -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <h6><i class="fas fa-history me-2"></i>آخر جلسات التسميع</h6>
-                <a href="{{ route('student.sessions.index') }}" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+<div class="dashboard-grid">
+    <div class="dashboard-card table-card">
+        <div class="card-header-custom">
+            <div class="card-title">
+                <i class="fas fa-history"></i>
+                <span>آخر جلسات التسميع</span>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <thead class="table-light">
-                            <tr><th>النوع</th><th>الجزء</th><th>الصفحات</th><th>الأخطاء</th><th>النتيجة</th><th>التاريخ</th></tr>
-                        </thead>
-                        <tbody>
-                            @forelse($recentSessions as $session)
-                            <tr>
-                                <td><span class="badge bg-info text-dark">{{ $session->type_label }}</span></td>
-                                <td>
-                                    @if($session->type === 'mafsil')
-                                        @php
-                                            $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values();
-                                        @endphp
-                                        {{ $partNumbers->isNotEmpty() ? $partNumbers->map(fn($num) => 'الجزء '.$num)->join('، ') : '-' }}
-                                    @else
-                                        {{ $session->part ? 'الجزء '.$session->part->part_number : '-' }}
-                                    @endif
-                                </td>
-                                <td>{{ $session->type === 'mafsil' ? '' : $session->total_pages }}</td>
-                                <td>
-                                    <span class="text-danger">{{ $session->total_errors }}</span>
-                                    <small class="text-muted">/ {{ $session->total_hesitations }}ت</small>
-                                </td>
-                                <td><span class="badge bg-{{ $session->status_color }}">{{ $session->status_label }}</span></td>
-                                <td><small>{{ $session->session_date->format('d/m/Y') }}</small></td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="6" class="text-center py-3 text-muted">لا توجد جلسات بعد</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+            <a href="{{ route('student.sessions.index') }}" class="view-all-btn">
+                عرض الكل <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="card-body-custom p-0">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>النوع</th>
+                            <th>الجزء</th>
+                            <th>الصفحات</th>
+                            <th>الأخطاء</th>
+                            <th>النتيجة</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentSessions as $session)
+                        <tr>
+                            <td><span class="badge-modern info">{{ $session->type_label }}</span></td>
+                            <td>
+                                @if($session->type === 'mafsil')
+                                    @php
+                                        $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values();
+                                    @endphp
+                                    {{ $partNumbers->isNotEmpty() ? $partNumbers->map(fn($num) => 'الجزء '.$num)->join('، ') : '-' }}
+                                @else
+                                    {{ $session->part ? 'الجزء '.$session->part->part_number : '-' }}
+                                @endif
+                            </td>
+                            <td>{{ $session->type === 'mafsil' ? '' : $session->total_pages }}</td>
+                            <td>
+                                <span class="text-danger fw-bold">{{ $session->total_errors }}</span>
+                                <small class="text-muted">/ {{ $session->total_hesitations }} تردد</small>
+                            </td>
+                            <td><span class="badge-modern {{ $session->status_color }}">{{ $session->status_label }}</span></td>
+                            <td class="date-cell"><small>{{ $session->session_date->format('d/m/Y') }}</small></td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="empty-cell">لا توجد جلسات بعد</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <!-- Warnings -->
+    <div class="dashboard-card sidebar-card">
         @if($recentWarnings->count() > 0)
-        <div class="card mb-3">
-            <div class="card-header">
-                <h6 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>إنذارات جديدة</h6>
+        <div class="card-header-custom">
+            <div class="card-title danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>إنذارات جديدة</span>
             </div>
-            <div class="card-body p-0">
-                @foreach($recentWarnings as $warning)
-                <div class="p-3 border-bottom">
-                    <div class="fw-bold" style="font-size:13px;">{{ $warning->title }}</div>
+        </div>
+        <div class="card-body-custom p-0">
+            @foreach($recentWarnings as $warning)
+            <div class="warning-item">
+                <div class="warning-content">
+                    <div class="fw-bold warning-title">{{ $warning->title }}</div>
                     <div class="text-muted" style="font-size:12px;">{{ $warning->issue_date->format('d/m/Y') }}</div>
-                    <span class="badge bg-danger" style="font-size:11px;">{{ $warning->type_label }}</span>
+                    <span class="badge-modern warning" style="font-size:10px;">{{ $warning->type_label }}</span>
                 </div>
-                @endforeach
             </div>
+            @endforeach
         </div>
         @endif
 
-        <!-- Memorization Tips Card -->
-        <div class="card" style="background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff;">
-            <div class="card-body text-center p-4">
-                <i class="fas fa-book-open fa-3x mb-3 opacity-75"></i>
-                <h6 class="mb-2">تعلم طريقة الحفظ المتقن</h6>
-                <p style="font-size:13px;opacity:0.9;" class="mb-3">اكتشف طريقة الحفظ الصحيحة في 45-60 دقيقة</p>
-                <a href="{{ route('student.memorization') }}" class="btn btn-light btn-sm">
-                    <i class="fas fa-arrow-left me-1"></i>عرض طرق الحفظ
-                </a>
+        <div class="memorization-tip-card">
+            <div class="tip-icon">
+                <i class="fas fa-book-open"></i>
             </div>
+            <div class="tip-content">
+                <h6>تعلم طريقة الحفظ المتقن</h6>
+                <p>اكتشف طريقة الحفظ الصحيحة</p>
+            </div>
+            <a href="{{ route('student.memorization') }}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>عرض
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+.welcome-section { margin-bottom: 25px; }
+
+.welcome-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(135deg, #182B48 0%, #1a3356 100%);
+    padding: 25px 30px;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(212,160,48,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.welcome-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
+}
+
+.welcome-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #d4a030, #B4802C);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(212,160,48,0.4);
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-content { position: relative; z-index: 1; }
+
+.welcome-content h4 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.welcome-content p {
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    margin: 0;
+}
+
+.date-badge {
+    background: rgba(255,255,255,0.1);
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: #d4a030;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid rgba(212,160,48,0.2);
+}
+
+.color-guide-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f4f8;
+}
+
+.card-header-custom {
+    padding: 20px 25px;
+    border-bottom: 1px solid #f0f4f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #182B48;
+}
+
+.card-title i {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #182B48, #1a3356);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d4a030;
+    font-size: 16px;
+}
+
+.card-title.danger i { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; }
+
+.card-body-custom { padding: 25px; }
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+@media (max-width: 992px) { .color-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .color-grid { grid-template-columns: 1fr; } }
+
+.color-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.color-item.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+.color-item.warning { background: linear-gradient(135deg, #f39c12, #e67e22); color: #2c3e50; }
+.color-item.danger { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+.color-item.dark { background: linear-gradient(135deg, #2c3e50, #34495e); }
+
+.color-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+}
+
+.color-content { flex: 1; }
+.color-content .fw-bold { font-size: 15px; margin-bottom: 3px; }
+.color-desc { font-size: 11px; opacity: 0.9; }
+
+.mafsil-guide h6 {
+    color: #182B48;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.mafsil-grid { display: flex; gap: 15px; flex-wrap: wrap; }
+
+.mafsil-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+.mafsil-name { font-weight: 600; color: #182B48; font-size: 13px; }
+
+.badge-modern {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-modern.success, .badge-modern.green { background: rgba(39,174,96,0.15); color: #27ae60; }
+.badge-modern.warning { background: rgba(243,156,18,0.15); color: #f39c12; }
+.badge-modern.danger, .badge-modern.red { background: rgba(192,57,43,0.15); color: #c0392b; }
+.badge-modern.info { background: rgba(52,152,219,0.15); color: #3498db; }
+.badge-modern.orange { background: rgba(230,126,34,0.15); color: #e67e22; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 992px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 576px) { .stats-grid { grid-template-columns: 1fr; } }
+
+.stat-card-modern {
+    position: relative;
+    padding: 25px;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.stat-card-modern.primary { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); }
+.stat-card-modern.success { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+.stat-card-modern.danger { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); }
+.stat-card-modern.warning { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+
+.stat-card-bg {
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    backdrop-filter: blur(5px);
+    flex-shrink: 0;
+}
+
+.stat-content { flex: 1; position: relative; z-index: 1; }
+
+.stat-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+}
+
+.stat-decoration {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    font-size: 40px;
+    opacity: 0.15;
+    color: #fff;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 992px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+.dashboard-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid #f0f4f8;
+}
+
+.view-all-btn {
+    color: #d4a030;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.view-all-btn:hover { color: #B4802C; }
+.view-all-btn i { font-size: 11px; }
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead { background: #f8f9fa; }
+
+.data-table th {
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #182B48;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.data-table td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: #2c3e50;
+    border-bottom: 1px solid #f0f4f8;
+    vertical-align: middle;
+}
+
+.data-table tbody tr { transition: all 0.2s; }
+.data-table tbody tr:hover { background: #fafbfc; }
+
+.date-cell { color: #7f8c8d; font-size: 13px; }
+
+.empty-cell { text-align: center; padding: 40px 20px; color: #bdc3c7; }
+
+.sidebar-card { display: flex; flex-direction: column; }
+
+.warning-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f4f8;
+}
+
+.warning-content { display: flex; flex-direction: column; gap: 4px; }
+.warning-title { font-weight: 600; font-size: 14px; color: #182B48; }
+
+.memorization-tip-card {
+    margin: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-radius: 14px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.tip-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.tip-content h6 { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
+.tip-content p { font-size: 12px; opacity: 0.9; margin-bottom: 15px; }
+</style>
+
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ar-SA', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+});
+</script>
+@endpush

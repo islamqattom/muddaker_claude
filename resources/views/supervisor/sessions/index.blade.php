@@ -53,8 +53,8 @@
                             <td><span class="badge bg-secondary">{{ $session->day }}</span></td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:32px;height:32px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:bold;">
-                                        {{ mb_substr($session->student->user->name, 0, 1) }}
+                                    <div class="user-avatar-sm">
+                                        <i class="fas fa-user"></i>
                                     </div>
                                     <span>{{ $session->student->user->name }}</span>
                                 </div>

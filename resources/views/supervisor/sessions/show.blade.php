@@ -27,8 +27,8 @@
             </div>
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div style="width:48px;height:48px;border-radius:50%;background:#182B48;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:bold;">
-                        {{ mb_substr($session->student->user->name, 0, 1) }}
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
                     </div>
                     <div>
                         <div class="fw-semibold">{{ $session->student->user->name }}</div>
