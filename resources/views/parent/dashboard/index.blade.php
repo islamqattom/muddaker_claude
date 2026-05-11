@@ -52,7 +52,7 @@
             <i class="fas fa-check-circle"></i>
         </div>
         <div class="stat-content">
-            @php $totalPresent = array_sum(array_column($studentsData, 'attendance')) ? array_sum(array_column(array_column($studentsData, 'attendance'), 'present')) : 0; @endphp
+            @php $totalPresent = array_sum(array_column(array_column($studentsData, 'attendance'), 'present')); @endphp
             <div class="stat-number">{{ $totalPresent }}</div>
             <div class="stat-label">حضور هذا الشهر</div>
         </div>
