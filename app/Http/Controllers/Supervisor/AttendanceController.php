@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\NotificationService;
+use App\Services\RecitationService;
 
 class AttendanceController extends Controller
 {
@@ -73,6 +74,7 @@ class AttendanceController extends Controller
         ]);
 
         $supervisorId = Auth::id();
+        $presentStudentIds = [];
 
         foreach ($request->attendance as $studentId => $data) {
             $attendance = Attendance::updateOrCreate(
@@ -88,6 +90,18 @@ class AttendanceController extends Controller
             if (in_array($data['status'], ['absent', 'late'])) {
                 $this->notifyParentOnAttendance($attendance);
             }
+
+            if ($data['status'] === 'present') {
+                $presentStudentIds[] = (int) $studentId;
+            }
+        }
+
+        if (!empty($presentStudentIds)) {
+            app(RecitationService::class)->ensureNotRecitateSessions(
+                $presentStudentIds,
+                $supervisorId,
+                $request->date
+            );
         }
 
         return redirect()->back()->with('success', 'تم حفظ سجل الحضور والغياب بنجاح');
