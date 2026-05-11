@@ -49,7 +49,7 @@ class MeetingMinuteController extends Controller
             ->limit(30)
             ->get();
 
-        $changedTasks = [];
+        $changedTasks = collect();
         if ($lastMeeting) {
             $changedTasks = MeetingTask::where('meeting_minute_id', '!=', $lastMeeting->id)
                 ->whereHas('meetingMinute', function($query) {
