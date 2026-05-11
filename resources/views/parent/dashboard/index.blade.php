@@ -82,7 +82,7 @@
             <i class="fas fa-exclamation-triangle"></i>
         </div>
         <div class="stat-content">
-            @php $totalWarnings = $studentsData->flatten(1)->filter(fn($d) => isset($d['recent_warnings']))->sum(fn($d) => $d['recent_warnings']->count()); @endphp
+            @php $totalWarnings = array_sum(array_map(fn($w) => $w->count(), array_column($studentsData, 'recent_warnings'))); @endphp
             <div class="stat-number">{{ $totalWarnings }}</div>
             <div class="stat-label">إنذارات جديدة</div>
         </div>
