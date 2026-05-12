@@ -44,15 +44,22 @@ class TaskController extends Controller
 
     public function updateTitle(Request $request, MeetingTask $task)
     {
-        if (!auth()->check()) {
-            abort(403, 'Unauthorized');
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:500',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->errors()['title'][0] ?? 'Validation failed'], 422);
+            }
+            throw $e;
         }
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:500',
-        ]);
-
         $task->update(['title' => $validated['title']]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'تم تحديث عنوان التكليف بنجاح']);
+        }
 
         return redirect()->back()->with('success', 'تم تحديث عنوان التكليف بنجاح');
     }
