@@ -499,27 +499,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        console.log('taskIdInput:', taskIdInput);
-        console.log('taskTitleInput:', taskTitleInput);
-        console.log('taskIdInput value:', taskIdInput?.value);
-        console.log('title input value:', taskTitleInput?.value);
         const taskId = taskIdInput?.value;
+        const titleValue = taskTitleInput?.value;
+        console.log('taskId:', taskId, 'title:', titleValue);
         const formData = new FormData(form);
-        console.log('FormData entries:');
-        for (const [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-        if (!taskId || !taskTitleInput?.value) {
+        const params = new URLSearchParams();
+        params.append('_token', formData.get('_token'));
+        params.append('_method', 'PUT');
+        params.append('title', titleValue);
+        params.append('task_id', taskId);
+        console.log('URLSearchParams:', params.toString());
+        if (!taskId || !titleValue) {
             alert('Error: Task ID or title not found');
             return;
         }
-        console.log('Fetching URL:', `/admin/tasks/${taskId}/title`);
         const response = await fetch(`/admin/tasks/${taskId}/title`, {
             method: 'PUT',
-            body: formData,
+            body: params,
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
 
