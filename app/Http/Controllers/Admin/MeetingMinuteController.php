@@ -274,6 +274,7 @@ class MeetingMinuteController extends Controller
             'recommendations' => 'nullable|string',
             'assignments' => 'nullable|array',
             'task_status' => 'nullable|array',
+            'task_titles' => 'nullable|array',
             'next_meeting_date' => 'nullable|date',
         ]);
 
@@ -332,11 +333,24 @@ class MeetingMinuteController extends Controller
 
         if (!empty($validated['task_status'])) {
             foreach ($validated['task_status'] as $taskId => $status) {
-                $updateData = ['status' => $status];
-                if ($status === 'completed') {
-                    $updateData['completed_at'] = now();
+                $task = MeetingTask::where('id', $taskId)
+                    ->where('meeting_minute_id', $meetingMinute->id)
+                    ->first();
+                if ($task) {
+                    $updateData = ['status' => $status];
+                    if ($status === 'completed') {
+                        $updateData['completed_at'] = now();
+                    }
+                    $task->update($updateData);
                 }
-                MeetingTask::where('id', $taskId)->update($updateData);
+            }
+        }
+
+        if (!empty($validated['task_titles'])) {
+            foreach ($validated['task_titles'] as $taskId => $title) {
+                MeetingTask::where('id', $taskId)
+                    ->where('meeting_minute_id', $meetingMinute->id)
+                    ->update(['title' => $title]);
             }
         }
 

@@ -653,7 +653,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <th class="text-center" style="width: 60px;">#</th>
                             <th class="text-center">المشرف</th>
                             <th class="text-center">الطالب</th>
-                            <th class="text-center" style="width: 120px;">الحضور</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 3</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 2</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 1</th>
                             <th class="text-center" style="min-width: 200px;">التسميع</th>
                         </tr>
                     </thead>
@@ -684,19 +686,31 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                         <span style="color: var(--primary); font-weight: 600;">{{ $student->user->name ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="text-center align-middle">
+                                <td class="text-center align-middle" colspan="3">
                                     @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
-                                        @php
-                                            $present = $student->last_three_attendances->whereIn('status', ['present', 'late'])->count();
-                                            $total = $student->last_three_attendances->count();
-                                            $rate = $present / $total;
-                                            $colorHex = $rate >= 1 ? '#27ae60' : ($rate >= 0.66 ? '#f39c12' : '#c0392b');
-                                        @endphp
-                                        <div class="attendance-wrapper d-flex flex-column align-items-center gap-2">
-                                            <div class="attendance-bar" style="width: 80px; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                <div class="attendance-bar-fill" style="width: {{ $rate * 100 }}%; background: {{ $colorHex }}; height: 100%; border-radius: 4px;"></div>
-                                            </div>
-                                            <span class="badge fw-bold" style="background: {{ $colorHex }}; color: #fff; font-size: 12px; padding: 4px 10px;">{{ $present }}/{{ $total }}</span>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            @foreach($student->last_three_attendances as $index => $attendance)
+                                                @php
+                                                    $statusConfig = [
+                                                        'present' => ['color' => '#27ae60', 'icon' => 'fa-check', 'label' => 'حاضر'],
+                                                        'late' => ['color' => '#f39c12', 'icon' => 'fa-clock', 'label' => 'تأخر'],
+                                                        'absent' => ['color' => '#c0392b', 'icon' => 'fa-times', 'label' => 'غائب'],
+                                                        'excused' => ['color' => '#8e44ad', 'icon' => 'fa-check', 'label' => 'معذور'],
+                                                        'holiday' => ['color' => '#95a5a6', 'icon' => 'fa-sun', 'label' => 'عطلة'],
+                                                    ];
+                                                    $config = $statusConfig[$attendance->status] ?? $statusConfig['absent'];
+                                                @endphp
+                                                <div class="attendance-day-card d-flex flex-column align-items-center gap-1 p-2" style="background: rgba(255,255,255,0.7); border: 1px solid #e9ecef; border-radius: 8px; min-width: 90px;">
+                                                    <span class="text-muted" style="font-size: 10px;">{{ $attendance->date->format('Y/m/d') }}</span>
+                                                    <span class="fw-bold" style="color: var(--primary); font-size: 11px;">{{ $attendance->day }}</span>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 24px; height: 24px; background: {{ $config['color'] }}; color: #fff;">
+                                                            <i class="fas {{ $config['icon'] }}" style="font-size: 10px;"></i>
+                                                        </span>
+                                                    </div>
+                                                    <span class="badge fw-bold" style="background: {{ $config['color'] }}; color: #fff; font-size: 10px; padding: 2px 6px;">{{ $config['label'] }}</span>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @else
                                         <span class="text-muted">—</span>
@@ -725,6 +739,56 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             </tr>
                             @php $rowIndex++; @endphp
                             @endforeach
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+        @if($meetingMinute->tasks && $meetingMinute->tasks->count() > 0)
+        <div class="divider"></div>
+        <div class="form-section">
+            <div class="section-title">
+                <i class="fas fa-edit" style="color: var(--warning);"></i>
+                <span>تعديل التكليفات القائمة</span>
+                <span class="section-badge">{{ $meetingMinute->tasks->count() }}</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+                            <th class="text-center" style="color: var(--gold); font-weight: 700; padding: 14px 12px;">#</th>
+                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">المشرف</th>
+                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">وصف التكليف</th>
+                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">الحالة</th>
+                            <th class="text-center" style="color: var(--gold); font-weight: 700; padding: 14px 12px;">الحالة الحالية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($meetingMinute->tasks as $index => $task)
+                        <tr style="border-bottom: 2px solid rgba(24,43,72,0.08);">
+                            <td class="text-center align-middle" style="padding: 12px;">
+                                <span class="fw-bold" style="color: var(--primary); font-size: 16px;">{{ $index + 1 }}</span>
+                            </td>
+                            <td style="padding: 12px;">
+                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->assignee->name ?? '-' }}</span>
+                            </td>
+                            <td style="padding: 12px;">
+                                <input type="text" name="task_titles[{{ $task->id }}]" class="form-control" value="{{ $task->title }}" placeholder="وصف التكليف">
+                            </td>
+                            <td style="padding: 12px; min-width: 160px;">
+                                <select name="task_status[{{ $task->id }}]" class="form-select">
+                                    <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
+                                    <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
+                                    <option value="completed" {{ $task->status == 'completed' ? 'selected' : '' }}>مكتمل</option>
+                                    <option value="cancelled" {{ $task->status == 'cancelled' ? 'selected' : '' }}>ملغي</option>
+                                </select>
+                            </td>
+                            <td class="text-center align-middle" style="padding: 12px;">
+                                <span class="badge badge-{{ $task->status_color }}">{{ $task->status_label }}</span>
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>

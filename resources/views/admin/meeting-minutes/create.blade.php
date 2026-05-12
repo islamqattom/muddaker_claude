@@ -644,7 +644,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <th class="text-center" style="width: 60px;">#</th>
                             <th class="text-center">المشرف</th>
                             <th class="text-center">الطالب</th>
-                            <th class="text-center" style="width: 120px;">الحضور</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 3</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 2</th>
+                            <th class="text-center" style="width: 100px;">اليوم - 1</th>
                             <th class="text-center" style="min-width: 200px;">التسميع</th>
                         </tr>
                     </thead>
@@ -675,19 +677,31 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                         <span style="color: var(--primary); font-weight: 600;">{{ $student->user->name ?? '-' }}</span>
                                     </div>
                                 </td>
-                                <td class="text-center align-middle">
+                                <td class="text-center align-middle" colspan="3">
                                     @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
-                                        @php
-                                            $present = $student->last_three_attendances->whereIn('status', ['present', 'late'])->count();
-                                            $total = $student->last_three_attendances->count();
-                                            $rate = $present / $total;
-                                            $colorHex = $rate >= 1 ? '#27ae60' : ($rate >= 0.66 ? '#f39c12' : '#c0392b');
-                                        @endphp
-                                        <div class="attendance-wrapper d-flex flex-column align-items-center gap-2">
-                                            <div class="attendance-bar" style="width: 80px; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                <div class="attendance-bar-fill" style="width: {{ $rate * 100 }}%; background: {{ $colorHex }}; height: 100%; border-radius: 4px;"></div>
-                                            </div>
-                                            <span class="badge fw-bold" style="background: {{ $colorHex }}; color: #fff; font-size: 12px; padding: 4px 10px;">{{ $present }}/{{ $total }}</span>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            @foreach($student->last_three_attendances as $index => $attendance)
+                                                @php
+                                                    $statusConfig = [
+                                                        'present' => ['color' => '#27ae60', 'icon' => 'fa-check', 'label' => 'حاضر'],
+                                                        'late' => ['color' => '#f39c12', 'icon' => 'fa-clock', 'label' => 'تأخر'],
+                                                        'absent' => ['color' => '#c0392b', 'icon' => 'fa-times', 'label' => 'غائب'],
+                                                        'excused' => ['color' => '#8e44ad', 'icon' => 'fa-check', 'label' => 'معذور'],
+                                                        'holiday' => ['color' => '#95a5a6', 'icon' => 'fa-sun', 'label' => 'عطلة'],
+                                                    ];
+                                                    $config = $statusConfig[$attendance->status] ?? $statusConfig['absent'];
+                                                @endphp
+                                                <div class="attendance-day-card d-flex flex-column align-items-center gap-1 p-2" style="background: rgba(255,255,255,0.7); border: 1px solid #e9ecef; border-radius: 8px; min-width: 90px;">
+                                                    <span class="text-muted" style="font-size: 10px;">{{ $attendance->date->format('Y/m/d') }}</span>
+                                                    <span class="fw-bold" style="color: var(--primary); font-size: 11px;">{{ $attendance->day }}</span>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 24px; height: 24px; background: {{ $config['color'] }}; color: #fff;">
+                                                            <i class="fas {{ $config['icon'] }}" style="font-size: 10px;"></i>
+                                                        </span>
+                                                    </div>
+                                                    <span class="badge fw-bold" style="background: {{ $config['color'] }}; color: #fff; font-size: 10px; padding: 2px 6px;">{{ $config['label'] }}</span>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @else
                                         <span class="text-muted">—</span>
