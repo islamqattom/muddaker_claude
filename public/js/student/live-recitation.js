@@ -103,7 +103,9 @@ class LiveRecitationController {
         if (clearTranscriptBtn) {
             clearTranscriptBtn.addEventListener('click', () => {
                 this.transcriptText = '';
-                this.transcriptEl.innerHTML = '<span class="text-muted">جارى الاستماع...</span>';
+                if (this.transcriptEl) {
+                    this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
+                }
             });
         }
     }
@@ -195,7 +197,7 @@ class LiveRecitationController {
 
         // Reset reconnect attempts
         this.reconnectAttempts = 0;
-        this.updateStatus('جارى البدء...');
+        this.updateStatus('جارٍ البدء...');
 
         // Check if we have API token (from meta tag or previous fetch)
         if (!this.apiToken) {
@@ -318,7 +320,7 @@ class LiveRecitationController {
 
         this.ws.onopen = () => {
             this.updateStatusIndicator('active');
-            this.updateStatus('متصل - جارى الاستماع...');
+            this.updateStatus('متصل - جارٍ الاستماع...');
             this.isRecording = true;
             this.startRecording();
         };
@@ -345,6 +347,11 @@ class LiveRecitationController {
                 this.reconnectAttempts++;
                 this.updateStatus('جارٍ إعادة الاتصال... (' + this.reconnectAttempts + '/' + this.maxReconnectAttempts + ')');
                 setTimeout(() => this.connectWebSocket(), this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1));
+            } else if (!this.isEnding) {
+                // Max reconnection attempts reached, stop gracefully
+                this.updateStatus('انقطع الاتصال - جارٍ إنهاء التسميع...');
+                this.showError('انقطع الاتصال بالخادم. سيتم حفظ تقدمك.');
+                setTimeout(() => this.stopRecitation(), 1500);
             }
         };
     }
@@ -355,6 +362,13 @@ class LiveRecitationController {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.mediaRecorder = new MediaRecorder(stream);
             this.audioChunks = [];
+
+            // Set up analyser BEFORE starting recording
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 256;
+            const source = this.audioContext.createMediaStreamSource(stream);
+            source.connect(this.analyser);
+
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     this.audioChunks.push(event.data);
@@ -375,19 +389,12 @@ class LiveRecitationController {
     }
 
     startSilenceDetection() {
-        if (!this.audioContext || !this.isRecording) return;
-        // Reuse existing analyser if already created
-        if (!this.analyser) {
-            this.analyser = this.audioContext.createAnalyser();
-            const source = this.audioContext.createMediaStreamSource(this.mediaRecorder.stream);
-            source.connect(this.analyser);
-            this.analyser.fftSize = 256;
-        }
+        if (!this.analyser || !this.isRecording) return;
         const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         const detectSilence = () => {
             if (!this.isRecording) return;
             this.analyser.getByteFrequencyData(dataArray);
-            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
             if (average < 5) {
                 if (!this.silenceTimeout) {
                     this.silenceTimeout = setTimeout(() => {
@@ -699,14 +706,16 @@ class LiveRecitationController {
 
     normalizeArabic(text) {
         if (!text) return '';
-        // Remove Arabic diacritics (tashkeel) - Unicode range ً-ٟ and ٰ
-        text = text.replace(/[ً-ٰٟ]/g, '');
+        // Remove Arabic diacritics (tashkeel): \x{064B}-\x{065F} and \x{0670}
+        text = text.replace(/[\u064B-\u065F\u0670]/g, '');
         // Normalize alef variations: أ إ آ ا -> ا
         text = text.replace(/[آأإا]/g, 'ا');
+        // Normalize teh marbuta:ة -> ت
+        text = text.replace(/ة/g, 'ت');
         // Normalize ya-al-maqsura: ى -> ي
         text = text.replace(/ى/g, 'ي');
-        // Remove zero-width non-joiner (U+200C) and zero-width joiner (U+200D)
-        text = text.replace(/[‌‍]/g, '');
+        // Remove non-Arabic characters but keep Arabic letters, numbers, spaces
+        text = text.replace(/[^\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\p{N}\s]/gu, '');
         // Normalize whitespace
         text = text.replace(/\s+/g, ' ');
         return text.trim();
@@ -784,6 +793,7 @@ class LiveRecitationController {
     }
 
     updateTranscript(text) {
+        if (!this.transcriptEl) return;
         if (text && text.trim().length > 0) {
             const span = document.createElement('span');
             span.className = 'text-success';
@@ -791,7 +801,7 @@ class LiveRecitationController {
             this.transcriptEl.innerHTML = '';
             this.transcriptEl.appendChild(span);
         } else {
-            this.transcriptEl.innerHTML = '<span class="text-muted">جارى الاستماع...</span>';
+            this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
         }
     }
 
@@ -855,14 +865,22 @@ class LiveRecitationController {
     cleanupRecording() {
         this.stopSilenceDetection();
 
-        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            this.mediaRecorder.stop();
+        if (this.mediaRecorder) {
+            if (this.mediaRecorder.state === 'recording' || this.mediaRecorder.state === 'paused') {
+                this.mediaRecorder.stop();
+            }
+            // Stop all stream tracks to release microphone
+            if (this.mediaRecorder.stream) {
+                this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            this.mediaRecorder = null;
         }
 
-        // Stop all stream tracks to release microphone
-        if (this.mediaRecorder && this.mediaRecorder.stream) {
-            this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        if (this.audioContext) {
+            this.audioContext.close();
+            this.audioContext = null;
         }
+        this.analyser = null;
 
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
@@ -915,8 +933,12 @@ class LiveRecitationController {
         this.nextVerseBtn.classList.add('d-none');
         this.updateStatusIndicator('');
         this.updateStatus('في انتظار البدء');
-        this.currentVerseEl.innerHTML = '<div class="idle-state"><i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i><h5>اضغط "ابدأ التسميع" للبدء</h5><p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p></div>';
-        this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
+        if (this.currentVerseEl) {
+            this.currentVerseEl.innerHTML = '<div class="idle-state"><i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i><h5>اضغط "ابدأ التسميع" للبدء</h5><p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p></div>';
+        }
+        if (this.transcriptEl) {
+            this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
+        }
         this.sessionId = null;
         this.verses = [];
         this.currentVerseIndex = 0;
@@ -930,8 +952,9 @@ class LiveRecitationController {
     }
 
     showReport(report) {
-        const accuracy = report.accuracy || 0;
-        const totalVerses = report.total_verses || 0;
+        const session = report.session || {};
+        const accuracy = session.average_similarity || 0;
+        const totalVerses = session.total_verses || 0;
         const errorCount = report.errors ? report.errors.length : 0;
         let errorsHtml = '';
         if (report.errors && report.errors.length > 0) {

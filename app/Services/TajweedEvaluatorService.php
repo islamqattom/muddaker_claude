@@ -248,19 +248,21 @@ class TajweedEvaluatorService
     public function normalizeArabic(string $text): string
     {
         // Remove diacritics (tashkeel) - Unicode ranges for Arabic diacritics
-        // \u064B-\u065F: Fatha through Tanween Fath, Damatan, Kasratan, Fatha, Damma, Kasra, Sukun, Shadda
-        // \u0670: Dagger alef
+        // \x{064B}-\x{065F}: Fatha through Tanween Fath, Damatan, Kasratan, Fatha, Damma, Kasra, Sukun, Shadda
+        // \x{0670}: Dagger alef
         $text = preg_replace('/[\x{064B}-\x{065F}\x{0670}]/u', '', $text);
 
         // Normalize alef variations
         $text = preg_replace('/[إأآا]/u', 'ا', $text);
 
-        // Normalize teh marbuta - trailing gets heh form, others get teh form
-        $text = str_replace('ة', 'ت', $text);  // First: all teh_marbuta -> teh
-        $text = preg_replace('/ه$/u', 'ة', $text);  // Then: trailing heh that should be teh_marbuta
+        // Normalize teh marbuta (ة) to teh (ت)
+        $text = str_replace('ة', 'ت', $text);
 
-        // Remove non-Arabic characters
-        $text = preg_replace('/[^\p{L}\p{N}\s]/u', '', $text);
+        // Normalize ya-al-maqsura (ى) to ya (ي)
+        $text = str_replace('ى', 'ي', $text);
+
+        // Remove non-Arabic characters but keep Arabic letters, numbers, spaces
+        $text = preg_replace('/[^\p{Arabic}\p{N}\s]/u', '', $text);
 
         return trim($text);
     }

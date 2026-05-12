@@ -172,6 +172,14 @@ class LiveRecitationController extends Controller
             ], 404);
         }
 
+        if ($session->status === 'completed' || $session->status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'error' => 'Session already ended',
+            ], 400);
+        }
+
+        $this->liveRecitationService->endSession($id);
         $report = $this->liveRecitationService->generateReport($id);
 
         return response()->json([
