@@ -511,6 +511,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error: Task ID or title not found');
             return;
         }
+        console.log('Request URL:', `/admin/tasks/${taskId}/title`);
+        console.log('Request body:', params.toString());
         const response = await fetch(`/admin/tasks/${taskId}/title`, {
             method: 'PUT',
             body: params,
