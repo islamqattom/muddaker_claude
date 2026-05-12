@@ -440,6 +440,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     <option value="cancelled" {{ $task->status === 'cancelled' ? 'selected' : '' }}>ملغي</option>
                                 </select>
                             </form>
+                            <button type="button" class="btn btn-sm btn-outline-primary ms-1" onclick="openTitleModal({{ $task->id }}, '{{ addslashes($task->title) }}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
                         </td>
                     </tr>
                     @endforeach
@@ -454,5 +457,62 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     </div>
     @endif
 @endif
+
+<div class="modal fade" id="editTitleModal" tabindex="-1" aria-labelledby="editTitleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTitleModalLabel">تعديل عنوان التكليف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTitleForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <input type="hidden" name="task_id" id="editTaskId">
+                    <div class="mb-3">
+                        <label for="editTaskTitle" class="form-label">عنوان التكليف</label>
+                        <input type="text" class="form-control" id="editTaskTitle" name="title" required maxlength="500">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openTitleModal(taskId, taskTitle) {
+    document.getElementById('editTaskId').value = taskId;
+    document.getElementById('editTaskTitle').value = taskTitle;
+    var modal = new bootstrap.Modal(document.getElementById('editTitleModal'));
+    modal.show();
+}
+
+document.getElementById('editTitleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var taskId = document.getElementById('editTaskId').value;
+    var formAction = '/admin/tasks/' + taskId + '/title';
+    this.action = formAction;
+
+    fetch(this.action, {
+        method: 'PUT',
+        body: new FormData(this),
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    }).then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('حدث خطأ أثناء تحديث العنوان');
+        }
+    });
+});
+</script>
 
 @endsection

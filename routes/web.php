@@ -111,6 +111,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [Admin\TaskController::class, 'index'])->name('index');
         Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
+        Route::put('/{task}/title', [Admin\TaskController::class, 'updateTitle'])->name('updateTitle');
     });
 
     // Audit Logs

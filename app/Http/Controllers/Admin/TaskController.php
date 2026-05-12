@@ -41,4 +41,15 @@ class TaskController extends Controller
 
         return redirect()->back()->with('success', 'تم تحديث حالة التكليف بنجاح');
     }
+
+    public function updateTitle(Request $request, MeetingTask $task)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:500',
+        ]);
+
+        $task->update(['title' => $validated['title']]);
+
+        return redirect()->back()->with('success', 'تم تحديث عنوان التكليف بنجاح');
+    }
 }
