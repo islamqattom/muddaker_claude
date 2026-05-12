@@ -469,7 +469,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                    <input type="hidden" id="editTaskId">
+                    <input type="hidden" id="editTaskId" name="task_id">
                     <div class="mb-3">
                         <label for="editTaskTitle" class="form-label">عنوان التكليف</label>
                         <input type="text" class="form-control" id="editTaskTitle" name="title" required maxlength="500">
@@ -485,32 +485,35 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 </div>
 
 <script>
-function openTitleModal(taskId, taskTitle) {
-    document.getElementById('editTaskId').value = taskId;
-    document.getElementById('editTaskTitle').value = taskTitle;
-    var modal = new bootstrap.Modal(document.getElementById('editTitleModal'));
-    modal.show();
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('editTitleModal');
+    const form = document.getElementById('editTitleForm');
+    const taskIdInput = document.getElementById('editTaskId');
+    const taskTitleInput = document.getElementById('editTaskTitle');
 
-document.getElementById('editTitleForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    var taskId = document.getElementById('editTaskId').value;
-    var formAction = '/admin/tasks/' + taskId + '/title';
+    window.openTitleModal = (taskId, taskTitle) => {
+        taskIdInput.value = taskId;
+        taskTitleInput.value = taskTitle;
+        new bootstrap.Modal(modal).show();
+    };
 
-    fetch(formAction, {
-        method: 'PUT',
-        body: new FormData(this),
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-        }
-    }).then(async response => {
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const taskId = taskIdInput.value;
+        const response = await fetch(`/admin/tasks/${taskId}/title`, {
+            method: 'PUT',
+            body: new FormData(form),
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        });
+
         if (response.ok) {
             window.location.reload();
         } else {
             const data = await response.json().catch(() => ({}));
-            const errorMsg = data.errors?.title?.[0] || data.message || 'حدث خطأ أثناء تحديث العنوان';
-            alert(errorMsg);
+            alert(data.errors?.title?.[0] || data.message || 'حدث خطأ أثناء تحديث العنوان');
         }
     });
 });
