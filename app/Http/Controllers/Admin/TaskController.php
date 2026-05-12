@@ -71,16 +71,27 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'assignee_id' => 'nullable|exists:users,id',
             'due_date' => 'nullable|date',
+            'meeting_minute_id' => 'nullable|exists:meeting_minutes,id',
         ]);
 
-        $task = MeetingTask::create([
+        // Get the latest meeting minute if not specified
+        $meetingMinuteId = $validated['meeting_minute_id'] ?? \App\Models\MeetingMinute::latest('id')->value('id');
+
+        $taskData = [
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'assignee_id' => $validated['assignee_id'] ?? null,
             'assigned_by' => auth()->id(),
             'due_date' => $validated['due_date'] ?? null,
             'status' => 'pending',
-        ]);
+        ];
+
+        // Only add meeting_minute_id if it exists
+        if ($meetingMinuteId) {
+            $taskData['meeting_minute_id'] = $meetingMinuteId;
+        }
+
+        $task = MeetingTask::create($taskData);
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'تم إضافة التكليف بنجاح', 'task' => $task]);

@@ -534,10 +534,35 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 document.addEventListener('DOMContentLoaded', function() {
     // Create Task Modal
     const createModal = document.getElementById('createTaskModal');
+    const createForm = document.getElementById('createTaskForm');
 
     window.openCreateTaskModal = () => {
         new bootstrap.Modal(createModal).show();
     };
+
+    if (createForm) {
+        createForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(createForm);
+            const response = await fetch(createForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const text = await response.text();
+                let data = {};
+                try { data = JSON.parse(text); } catch {}
+                alert(data.message || data.errors?.title?.[0] || 'حدث خطأ أثناء إضافة التكليف');
+            }
+        });
+    }
 
     // Edit Title Modal
     const editModal = document.getElementById('editTitleModal');
