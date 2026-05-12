@@ -679,7 +679,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
                                         @php
                                             $presentCount = $student->last_three_attendances->where('status', 'present')->count();
-                                            $totalDays = $student->last_three_attendances->count();
+                                            $totalDays = 3;
                                             $attendanceRatio = $presentCount . '/' . $totalDays;
                                             $ratioColor = $presentCount == 3 ? '#27ae60' : ($presentCount == 2 ? '#f39c12' : '#c0392b');
                                         @endphp
