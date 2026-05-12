@@ -516,8 +516,7 @@ document.addEventListener('DOMContentLoaded', function() {
             body: params,
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Accept': 'application/json'
             }
         });
 
