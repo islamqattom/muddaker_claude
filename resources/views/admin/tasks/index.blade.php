@@ -503,12 +503,18 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('taskTitleInput:', taskTitleInput);
         console.log('taskIdInput value:', taskIdInput?.value);
         console.log('title input value:', taskTitleInput?.value);
-        const taskId = taskIdInput.value;
+        const taskId = taskIdInput?.value;
         const formData = new FormData(form);
         console.log('FormData entries:');
         for (const [key, value] of formData.entries()) {
             console.log(key, value);
         }
+        if (!taskId || !taskTitleInput?.value) {
+            alert('Error: Task ID or title not found');
+            return;
+        }
+        console.log('Fetching URL:', `/admin/tasks/${taskId}/title`);
+        const response = await fetch(`/admin/tasks/${taskId}/title`, {
         const response = await fetch(`/admin/tasks/${taskId}/title`, {
             method: 'PUT',
             body: formData,
