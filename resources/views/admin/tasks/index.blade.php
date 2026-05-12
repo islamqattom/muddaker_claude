@@ -515,7 +515,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         console.log('Fetching URL:', `/admin/tasks/${taskId}/title`);
         const response = await fetch(`/admin/tasks/${taskId}/title`, {
-        const response = await fetch(`/admin/tasks/${taskId}/title`, {
             method: 'PUT',
             body: formData,
             headers: {
