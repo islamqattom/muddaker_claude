@@ -465,7 +465,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <h5 class="modal-title" id="editTitleModalLabel">تعديل عنوان التكليف</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editTitleForm" method="POST">
+            <form id="editTitleForm" method="POST" action="">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -496,9 +496,8 @@ document.getElementById('editTitleForm').addEventListener('submit', function(e) 
     e.preventDefault();
     var taskId = document.getElementById('editTaskId').value;
     var formAction = '/admin/tasks/' + taskId + '/title';
-    this.action = formAction;
 
-    fetch(this.action, {
+    fetch(formAction, {
         method: 'PUT',
         body: new FormData(this),
         headers: {
