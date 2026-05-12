@@ -499,10 +499,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
+        console.log('taskIdInput:', taskIdInput);
+        console.log('taskTitleInput:', taskTitleInput);
+        console.log('taskIdInput value:', taskIdInput?.value);
+        console.log('title input value:', taskTitleInput?.value);
         const taskId = taskIdInput.value;
+        const formData = new FormData(form);
+        console.log('FormData entries:');
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
         const response = await fetch(`/admin/tasks/${taskId}/title`, {
             method: 'PUT',
-            body: new FormData(form),
+            body: formData,
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 'Accept': 'application/json'
