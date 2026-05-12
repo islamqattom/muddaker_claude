@@ -500,15 +500,13 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async e => {
         e.preventDefault();
         const taskId = taskIdInput?.value;
-        const titleValue = taskTitleInput?.value;
-        console.log('taskId:', taskId, 'title:', titleValue);
-        const formData = new FormData(form);
+        const titleValue = document.getElementById('editTaskTitle').value;
+        console.log('taskId:', taskId, 'titleValue from input:', titleValue);
         const params = new URLSearchParams();
-        params.append('_token', formData.get('_token'));
+        params.append('_token', document.querySelector('meta[name="csrf-token"]').content);
         params.append('_method', 'PUT');
         params.append('title', titleValue);
-        params.append('task_id', taskId);
-        console.log('URLSearchParams:', params.toString());
+        console.log('params title value:', params.get('title'));
         if (!taskId || !titleValue) {
             alert('Error: Task ID or title not found');
             return;
@@ -526,7 +524,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (response.ok) {
             window.location.reload();
         } else {
-            const data = await response.json().catch(() => ({}));
+            const text = await response.text();
+            console.log('Error response:', text);
+            let data = {};
+            try { data = JSON.parse(text); } catch {}
             alert(data.errors?.title?.[0] || data.message || 'حدث خطأ أثناء تحديث العنوان');
         }
     });
