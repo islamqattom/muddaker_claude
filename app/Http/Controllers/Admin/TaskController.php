@@ -44,6 +44,10 @@ class TaskController extends Controller
 
     public function updateTitle(Request $request, MeetingTask $task)
     {
+        if (!auth()->check()) {
+            abort(403, 'Unauthorized');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:500',
         ]);

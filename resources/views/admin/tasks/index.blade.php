@@ -469,7 +469,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                    <input type="hidden" name="task_id" id="editTaskId">
+                    <input type="hidden" id="editTaskId">
                     <div class="mb-3">
                         <label for="editTaskTitle" class="form-label">عنوان التكليف</label>
                         <input type="text" class="form-control" id="editTaskTitle" name="title" required maxlength="500">
@@ -505,11 +505,13 @@ document.getElementById('editTitleForm').addEventListener('submit', function(e) 
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             'Accept': 'application/json'
         }
-    }).then(response => {
+    }).then(async response => {
         if (response.ok) {
             window.location.reload();
         } else {
-            alert('حدث خطأ أثناء تحديث العنوان');
+            const data = await response.json().catch(() => ({}));
+            const errorMsg = data.errors?.title?.[0] || data.message || 'حدث خطأ أثناء تحديث العنوان';
+            alert(errorMsg);
         }
     });
 });
