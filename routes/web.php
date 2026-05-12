@@ -110,6 +110,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Tasks
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [Admin\TaskController::class, 'index'])->name('index');
+        Route::post('/', [Admin\TaskController::class, 'store'])->name('store');
         Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
         Route::put('/{task}/title', [Admin\TaskController::class, 'updateTitle'])->name('updateTitle');
     });

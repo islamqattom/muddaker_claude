@@ -63,4 +63,29 @@ class TaskController extends Controller
 
         return redirect()->back()->with('success', 'تم تحديث عنوان التكليف بنجاح');
     }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:500',
+            'description' => 'nullable|string',
+            'assignee_id' => 'nullable|exists:users,id',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task = MeetingTask::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'assignee_id' => $validated['assignee_id'] ?? null,
+            'assigned_by' => auth()->id(),
+            'due_date' => $validated['due_date'] ?? null,
+            'status' => 'pending',
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'تم إضافة التكليف بنجاح', 'task' => $task]);
+        }
+
+        return redirect()->back()->with('success', 'تم إضافة التكليف بنجاح');
+    }
 }

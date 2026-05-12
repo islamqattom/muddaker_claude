@@ -268,6 +268,11 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
             <p>متابعة وتتبع جميع التكليفات المكلّفة للمشرفين</p>
         </div>
     </div>
+    <div class="header-actions">
+        <button type="button" class="btn btn-primary" onclick="openCreateTaskModal()">
+            <i class="fas fa-plus"></i> إضافة تكليف
+        </button>
+    </div>
 </div>
 
 @php
@@ -458,6 +463,47 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     @endif
 @endif
 
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaskModalLabel">إضافة تكليف جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createTaskForm" method="POST" action="{{ route('admin.tasks.store') }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="createTaskTitle" class="form-label">عنوان التكليف <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="createTaskTitle" name="title" required maxlength="500" placeholder="أدخل عنوان التكليف">
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaskDescription" class="form-label">الوصف</label>
+                        <textarea class="form-control" id="createTaskDescription" name="description" rows="3" placeholder="أدخل وصف التكليف (اختياري)"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaskAssignee" class="form-label">المشرف المسؤول</label>
+                        <select class="form-select" id="createTaskAssignee" name="assignee_id">
+                            <option value="">— اختر المشرف —</option>
+                            @foreach($supervisors as $supervisor)
+                                <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createTaskDueDate" class="form-label">تاريخ الاستحقاق</label>
+                        <input type="date" class="form-control" id="createTaskDueDate" name="due_date">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إضافة التكليف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="editTitleModal" tabindex="-1" aria-labelledby="editTitleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -486,7 +532,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('editTitleModal');
+    // Create Task Modal
+    const createModal = document.getElementById('createTaskModal');
+
+    window.openCreateTaskModal = () => {
+        new bootstrap.Modal(createModal).show();
+    };
+
+    // Edit Title Modal
+    const editModal = document.getElementById('editTitleModal');
     const form = document.getElementById('editTitleForm');
     const taskIdInput = document.getElementById('editTaskId');
     const taskTitleInput = document.getElementById('editTaskTitle');
@@ -494,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openTitleModal = (taskId, taskTitle) => {
         taskIdInput.value = taskId;
         taskTitleInput.value = taskTitle;
-        new bootstrap.Modal(modal).show();
+        new bootstrap.Modal(editModal).show();
     };
 
     form.addEventListener('submit', async e => {
