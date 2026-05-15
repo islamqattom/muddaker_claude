@@ -230,13 +230,7 @@
                                     <td><span class="page-num">{{ $session->start_page }}</span></td>
                                     <td><span class="page-num">{{ $session->end_page }}</span></td>
                                     <td>
-                                        @if($session->status === 'passed')
-                                            <span class="status-badge success">ناجح</span>
-                                        @elseif($session->status === 'failed')
-                                            <span class="status-badge danger">راسب</span>
-                                        @else
-                                            <span class="status-badge pending">قيد التسميع</span>
-                                        @endif
+                                        <span class="status-badge {{ $session->status_color }}">{{ $session->status_label }}</span>
                                     </td>
                                 </tr>
                                 @endforeach

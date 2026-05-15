@@ -186,15 +186,9 @@
                                 <td>{{ $session->part->name ?? '-' }}</td>
                                 <td>{{ $session->from_page }}</td>
                                 <td>{{ $session->to_page }}</td>
-                                <td>
-                                    @if($session->status === 'passed')
-                                        <span class="badge bg-success">ناجح</span>
-                                    @elseif($session->status === 'failed')
-                                        <span class="badge bg-danger">راسب</span>
-                                    @else
-                                        <span class="badge bg-secondary">{{ $session->status }}</span>
-                                    @endif
-                                </td>
+                                    <td>
+                                        <span class="badge bg-{{ $session->status_color }}">{{ $session->status_label }}</span>
+                                    </td>
                             </tr>
                             @endforeach
                         </tbody>

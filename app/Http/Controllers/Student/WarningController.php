@@ -10,14 +10,13 @@ class WarningController extends Controller
     public function index()
     {
         $student = Auth::user()->student;
-        $warnings = Warning::where('student_id', $student->id)->latest()->get();
+        $warnings = Warning::where('student_id', $student->id)->latest()->paginate(15);
         return view('student.warnings.index', compact('warnings'));
     }
 
     public function show(Warning $warning)
     {
         $student = Auth::user()->student;
-        // Ensure the warning belongs to this student
         if ($warning->student_id !== $student->id) {
             abort(403);
         }

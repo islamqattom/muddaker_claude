@@ -4,8 +4,8 @@
     <span>لوحتي الشخصية</span>
 </a>
 <span class="nav-section-title">القرآن الكريم</span>
-<a href="{{ route('student.quran') }}" class="nav-link {{ request()->routeIs('student.quran*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
+<a href="{{ route('student.quran.page', 1) }}" class="nav-link {{ request()->routeIs('student.quran.page') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
     <span>قراءة القرآن</span>
 </a>
 <a href="{{ route('student.live-recitation') }}" class="nav-link {{ request()->routeIs('student.live-recitation*') ? 'active' : '' }}">
@@ -45,6 +45,10 @@
 <a href="{{ route('student.bookmarks') }}" class="nav-link {{ request()->routeIs('student.bookmarks*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-bookmark"></i></div>
     <span>علاماتي</span>
+</a>
+<a href="{{ route('student.azkar') }}" class="nav-link {{ request()->routeIs('student.azkar*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
+    <span>أذكار المسلم</span>
 </a>
 <span class="nav-section-title">المساعدة</span>
 <a href="{{ route('student.memorization') }}" class="nav-link {{ request()->routeIs('student.memorization') ? 'active' : '' }}">

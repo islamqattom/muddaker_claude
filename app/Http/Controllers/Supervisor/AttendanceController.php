@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Services\NotificationService;
-use App\Services\RecitationService;
 
 class AttendanceController extends Controller
 {
@@ -74,7 +73,6 @@ class AttendanceController extends Controller
         ]);
 
         $supervisorId = Auth::id();
-        $presentStudentIds = [];
 
         foreach ($request->attendance as $studentId => $data) {
             $attendance = Attendance::updateOrCreate(
@@ -90,18 +88,7 @@ class AttendanceController extends Controller
             if (in_array($data['status'], ['absent', 'late'])) {
                 $this->notifyParentOnAttendance($attendance);
             }
-
-            if ($data['status'] === 'present') {
-                $presentStudentIds[] = (int) $studentId;
-            }
-        }
-
-        if (!empty($presentStudentIds)) {
-            app(RecitationService::class)->ensureNotRecitateSessions(
-                $presentStudentIds,
-                $supervisorId,
-                $request->date
-            );
+            $this->notifyStudentOnAttendance($attendance);
         }
 
         return redirect()->back()->with('success', 'تم حفظ سجل الحضور والغياب بنجاح');
@@ -194,6 +181,36 @@ class AttendanceController extends Controller
             );
         } catch (\Exception $e) {
             \Log::error("Failed to notify parent about attendance {$attendance->id}: " . $e->getMessage());
+        }
+    }
+
+    protected function notifyStudentOnAttendance(Attendance $attendance): void
+    {
+        $student = $attendance->student;
+        if (!$student->user) {
+            return;
+        }
+
+        $statusLabels = [
+            'present' => 'حاضر',
+            'absent' => 'غائب',
+            'late' => 'متأخر',
+            'excused' => 'غائب بعذر',
+            'holiday' => 'عطلة',
+        ];
+        $statusLabel = $statusLabels[$attendance->status] ?? $attendance->status;
+
+        try {
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $student->user,
+                'attendance',
+                "تم تسجيل حضورك",
+                "تم تسجيلك ك{$statusLabel} بتاريخ {$attendance->date}",
+                route('student.attendance.index')
+            );
+        } catch (\Exception $e) {
+            \Log::error("Failed to notify student about attendance {$attendance->id}: " . $e->getMessage());
         }
     }
 }

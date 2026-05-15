@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewMeetingTaskAssigned extends Notification implements ShouldQueue
+class NewMeetingTaskAssigned extends Notification
 {
     use Queueable;
 
@@ -23,6 +23,12 @@ class NewMeetingTaskAssigned extends Notification implements ShouldQueue
 
     public function toArray(object $notifiable): array
     {
+        $link = match (true) {
+            $notifiable->isAdmin() => route('admin.tasks.index'),
+            $notifiable->isSupervisor() => route('supervisor.tasks.index'),
+            default => route('notifications.index'),
+        };
+
         return [
             'type' => 'meeting_task',
             'task_id' => $this->task->id,
@@ -30,6 +36,7 @@ class NewMeetingTaskAssigned extends Notification implements ShouldQueue
             'meeting_minute_id' => $this->task->meeting_minute_id,
             'message' => 'تم إسناد تكليف جديد: ' . $this->task->title,
             'assigned_by' => $this->task->assigner?->name ?? 'غير معروف',
+            'link' => $link,
         ];
     }
 }

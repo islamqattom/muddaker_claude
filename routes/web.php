@@ -269,7 +269,6 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/student-parts', [StudentStudentPartRecordController::class, 'show'])->name('student-parts');
 
     // Quran Reader
-    Route::get('/quran', [Student\QuranReaderController::class, 'index'])->name('quran');
     Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
     Route::get('/quran/part/{part}', [Student\QuranReaderController::class, 'part'])->name('quran.part');
 
@@ -288,6 +287,12 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::put('/bookmarks/{id}', [Student\BookmarkController::class, 'update'])->name('bookmarks.update');
     Route::delete('/bookmarks/{id}', [Student\BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
     Route::get('/bookmarks/export', [Student\BookmarkController::class, 'export'])->name('bookmarks.export');
+
+    // Azkar (أذكار المسلم)
+    Route::get('/azkar', [Student\AzkarController::class, 'index'])->name('azkar');
+    Route::get('/azkar/{id}', [Student\AzkarController::class, 'category'])->name('azkar.category');
+    Route::post('/azkar/track', [Student\AzkarController::class, 'track'])->name('azkar.track');
+    Route::post('/azkar/reset', [Student\AzkarController::class, 'resetStats'])->name('azkar.reset');
 
     // Achievements
     Route::get('/achievements', [Student\AchievementController::class, 'index'])->name('achievements');

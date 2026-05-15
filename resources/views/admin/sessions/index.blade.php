@@ -196,10 +196,14 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     padding: 6px 16px; border-radius: 25px;
     font-size: 12px; font-weight: 700;
 }
-.status-badge.passed { background: rgba(39,174,96,0.15); color: var(--success); }
-.status-badge.passed i { color: var(--success); }
-.status-badge.failed { background: rgba(192,57,43,0.15); color: var(--danger); }
-.status-badge.failed i { color: var(--danger); }
+.status-badge.passed, .status-badge.success { background: rgba(39,174,96,0.15); color: var(--success); }
+.status-badge.passed i, .status-badge.success i { color: var(--success); }
+.status-badge.failed, .status-badge.danger { background: rgba(192,57,43,0.15); color: var(--danger); }
+.status-badge.failed i, .status-badge.danger i { color: var(--danger); }
+.status-badge.in_progress, .status-badge.warning { background: rgba(243,156,18,0.15); color: var(--warning); }
+.status-badge.in_progress i, .status-badge.warning i { color: var(--warning); }
+.status-badge.not_recite, .status-badge.secondary { background: rgba(149,165,166,0.15); color: #95a5a6; }
+.status-badge.incomplete { background: rgba(149,165,166,0.15); color: #95a5a6; }
 
 .action-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -425,22 +429,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             @endif
                         </td>
                         <td>
-                            @if($session->final_score !== null)
-                                @php $passingScore = $session->max_score * 0.7; @endphp
-                                @if($session->final_score >= $passingScore)
-                                    <span class="status-badge passed">
-                                        <i class="fas fa-check-circle"></i>
-                                        ناجح
-                                    </span>
-                                @else
-                                    <span class="status-badge failed">
-                                        <i class="fas fa-times-circle"></i>
-                                        راسب
-                                    </span>
-                                @endif
-                            @else
-                                <span style="color: #95a5a6;">—</span>
-                            @endif
+                            <span class="status-badge {{ $session->status_color }}">
+                                {{ $session->status_label }}
+                            </span>
                         </td>
                         <td>
                             <a href="{{ route('admin.sessions.show', $session->id) }}" class="action-btn view">

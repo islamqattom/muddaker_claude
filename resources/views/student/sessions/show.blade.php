@@ -315,7 +315,7 @@
     </div>
     @endif
 
-    @if($session->pages->isNotEmpty())
+    @if(isset($session->all_pages) && $session->all_pages->isNotEmpty())
     <div class="info-card">
         <div class="card-accent"></div>
         <div class="info-header">
@@ -336,7 +336,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($session->pages as $index => $page)
+                        @foreach($session->all_pages as $index => $page)
                         <tr>
                             <td><span style="color: var(--gold); font-weight: 700;">{{ $index + 1 }}</span></td>
                             <td class="fw-bold" style="color: var(--navy);">{{ $page->page_number }}</td>

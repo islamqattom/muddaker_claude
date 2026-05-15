@@ -22,6 +22,7 @@ class NotificationService
             'title' => $title,
             'message' => $body,
             'link' => $link,
+            'is_read' => false,
         ]);
 
         $this->sendWebPush($user, $title, $body, $link);

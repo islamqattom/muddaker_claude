@@ -2123,7 +2123,7 @@
         <!-- Header -->
         <header class="top-header">
             <!-- Mobile menu toggle -->
-            <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="القائمة" aria-label="القائمة" style="background:#fff;color:#182B48;border:none;width:42px;height:42px;border-radius:10px;box-shadow:0 2px 8px rgba(24,43,72,0.15);">
+            <button class="btn btn-sm d-lg-none" id="mobileMenuBtn" onclick="toggleMobileSidebar()" title="القائمة" aria-label="القائمة" style="background:#fff;color:#182B48;border:none;width:44px;height:44px;border-radius:10px;box-shadow:0 2px 8px rgba(24,43,72,0.15);">
                 <i class="fas fa-bars"></i>
             </button>
 
@@ -2163,7 +2163,9 @@
                         <div class="notif-list">
                             @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notif)
                                 <a href="{{ $notif->link ?? ($notif->is_read ? '#' : route('notifications.markAsRead', $notif->id)) }}"
-                                   class="notif-item {{ !$notif->is_read ? 'unread' : '' }}">
+                                   class="notif-item {{ !$notif->is_read ? 'unread' : '' }} mark-as-read-header"
+                                   data-notif-id="{{ $notif->id }}"
+                                   data-link="{{ $notif->link ?? '' }}">
                                     <div class="notif-icon {{ !$notif->is_read ? 'new' : '' }}">
                                         @if(str_contains($notif->type, 'warning'))
                                             <i class="fas fa-exclamation-triangle"></i>
@@ -2445,6 +2447,55 @@
     <!-- PWA Push + Service Worker -->
     <script src="/js/push-init.js"></script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.mark-as-read-header').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                const notifId = this.dataset.notifId;
+                const link = this.dataset.link;
+                const isUnread = this.classList.contains('unread');
+
+                if (isUnread && notifId) {
+                    e.preventDefault();
+                    fetch('/notifications/' + notifId + '/read', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.classList.remove('unread');
+                        const dot = this.querySelector('.notif-dot');
+                        if (dot) dot.remove();
+                        const badge = document.getElementById('notifBadge');
+                        if (badge) {
+                            const currentCount = parseInt(badge.textContent) || 0;
+                            if (currentCount > 0) {
+                                badge.textContent = currentCount - 1;
+                                if (currentCount - 1 <= 0) badge.remove();
+                            }
+                        }
+                        if (data.success && data.link) {
+                            window.location.href = data.link;
+                        } else if (link) {
+                            window.location.href = link;
+                        } else {
+                            window.location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        if (link) window.location.href = link;
+                        else window.location.reload();
+                    });
+                } else if (link) {
+                    window.location.href = link;
+                }
+            });
+        });
+    });
+    </script>
 
     @stack('scripts')
 </body>

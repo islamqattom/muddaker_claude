@@ -49,8 +49,8 @@
                 <td>{{ $session->part->name ?? '-' }}</td>
                 <td>{{ $session->from_page }} - {{ $session->to_page }}</td>
                 <td>{{ $session->session_date?->format('d/m/Y') }}</td>
-                <td class="{{ $session->status === 'passed' ? 'status-passed' : 'status-failed' }}">
-                    {{ $session->status === 'passed' ? 'ناجح' : ($session->status === 'failed' ? 'راسب' : $session->status) }}
+                <td class="{{ $session->status === 'passed' ? 'status-passed' : ($session->status === 'failed' ? 'status-failed' : '') }}">
+                    {{ $session->status_label }}
                 </td>
             </tr>
             @endforeach

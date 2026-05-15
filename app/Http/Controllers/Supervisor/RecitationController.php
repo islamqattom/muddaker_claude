@@ -311,6 +311,9 @@ class RecitationController extends Controller
             'notes' => $request->reason,
         ]);
 
+        $this->notifyParentOnSession($session);
+        $this->notifyStudentOnSession($session);
+
         return redirect()->route('supervisor.recitation.index')
             ->with('success', 'تم تسجيل عدم التسميع بنجاح');
     }
@@ -366,6 +369,7 @@ class RecitationController extends Controller
             });
 
             $this->notifyParentOnSession($session);
+            $this->notifyStudentOnSession($session);
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -629,6 +633,9 @@ class RecitationController extends Controller
                 return $session;
             });
 
+            $this->notifyParentOnSession($session);
+            $this->notifyStudentOnSession($session);
+
             return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
         } catch (\Exception $e) {
             \Log::error('Failed to save recitation session: ' . $e->getMessage());
@@ -747,11 +754,44 @@ class RecitationController extends Controller
                 $parent->user,
                 'recitation_session',
                 "تسميع جديد للطالب {$student->name}",
-                "تم تسجيل {$typeLabel} بتاريخ {$session->session_date}{$scoreText} - {$statusText}",
+                "تم تسجيل تلاوة بتاريخ {$session->session_date} من نوع {$typeLabel} بنتيجة {$statusText}{$scoreText}",
                 route('parent.sessions.show', $session->id)
             );
         } catch (\Exception $e) {
             \Log::error("Failed to notify parent about session {$session->id}: " . $e->getMessage());
+        }
+    }
+
+    protected function notifyStudentOnSession(RecitationSession $session): void
+    {
+        $student = $session->student;
+        if (!$student->user) {
+            return;
+        }
+
+        $typeLabels = [
+            'new_memorization' => 'حفظ جديد',
+            'review' => 'مراجعة',
+            'unmastered' => 'غير متقنة',
+            'recitation' => 'تلاوة',
+            'mafsil' => 'مفصل',
+        ];
+
+        $typeLabel = $typeLabels[$session->type] ?? $session->type;
+        $scoreText = $session->final_score !== null ? " - الدرجة: {$session->final_score}" : '';
+        $statusText = $session->status === RecitationSession::STATUS_PASSED ? 'ناجح' : 'راسب';
+
+        try {
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendToUser(
+                $student->user,
+                'recitation_session',
+                "تم تسجيل تسميع جديد",
+                "تم تسجيل تلاوة بتاريخ {$session->session_date} من نوع {$typeLabel} بنتيجة {$statusText}{$scoreText}",
+                route('student.sessions.show', $session->id)
+            );
+        } catch (\Exception $e) {
+            \Log::error("Failed to notify student about session {$session->id}: " . $e->getMessage());
         }
     }
 }

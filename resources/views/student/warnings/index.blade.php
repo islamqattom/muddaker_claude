@@ -12,66 +12,232 @@
     <li class="breadcrumb-item active">الإنذارات</li>
 @endsection
 
+@push('styles')
+<style>
+.student-warnings {
+    --gold: #d4a030;
+    --gold-light: #e6b84d;
+    --navy: #182B48;
+    --navy-light: #2A4570;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #c0392b;
+    --info: #3498db;
+}
+
+.student-warnings .page-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.student-warnings .page-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.student-warnings .page-hero::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100px; height: 4px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.student-warnings .hero-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--danger) 0%, #e74c3c 100%);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: white;
+    box-shadow: 0 6px 18px rgba(192,57,43,0.35);
+}
+
+.student-warnings .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.student-warnings .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+
+.student-warnings .warnings-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    border: 1px solid rgba(24,43,72,0.04);
+    overflow: hidden;
+}
+
+.student-warnings .warnings-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+.student-warnings .warnings-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.student-warnings .warnings-header h5 i { color: var(--gold); }
+
+.student-warnings .warnings-table { margin: 0; }
+
+.student-warnings .warnings-table thead th {
+    background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--navy);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.student-warnings .warnings-table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-color: rgba(24,43,72,0.04);
+    font-size: 14px;
+}
+
+.student-warnings .warnings-table tbody tr { transition: all 0.2s ease; }
+.student-warnings .warnings-table tbody tr:hover { background: linear-gradient(90deg, rgba(212,160,48,0.04) 0%, rgba(24,43,72,0.02) 100%); }
+.student-warnings .warnings-table tbody tr:hover td:first-child { border-right: 3px solid var(--gold); }
+
+.student-warnings .type-badge {
+    padding: 6px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 600;
+}
+
+.student-warnings .type-badge.attendance { background: rgba(243,156,18,0.15); color: var(--warning); }
+.student-warnings .type-badge.recitation { background: rgba(52,152,219,0.15); color: var(--info); }
+.student-warnings .type-badge.general { background: rgba(108,117,125,0.15); color: #6c757d; }
+
+.student-warnings .warning-number {
+    font-family: monospace;
+    background: rgba(24,43,72,0.06);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.student-warnings .view-btn {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(24,43,72,0.1);
+    background: white;
+    color: var(--navy);
+    transition: all 0.2s ease;
+}
+
+.student-warnings .view-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24,43,72,0.2);
+    background: var(--navy);
+    color: white;
+}
+
+.student-warnings .pagination-wrapper {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(24,43,72,0.04);
+    display: flex; justify-content: center;
+}
+
+.student-warnings .empty-state { text-align: center; padding: 60px 20px; }
+.student-warnings .empty-icon {
+    width: 90px; height: 90px;
+    background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(46,204,113,0.15));
+    border-radius: 22px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+}
+.student-warnings .empty-icon i { font-size: 36px; color: var(--success); }
+
+@media (max-width: 992px) {
+    .student-warnings .page-hero { padding: 20px 24px; }
+    .student-warnings .hero-icon { width: 48px; height: 48px; font-size: 20px; }
+    .student-warnings .hero-title { font-size: 18px; }
+}
+</style>
+@endpush
+
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h6 class="mb-0">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            سجل الإنذارات
-        </h6>
+<div class="student-warnings">
+    <div class="page-hero">
+        <div class="d-flex align-items-center gap-3">
+            <div class="hero-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <h1 class="hero-title">الإنذارات</h1>
+                <p class="hero-sub">سجل الإنذارات والتوبيخات</p>
+            </div>
+        </div>
     </div>
-    <div class="card-body p-0">
+
+    <div class="warnings-card">
+        <div class="warnings-header">
+            <h5><i class="fas fa-list"></i>جدول الإنذارات</h5>
+            <span class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 12px; padding: 6px 14px; border-radius: 20px; font-weight: 600;">
+                <i class="fas fa-exclamation-circle me-1"></i>
+                {{ $warnings->total() }} إنذار
+            </span>
+        </div>
+
         @if($warnings->isEmpty())
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-check-circle fa-3x mb-3 d-block text-success"></i>
-                <p>لا توجد إنذارات مسجلة بحقك</p>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h5 class="text-muted mb-2">لا توجد إنذارات</h5>
+                <p class="text-muted small">لم يتم تسجيل أي إنذارات بحقك حتى الآن</p>
             </div>
         @else
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table warnings-table">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>نوع الإنذار</th>
                             <th>العنوان</th>
                             <th>التاريخ</th>
-                            <th>اليوم</th>
                             <th>الرقم</th>
-                            <th>الإجراءات</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($warnings as $index => $warning)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td><span style="color: var(--gold); font-weight: 700;">{{ $warnings->firstItem() + $index }}</span></td>
                             <td>
-                                @if($warning->type === 'attendance')
-                                    <span class="badge bg-warning text-dark">
+                                <span class="type-badge {{ $warning->type }}">
+                                    @if($warning->type === 'attendance')
                                         <i class="fas fa-calendar-times me-1"></i>حضور
-                                    </span>
-                                @elseif($warning->type === 'recitation')
-                                    <span class="badge bg-info">
+                                    @elseif($warning->type === 'recitation')
                                         <i class="fas fa-microphone me-1"></i>تسميع
-                                    </span>
-                                @else
-                                    <span class="badge bg-secondary">
+                                    @else
                                         <i class="fas fa-exclamation-circle me-1"></i>عام
-                                    </span>
-                                @endif
+                                    @endif
+                                </span>
                             </td>
-                            <td>{{ $warning->title }}</td>
-                            <td>{{ $warning->issue_date->format('d/m/Y') }}</td>
-                            <td><span class="badge bg-secondary">{{ $warning->issue_day }}</span></td>
-                            <td><code class="small">{{ $warning->warning_number }}</code></td>
+                            <td class="fw-semibold" style="color: var(--navy);">{{ $warning->title }}</td>
+                            <td><span class="date-val">{{ $warning->issue_date->format('Y/m/d') }}</span></td>
+                            <td><span class="warning-number">{{ $warning->warning_number }}</span></td>
                             <td>
-                                <a href="{{ route('student.warnings.show', $warning->id) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> عرض
+                                <a href="{{ route('student.warnings.show', $warning->id) }}" class="view-btn" title="عرض التفاصيل">
+                                    <i class="fas fa-eye"></i>
                                 </a>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+
+            <div class="pagination-wrapper">
+                {{ $warnings->links() }}
             </div>
         @endif
     </div>

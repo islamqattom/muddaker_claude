@@ -197,7 +197,7 @@
 <body>
     <div class="login-card">
         <div class="login-logo">
-            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo" style="width:180px;height:120px;">
+            <img src="{{ asset('images/muddaker-logo-main-nobg.png') }}" alt="Logo" style="width:140px;height:93px;">
             <p>نظام متابعة وتسميع القرآن الكريم</p>
         </div>
 

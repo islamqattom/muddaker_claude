@@ -31,6 +31,123 @@ class QuranApiService
         26 => [502, 520], 27 => [521, 539], 28 => [540, 557], 29 => [558, 577], 30 => [578, 604],
     ];
 
+    public const SURAH_INFO = [
+        1 => ['name' => 'الفاتحة', 'aya' => 7, 'type' => 'مكية'],
+        2 => ['name' => 'البقرة', 'aya' => 286, 'type' => 'مدنية'],
+        3 => ['name' => 'آل عمران', 'aya' => 200, 'type' => 'مدنية'],
+        4 => ['name' => 'النساء', 'aya' => 176, 'type' => 'مدنية'],
+        5 => ['name' => 'المائدة', 'aya' => 120, 'type' => 'مدنية'],
+        6 => ['name' => 'الأنعام', 'aya' => 165, 'type' => 'مكية'],
+        7 => ['name' => 'الأعراف', 'aya' => 206, 'type' => 'مكية'],
+        8 => ['name' => 'الأنفال', 'aya' => 75, 'type' => 'مدنية'],
+        9 => ['name' => 'التوبة', 'aya' => 129, 'type' => 'مدنية'],
+        10 => ['name' => 'يونس', 'aya' => 109, 'type' => 'مكية'],
+        11 => ['name' => 'هود', 'aya' => 123, 'type' => 'مكية'],
+        12 => ['name' => 'يوسف', 'aya' => 111, 'type' => 'مكية'],
+        13 => ['name' => 'الرعد', 'aya' => 43, 'type' => 'مدنية'],
+        14 => ['name' => 'إبراهيم', 'aya' => 52, 'type' => 'مكية'],
+        15 => ['name' => 'الحجر', 'aya' => 99, 'type' => 'مكية'],
+        16 => ['name' => 'النحل', 'aya' => 128, 'type' => 'مكية'],
+        17 => ['name' => 'الإسراء', 'aya' => 111, 'type' => 'مكية'],
+        18 => ['name' => 'الكهف', 'aya' => 110, 'type' => 'مكية'],
+        19 => ['name' => 'مريم', 'aya' => 98, 'type' => 'مكية'],
+        20 => ['name' => 'طه', 'aya' => 135, 'type' => 'مكية'],
+        21 => ['name' => 'الأنبياء', 'aya' => 112, 'type' => 'مكية'],
+        22 => ['name' => 'الحج', 'aya' => 78, 'type' => 'مدنية'],
+        23 => ['name' => 'المؤمنون', 'aya' => 118, 'type' => 'مكية'],
+        24 => ['name' => 'النور', 'aya' => 64, 'type' => 'مدنية'],
+        25 => ['name' => 'الفرقان', 'aya' => 77, 'type' => 'مكية'],
+        26 => ['name' => 'الشعراء', 'aya' => 227, 'type' => 'مكية'],
+        27 => ['name' => 'النمل', 'aya' => 93, 'type' => 'مكية'],
+        28 => ['name' => 'القصص', 'aya' => 88, 'type' => 'مكية'],
+        29 => ['name' => 'العنكبوت', 'aya' => 69, 'type' => 'مكية'],
+        30 => ['name' => 'الروم', 'aya' => 60, 'type' => 'مكية'],
+        31 => ['name' => 'لقمان', 'aya' => 34, 'type' => 'مكية'],
+        32 => ['name' => 'السجدة', 'aya' => 30, 'type' => 'مكية'],
+        33 => ['name' => 'الأحزاب', 'aya' => 73, 'type' => 'مدنية'],
+        34 => ['name' => 'سبأ', 'aya' => 54, 'type' => 'مكية'],
+        35 => ['name' => 'فاطر', 'aya' => 45, 'type' => 'مكية'],
+        36 => ['name' => 'يس', 'aya' => 83, 'type' => 'مكية'],
+        37 => ['name' => 'الصافات', 'aya' => 182, 'type' => 'مكية'],
+        38 => ['name' => 'ص', 'aya' => 88, 'type' => 'مكية'],
+        39 => ['name' => 'الزمر', 'aya' => 75, 'type' => 'مكية'],
+        40 => ['name' => 'غافر', 'aya' => 85, 'type' => 'مكية'],
+        41 => ['name' => 'فصلت', 'aya' => 54, 'type' => 'مكية'],
+        42 => ['name' => 'الشورى', 'aya' => 53, 'type' => 'مكية'],
+        43 => ['name' => 'الزخرف', 'aya' => 89, 'type' => 'مكية'],
+        44 => ['name' => 'الدخان', 'aya' => 59, 'type' => 'مكية'],
+        45 => ['name' => 'الجاثية', 'aya' => 37, 'type' => 'مكية'],
+        46 => ['name' => 'الأحقاف', 'aya' => 35, 'type' => 'مكية'],
+        47 => ['name' => 'محمد', 'aya' => 38, 'type' => 'مدنية'],
+        48 => ['name' => 'الفتح', 'aya' => 29, 'type' => 'مدنية'],
+        49 => ['name' => 'الحجرات', 'aya' => 18, 'type' => 'مدنية'],
+        50 => ['name' => 'ق', 'aya' => 45, 'type' => 'مكية'],
+        51 => ['name' => 'الذاريات', 'aya' => 60, 'type' => 'مكية'],
+        52 => ['name' => 'الطور', 'aya' => 49, 'type' => 'مكية'],
+        53 => ['name' => 'النجم', 'aya' => 62, 'type' => 'مكية'],
+        54 => ['name' => 'القمر', 'aya' => 55, 'type' => 'مكية'],
+        55 => ['name' => 'الرحمن', 'aya' => 78, 'type' => 'مدنية'],
+        56 => ['name' => 'الواقعة', 'aya' => 96, 'type' => 'مكية'],
+        57 => ['name' => 'الحديد', 'aya' => 29, 'type' => 'مدنية'],
+        58 => ['name' => 'المجادلة', 'aya' => 22, 'type' => 'مدنية'],
+        59 => ['name' => 'الحشر', 'aya' => 24, 'type' => 'مدنية'],
+        60 => ['name' => 'الممتحنة', 'aya' => 13, 'type' => 'مدنية'],
+        61 => ['name' => 'الصف', 'aya' => 14, 'type' => 'مدنية'],
+        62 => ['name' => 'الجمعة', 'aya' => 11, 'type' => 'مدنية'],
+        63 => ['name' => 'المنافقون', 'aya' => 11, 'type' => 'مدنية'],
+        64 => ['name' => 'التغابن', 'aya' => 18, 'type' => 'مدنية'],
+        65 => ['name' => 'الطلاق', 'aya' => 12, 'type' => 'مدنية'],
+        66 => ['name' => 'التحريم', 'aya' => 12, 'type' => 'مدنية'],
+        67 => ['name' => 'الملك', 'aya' => 30, 'type' => 'مكية'],
+        68 => ['name' => 'القلم', 'aya' => 52, 'type' => 'مكية'],
+        69 => ['name' => 'الحاقة', 'aya' => 52, 'type' => 'مكية'],
+        70 => ['name' => 'المعارج', 'aya' => 44, 'type' => 'مكية'],
+        71 => ['name' => 'نوح', 'aya' => 28, 'type' => 'مكية'],
+        72 => ['name' => 'الجن', 'aya' => 28, 'type' => 'مكية'],
+        73 => ['name' => 'المزمل', 'aya' => 20, 'type' => 'مكية'],
+        74 => ['name' => 'المدثر', 'aya' => 56, 'type' => 'مكية'],
+        75 => ['name' => 'القيامة', 'aya' => 40, 'type' => 'مكية'],
+        76 => ['name' => 'الإنسان', 'aya' => 31, 'type' => 'مدنية'],
+        77 => ['name' => 'المرسلات', 'aya' => 50, 'type' => 'مكية'],
+        78 => ['name' => 'النبأ', 'aya' => 40, 'type' => 'مكية'],
+        79 => ['name' => 'النازعات', 'aya' => 46, 'type' => 'مكية'],
+        80 => ['name' => 'عبس', 'aya' => 42, 'type' => 'مكية'],
+        81 => ['name' => 'التكوير', 'aya' => 29, 'type' => 'مكية'],
+        82 => ['name' => 'الانفطار', 'aya' => 19, 'type' => 'مكية'],
+        83 => ['name' => 'المطففين', 'aya' => 36, 'type' => 'مكية'],
+        84 => ['name' => 'الانشقاق', 'aya' => 25, 'type' => 'مكية'],
+        85 => ['name' => 'البروج', 'aya' => 22, 'type' => 'مكية'],
+        86 => ['name' => 'الطارق', 'aya' => 17, 'type' => 'مكية'],
+        87 => ['name' => 'الأعلى', 'aya' => 19, 'type' => 'مكية'],
+        88 => ['name' => 'الغاشية', 'aya' => 26, 'type' => 'مكية'],
+        89 => ['name' => 'الفجر', 'aya' => 30, 'type' => 'مكية'],
+        90 => ['name' => 'البلد', 'aya' => 20, 'type' => 'مكية'],
+        91 => ['name' => 'الشمس', 'aya' => 18, 'type' => 'مكية'],
+        92 => ['name' => 'الليل', 'aya' => 21, 'type' => 'مكية'],
+        93 => ['name' => 'الضحى', 'aya' => 11, 'type' => 'مكية'],
+        94 => ['name' => 'الشرح', 'aya' => 8, 'type' => 'مكية'],
+        95 => ['name' => 'التين', 'aya' => 8, 'type' => 'مكية'],
+        96 => ['name' => 'العلق', 'aya' => 19, 'type' => 'مكية'],
+        97 => ['name' => 'القدر', 'aya' => 5, 'type' => 'مكية'],
+        98 => ['name' => 'البينة', 'aya' => 8, 'type' => 'مدنية'],
+        99 => ['name' => 'الزلزلة', 'aya' => 8, 'type' => 'مدنية'],
+        100 => ['name' => 'العاديات', 'aya' => 11, 'type' => 'مكية'],
+        101 => ['name' => 'القارعة', 'aya' => 11, 'type' => 'مكية'],
+        102 => ['name' => 'التكاثر', 'aya' => 8, 'type' => 'مكية'],
+        103 => ['name' => 'العصر', 'aya' => 3, 'type' => 'مكية'],
+        104 => ['name' => 'الهمزة', 'aya' => 9, 'type' => 'مكية'],
+        105 => ['name' => 'الفيل', 'aya' => 5, 'type' => 'مكية'],
+        106 => ['name' => 'قريش', 'aya' => 4, 'type' => 'مكية'],
+        107 => ['name' => 'الماعون', 'aya' => 7, 'type' => 'مكية'],
+        108 => ['name' => 'الكوثر', 'aya' => 3, 'type' => 'مكية'],
+        109 => ['name' => 'الكافرون', 'aya' => 6, 'type' => 'مكية'],
+        110 => ['name' => 'النصر', 'aya' => 3, 'type' => 'مدنية'],
+        111 => ['name' => 'المسد', 'aya' => 5, 'type' => 'مكية'],
+        112 => ['name' => 'الإخلاص', 'aya' => 4, 'type' => 'مكية'],
+        113 => ['name' => 'الفلق', 'aya' => 5, 'type' => 'مكية'],
+        114 => ['name' => 'الناس', 'aya' => 6, 'type' => 'مكية'],
+    ];
+
     public function getPage(int $pageNumber): array
     {
         $cacheKey = "quran_page_{$pageNumber}";
@@ -279,5 +396,67 @@ class QuranApiService
         }
 
         return self::JUZ_DATA[$juzNumber][1];
+    }
+
+    public function getSurahs(): array
+    {
+        return self::SURAH_INFO;
+    }
+
+    public function getSurah(int $number): array
+    {
+        if ($number < 1 || $number > 114) {
+            throw new \InvalidArgumentException("Surah number must be between 1 and 114, got {$number}");
+        }
+
+        $cacheKey = "quran_surah_{$number}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($number) {
+            $response = Http::get(self::BASE_URL . "/surah/{$number}/quran-quranuthmani");
+
+            if ($response->failed()) {
+                Log::error('QuranApiService: Failed to fetch surah', [
+                    'surah' => $number,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                throw new \Exception("Failed to fetch Surah {$number}");
+            }
+
+            return $response->json()['data'];
+        });
+    }
+
+    public function getSurahAudioUrls(int $surahNumber, string $reciter = 'ar.alafasy'): array
+    {
+        $cacheKey = "quran_surah_audio_{$surahNumber}_{$reciter}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($surahNumber, $reciter) {
+            $surah = $this->getSurah($surahNumber);
+            $urls = [];
+
+            foreach ($surah['ayahs'] as $verse) {
+                $verseInSurah = $verse['numberInSurah'];
+                $verseKey = "{$surahNumber}:{$verseInSurah}";
+                $urls[$verseKey] = "https://cdn.islamic.network/quran/audio/128/{$reciter}/{$verse['number']}.mp3";
+            }
+
+            return $urls;
+        });
+    }
+
+    public function getAvailableReciters(): array
+    {
+        return [
+            'ar.alafasy' => 'مشاري راشد العفاسي',
+            'ar.abdulbaset' => 'عبد الباسط عبد الصمد',
+            'ar.minshawimujawwad' => 'محمد صدقي المنشاوي',
+            'ar.husary' => 'محمود خليل الحصري',
+            'ar.shuraym' => 'سعود الشريم',
+            'ar.ahmedajamy' => 'أحمد بن علي العجمي',
+            'arulu' => 'عبد الرحمن السديس',
+            'sv' => 'سعد الغامدي',
+            'fb' => 'فارس عباد',
+        ];
     }
 }

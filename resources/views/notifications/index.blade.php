@@ -78,8 +78,10 @@
     </div>
     <div class="notif-list-modern">
         @forelse($notifications as $notification)
-            <a href="{{ route('notifications.markAsRead', $notification->id) }}"
-               class="notif-item-modern {{ !$notification->is_read ? 'unread' : '' }}">
+            <a href="{{ !$notification->is_read ? '#' : ($notification->link ?? '#') }}"
+               class="notif-item-modern {{ !$notification->is_read ? 'unread' : '' }} mark-as-read-page"
+               data-notif-id="{{ $notification->id }}"
+               data-link="{{ $notification->link ?? '' }}">
                 <div class="notif-icon-wrapper
                     @if($notification->type === 'warning_draft') warning-draft
                     @elseif($notification->type === 'warning') warning
@@ -364,4 +366,47 @@
     }
 }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.mark-as-read-page').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+            const notifId = this.dataset.notifId;
+            const link = this.dataset.link;
+            const isUnread = this.classList.contains('unread');
+
+            if (isUnread && notifId) {
+                e.preventDefault();
+                fetch('/notifications/' + notifId + '/read', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.classList.remove('unread');
+                    const badge = this.querySelector('.notif-badge-new');
+                    if (badge) badge.remove();
+                    if (data.success && data.link) {
+                        window.location.href = data.link;
+                    } else if (link) {
+                        window.location.href = link;
+                    } else {
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    window.location.reload();
+                });
+            } else if (link) {
+                window.location.href = link;
+            }
+        });
+    });
+});
+</script>
 @endpush

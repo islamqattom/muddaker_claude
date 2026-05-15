@@ -251,6 +251,32 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .empty-state-card h5 { color: var(--primary); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
 .empty-state-card p { color: #95a5a6; margin-bottom: 25px; font-size: 15px; }
 
+.btn-add {
+    background: transparent;
+    border: 2px dashed var(--gold);
+    border-radius: 12px;
+    color: var(--gold);
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: 'Tajawal', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+}
+.btn-add:hover { background: rgba(212,160,48,0.08); border-style: solid; }
+.btn-add i { font-size: 14px; }
+
+.assignment-row {
+    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-radius: 14px; padding: 16px;
+    margin-bottom: 12px; border: 2px solid rgba(24,43,72,0.06);
+}
+.assignment-row .form-label {
+    font-weight: 600; color: #5a6c7d;
+    margin-bottom: 8px; display: block;
+    font-size: 14px;
+}
+.assignment-row .form-label i { color: var(--gold); margin-left: 6px; }
+
 @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) {
     .stats-grid { grid-template-columns: 1fr; }
@@ -464,40 +490,51 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 @endif
 
 <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createTaskModalLabel">إضافة تكليف جديد</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
+                <h5 class="modal-title" id="createTaskModalLabel" style="color: #fff;">
+                    <i class="fas fa-tasks" style="color: var(--gold);"></i>
+                    إضافة تكليف جديد
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createTaskForm" method="POST" action="{{ route('admin.tasks.store') }}">
                 @csrf
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="createTaskTitle" class="form-label">عنوان التكليف <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="createTaskTitle" name="title" required maxlength="500" placeholder="أدخل عنوان التكليف">
+                    <div id="tasks-assignments-container">
+                        <div class="assignment-row" data-index="0">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label"><i class="fas fa-user-tie" style="color: var(--gold);"></i> المشرف</label>
+                                    <select name="assignments[0][supervisor_id]" class="form-select">
+                                        <option value="">-- المشرف --</option>
+                                        @foreach($supervisors as $supervisor)
+                                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-tasks" style="color: var(--gold);"></i> وصف التكليف</label>
+                                    <input type="text" name="assignments[0][task]" class="form-control" placeholder="وصف التكليف">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius: 10px;" disabled>
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="createTaskDescription" class="form-label">الوصف</label>
-                        <textarea class="form-control" id="createTaskDescription" name="description" rows="3" placeholder="أدخل وصف التكليف (اختياري)"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="createTaskAssignee" class="form-label">المشرف المسؤول</label>
-                        <select class="form-select" id="createTaskAssignee" name="assignee_id">
-                            <option value="">— اختر المشرف —</option>
-                            @foreach($supervisors as $supervisor)
-                                <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="createTaskDueDate" class="form-label">تاريخ الاستحقاق</label>
-                        <input type="date" class="form-control" id="createTaskDueDate" name="due_date">
-                    </div>
+                    <button type="button" class="btn-add mt-3 w-100" onclick="addTaskAssignment()">
+                        <i class="fas fa-plus"></i>إضافة تكليف
+                    </button>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary">إضافة التكليف</button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff;">
+                        <i class="fas fa-save"></i> إضافة التكليف
+                    </button>
                 </div>
             </form>
         </div>
@@ -540,6 +577,43 @@ document.addEventListener('DOMContentLoaded', function() {
         new bootstrap.Modal(createModal).show();
     };
 
+    window.addTaskAssignment = function() {
+        const container = document.getElementById('tasks-assignments-container');
+        const count = container.querySelectorAll('.assignment-row').length;
+        const supervisors = @json($supervisors);
+        let options = '<option value="">-- المشرف --</option>';
+        supervisors.forEach(function(s) {
+            options += '<option value="' + s.id + '">' + s.name + '</option>';
+        });
+        const html = '<div class="assignment-row" data-index="' + count + '">' +
+            '<div class="row g-3 align-items-end">' +
+            '<div class="col-md-4">' +
+            '<label class="form-label"><i class="fas fa-user-tie" style="color: var(--gold);"></i> المشرف</label>' +
+            '<select name="assignments[' + count + '][supervisor_id]" class="form-select">' + options + '</select>' +
+            '</div>' +
+            '<div class="col-md-6">' +
+            '<label class="form-label"><i class="fas fa-tasks" style="color: var(--gold);"></i> وصف التكليف</label>' +
+            '<input type="text" name="assignments[' + count + '][task]" class="form-control" placeholder="وصف التكليف">' +
+            '</div>' +
+            '<div class="col-md-2">' +
+            '<button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius: 10px;">' +
+            '<i class="fas fa-trash-alt"></i>' +
+            '</button>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        container.insertAdjacentHTML('beforeend', html);
+    };
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-task-assignment')) {
+            const row = e.target.closest('.assignment-row');
+            if (row && document.querySelectorAll('.assignment-row').length > 1) {
+                row.remove();
+            }
+        }
+    });
+
     if (createForm) {
         createForm.addEventListener('submit', async e => {
             e.preventDefault();
@@ -559,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const text = await response.text();
                 let data = {};
                 try { data = JSON.parse(text); } catch {}
-                alert(data.message || data.errors?.title?.[0] || 'حدث خطأ أثناء إضافة التكليف');
+                alert(data.message || 'حدث خطأ أثناء إضافة التكليف');
             }
         });
     }

@@ -44,6 +44,7 @@ class BookmarkController extends Controller
         $validated = $request->validate([
             'page_number' => 'required|integer|min:1|max:604',
             'verse_number' => 'nullable|integer|min:1',
+            'surah_number' => 'nullable|integer|min:1|max:114',
             'surah_name' => 'nullable|string|max:255',
             'category_id' => 'nullable|exists:bookmark_categories,id',
             'title' => 'nullable|string|max:255',

@@ -16,19 +16,6 @@ class QuranReaderController extends Controller
         $this->quranApi = $quranApi;
     }
 
-    public function index()
-    {
-        $user = Auth::user();
-        $student = $user->student()->firstOrFail();
-        $juzOptions = $this->quranApi->getJuzOptions();
-
-        return view('student.quran.reader', [
-            'student' => $student,
-            'currentPage' => $student->current_page ?? 1,
-            'juzOptions' => $juzOptions,
-        ]);
-    }
-
     public function page(int $page)
     {
         $user = Auth::user();
@@ -43,6 +30,7 @@ class QuranReaderController extends Controller
             $audioUrls = $this->quranApi->getAudioUrls($page);
             $juzOptions = $this->quranApi->getJuzOptions();
             $currentJuz = $this->quranApi->getJuzForPage($page);
+            $reciters = $this->quranApi->getAvailableReciters();
         } catch (\Exception $e) {
             return back()->with('error', 'فشل في تحميل الصفحة: ' . $e->getMessage());
         }
@@ -54,6 +42,7 @@ class QuranReaderController extends Controller
             'audioUrls' => $audioUrls,
             'juzOptions' => $juzOptions,
             'currentJuz' => $currentJuz,
+            'reciters' => $reciters,
         ]);
     }
 

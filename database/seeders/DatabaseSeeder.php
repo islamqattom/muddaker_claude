@@ -178,6 +178,7 @@ class DatabaseSeeder extends Seeder
             $parent->students()->attach($student->id);
         }
 
+        $this->call(AzkarSeeder::class);
         $this->command->info('✅ تم إنشاء البيانات الأولية بنجاح!');
         $this->command->table(
             ['المستخدم', 'البريد الإلكتروني', 'كلمة المرور', 'الدور'],

@@ -112,7 +112,7 @@
                         @endif
                     </td>
                     <td>
-                        <span class="badge {{ $session->status === 'passed' ? 'badge-success' : 'badge-danger' }}">
+                        <span class="badge bg-{{ $session->status_color }}">
                             {{ $session->status_label }}
                         </span>
                     </td>

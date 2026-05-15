@@ -344,7 +344,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     }
     .student-table {
         font-size: 12px;
-        min-width: 500px;
     }
     .student-table thead th,
     .student-table tbody td {
@@ -654,7 +653,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <th class="text-center">المشرف</th>
                             <th class="text-center">الطالب</th>
                             <th class="text-center">الحضور</th>
-                            <th class="text-center" style="min-width: 200px;">التسميع</th>
+                            <th class="text-center">التسميع</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -688,9 +687,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
                                         @php
                                             $presentCount = $student->last_three_attendances->where('status', 'present')->count();
-                                            $totalDays = 3;
+                                            $totalDays = $student->last_three_attendances->count();
                                             $attendanceRatio = $presentCount . '/' . $totalDays;
-                                            $ratioColor = $presentCount == 3 ? '#27ae60' : ($presentCount == 2 ? '#f39c12' : '#c0392b');
+                                            $ratioColor = $presentCount == $totalDays ? '#27ae60' : ($presentCount >= ($totalDays / 2) ? '#f39c12' : '#c0392b');
                                         @endphp
                                         <span class="attendance-ratio-badge d-inline-flex align-items-center justify-content-center rounded-pill" style="background: {{ $ratioColor }}; color: #fff; padding: 6px 16px; font-weight: 700; font-size: 14px;">
                                             {{ $attendanceRatio }}

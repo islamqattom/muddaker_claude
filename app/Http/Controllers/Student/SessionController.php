@@ -38,15 +38,35 @@ class SessionController extends Controller {
         $user = Auth::user();
         $role = $user->role;
 
-        // Load common relationships
         $session->load(['part', 'pages', 'supervisor']);
 
-        // For students, ensure they can only view their own sessions
         if ($role === 'student') {
             $student = $user->student;
             if ($session->student_id !== $student->id) {
                 abort(403, 'غير مصرح لك بالوصول إلى هذه الصفحة');
             }
+        }
+
+        if ($session->start_page && $session->end_page) {
+            $recordedPages = $session->pages->keyBy('page_number');
+            $allPages = collect();
+
+            for ($p = $session->start_page; $p <= $session->end_page; $p++) {
+                if (isset($recordedPages[$p])) {
+                    $allPages->push($recordedPages[$p]);
+                } else {
+                    $allPages->push((object) [
+                        'page_number' => $p,
+                        'errors' => 0,
+                        'hesitations' => 0,
+                        'color_status' => 'green',
+                        'color_label' => 'ممتاز',
+                        'color_class' => 'bg-success text-white',
+                        'page_score' => null,
+                    ]);
+                }
+            }
+            $session->all_pages = $allPages;
         }
 
         return view('student.sessions.show', compact('session'));

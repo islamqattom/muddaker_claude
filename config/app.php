@@ -26,6 +26,11 @@ return [
         'api_key' => env('ASSEMBLYAI_API_KEY', ''),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY', ''),
+        'model' => env('OPENAI_MODEL', 'gpt-4o'),
+    ],
+
     'providers' => [
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,

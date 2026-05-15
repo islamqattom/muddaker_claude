@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\Warning;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -147,6 +148,8 @@ class WarningController extends Controller
             'test_data' => $testData,
         ]);
 
+        $this->notifyStudentAndParent($student, $warning);
+
         return redirect()->route('admin.warnings.show', $warning)->with('success', 'تم إضافة الإنذار بنجاح');
     }
 
@@ -272,5 +275,39 @@ class WarningController extends Controller
             return $dateTime->format('h:i A');
         }
         return $time;
+    }
+
+    private function notifyStudentAndParent(Student $student, Warning $warning): void
+    {
+        $notificationService = app(NotificationService::class);
+
+        if ($student->user) {
+            try {
+                $notificationService->sendToUser(
+                    $student->user,
+                    'warning',
+                    "إنذار جديد",
+                    "تم إصدار إنذار جديد: {$warning->title}",
+                    route('student.warnings.show', $warning->id)
+                );
+            } catch (\Exception $e) {
+                \Log::error("Failed to notify student {$student->id} about warning {$warning->id}: " . $e->getMessage());
+            }
+        }
+
+        $parent = $student->parents()->first();
+        if ($parent && $parent->user) {
+            try {
+                $notificationService->sendToUser(
+                    $parent->user,
+                    'warning',
+                    "إنذار جديد لابنكم",
+                    "تم إصدار إنذار جديد لابنكم {$student->name}: {$warning->title}",
+                    route('parent.warnings.show', $warning->id)
+                );
+            } catch (\Exception $e) {
+                \Log::error("Failed to notify parent {$parent->id} about warning {$warning->id}: " . $e->getMessage());
+            }
+        }
     }
 }

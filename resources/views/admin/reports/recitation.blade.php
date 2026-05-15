@@ -353,19 +353,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <td>{{ $session->start_page ?? '-' }} - {{ $session->end_page ?? '-' }}</td>
                             <td style="font-weight: 600;">{{ $session->session_date?->format('Y/m/d') }}</td>
                             <td>
-                                @if($session->status === 'passed')
-                                    <span class="status-badge passed">
-                                        <i class="fas fa-check"></i>ناجح
-                                    </span>
-                                @elseif($session->status === 'failed')
-                                    <span class="status-badge failed">
-                                        <i class="fas fa-times"></i>راسب
-                                    </span>
-                                @else
-                                    <span class="status-badge" style="background: rgba(149,165,166,0.15); color: #95a5a6;">
-                                        {{ $session->status }}
-                                    </span>
-                                @endif
+                                <span class="status-badge {{ $session->status }}">
+                                    {{ $session->status_label }}
+                                </span>
                             </td>
                         </tr>
                         @endforeach

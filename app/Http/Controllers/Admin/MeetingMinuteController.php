@@ -10,6 +10,7 @@ use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
 use App\Notifications\NewMeetingTaskAssigned;
+use App\Services\AiParsingService;
 use Illuminate\Http\Request;
 
 class MeetingMinuteController extends Controller
@@ -160,18 +161,23 @@ class MeetingMinuteController extends Controller
 
                     $assignee = User::find($assignment['supervisor_id']);
                     if ($assignee) {
+                        $link = $assignee->isSupervisor()
+                            ? route('supervisor.tasks.index')
+                            : route('admin.tasks.index');
                         \App\Models\Notification::create([
                             'user_id' => $assignee->id,
                             'title' => 'تكليف جديد',
                             'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
                             'type' => 'meeting_task',
-                            'link' => route('admin.meeting-minutes.show', $meetingMinute->id),
+                            'link' => $link,
                             'is_read' => false,
                         ]);
                     }
                 }
             }
         }
+
+        $this->processAiExtractedTasks($meetingMinute, $validated);
 
         if (!empty($validated['task_status'])) {
             foreach ($validated['task_status'] as $taskId => $status) {
@@ -318,12 +324,15 @@ class MeetingMinuteController extends Controller
 
                     $assignee = User::find($assignment['supervisor_id']);
                     if ($assignee) {
+                        $link = $assignee->isSupervisor()
+                            ? route('supervisor.tasks.index')
+                            : route('admin.tasks.index');
                         \App\Models\Notification::create([
                             'user_id' => $assignee->id,
                             'title' => 'تكليف جديد',
                             'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
                             'type' => 'meeting_task',
-                            'link' => route('admin.meeting-minutes.show', $meetingMinute->id),
+                            'link' => $link,
                             'is_read' => false,
                         ]);
                     }
@@ -378,5 +387,66 @@ class MeetingMinuteController extends Controller
         $meetingMinute->update(['status' => 'archived']);
 
         return redirect()->back()->with('success', 'تم أرشفة المحضر بنجاح');
+    }
+
+    private function processAiExtractedTasks(MeetingMinute $meetingMinute, array $validated): void
+    {
+        $supervisors = User::whereIn('role', ['supervisor'])->get()->map(fn($u) => [
+            'id' => $u->id,
+            'name' => $u->name,
+        ])->toArray();
+
+        $meetingData = [
+            'title' => $validated['meeting_date'] ?? '',
+            'decisions' => $validated['decisions'] ?? '',
+            'recommendations' => $validated['recommendations'] ?? '',
+            'agenda' => $validated['agenda'] ?? [],
+            'attendees' => $validated['attendees'] ?? [],
+            'supervisors' => $supervisors,
+        ];
+
+        $aiService = app(AiParsingService::class);
+        $result = $aiService->analyzeMeetingMinutes($meetingData);
+
+        if (!$result['success'] || empty($result['tasks'])) {
+            return;
+        }
+
+        foreach ($result['tasks'] as $aiTask) {
+            if (empty($aiTask['title']) || empty($aiTask['assignee_id'])) {
+                continue;
+            }
+
+            $assigneeId = (int) $aiTask['assignee_id'];
+            $supervisorExists = collect($supervisors)->contains('id', $assigneeId);
+
+            if (!$supervisorExists) {
+                continue;
+            }
+
+            $task = MeetingTask::create([
+                'meeting_minute_id' => $meetingMinute->id,
+                'assignee_id' => $assigneeId,
+                'assigned_by' => auth()->id(),
+                'title' => $aiTask['title'],
+                'description' => $aiTask['description'] ?? null,
+                'status' => 'pending',
+            ]);
+
+            $assignee = User::find($assigneeId);
+            if ($assignee) {
+                $link = $assignee->isSupervisor()
+                    ? route('supervisor.tasks.index')
+                    : route('admin.tasks.index');
+                \App\Models\Notification::create([
+                    'user_id' => $assignee->id,
+                    'title' => 'تكليف جديد من الذكاء الاصطناعي',
+                    'message' => 'تم إسناد تكليف تلقائياً: ' . $aiTask['title'],
+                    'type' => 'meeting_task',
+                    'link' => $link,
+                    'is_read' => false,
+                ]);
+            }
+        }
     }
 }

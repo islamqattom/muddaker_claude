@@ -167,6 +167,94 @@
 </div>
 
 {{-- Changes Section --}}
+@php
+function formatAuditValue($value, $modelType = null) {
+    if (!is_array($value)) {
+        return $value;
+    }
+
+    $fieldLabels = [
+        'student_id' => 'الطالب',
+        'supervisor_id' => 'المشرف',
+        'part_id' => 'الجزء',
+        'type' => 'نوع التسميع',
+        'status' => 'الحالة',
+        'start_page' => 'من صفحة',
+        'end_page' => 'إلى صفحة',
+        'total_pages' => 'عدد الصفحات',
+        'total_errors' => 'عدد الأخطاء',
+        'total_hesitations' => 'عدد الترددات',
+        'max_score' => 'الدرجة القصوى',
+        'final_score' => 'العلامة النهائية',
+        'session_date' => 'تاريخ الجلسة',
+        'notes' => 'ملاحظات',
+        'name' => 'الاسم',
+        'email' => 'البريد الإلكتروني',
+        'phone' => 'الهاتف',
+        'address' => 'العنوان',
+        'level_id' => 'المستوى',
+        'is_active' => 'نشط',
+        'created_at' => 'تاريخ الإنشاء',
+        'updated_at' => 'تاريخ التحديث',
+        'pages' => 'الصفحات',
+        'mafsil_type' => 'نوع المفصل',
+        'unmastered_pages_count' => 'عدد الصفحات غير المتقنة',
+        'additional_pages' => 'صفحات إضافية',
+        'repeated_pages' => 'صفحات متكررة',
+    ];
+
+    $typeLabels = [
+        'new_memorization' => 'حفظ جديد',
+        'review' => 'مراجعة',
+        'unmastered' => 'حفظ غير متقن',
+        'recitation' => 'سرد',
+        'mafsil' => 'مفصل',
+        'not_recitate' => 'لم يسمع',
+    ];
+
+    $statusLabels = [
+        'passed' => 'ناجح',
+        'failed' => 'راسب',
+        'in_progress' => 'قيد التسميع',
+        'not_recitate' => 'لم يسمع',
+        'incomplete' => 'لم يكمل',
+    ];
+
+    $output = '';
+    foreach ($value as $key => $item) {
+        $label = $fieldLabels[$key] ?? $key;
+
+        if (is_array($item)) {
+            if ($key === 'pages' && isset($item[0]) && is_array($item[0])) {
+                $pageNumbers = array_column($item, 'page_number');
+                $output .= "{$label}: " . implode(', ', $pageNumbers) . "\n";
+            } else {
+                $output .= "{$label}:\n";
+                foreach ($item as $subKey => $subItem) {
+                    $subLabel = $fieldLabels[$subKey] ?? $subKey;
+                    $displayValue = is_bool($subItem) ? ($subItem ? 'نعم' : 'لا') : (is_array($subItem) ? json_encode($subItem, JSON_UNESCAPED_UNICODE) : $subItem);
+                    $output .= "    - {$subLabel}: {$displayValue}\n";
+                }
+            }
+        } else {
+            $displayValue = $item;
+            if ($key === 'type' && isset($typeLabels[$item])) {
+                $displayValue = $typeLabels[$item];
+            } elseif ($key === 'status' && isset($statusLabels[$item])) {
+                $displayValue = $statusLabels[$item];
+            } elseif (is_bool($item)) {
+                $displayValue = $item ? 'نعم' : 'لا';
+            } elseif ($item === null || $item === '') {
+                $displayValue = '—';
+            }
+
+            $output .= "{$label}: {$displayValue}\n";
+        }
+    }
+    return $output;
+}
+@endphp
+
 @if($auditLog->action === 'updated' && ($auditLog->old_values || $auditLog->new_values))
     <div class="changes-section">
         <div class="changes-grid">
@@ -176,7 +264,7 @@
                     <span>القيم القديمة</span>
                 </div>
                 <div class="change-card-body">
-                    <pre class="json-data">{{ json_encode($auditLog->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                    <pre class="json-data">{{ formatAuditValue($auditLog->old_values, $auditLog->model_type) }}</pre>
                 </div>
             </div>
             <div class="change-card new">
@@ -185,7 +273,7 @@
                     <span>القيم الجديدة</span>
                 </div>
                 <div class="change-card-body">
-                    <pre class="json-data">{{ json_encode($auditLog->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                    <pre class="json-data">{{ formatAuditValue($auditLog->new_values, $auditLog->model_type) }}</pre>
                 </div>
             </div>
         </div>
@@ -198,7 +286,7 @@
                 <span>قيمة السجل الجديد</span>
             </div>
             <div class="change-card-body">
-                <pre class="json-data">{{ json_encode($auditLog->new_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                <pre class="json-data">{{ formatAuditValue($auditLog->new_values, $auditLog->model_type) }}</pre>
             </div>
         </div>
     </div>
@@ -210,7 +298,7 @@
                 <span>قيمة السجل المحذوف</span>
             </div>
             <div class="change-card-body">
-                <pre class="json-data">{{ json_encode($auditLog->old_values, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                <pre class="json-data">{{ formatAuditValue($auditLog->old_values, $auditLog->model_type) }}</pre>
             </div>
         </div>
     </div>
