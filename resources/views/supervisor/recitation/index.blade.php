@@ -53,7 +53,18 @@ $sessionTypes = [
     z-index: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 16px;
+}
+
+.recitation-index .hero-content > .hero-icon {
+    position: absolute;
+    right: 24px;
+}
+
+.recitation-index .hero-content > div:not(.hero-icon) {
+    flex: 1;
+    text-align: center;
 }
 
 .recitation-index .hero-icon {
@@ -91,7 +102,11 @@ $sessionTypes = [
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background: white;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
 }
 
 .recitation-index .session-type-card:hover {
@@ -106,15 +121,15 @@ $sessionTypes = [
 }
 
 .recitation-index .session-type-card .type-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    margin: 0 auto 10px;
-    transition: all 0.3s ease;
+    font-size: 20px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
 }
 
 .recitation-index .session-type-card:hover .type-icon {
@@ -132,6 +147,7 @@ $sessionTypes = [
     font-size: 11px;
     color: #7f8c8d;
     margin: 0;
+    line-height: 1.3;
 }
 
 .recitation-index .form-card {
@@ -432,19 +448,66 @@ $sessionTypes = [
                                 نوع التسميع
                             </label>
                             <div class="row g-2" id="sessionTypes">
-                                @foreach($sessionTypes as $type)
                                 <div class="col-6">
-                                    <input type="radio" class="btn-check" name="type" id="type-{{ $type['value'] }}"
-                                           value="{{ $type['value'] }}" onchange="showTypeOptions('{{ $type['value'] }}')">
-                                    <label class="session-type-card" for="type-{{ $type['value'] }}">
-                                        <div class="type-icon bg-{{ $type['color'] }} bg-opacity-10 text-{{ $type['color'] }}">
-                                            <i class="fas {{ $type['icon'] }}"></i>
+                                    <input type="radio" class="btn-check" name="type" id="type-new_memorization" value="new_memorization" onchange="showTypeOptions('new_memorization')">
+                                    <label class="session-type-card" for="type-new_memorization">
+                                        <div class="type-icon bg-primary bg-opacity-10 text-primary">
+                                            <i class="fas fa-book-open"></i>
                                         </div>
-                                        <div class="type-label">{{ $type['label'] }}</div>
-                                        <p class="type-desc">{{ $type['desc'] }}</p>
+                                        <div class="type-label">حفظ جديد</div>
+                                        <p class="type-desc">تسميع حفظ جديد للطالب</p>
                                     </label>
                                 </div>
-                                @endforeach
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-review" value="review" onchange="showTypeOptions('review')">
+                                    <label class="session-type-card" for="type-review">
+                                        <div class="type-icon bg-success bg-opacity-10 text-success">
+                                            <i class="fas fa-redo"></i>
+                                        </div>
+                                        <div class="type-label">مراجعة</div>
+                                        <p class="type-desc">مراجعة ما تم حفظه سابقاً</p>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-unmastered" value="unmastered" onchange="showTypeOptions('unmastered')">
+                                    <label class="session-type-card" for="type-unmastered">
+                                        <div class="type-icon bg-warning bg-opacity-10 text-warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="type-label">حفظ غير متقن</div>
+                                        <p class="type-desc">إعادة التسميع للصفحات الضعيفة</p>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-recitation" value="recitation" onchange="showTypeOptions('recitation')">
+                                    <label class="session-type-card" for="type-recitation">
+                                        <div class="type-icon bg-info bg-opacity-10 text-info">
+                                            <i class="fas fa-scroll"></i>
+                                        </div>
+                                        <div class="type-label">سرد</div>
+                                        <p class="type-desc">تلاوة الجزء كاملاً من أوله لآخره</p>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-mafsil" value="mafsil" onchange="showTypeOptions('mafsil')">
+                                    <label class="session-type-card" for="type-mafsil">
+                                        <div class="type-icon bg-danger bg-opacity-10 text-danger">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="type-label">مفصل</div>
+                                        <p class="type-desc">اختبار المفصل (3-30 جزء)</p>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="type" id="type-not_recitate" value="not_recitate" onchange="showTypeOptions('not_recitate')">
+                                    <label class="session-type-card" for="type-not_recitate">
+                                        <div class="type-icon bg-secondary bg-opacity-10 text-secondary">
+                                            <i class="fas fa-times-circle"></i>
+                                        </div>
+                                        <div class="type-label">لم يسمع</div>
+                                        <p class="type-desc">تسجيل عدم التسميع</p>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
