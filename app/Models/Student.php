@@ -17,6 +17,7 @@ class Student extends Model
         'memorized_parts', 'current_part', 'current_page',
         'enrollment_date', 'notes', 'fee_category_id',
         'current_streak', 'longest_streak', 'last_memorization_date', 'accuracy_rate',
+        'has_ijazah',
     ];
 
     protected $casts = [

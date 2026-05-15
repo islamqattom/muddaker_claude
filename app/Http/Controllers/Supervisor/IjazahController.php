@@ -32,6 +32,7 @@ class IjazahController extends Controller
         $students = collect([]);
         try {
             $students = Student::where('supervisor_id', $supervisorId)
+                ->where('has_ijazah', true)
                 ->with('user')
                 ->get();
         } catch (\Exception $e) {

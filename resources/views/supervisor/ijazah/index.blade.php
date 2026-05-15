@@ -61,18 +61,6 @@
     color: rgba(255,255,255,0.75); font-size: 13px; margin: 0;
 }
 
-.ijazah-page .quran-verse {
-    font-family: 'Amiri', serif;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.6);
-    text-align: center;
-    padding: 10px 20px;
-    background: rgba(0,0,0,0.1);
-    border-top: 1px solid rgba(212, 160, 48, 0.2);
-    margin-top: 16px;
-    position: relative; z-index: 1;
-}
-
 .ijazah-page .form-card {
     background: white;
     border-radius: 16px;
@@ -275,10 +263,6 @@
                 <h1 class="hero-title">تسجيل الإجازة</h1>
                 <p class="hero-sub">سجل إجازة الطالب في القرآن الكريم</p>
             </div>
-        </div>
-        <div class="quran-verse">
-            <i class="fas fa-book-quran me-2"></i>
-            إِذَا مَا أَثْبَتَهُ اللَّهُ فِي الْقُرْآنِ فَلَا مُسْتَعْتِبَ
         </div>
     </div>
 
