@@ -60,7 +60,7 @@ class StudentPartRecordController extends Controller
             'total_hesitations' => 'integer|min:0',
             'total_score' => 'nullable|numeric|min:0|max:100',
             'session_date' => 'nullable|date',
-            'mastery_status' => 'nullable|string|in:' . StudentPartRecord::MASTERY_MASTERED . ',' . StudentPartRecord::MASTERY_NOT_MASTERED,
+            'mastery_status' => 'nullable|string|in:' . StudentPartRecord::MASTERY_MASTERED . ',' . StudentPartRecord::MASTERY_NOT_MASTERED . ',' . StudentPartRecord::MASTERY_MAFSIL,
         ]);
 
         $this->updatePartRecord($studentId, $partNumber, $validated);

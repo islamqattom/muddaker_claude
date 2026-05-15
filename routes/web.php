@@ -226,6 +226,11 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::put('/student-parts/{studentId}/{partNumber}', [StudentPartRecordController::class, 'update'])->name('student-parts.update');
     Route::post('/student-parts/{studentId}/{partNumber}/reset', [StudentPartRecordController::class, 'resetToAuto'])->name('student-parts.reset');
 
+    // Ijazah
+    Route::get('/ijazah', [Supervisor\IjazahController::class, 'index'])->name('ijazah.index');
+    Route::post('/ijazah', [Supervisor\IjazahController::class, 'store'])->name('ijazah.store');
+    Route::delete('/ijazah', [Supervisor\IjazahController::class, 'destroy'])->name('ijazah.destroy');
+
     // Quran Exam Assistant
     Route::get('/exam-assistant', [Supervisor\QuranExamAssistantController::class, 'index'])->name('exam-assistant.index');
     Route::post('/exam-assistant/generate', [Supervisor\QuranExamAssistantController::class, 'generateQuestion'])->name('exam-assistant.generate');

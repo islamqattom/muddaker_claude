@@ -347,6 +347,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         $statusLabel = match(true) {
                             $isOverride && $recordMasteryStatus === 'متقن' => 'متقن',
                             $isOverride && $recordMasteryStatus === 'غير متقن' => 'غير متقن',
+                            $isOverride && $recordMasteryStatus === 'مفصل' => 'مفصل',
                             $sessionType === 'mafsil' => 'مفصل',
                             $sessionType === 'recitation' && $isCompleted => 'متقن',
                             $sessionType === 'recitation' && !$isCompleted => 'غير متقن',

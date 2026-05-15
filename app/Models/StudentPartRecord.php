@@ -9,6 +9,7 @@ class StudentPartRecord extends Model
 {
     public const MASTERY_MASTERED = 'متقن';
     public const MASTERY_NOT_MASTERED = 'غير متقن';
+    public const MASTERY_MAFSIL = 'مفصل';
 
     protected $fillable = [
         'student_id',

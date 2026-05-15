@@ -167,6 +167,9 @@ trait HasStudentPartRecords
         if ($isOverride && $recordMasteryStatus === StudentPartRecord::MASTERY_NOT_MASTERED) {
             return StudentPartRecord::MASTERY_NOT_MASTERED;
         }
+        if ($isOverride && $recordMasteryStatus === StudentPartRecord::MASTERY_MAFSIL) {
+            return StudentPartRecord::MASTERY_MAFSIL;
+        }
         if ($sessionType === RecitationSession::TYPE_MAFSIL) {
             return 'مفصل';
         }
