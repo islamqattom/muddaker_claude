@@ -116,6 +116,7 @@ class MeetingMinuteController extends Controller
             'assignments' => 'nullable|array',
             'task_status' => 'nullable|array',
             'next_meeting_date' => 'nullable|date',
+            'excluded_supervisors' => 'nullable|array',
         ]);
 
         $meetingMinute = MeetingMinute::create([
@@ -123,6 +124,7 @@ class MeetingMinuteController extends Controller
             'meeting_time' => $validated['meeting_time'] ?? now()->format('H:i:s'),
             'location' => $validated['location'] ?? '',
             'attendees' => $validated['attendees'] ?? [],
+            'excluded_supervisors' => $validated['excluded_supervisors'] ?? [],
             'absent' => [],
             'agenda' => $validated['agenda'] ?? [],
             'decisions' => $validated['decisions'] ?? null,
@@ -282,6 +284,7 @@ class MeetingMinuteController extends Controller
             'task_status' => 'nullable|array',
             'task_titles' => 'nullable|array',
             'next_meeting_date' => 'nullable|date',
+            'excluded_supervisors' => 'nullable|array',
         ]);
 
         $meetingMinute->update([
@@ -289,6 +292,7 @@ class MeetingMinuteController extends Controller
             'meeting_time' => $validated['meeting_time'] ?? now()->format('H:i:s'),
             'location' => $validated['location'] ?? '',
             'attendees' => $validated['attendees'] ?? [],
+            'excluded_supervisors' => $validated['excluded_supervisors'] ?? [],
             'agenda' => $validated['agenda'] ?? [],
             'decisions' => $validated['decisions'] ?? null,
             'recommendations' => $validated['recommendations'] ?? null,
