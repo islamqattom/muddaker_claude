@@ -44,9 +44,10 @@ class AssemblyAIRealtimeService
         $expiresIn = min($expiresIn, 600);
 
         try {
-            $response = Http::withToken($this->apiKey)
-                ->get('https://streaming.assemblyai.com/v3/token', [
-                    'expires_in_seconds' => $expiresIn,
+            $response = Http::withHeaders([
+                    'Authorization' => $this->apiKey,
+                ])->post('https://api.assemblyai.com/v2/realtime/token', [
+                    'expires_in' => $expiresIn,
                 ]);
 
             if (!$response->successful()) {
@@ -79,7 +80,7 @@ class AssemblyAIRealtimeService
      */
     public function buildWebSocketUrl(string $token): string
     {
-        return self::WS_BASE_URL . '/stream?token=' . $token;
+        return self::WS_BASE_URL . '/ws?sample_rate=16000&token=' . $token;
     }
 
     /**

@@ -32,7 +32,7 @@ class AssemblyAIRealtimeServiceTest extends TestCase
 
         $this->assertTrue($result['success']);
         $this->assertEquals('test-token-123', $result['token']);
-        $this->assertEquals('wss://api.assemblyai.com/v2/realtime/stream?token=test-token-123', $result['websocket_url']);
+        $this->assertEquals('wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=test-token-123', $result['websocket_url']);
     }
 
     public function test_get_websocket_token_failure(): void
@@ -66,7 +66,7 @@ class AssemblyAIRealtimeServiceTest extends TestCase
         Http::fake([
             'https://api.assemblyai.com/v2/realtime/token' => Http::response([
                 'token' => 'test-token',
-                'websocket_url' => 'wss://api.assemblyai.com/v2/realtime/stream?token=test-token',
+                'websocket_url' => 'wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=test-token',
             ], 200),
         ]);
 
@@ -82,7 +82,7 @@ class AssemblyAIRealtimeServiceTest extends TestCase
         $token = 'my-token-abc123';
         $url = $this->service->buildWebSocketUrl($token);
 
-        $this->assertEquals('wss://api.assemblyai.com/v2/realtime/stream?token=my-token-abc123', $url);
+        $this->assertEquals('wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=my-token-abc123', $url);
     }
 
     public function test_get_realtime_config_arabic(): void
