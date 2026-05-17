@@ -59,10 +59,11 @@ class AssemblyAIRealtimeService
 
             $data = $response->json();
 
+            $token = $data['token'] ?? null;
             return [
                 'success' => true,
-                'token' => $data['token'] ?? null,
-                'websocket_url' => 'wss://api.assemblyai.com/v2/realtime/ws',
+                'token' => $token,
+                'websocket_url' => $token ? $this->buildWebSocketUrl($token) : null,
             ];
         } catch (\Exception $e) {
             Log::error('AssemblyAI token error', ['error' => $e->getMessage()]);
