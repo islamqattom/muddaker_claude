@@ -310,11 +310,17 @@ class LiveRecitationController {
             });
             const data = await response.json();
 
+            console.log('API Response:', response.status, data);
+
             if (!data.success) {
                 let errorMsg = data.error || data.errors || 'فشل في بدء جلسة التسميع';
                 if (errorMsg.includes('AssemblyAI') || errorMsg.includes('مفتاح')) {
                     errorMsg = 'يرجى التواصل مع المشرف لتفعيل خدمة التسميع المباشر';
                 }
+                if (response.status === 422 && data.errors) {
+                    errorMsg = Object.values(data.errors).flat().join(' / ') || errorMsg;
+                }
+                console.error('API Error:', errorMsg);
                 this.showError(errorMsg);
                 this.startBtn.disabled = false;
                 this.startBtn.classList.remove('recording');
@@ -358,6 +364,8 @@ class LiveRecitationController {
             }
         } catch (error) {
             console.error('Error starting recitation:', error);
+            console.error('Response status:', response?.status);
+            console.error('Response body:', response?.body);
             this.showError('حدث خطأ أثناء بدء التسميع');
             this.startBtn.disabled = false;
             this.startBtn.classList.remove('recording');

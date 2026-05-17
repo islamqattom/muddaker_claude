@@ -110,6 +110,12 @@ self.addEventListener('notificationclick', event => {
 // Fetch event - different strategies for different resources
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
+
+    // Skip API requests - let them go directly to network
+    if (url.pathname.startsWith('/api/')) {
+        return;
+    }
+
     const isNavigation = event.request.mode === 'navigate';
 
     // For navigation requests (page loads), always go to network

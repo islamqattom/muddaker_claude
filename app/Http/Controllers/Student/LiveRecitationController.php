@@ -97,6 +97,13 @@ class LiveRecitationController extends Controller
         }
 
         try {
+            Log::info('Live recitation start attempt', [
+                'user_id' => $user->id,
+                'mode' => $request->input('mode'),
+                'start_page' => $request->input('start_page'),
+                'end_page' => $request->input('end_page'),
+            ]);
+
             $result = $this->liveRecitationService->startSession($student, [
                 'mode' => $request->input('mode'),
                 'start_page' => $request->input('start_page', 1),
@@ -116,6 +123,8 @@ class LiveRecitationController extends Controller
                 'error' => 'خطأ في بدء التسميع: ' . $e->getMessage(),
             ], 500);
         }
+
+        Log::info('Live recitation start result', ['success' => $result['success'], 'error' => $result['error'] ?? null]);
 
         if (!$result['success']) {
             return response()->json([
