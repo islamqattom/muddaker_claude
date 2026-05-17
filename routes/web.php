@@ -14,6 +14,11 @@ use App\Http\Controllers\PushController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\NotificationController;
 
+// Root redirect to login
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 // Auth Routes
 Route::middleware('throttle:5,1')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
