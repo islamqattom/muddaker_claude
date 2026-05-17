@@ -3,6 +3,10 @@
     <div class="icon-wrapper"><i class="fas fa-home"></i></div>
     <span>لوحتي الشخصية</span>
 </a>
+<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+    <span>المحادثات</span>
+</a>
 <span class="nav-section-title">القرآن الكريم</span>
 <a href="{{ route('student.quran.page', 1) }}" class="nav-link {{ request()->routeIs('student.quran.page') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>

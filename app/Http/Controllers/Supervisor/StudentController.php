@@ -96,7 +96,6 @@ class StudentController extends Controller {
                 'address' => $request->address,
                 'enrollment_date' => today(),
                 'notes' => $request->notes,
-                'has_ijazah' => $request->has_ijazah ?? false,
             ]);
         });
 
@@ -169,7 +168,6 @@ class StudentController extends Controller {
                 'address' => $request->address,
                 'enrollment_date' => $request->enrollment_date,
                 'notes' => $request->notes,
-                'has_ijazah' => $request->has_ijazah,
             ]);
         });
 

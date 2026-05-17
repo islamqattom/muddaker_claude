@@ -3,6 +3,10 @@
     <div class="icon-wrapper"><i class="fas fa-tachometer-alt"></i></div>
     <span>لوحة التحكم</span>
 </a>
+<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+    <span>المحادثات</span>
+</a>
 <span class="nav-section-title">إدارة المستخدمين</span>
 <a href="{{ route('admin.students.index') }}" class="nav-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-user-graduate"></i></div>
@@ -11,6 +15,10 @@
 <a href="{{ route('admin.student-parts.index') }}" class="nav-link {{ request()->routeIs('admin.student-parts.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
     <span>سجل أجزاء الطلاب</span>
+</a>
+<a href="{{ route('admin.ijazah.index') }}" class="nav-link {{ request()->routeIs('admin.ijazah.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-award"></i></div>
+    <span>الإجازة</span>
 </a>
 <a href="{{ route('admin.supervisors.index') }}" class="nav-link {{ request()->routeIs('admin.supervisors.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-user-tie"></i></div>

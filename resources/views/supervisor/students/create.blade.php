@@ -330,13 +330,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <label class="form-label">تاريخ التسجيل</label>
                     <input type="date" name="enrollment_date" class="form-control" value="{{ old('enrollment_date', date('Y-m-d')) }}">
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">الإجازة</label>
-                    <select name="has_ijazah" class="form-control">
-                        <option value="0" selected>لا</option>
-                        <option value="1">نعم</option>
-                    </select>
-                </div>
             </div>
 
             <div class="row g-4 mt-2">

@@ -17,7 +17,7 @@ class AssemblyAIRealtimeService
 
     public function __construct()
     {
-        $this->apiKey = config('services.assemblyai.api_key', env('ASSEMBLYAI_API_KEY', ''));
+        $this->apiKey = config('app.assemblyai.api_key', env('ASSEMBLYAI_API_KEY', ''));
     }
 
     /**
@@ -28,9 +28,17 @@ class AssemblyAIRealtimeService
      */
     public function getWebSocketToken(int $expiresIn = 600): array
     {
-        if (empty($this->apiKey)) {
-            Log::warning('AssemblyAI API key not configured');
-            return ['success' => false, 'error' => 'AssemblyAI API key not configured'];
+        $apiKey = $this->apiKey;
+        $isPlaceholder = empty($apiKey) || $apiKey === 'your_assemblyai_api_key_here' || $apiKey === 'your_assemblyai_api_key_here';
+        
+        if ($isPlaceholder) {
+            Log::info('AssemblyAI API key not configured - using Web Speech API fallback');
+            return [
+                'success' => false,
+                'error' => 'مفتاح AssemblyAI غير موجود - سيتم استخدام التعرف على الصوت',
+                'requires_setup' => true,
+                'use_web_speech' => true
+            ];
         }
 
         $expiresIn = min($expiresIn, 600);
@@ -46,7 +54,7 @@ class AssemblyAIRealtimeService
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
-                return ['success' => false, 'error' => 'Failed to get WebSocket token'];
+                return ['success' => false, 'error' => 'فشل في الحصول على رمز WebSocket'];
             }
 
             $data = $response->json();

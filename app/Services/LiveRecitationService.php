@@ -45,12 +45,9 @@ class LiveRecitationService
                 return ['success' => false, 'error' => 'No verses found for the specified range'];
             }
 
-            // Get WebSocket token for AssemblyAI
+            // Try to get WebSocket token for AssemblyAI (optional - will use browser speech API if unavailable)
+            $websocketToken = null;
             $websocketToken = $this->assemblyAI->getWebSocketToken();
-
-            if (!$websocketToken['success']) {
-                return ['success' => false, 'error' => 'Failed to get WebSocket token: ' . ($websocketToken['error'] ?? 'Unknown error')];
-            }
 
             // Create session
             $session = LiveRecitationSession::create([
@@ -69,17 +66,27 @@ class LiveRecitationService
                 'started_at' => Carbon::now(),
             ]);
 
-            return [
+            $result = [
                 'success' => true,
                 'session' => $session,
                 'verses' => $versesData['verses'],
                 'audio_urls' => $versesData['audio_urls'],
-                'websocket_token' => $websocketToken,
             ];
+
+            // Only add WebSocket info if AssemblyAI is configured
+            if ($websocketToken && $websocketToken['success']) {
+                $result['websocket_token'] = $websocketToken;
+                $result['websocket_url'] = $websocketToken['websocket_url'];
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Failed to start live recitation session', [
                 'student_id' => $student->id,
+                'mode' => $params['mode'] ?? 'unknown',
+                'start_page' => $params['start_page'] ?? 'unknown',
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             return ['success' => false, 'error' => $e->getMessage()];
         }

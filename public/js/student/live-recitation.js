@@ -30,12 +30,67 @@ class LiveRecitationController {
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 3;
         this.reconnectDelay = 1000;
+        this.lastErrorFeedbackTime = 0;
+        this.errorFeedbackThrottle = 1500;
+
+        // Web Speech API fallback
+        this.speechRecognition = null;
+        this.useWebSpeech = false;
+
         this.init();
     }
 
     init() {
         this.modeSelect = document.getElementById('modeSelect');
         this.startPageInput = document.getElementById('startPage');
+
+        // Check for Web Speech API support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            this.speechRecognition = new SpeechRecognition();
+            this.speechRecognition.continuous = true;
+            this.speechRecognition.interimResults = true;
+            this.speechRecognition.lang = 'ar-SA';
+
+            this.speechRecognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                if (transcript.trim().length > 0) {
+                    this.transcriptText = transcript;
+                    this.updateTranscript(transcript);
+
+                    // Real-time error detection during speech
+                    if (event.results[i].isFinal) {
+                        this.checkForErrorsDuringRecitation(transcript);
+                        this.processRecitation(transcript);
+                    } else {
+                        this.checkForErrorsDuringRecitation(transcript);
+                    }
+                }
+            };
+
+            this.speechRecognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error === 'not-allowed') {
+                    this.showError('لم يتم السماح بالوصول إلى الميكروفون');
+                }
+            };
+
+            this.speechRecognition.onend = () => {
+                if (this.isRecording && !this.isEnding) {
+                    // Restart recognition if it stopped unexpectedly
+                    try {
+                        this.speechRecognition.start();
+                    } catch (e) {
+                        console.warn('Could not restart speech recognition');
+                    }
+                }
+            };
+        }
+
+        this.modeSelect = document.getElementById('modeSelect');
         this.endPageInput = document.getElementById('endPage');
         this.endPageInputContainer = document.getElementById('endPageInput');
         this.similarityThresholdInput = document.getElementById('similarityThreshold');
@@ -256,8 +311,14 @@ class LiveRecitationController {
             const data = await response.json();
 
             if (!data.success) {
-                this.showError(data.error || data.errors || 'فشل في بدء جلسة التسميع');
+                let errorMsg = data.error || data.errors || 'فشل في بدء جلسة التسميع';
+                if (errorMsg.includes('AssemblyAI') || errorMsg.includes('مفتاح')) {
+                    errorMsg = 'يرجى التواصل مع المشرف لتفعيل خدمة التسميع المباشر';
+                }
+                this.showError(errorMsg);
                 this.startBtn.disabled = false;
+                this.startBtn.classList.remove('recording');
+                this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
                 return;
             }
 
@@ -288,11 +349,40 @@ class LiveRecitationController {
             this.highlightVerse(0);
             this.stopBtn.classList.remove('d-none');
             this.nextVerseBtn.classList.remove('d-none');
-            this.connectWebSocket();
+
+            // Use Web Speech API if no WebSocket URL (AssemblyAI not configured)
+            if (data.data.websocket_url && data.data.websocket_token) {
+                this.connectWebSocket();
+            } else {
+                this.startWebSpeechRecognition();
+            }
         } catch (error) {
             console.error('Error starting recitation:', error);
-            this.showError('حدث خطأ أثناء بدء التسميع: ' + error.message);
+            this.showError('حدث خطأ أثناء بدء التسميع');
             this.startBtn.disabled = false;
+            this.startBtn.classList.remove('recording');
+            this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
+        }
+    }
+
+    startWebSpeechRecognition() {
+        if (!this.speechRecognition) {
+            this.showError('المتصفح لا يدعم التعرف على الصوت العربي');
+            this.resetUI();
+            return;
+        }
+
+        this.updateStatusIndicator('active');
+        this.updateStatus('متصل - جارٍ الاستماع...');
+        this.isRecording = true;
+        this.startBtn.classList.add('recording');
+        this.startBtn.innerHTML = '<i class="fas fa-circle me-2"></i>جارٍ التسجيل...';
+
+        try {
+            this.speechRecognition.start();
+        } catch (error) {
+            console.error('Failed to start speech recognition:', error);
+            this.showError('فشل في بدء التعرف على الصوت');
         }
     }
 
@@ -322,6 +412,8 @@ class LiveRecitationController {
             this.updateStatusIndicator('active');
             this.updateStatus('متصل - جارٍ الاستماع...');
             this.isRecording = true;
+            this.startBtn.classList.add('recording');
+            this.startBtn.innerHTML = '<i class="fas fa-circle me-2"></i>جارٍ التسجيل...';
             this.startRecording();
         };
         this.ws.onmessage = (event) => {
@@ -464,10 +556,58 @@ class LiveRecitationController {
             this.transcriptText = transcript;
             this.updateTranscript(transcript);
 
-            // Real-time verse detection - match transcription to verses immediately
+            // Real-time error detection - check during speech (PartialTranscript)
+            if (message.message_type === 'PartialTranscript' && transcript.trim().length > 3) {
+                this.checkForErrorsDuringRecitation(transcript);
+            }
+
+            // On final transcript, do verse matching and evaluation
             if (message.message_type === 'FinalTranscript' && transcript.trim().length > 0) {
                 this.processRecitation(transcript);
             }
+        }
+    }
+
+    checkForErrorsDuringRecitation(transcript) {
+        const currentVerse = this.verses[this.currentVerseIndex];
+        if (!currentVerse) return;
+
+        const similarity = this.calculateSimilarity(transcript, currentVerse.text);
+
+        // Throttle error feedback to avoid too many alerts
+        const now = Date.now();
+        if (now - this.lastErrorFeedbackTime < this.errorFeedbackThrottle) return;
+
+        // If similarity drops below threshold during recitation, show warning
+        if (similarity < this.similarityThreshold && similarity > 20) {
+            this.lastErrorFeedbackTime = now;
+            // Show real-time error feedback - verse glows red to indicate mistake
+            this.setVerseErrorState(this.currentVerseIndex, 1000);
+            // Play short error tone for immediate feedback
+            this.playErrorTone();
+        }
+    }
+
+    playErrorTone() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 400;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+
+            oscillator.onended = () => audioContext.close();
+        } catch (e) {
+            console.warn('Error tone playback failed:', e);
         }
     }
 
@@ -885,6 +1025,15 @@ class LiveRecitationController {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.close();
         }
+
+        // Stop speech recognition if active
+        if (this.speechRecognition) {
+            try {
+                this.speechRecognition.stop();
+            } catch (e) {
+                console.warn('Speech recognition stop error:', e);
+            }
+        }
     }
 
     async stopRecitation() {
@@ -929,6 +1078,8 @@ class LiveRecitationController {
 
     resetUI() {
         this.startBtn.disabled = false;
+        this.startBtn.classList.remove('recording');
+        this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
         this.stopBtn.classList.add('d-none');
         this.nextVerseBtn.classList.add('d-none');
         this.updateStatusIndicator('');

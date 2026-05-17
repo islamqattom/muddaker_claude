@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\LiveRecitationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LiveRecitationController extends Controller
@@ -78,23 +79,43 @@ class LiveRecitationController extends Controller
         }
 
         $user = Auth::user();
-        $student = $user->student()->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'error' => 'User not authenticated',
+            ], 401);
+        }
+
+        $student = $user->student;
 
         if (!$student) {
             return response()->json([
                 'success' => false,
-                'error' => 'Student profile not found',
+                'error' => 'Student profile not found for user: ' . $user->id,
             ], 404);
         }
 
-        $result = $this->liveRecitationService->startSession($student, [
-            'mode' => $request->input('mode'),
-            'start_page' => $request->input('start_page', 1),
-            'end_page' => $request->input('end_page', $request->input('start_page', 1)),
-            'surah' => $request->input('surah'),
-            'verse_start' => $request->input('verse_start'),
-            'verse_end' => $request->input('verse_end'),
-        ]);
+        try {
+            $result = $this->liveRecitationService->startSession($student, [
+                'mode' => $request->input('mode'),
+                'start_page' => $request->input('start_page', 1),
+                'end_page' => $request->input('end_page', $request->input('start_page', 1)),
+                'surah' => $request->input('surah'),
+                'verse_start' => $request->input('verse_start'),
+                'verse_end' => $request->input('verse_end'),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Live recitation start error', [
+                'user_id' => $user->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'خطأ في بدء التسميع: ' . $e->getMessage(),
+            ], 500);
+        }
 
         if (!$result['success']) {
             return response()->json([
@@ -109,8 +130,8 @@ class LiveRecitationController extends Controller
                 'session_id' => $result['session']->id,
                 'verses' => $result['verses'],
                 'audio_urls' => $result['audio_urls'],
-                'websocket_token' => $result['websocket_token']['token'],
-                'websocket_url' => $result['websocket_token']['websocket_url'],
+                'websocket_token' => $result['websocket_token']['token'] ?? null,
+                'websocket_url' => $result['websocket_url'] ?? null,
             ],
         ]);
     }
@@ -123,7 +144,8 @@ class LiveRecitationController extends Controller
      */
     private function getSessionForStudent(int $id): ?\App\Models\LiveRecitationSession
     {
-        $student = Auth::user()->student()->first();
+        $user = Auth::user();
+        $student = $user->student ?? null;
         if (!$student) {
             return null;
         }

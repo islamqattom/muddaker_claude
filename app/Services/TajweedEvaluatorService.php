@@ -19,7 +19,7 @@ class TajweedEvaluatorService
 
     public function __construct()
     {
-        $this->apiKey = config('services.assemblyai.api_key', env('ASSEMBLYAI_API_KEY', ''));
+        $this->apiKey = config('app.assemblyai.api_key', env('ASSEMBLYAI_API_KEY', ''));
     }
 
     /**

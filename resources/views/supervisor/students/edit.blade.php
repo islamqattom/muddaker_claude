@@ -135,15 +135,6 @@
                             </label>
                             <input type="date" name="enrollment_date" class="form-control-custom" value="{{ old('enrollment_date', $student->enrollment_date?->format('Y-m-d')) }}">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label-custom">
-                                <i class="fas fa-award me-2"></i>الإجازة
-                            </label>
-                            <select name="has_ijazah" class="form-select-custom">
-                                <option value="0" {{ old('has_ijazah', $student->has_ijazah) == 0 ? 'selected' : '' }}>لا</option>
-                                <option value="1" {{ old('has_ijazah', $student->has_ijazah) == 1 ? 'selected' : '' }}>نعم</option>
-                            </select>
-                        </div>
                         <div class="col-12">
                             <label class="form-label-custom">
                                 <i class="fas fa-map-marker-alt me-2"></i>العنوان

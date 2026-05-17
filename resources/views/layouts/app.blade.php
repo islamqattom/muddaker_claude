@@ -1556,6 +1556,52 @@
             font-size: 16px;
         }
 
+        /* Notification Permission Button */
+        .notification-permission-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.35);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .notification-permission-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(39, 174, 96, 0.45);
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .notification-permission-btn i {
+            font-size: 14px;
+        }
+
+        .notification-permission-btn.granted {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            box-shadow: none;
+            cursor: default;
+        }
+
+        @media (max-width: 768px) {
+            .notification-permission-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            .notification-permission-btn span {
+                display: none;
+            }
+        }
+
         /* Mobile close button for sidebar */
         @media (max-width: 768px) {
             .sidebar-close-btn {
@@ -2135,6 +2181,18 @@
             <h1 class="page-title">@yield('page-title', 'الرئيسية')</h1>
 
             <div class="header-actions">
+                <!-- Chat -->
+                <a href="{{ route('chat.index') }}" class="notification-bell" id="chatIcon" title="المحادثات">
+                    <i class="fas fa-comments"></i>
+                    <span class="notification-badge" id="chatBadge" style="display: none;">0</span>
+                </a>
+
+                <!-- Enable Notifications Button -->
+                <button class="notification-permission-btn" onclick="requestNotificationPermission()" style="display: none;">
+                    <i class="fas fa-bell"></i>
+                    <span>تفعيل الإشعارات</span>
+                </button>
+
                 <!-- Notifications -->
                 <div class="dropdown">
                     <div class="notification-bell" data-bs-toggle="dropdown" id="notifBell">
@@ -2446,6 +2504,48 @@
 
     <!-- PWA Push + Service Worker -->
     <script src="/js/push-init.js"></script>
+
+    @if(config('broadcasting.default') === 'pusher')
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch initial unread count
+        fetch('/chat/unread/count')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('chatBadge');
+                if (badge && data.unread > 0) {
+                    badge.textContent = data.unread;
+                    badge.style.display = 'flex';
+                }
+            });
+
+        // Pusher for real-time chat notifications
+        const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}', {
+            cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}'
+        });
+
+        const channel = pusher.subscribe('chat.{{ auth()->id() }}');
+        channel.bind('new-message', function(data) {
+            const badge = document.getElementById('chatBadge');
+            if (badge) {
+                let count = parseInt(badge.textContent) || 0;
+                badge.textContent = count + 1;
+                badge.style.display = 'flex';
+            }
+        });
+
+        // Clear badge when visiting chat index
+        if (window.location.pathname === '/chat') {
+            const badge = document.getElementById('chatBadge');
+            if (badge) {
+                badge.textContent = '0';
+                badge.style.display = 'none';
+            }
+        }
+    });
+    </script>
+    @endif
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {

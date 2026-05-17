@@ -11,10 +11,8 @@ use App\Http\Controllers\Student\StudentPartRecordController as StudentStudentPa
 use App\Http\Controllers\ParentPortal;
 use App\Http\Controllers\ParentPortal\StudentPartRecordController as ParentStudentPartRecordController;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\NotificationController;
-
-// Redirect root to login
-Route::get('/', fn() => redirect()->route('login'));
 
 // Auth Routes
 Route::middleware('throttle:5,1')->group(function () {
@@ -33,6 +31,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::get('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+
+    // Chat routes
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{conversation}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    Route::post('/chat/{conversation}/message', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
+    Route::post('/chat/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.markAsRead');
+    Route::get('/chat/users/search', [ChatController::class, 'getUsers'])->name('chat.users');
+    Route::post('/chat/{conversation}/participants', [ChatController::class, 'addParticipant'])->name('chat.addParticipant');
+    Route::delete('/chat/{conversation}/participants/{user}', [ChatController::class, 'removeParticipant'])->name('chat.removeParticipant');
+    Route::get('/chat/unread/count', [ChatController::class, 'unreadCount'])->name('chat.unreadCount');
 });
 
 // ============================
@@ -137,6 +146,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::post('/fee-categories/{feeCategory}/toggle-active', [Admin\FeeCategoryController::class, 'toggleActive'])->name('feeCategories.toggleActive');
         Route::delete('/fee-categories/{feeCategory}', [Admin\FeeCategoryController::class, 'destroy'])->name('feeCategories.destroy');
     });
+
+    // Ijazah
+    Route::get('/ijazah', [Admin\IjazahController::class, 'index'])->name('ijazah.index');
+    Route::post('/ijazah', [Admin\IjazahController::class, 'store'])->name('ijazah.store');
+    Route::delete('/ijazah', [Admin\IjazahController::class, 'destroy'])->name('ijazah.destroy');
+    Route::get('/ijazah/get-students', [Admin\IjazahController::class, 'getStudentsForSupervisor'])->name('ijazah.getStudents');
+    Route::get('/ijazah/get-ijazah', [Admin\IjazahController::class, 'getIjazahForStudent'])->name('ijazah.getIjazah');
+    Route::post('/ijazah/assign-student', [Admin\IjazahController::class, 'assignStudentToSupervisor'])->name('ijazah.assignStudent');
+    Route::post('/ijazah/remove-student', [Admin\IjazahController::class, 'removeStudentFromIjazah'])->name('ijazah.removeStudent');
 });
 
 // ============================

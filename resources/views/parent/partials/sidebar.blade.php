@@ -3,6 +3,10 @@
     <div class="icon-wrapper"><i class="fas fa-home"></i></div>
     <span>الصفحة الرئيسية</span>
 </a>
+<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+    <span>المحادثات</span>
+</a>
 <span class="nav-section-title">المتابعة</span>
 <a href="{{ route('parent.sessions.index') }}" class="nav-link {{ request()->routeIs('parent.sessions.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>

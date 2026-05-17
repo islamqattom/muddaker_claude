@@ -314,6 +314,25 @@ $apiToken = $token ? $token->token : null;
     cursor: not-allowed;
 }
 
+.btn-start.recording {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    animation: recordingPulse 1.5s ease-in-out infinite;
+}
+
+.btn-start.recording i {
+    animation: micBounce 0.6s ease-in-out infinite;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { box-shadow: 0 4px 12px rgba(220, 53, 69, 0.25); }
+    50% { box-shadow: 0 4px 25px rgba(220, 53, 69, 0.5); }
+}
+
+@keyframes micBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
 .btn-stop {
     background: linear-gradient(135deg, #dc3545, #c82333);
     color: white;

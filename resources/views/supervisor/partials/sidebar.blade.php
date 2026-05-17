@@ -3,6 +3,10 @@
     <div class="icon-wrapper"><i class="fas fa-home"></i></div>
     <span>لوحة التحكم</span>
 </a>
+<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+    <span>المحادثات</span>
+</a>
 
 <span class="nav-section-title">إدارة الطلاب</span>
 <a href="{{ route('supervisor.students.index') }}" class="nav-link {{ request()->routeIs('supervisor.students.*') ? 'active' : '' }}">
