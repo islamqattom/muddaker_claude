@@ -304,11 +304,18 @@ class LiveRecitationController {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-XSRF-TOKEN': this.getCsrfToken()
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(requestBody)
             });
-            const data = await response.json();
+            let data;
+            const responseText = await response.text();
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON. Response text:', responseText);
+                throw new Error('Server returned non-JSON response: ' + response.status);
+            }
 
             console.log('API Response:', response.status, data);
 
@@ -880,7 +887,6 @@ class LiveRecitationController {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -910,7 +916,6 @@ class LiveRecitationController {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
                 body: JSON.stringify({
@@ -1056,7 +1061,6 @@ class LiveRecitationController {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + this.apiToken,
-                    'X-XSRF-TOKEN': this.getCsrfToken()
                 },
                 credentials: 'include',
             });
