@@ -518,3 +518,472 @@
         gap: 0.5rem;
     }
 }
+
+/* ========================================
+   SMART MEMORIZATION - التسميع الذكي
+   ======================================== */
+
+.smart-memo-text-area {
+    background: linear-gradient(135deg, #fffef9, #f9f7f2);
+    border: 2px solid #e8e4dc;
+    border-radius: 12px;
+    min-height: 220px;
+    font-family: 'Amiri', serif;
+    font-size: 1.7rem;
+    line-height: 2.4;
+    color: #2c3e2c;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    overflow-y: auto;
+    max-height: 450px;
+    position: relative;
+}
+
+.smart-memo-text-area.smart-memo-active {
+    border-color: #1a7a4a;
+    box-shadow: 0 0 0 3px rgba(26, 122, 74, 0.08);
+}
+
+.smart-memo-text-area.smart-memo-complete {
+    border-color: #1a7a4a;
+    animation: completionGlow 2s ease-in-out;
+}
+
+@keyframes completionGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(26, 122, 74, 0); }
+    50% { box-shadow: 0 0 30px rgba(26, 122, 74, 0.2); }
+}
+
+/* Word styling */
+.smart-memo-words-container {
+    display: inline;
+    direction: rtl;
+}
+
+.smart-memo-word {
+    display: inline-block;
+    padding: 0.2rem 0.4rem;
+    margin: 0.15rem 0.1rem;
+    border-radius: 6px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+    user-select: none;
+    position: relative;
+    vertical-align: middle;
+}
+
+/* Hidden word (mask mode) */
+.smart-memo-word.hidden-word {
+    color: transparent;
+    background: rgba(0, 0, 0, 0.07);
+    min-width: 2.5rem;
+    min-height: 1.8rem;
+    border-radius: 8px;
+}
+
+.smart-memo-word.hidden-word::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: #c4bdb0;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+/* Revealed word (correct pronunciation) */
+.smart-memo-word.revealed-word {
+    color: #1a7a4a;
+    background: rgba(26, 122, 74, 0.08);
+    font-weight: 600;
+    animation: revealPop 0.4s ease;
+}
+
+@keyframes revealPop {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Error word (wrong pronunciation) — red background but text stays hidden */
+.smart-memo-word.error-word {
+    color: transparent;
+    background: rgba(220, 53, 69, 0.45);
+    animation: wordErrorFlash 0.7s ease;
+}
+
+.smart-memo-word.error-word::after {
+    display: none; /* hide the hidden-word dot when error flashes */
+}
+
+@keyframes wordErrorFlash {
+    0%, 100% { background: rgba(220, 53, 69, 0.12); }
+    30% { background: rgba(220, 53, 69, 0.35); }
+    60% { background: rgba(220, 53, 69, 0.12); }
+}
+
+/* Hint-revealed word (user asked for help) */
+.smart-memo-word.hint-revealed {
+    color: #856404;
+    background: rgba(255, 193, 7, 0.15);
+    font-weight: 600;
+    animation: hintRevealPop 0.5s ease;
+}
+
+@keyframes hintRevealPop {
+    0% { transform: scale(0.9); background: rgba(255, 193, 7, 0.4); }
+    100% { transform: scale(1); background: rgba(255, 193, 7, 0.15); }
+}
+
+/* Verse separator and number badge */
+.verse-separator {
+    display: inline;
+    margin: 0 0.25rem;
+}
+
+.verse-number-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #1a7a4a, #2d9d63);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', sans-serif;
+    vertical-align: middle;
+    padding: 0 4px;
+}
+
+/* Listening indicator */
+.listening-pulse {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #dc3545;
+    animation: recordingPulse 1.5s ease-in-out infinite;
+    vertical-align: middle;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); transform: scale(1.15); }
+}
+
+/* Hint button pulse */
+#smartMemoHintBtn.hint-pulse {
+    animation: hintButtonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes hintButtonPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(255, 193, 7, 0); }
+}
+
+/* Transcript area */
+.smart-memo-transcript {
+    font-size: 1.05rem;
+    color: #6c757d;
+    min-height: 28px;
+    font-style: italic;
+}
+
+/* Mobile responsiveness for smart memorization */
+@media (max-width: 768px) {
+    .smart-memo-text-area {
+        font-size: 1.35rem;
+        line-height: 2.2;
+        min-height: 180px;
+        padding: 1rem;
+        max-height: 350px;
+    }
+
+    .smart-memo-word {
+        padding: 0.15rem 0.25rem;
+        margin: 0.1rem;
+    }
+
+    .smart-memo-word.hidden-word {
+        min-width: 2rem;
+        min-height: 1.5rem;
+    }
+
+    #smartMemoStartBtn,
+    #smartMemoStopBtn {
+        font-size: 1rem;
+        padding: 0.625rem 1rem;
+    }
+
+    .verse-number-badge {
+        min-width: 20px;
+        height: 20px;
+        font-size: 0.65rem;
+    }
+}
+
+/* ==================== Verse Audio Buttons ==================== */
+.verse-audio-btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.verse-audio-btn:hover {
+    transform: scale(1.05);
+}
+
+.verse-audio-btn-inline {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    line-height: 1;
+}
+
+.verse-audio-btn-inline i {
+    font-size: 0.75rem;
+}
+
+/* ==================== Session Timer ==================== */
+.session-timer {
+    background: linear-gradient(135deg, #f0f4ff, #e8ecf8);
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'Tajawal', monospace;
+    letter-spacing: 1px;
+}
+
+/* ==================== Accuracy Chart ==================== */
+.accuracy-chart-wrapper {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0.5rem;
+    border: 1px solid #e8e4dc;
+}
+
+/* ==================== Word-level Display ==================== */
+.verse-words-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    direction: rtl;
+    justify-content: flex-start;
+    padding: 0.5rem 0;
+}
+
+.verse-word {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    line-height: 1.8;
+    color: #2c3e2c;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.verse-word.highlighted-word {
+    background: linear-gradient(135deg, #1a7a4a, #2d9d63);
+    color: #fff;
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(26, 122, 74, 0.3);
+}
+
+/* ==================== Tajweed Rules Colors ==================== */
+.tajweed-rule {
+    font-weight: 600;
+    cursor: help;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.tajweed-rule:hover {
+    text-decoration: underline;
+    filter: brightness(1.1);
+}
+
+/* Specific Tajweed rule colors */
+.tajweed-ghunna { color: #FF7F50; }
+.tajweed-ikhfa { color: #8A2BE2; }
+.tajweed-idgham { color: #4169E1; }
+.tajweed-idgham_without_ghunnah { color: #6495ED; }
+.tajweed-iqlab { color: #2E8B57; }
+.tajweed-qalqalah { color: #008080; }
+.tajweed-madd_2 { color: #DC143C; }
+.tajweed-madd_246 { color: #B22222; }
+.tajweed-madd_6 { color: #8B0000; }
+.tajweed-madd_obligatory { color: #FF1493; }
+.tajweed-slient { color: #708090; }
+
+/* ==================== Mushaf View ==================== */
+.mushaf-page-view {
+    background: linear-gradient(to bottom, #fdfbf7, #f5f0e8);
+    border: 2px solid #d4cfc4;
+    border-radius: 8px;
+    padding: 1.5rem;
+    min-height: 400px;
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+}
+
+.mushaf-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e8e4dc;
+}
+
+.mushaf-layout-badge {
+    display: inline-block;
+    background: #1a7a4a;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.mushaf-title {
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    color: #2c3e2c;
+    margin: 0;
+}
+
+.mushaf-bismillah {
+    font-family: 'Amiri', serif;
+    font-size: 1.3rem;
+    color: #4a5568;
+    margin-top: 0.75rem;
+}
+
+.mushaf-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.mushaf-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    align-items: center;
+    border-bottom: 1px dotted #e0d8cc;
+    padding-bottom: 0.5rem;
+}
+
+.mushaf-verse-wrapper {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    direction: rtl;
+}
+
+.mushaf-verse-wrapper:hover {
+    background: rgba(26, 122, 74, 0.05);
+}
+
+.mushaf-verse-wrapper.active-verse {
+    background: rgba(26, 122, 74, 0.12);
+    box-shadow: 0 0 0 2px rgba(26, 122, 74, 0.2);
+}
+
+.mushaf-word {
+    display: inline-block;
+    padding: 0.1rem 0.2rem;
+    border-radius: 4px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    direction: rtl;
+}
+
+.mushaf-word:hover {
+    background: rgba(26, 122, 74, 0.15);
+}
+
+.mushaf-verse-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    background: #e8e4dc;
+    color: #4a5568;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    margin-right: 0.25rem;
+    margin-left: 0.25rem;
+    font-family: 'Amiri', serif;
+}
+
+.mushaf-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e8e4dc;
+}
+
+.mushaf-page-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* ==================== Concordance Modal ==================== */
+#concordanceModal .font-amiri {
+    font-family: 'Amiri', serif;
+}
+
+/* ==================== Mutashabihat Modal ==================== */
+#mutashabihatModal .list-group-item {
+    border: 1px solid #e8e4dc;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+}
+
+/* ==================== Clickable Words in Cards ==================== */
+.verse-word {
+    cursor: pointer;
+}
+
+.verse-word:hover {
+    background: rgba(26, 122, 74, 0.1);
+}
+
+/* ==================== Mutashabihat Button in Verse Cards ==================== */
+.mutashabihat-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    margin-right: 0.5rem;
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+    transition: all 0.2s ease;
+}
+
+.mutashabihat-btn:hover {
+    background: #1976d2;
+    color: white;
+}

@@ -15,6 +15,14 @@
                     <small id="modeHelp" class="text-muted">اختر نوع التسميع</small>
                 </div>
 
+                <div class="mb-4">
+                    <label class="form-label">القارئ</label>
+                    <select class="form-select" id="reciterSelect" aria-describedby="reciterHelp">
+                        <option value="">مشاري العفاسي (افتراضي)</option>
+                    </select>
+                    <small id="reciterHelp" class="text-muted">اختر القارئ المفضل</small>
+                </div>
+
                 <div class="mb-3" id="pageInputs">
                     <label class="form-label" for="startPage">من صفحة</label>
                     <input type="number" class="form-control" id="startPage" value="1" min="1" max="604" aria-describedby="pageHelp">
@@ -93,6 +101,20 @@
                     </div>
                 </div>
 
+                <!-- Session Timer -->
+                <div class="session-timer mb-3" id="sessionTimerSection" style="display: none;">
+                    <div class="timer-display">
+                        <i class="fas fa-clock text-primary me-1"></i>
+                        <span id="sessionTimer">00:00</span>
+                    </div>
+                    <small class="text-muted">مدة الجلسة</small>
+                </div>
+
+                <!-- Accuracy Chart -->
+                <div class="accuracy-chart-wrapper mb-3" style="display: none;" id="accuracyChartWrapper">
+                    <canvas id="accuracyChart" height="120"></canvas>
+                </div>
+
                 <div class="d-grid gap-2">
                     <button class="btn btn-outline-primary d-none" id="nextVerse">
                         <i class="fas fa-forward me-1"></i>التالي
@@ -117,6 +139,9 @@
                         </button>
                         <button type="button" class="btn btn-outline-secondary" id="viewModeQuran" title="عرض مصحف" onclick="window.toggleViewMode('quran')">
                             <i class="fas fa-book-open"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="viewModeMushaf" title="عرض المصحف (رسم عثماني)" onclick="window.toggleViewMode('mushaf')">
+                            <i class="fas fa-mosque"></i>
                         </button>
                     </div>
                 </div>

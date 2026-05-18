@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'مركز ترتيل - التسميع والحفظ والتجويد')
-@section('page-title', 'مركز ترتيل')
+@section('title', 'تسميع القرآن - التسميع والحفظ والتجويد')
+@section('page-title', 'تسميع القرآن')
 @section('role-label', 'طالب')
 
 @section('sidebar-menu')
@@ -35,6 +35,10 @@ $apiToken = $token ? $token->token : null;
 <meta name="tajweed-example-url" content="{{ route('api.student.tarteel.tajweed-example', ['id' => '__ID__']) }}">
 
 <div id="recitationAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+    window.SURAH_INFO = @json(\App\Services\QuranApiService::SURAH_INFO);
+</script>
 
 <link rel="stylesheet" href="{{ asset('css/student/tarteel-center.css') }}?v={{ time() }}">
 
@@ -179,5 +183,6 @@ $apiToken = $token ? $token->token : null;
 <script src="{{ asset('js/student/live-recitation.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/student/tarteel-memorization.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/student/tarteel-tajweed.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('js/student/smart-memorization.js') }}?v={{ time() }}"></script>
 @endpush
 @endsection

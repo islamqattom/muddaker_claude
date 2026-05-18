@@ -6,6 +6,7 @@ class LiveRecitationController {
         this.sessionId = null;
         this.currentSession = null;
         this.verses = [];
+        this.audioUrls = {};
         this.currentVerseIndex = 0;
         this.totalErrors = 0;
         this.isRecording = false;
@@ -33,11 +34,32 @@ class LiveRecitationController {
         this.lastErrorFeedbackTime = 0;
         this.errorFeedbackThrottle = 1500;
         this.isPreviewMode = false;
-        this.viewMode = 'cards'; // 'cards' or 'quran'
+        this.viewMode = 'cards'; // 'cards', 'quran', or 'mushaf'
+        this.mushafLayout = 'KFGQPC_V4'; // default mushaf layout
 
         // Web Speech API fallback
         this.speechRecognition = null;
         this.useWebSpeech = false;
+
+        // Session timer
+        this.sessionStartTime = null;
+        this.sessionTimerInterval = null;
+        this.sessionTimerEl = null;
+        this.sessionTimerSectionEl = null;
+
+        // Accuracy chart
+        this.accuracyChart = null;
+        this.accuracyData = [];
+        this.verseAccuracyMap = [];
+
+        // Word-level data from QUL
+        this.wordSegments = {};
+        this.verseWords = {};
+        this.tajweedRules = {};
+        this.concordance = {};
+        this.mutashabihat = {};
+        this.currentReciter = '';
+        this.wordHighlightTimer = null;
 
         this.init();
     }
@@ -45,6 +67,7 @@ class LiveRecitationController {
     init() {
         this.modeSelect = document.getElementById('modeSelect');
         this.startPageInput = document.getElementById('startPage');
+        this.reciterSelect = document.getElementById('reciterSelect');
 
         // Check for Web Speech API support
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -134,6 +157,9 @@ class LiveRecitationController {
         this.startBtn.addEventListener('click', () => this.startRecitation());
         this.stopBtn.addEventListener('click', () => this.stopRecitation());
         this.nextVerseBtn.addEventListener('click', () => this.nextVerse());
+
+        // Load reciters
+        this.loadReciters();
 
         // Cache frequently accessed DOM elements
         this.pageInputsContainer = document.getElementById('pageInputs');
@@ -253,6 +279,30 @@ class LiveRecitationController {
         });
     }
 
+    async loadReciters() {
+        if (!this.reciterSelect) return;
+        try {
+            const response = await fetch('/api/student/live-recitation/reciters', {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.reciters) {
+                    this.reciterSelect.innerHTML = '<option value="">اختر القارئ</option>';
+                    Object.entries(data.reciters).forEach(([slug, name]) => {
+                        const option = document.createElement('option');
+                        option.value = slug;
+                        option.textContent = name;
+                        this.reciterSelect.appendChild(option);
+                    });
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load reciters:', error);
+        }
+    }
+
     async loadVersesPreview() {
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
@@ -301,6 +351,9 @@ class LiveRecitationController {
 
         try {
             const requestBody = { mode: mode };
+            if (this.reciterSelect && this.reciterSelect.value) {
+                requestBody.reciter = this.reciterSelect.value;
+            }
 
             if (mode === 'page') {
                 requestBody.start_page = startPage;
@@ -353,11 +406,17 @@ class LiveRecitationController {
             }
 
             this.verses = data.data.verses;
+            this.audioUrls = data.data.audio_urls || {};
+            this.wordSegments = data.data.word_segments || {};
+            this.verseWords = data.data.verse_words || {};
+            this.tajweedRules = data.data.tajweed_rules || {};
+            this.concordance = data.data.concordance || {};
+            this.mutashabihat = data.data.mutashabihat || {};
             this.currentVerseIndex = 0;
             this.totalErrors = 0;
             this.isPreviewMode = true;
             this.updateProgress();
-            this.initializeVersesDisplay();
+            this.refreshVersesDisplay();
             this.highlightVerse(0);
 
             // Enable start button after successful preview
@@ -439,6 +498,9 @@ class LiveRecitationController {
 
         try {
             const requestBody = { mode: mode };
+            if (this.reciterSelect && this.reciterSelect.value) {
+                requestBody.reciter = this.reciterSelect.value;
+            }
 
             if (mode === 'page') {
                 requestBody.start_page = startPage;
@@ -517,13 +579,25 @@ class LiveRecitationController {
                     return;
                 }
                 this.verses = data.data.verses;
+                this.audioUrls = data.data.audio_urls || {};
+                this.wordSegments = data.data.word_segments || {};
+                this.verseWords = data.data.verse_words || {};
+                this.tajweedRules = data.data.tajweed_rules || {};
+                this.concordance = data.data.concordance || {};
+                this.mutashabihat = data.data.mutashabihat || {};
                 this.currentVerseIndex = 0;
                 this.totalErrors = 0;
                 this.updateProgress();
-                this.initializeVersesDisplay();
+                this.refreshVersesDisplay();
                 this.highlightVerse(0);
             } else {
                 // In preview mode: reset tracking state but keep verses display
+                this.audioUrls = data.data.audio_urls || {};
+                this.wordSegments = data.data.word_segments || {};
+                this.verseWords = data.data.verse_words || {};
+                this.tajweedRules = data.data.tajweed_rules || {};
+                this.concordance = data.data.concordance || {};
+                this.mutashabihat = data.data.mutashabihat || {};
                 this.currentVerseIndex = 0;
                 this.totalErrors = 0;
                 this.errorCountEl.textContent = '0';
@@ -537,6 +611,11 @@ class LiveRecitationController {
             this.isEnding = false;
             this.stopBtn.classList.remove('d-none');
             this.nextVerseBtn.classList.remove('d-none');
+
+            // Start session timer and accuracy chart
+            this.startSessionTimer();
+            this.initAccuracyChart();
+            this.showToast('بدأت جلسة التسميع - اقرأ بصوت واضح', 'success');
 
             // Use Web Speech API if no WebSocket URL (AssemblyAI not configured)
             if (data.data.websocket_url && data.data.websocket_token) {
@@ -809,6 +888,350 @@ class LiveRecitationController {
         }
     }
 
+    /**
+     * Play the recitation audio for a verse.
+     * Supports word-level highlighting if wordSegments are available.
+     * @param {string} url
+     * @param {HTMLButtonElement} btn
+     * @param {string|null} verseKey - e.g. "1:1" for word-level highlighting
+     */
+    playVerseAudio(url, btn, verseKey = null) {
+        // If clicking the same button that is currently playing, just stop it
+        if (this.currentAudioBtn === btn && this.currentVerseAudio) {
+            this.stopCurrentAudio();
+            return;
+        }
+
+        this.stopCurrentAudio();
+
+        const audio = new Audio(url);
+        this.currentVerseAudio = audio;
+        this.currentAudioBtn = btn;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>جارٍ التحميل...';
+        btn.disabled = true;
+
+        audio.addEventListener('canplaythrough', () => {
+            btn.innerHTML = '<i class="fas fa-stop me-1"></i>إيقاف';
+            btn.disabled = false;
+            btn.classList.remove('btn-outline-success');
+            btn.classList.add('btn-success');
+            audio.play();
+            // Start word highlighting if segments available
+            if (verseKey && this.wordSegments[verseKey]) {
+                this.startWordHighlighting(verseKey, audio);
+            }
+        });
+
+        audio.addEventListener('ended', () => {
+            this.resetAudioButton(btn);
+            this.stopWordHighlighting();
+        });
+
+        audio.addEventListener('error', () => {
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>خطأ';
+            btn.disabled = false;
+            this.showToast('تعذر تحميل التسجيل الصوتي', 'error');
+            this.stopCurrentAudio();
+        });
+
+        audio.load();
+    }
+
+    stopCurrentAudio() {
+        if (this.currentVerseAudio) {
+            this.currentVerseAudio.pause();
+            this.currentVerseAudio.currentTime = 0;
+            this.currentVerseAudio = null;
+        }
+        if (this.currentAudioBtn) {
+            this.currentAudioBtn.innerHTML = '<i class="fas fa-volume-up me-1"></i>سماع التلاوة';
+            this.currentAudioBtn.classList.remove('btn-success');
+            this.currentAudioBtn.classList.add('btn-outline-success');
+            this.currentAudioBtn = null;
+        }
+        this.stopWordHighlighting();
+    }
+
+    resetAudioButton(btn) {
+        btn.innerHTML = '<i class="fas fa-volume-up me-1"></i>سماع التلاوة';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-outline-success');
+        this.currentVerseAudio = null;
+        this.currentAudioBtn = null;
+    }
+
+    startWordHighlighting(verseKey, audio) {
+        const segments = this.wordSegments[verseKey];
+        if (!segments || segments.length === 0) return;
+
+        const words = this.verseWords[verseKey];
+        if (!words) return;
+
+        // Find word elements for this verse
+        const wordEls = this.getVerseWordElements(verseKey);
+        if (!wordEls) return;
+
+        this.stopWordHighlighting();
+
+        const checkTime = () => {
+            if (!this.currentVerseAudio || this.currentVerseAudio.paused) return;
+            const currentTime = audio.currentTime;
+
+            // Find current word based on time
+            let activeIndex = -1;
+            for (let i = 0; i < segments.length; i++) {
+                const seg = segments[i];
+                if (currentTime >= seg.start_time && currentTime <= seg.end_time) {
+                    activeIndex = i;
+                    break;
+                }
+                if (i === segments.length - 1 && currentTime > seg.end_time) {
+                    activeIndex = i;
+                }
+            }
+
+            // Highlight current word
+            wordEls.forEach((el, i) => {
+                el.classList.toggle('highlighted-word', i === activeIndex);
+            });
+
+            this.wordHighlightTimer = requestAnimationFrame(checkTime);
+        };
+
+        this.wordHighlightTimer = requestAnimationFrame(checkTime);
+    }
+
+    stopWordHighlighting() {
+        if (this.wordHighlightTimer) {
+            cancelAnimationFrame(this.wordHighlightTimer);
+            this.wordHighlightTimer = null;
+        }
+        // Remove all word highlights
+        document.querySelectorAll('.highlighted-word').forEach(el => {
+            el.classList.remove('highlighted-word');
+        });
+    }
+
+    getVerseWordElements(verseKey) {
+        const card = document.querySelector(`.verse-card[data-key="${verseKey}"]`);
+        if (!card) return null;
+        return card.querySelectorAll('.verse-word');
+    }
+
+    /**
+     * Apply Tajweed rules to a single word text using rule spans
+     */
+    applyTajweedToWord(wordText, rules) {
+        if (!rules || rules.length === 0) return wordText;
+        // Sort rules by start_char descending to build from end to start
+        const sortedRules = [...rules].sort((a, b) => (b.start_char || 0) - (a.start_char || 0));
+        let result = wordText;
+        sortedRules.forEach(rule => {
+            const start = rule.start_char || 0;
+            const end = rule.end_char != null ? rule.end_char + 1 : start + 1;
+            const color = rule.rule_color || this.getTajweedColor(rule.rule_type);
+            const label = this.getTajweedLabel(rule.rule_type);
+            const before = result.substring(0, start);
+            const target = result.substring(start, end);
+            const after = result.substring(end);
+            result = before + `<span class="tajweed-rule tajweed-${rule.rule_type}" style="color:${color}" title="${label}">${target}</span>` + after;
+        });
+        return result;
+    }
+
+    /**
+     * Apply Tajweed rules to full verse text (when no word-level data)
+     */
+    applyTajweedToText(text, rules) {
+        if (!rules || rules.length === 0) return text;
+        // For full-text mode, word_position is null; apply sequentially
+        const sortedRules = [...rules].sort((a, b) => (b.start_char || 0) - (a.start_char || 0));
+        let result = text;
+        sortedRules.forEach(rule => {
+            const start = rule.start_char || 0;
+            const end = rule.end_char != null ? rule.end_char + 1 : start + 1;
+            const color = rule.rule_color || this.getTajweedColor(rule.rule_type);
+            const label = this.getTajweedLabel(rule.rule_type);
+            const before = result.substring(0, start);
+            const target = result.substring(start, end);
+            const after = result.substring(end);
+            result = before + `<span class="tajweed-rule tajweed-${rule.rule_type}" style="color:${color}" title="${label}">${target}</span>` + after;
+        });
+        return result;
+    }
+
+    getTajweedColor(ruleType) {
+        const colors = {
+            'ghunna': '#FF7F50',
+            'ikhfa': '#8A2BE2',
+            'idgham': '#4169E1',
+            'idgham_without_ghunnah': '#6495ED',
+            'iqlab': '#2E8B57',
+            'qalqalah': '#008080',
+            'madd_2': '#DC143C',
+            'madd_246': '#B22222',
+            'madd_6': '#8B0000',
+            'madd_obligatory': '#FF1493',
+            'slient': '#708090',
+        };
+        return colors[ruleType] || '#666666';
+    }
+
+    getTajweedLabel(ruleType) {
+        const labels = {
+            'ghunna': 'غنة',
+            'ikhfa': 'إخفاء',
+            'idgham': 'إدغام',
+            'idgham_without_ghunnah': 'إدغام بلا غنة',
+            'iqlab': 'إقلاب',
+            'qalqalah': 'قلقلة',
+            'madd_2': 'مد ٢',
+            'madd_246': 'مد ٢/٤/٦',
+            'madd_6': 'مد ٦',
+            'madd_obligatory': 'مد لازم',
+            'slient': 'سكت',
+        };
+        return labels[ruleType] || ruleType;
+    }
+
+    /**
+     * Show word concordance modal (grammar/morphology analysis)
+     */
+    showWordConcordance(verseKey, wordPosition) {
+        const concordanceData = this.concordance[verseKey];
+        if (!concordanceData || !concordanceData[wordPosition]) {
+            // Try from verse-level concordance array
+            const verseConc = this.concordance[verseKey];
+            const wordData = verseConc ? verseConc.find(w => w.word_position === wordPosition + 1) : null;
+            if (!wordData) {
+                this.showToast('لا توجد بيانات تحليلية لهذه الكلمة', 'info');
+                return;
+            }
+            this.renderConcordanceModal(wordData, verseKey);
+            return;
+        }
+        this.renderConcordanceModal(concordanceData[wordPosition], verseKey);
+    }
+
+    renderConcordanceModal(wordData, verseKey) {
+        const parts = verseKey.split(':');
+        const surah = parts[0];
+        const ayah = parts[1];
+
+        const posLabel = wordData.pos_label || wordData.part_of_speech || '';
+        const root = wordData.root || '';
+        const lemma = wordData.lemma || '';
+        const gender = wordData.gender || '';
+        const number = wordData.number || '';
+        const person = wordData.person || '';
+        const tense = wordData.tense || '';
+        const voice = wordData.voice || '';
+        const wordCase = wordData.case || wordData.word_case || '';
+        const translation = wordData.translation || '';
+
+        let detailsHtml = '';
+        if (root) detailsHtml += `<tr><td class="fw-bold">الجذر</td><td>${root}</td></tr>`;
+        if (lemma) detailsHtml += `<tr><td class="fw-bold">المصدر</td><td>${lemma}</td></tr>`;
+        if (posLabel) detailsHtml += `<tr><td class="fw-bold">نوع الكلمة</td><td>${posLabel}</td></tr>`;
+        if (gender) detailsHtml += `<tr><td class="fw-bold">الجنس</td><td>${gender === 'masculine' ? 'مذكر' : gender === 'feminine' ? 'مؤنث' : gender}</td></tr>`;
+        if (number) detailsHtml += `<tr><td class="fw-bold">العدد</td><td>${number === 'singular' ? 'مفرد' : number === 'dual' ? 'مثنى' : number === 'plural' ? 'جمع' : number}</td></tr>`;
+        if (person) detailsHtml += `<tr><td class="fw-bold">الشخص</td><td>${person === '1st' ? 'متكلم' : person === '2nd' ? 'مخاطب' : person === '3rd' ? 'غائب' : person}</td></tr>`;
+        if (tense) detailsHtml += `<tr><td class="fw-bold">الزمن</td><td>${tense === 'past' ? 'ماضٍ' : tense === 'present' ? 'مضارع' : tense === 'imperative' ? 'أمر' : tense}</td></tr>`;
+        if (voice) detailsHtml += `<tr><td class="fw-bold">المبني</td><td>${voice === 'active' ? 'معلوم' : voice === 'passive' ? 'مجهول' : voice}</td></tr>`;
+        if (wordCase) detailsHtml += `<tr><td class="fw-bold">الإعراب</td><td>${wordCase === 'nominative' ? 'رفع' : wordCase === 'accusative' ? 'نصب' : wordCase === 'genitive' ? 'جر' : wordCase}</td></tr>`;
+        if (translation) detailsHtml += `<tr><td class="fw-bold">الترجمة</td><td>${translation}</td></tr>`;
+
+        const modalHtml = `
+            <div class="modal fade" id="concordanceModal" tabindex="-1">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-microscope me-2"></i>تحليل الكلمة
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <span class="fs-2 font-amiri">${wordData.word_text || wordData.text_uthmani || ''}</span>
+                                <div class="text-muted small">سورة ${surah} - آية ${ayah}</div>
+                            </div>
+                            <table class="table table-sm table-striped">
+                                <tbody>${detailsHtml}</tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        const existing = document.getElementById('concordanceModal');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('concordanceModal'));
+        modal.show();
+    }
+
+    /**
+     * Show mutashabihat panel for a verse
+     */
+    showMutashabihat(verseKey) {
+        const data = this.mutashabihat[verseKey];
+        if (!data || data.length === 0) {
+            this.showToast('لا توجد آيات متشابهة لهذه الآية', 'info');
+            return;
+        }
+
+        const parts = verseKey.split(':');
+        const surah = parts[0];
+        const ayah = parts[1];
+
+        let itemsHtml = '';
+        data.forEach(item => {
+            const simBadge = item.similarity_score >= 80 ? 'bg-danger' : item.similarity_score >= 60 ? 'bg-warning' : 'bg-info';
+            itemsHtml += `
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong>${item.surah}:${item.ayah}</strong>
+                        <span class="badge ${simBadge}">${item.similarity_score}% تشابه</span>
+                    </div>
+                    ${item.shared_phrase ? `<div class="small text-muted"><em>العبارة المشتركة: ${item.shared_phrase}</em></div>` : ''}
+                </div>`;
+        });
+
+        const modalHtml = `
+            <div class="modal fade" id="mutashabihatModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-clone me-2"></i>آيات متشابهة
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center mb-3">
+                                <span class="text-muted">الآية: ${surah}:${ayah}</span>
+                            </div>
+                            <div class="list-group">${itemsHtml}</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+        const existing = document.getElementById('mutashabihatModal');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('mutashabihatModal'));
+        modal.show();
+    }
+
     processRecitation(transcript) {
         // Find the best matching verse for the transcription
         let bestMatchIndex = -1;
@@ -892,12 +1315,14 @@ class LiveRecitationController {
         container.className = 'verses-container';
 
         this.verses.forEach((verse, index) => {
+            const audioKey = verse.surah + ':' + verse.verse_number;
             const card = document.createElement('div');
             card.className = 'verse-card' + (index === 0 ? ' active-verse' : '');
             card.dataset.index = index;
+            card.dataset.key = audioKey;
             card.setAttribute('tabindex', '0');
             card.setAttribute('role', 'button');
-            card.setAttribute('aria-label', 'آية ' + (index + 1) + ' من ' + verse.surah + ':' + verse.verse_number);
+            card.setAttribute('aria-label', 'آية ' + (index + 1) + ' من ' + audioKey);
 
             // Click handler for manual navigation
             card.addEventListener('click', () => {
@@ -921,7 +1346,7 @@ class LiveRecitationController {
 
             const badge = document.createElement('span');
             badge.className = 'badge verse-badge bg-secondary';
-            badge.textContent = verse.surah + ':' + verse.verse_number;
+            badge.textContent = audioKey;
 
             const counter = document.createElement('span');
             counter.className = 'verse-counter';
@@ -930,13 +1355,87 @@ class LiveRecitationController {
             header.appendChild(badge);
             header.appendChild(counter);
 
-            const text = document.createElement('p');
-            text.className = 'verse-text mb-0';
-            text.dir = 'rtl';
-            text.textContent = verse.text;
-
             card.appendChild(header);
-            card.appendChild(text);
+
+            // Word-level display if available
+            const words = this.verseWords[audioKey];
+            const tajweed = this.tajweedRules[audioKey];
+            if (words && words.length > 0) {
+                const wordsContainer = document.createElement('div');
+                wordsContainer.className = 'verse-words-container';
+                wordsContainer.dir = 'rtl';
+                words.forEach((word, wi) => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'verse-word';
+                    wordSpan.dataset.position = wi;
+                    wordSpan.dataset.key = audioKey;
+                    let wordText = word.text_uthmani || word.text_imlaei || '';
+                    // Apply tajweed highlighting to this word if rules exist
+                    if (tajweed && tajweed.length > 0) {
+                        const wordRules = tajweed.filter(r => r.word_position === (wi + 1));
+                        if (wordRules.length > 0) {
+                            wordSpan.innerHTML = this.applyTajweedToWord(wordText, wordRules);
+                        } else {
+                            wordSpan.textContent = wordText;
+                        }
+                    } else {
+                        wordSpan.textContent = wordText;
+                    }
+                    // Click handler for word concordance
+                    wordSpan.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.showWordConcordance(audioKey, wi);
+                    });
+                    wordsContainer.appendChild(wordSpan);
+                });
+                card.appendChild(wordsContainer);
+            } else {
+                const text = document.createElement('p');
+                text.className = 'verse-text mb-0';
+                text.dir = 'rtl';
+                // Apply tajweed to full text if no word-level data
+                if (tajweed && tajweed.length > 0) {
+                    text.innerHTML = this.applyTajweedToText(verse.text, tajweed);
+                } else {
+                    text.textContent = verse.text;
+                }
+                card.appendChild(text);
+            }
+
+            // Action buttons container
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'd-flex gap-2 mt-2 flex-wrap';
+
+            // Audio player button
+            const audioUrl = this.audioUrls[audioKey];
+            if (audioUrl) {
+                const audioBtn = document.createElement('button');
+                audioBtn.className = 'btn btn-sm btn-outline-success verse-audio-btn';
+                audioBtn.innerHTML = '<i class="fas fa-volume-up me-1"></i>سماع التلاوة';
+                audioBtn.setAttribute('aria-label', 'تشغيل تلاوة آية ' + audioKey);
+                audioBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.playVerseAudio(audioUrl, audioBtn, audioKey);
+                });
+                btnContainer.appendChild(audioBtn);
+            }
+
+            // Mutashabihat button
+            if (this.mutashabihat[audioKey] && this.mutashabihat[audioKey].length > 0) {
+                const mutaBtn = document.createElement('button');
+                mutaBtn.className = 'btn btn-sm mutashabihat-btn';
+                mutaBtn.innerHTML = '<i class="fas fa-clone me-1"></i>متشابهات (' + this.mutashabihat[audioKey].length + ')';
+                mutaBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showMutashabihat(audioKey);
+                });
+                btnContainer.appendChild(mutaBtn);
+            }
+
+            if (btnContainer.children.length > 0) {
+                card.appendChild(btnContainer);
+            }
+
             container.appendChild(card);
         });
 
@@ -950,6 +1449,8 @@ class LiveRecitationController {
         if (!this.verses || this.verses.length === 0) return;
         if (this.viewMode === 'quran') {
             this.initializeQuranPageView();
+        } else if (this.viewMode === 'mushaf') {
+            this.initializeMushafView();
         } else {
             this.initializeVersesDisplay();
         }
@@ -960,15 +1461,12 @@ class LiveRecitationController {
         this.viewMode = mode;
         const viewModeCards = document.getElementById('viewModeCards');
         const viewModeQuran = document.getElementById('viewModeQuran');
-        if (viewModeCards && viewModeQuran) {
-            if (mode === 'cards') {
-                viewModeCards.classList.add('active');
-                viewModeQuran.classList.remove('active');
-            } else {
-                viewModeQuran.classList.add('active');
-                viewModeCards.classList.remove('active');
-            }
-        }
+        const viewModeMushaf = document.getElementById('viewModeMushaf');
+        if (viewModeCards) viewModeCards.classList.remove('active');
+        if (viewModeQuran) viewModeQuran.classList.remove('active');
+        if (viewModeMushaf) viewModeMushaf.classList.remove('active');
+        const activeBtn = mode === 'cards' ? viewModeCards : mode === 'quran' ? viewModeQuran : viewModeMushaf;
+        if (activeBtn) activeBtn.classList.add('active');
         this.refreshVersesDisplay();
     }
 
@@ -1024,8 +1522,14 @@ class LiveRecitationController {
 
             const verseText = document.createElement('span');
             verseText.className = 'quran-verse-text';
-            verseText.textContent = verse.text;
             verseText.dir = 'rtl';
+            const audioKey = verse.surah + ':' + verse.verse_number;
+            const tajweed = this.tajweedRules[audioKey];
+            if (tajweed && tajweed.length > 0) {
+                verseText.innerHTML = this.applyTajweedToText(verse.text, tajweed);
+            } else {
+                verseText.textContent = verse.text;
+            }
 
             const verseNum = document.createElement('span');
             verseNum.className = 'quran-verse-number';
@@ -1033,6 +1537,22 @@ class LiveRecitationController {
 
             line.appendChild(verseText);
             line.appendChild(verseNum);
+
+            // Audio player button (inline, small)
+            const audioUrl = this.audioUrls[audioKey];
+            if (audioUrl) {
+                const audioBtn = document.createElement('button');
+                audioBtn.className = 'btn btn-sm btn-outline-success verse-audio-btn-inline';
+                audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                audioBtn.setAttribute('aria-label', 'تشغيل تلاوة آية ' + audioKey);
+                audioBtn.title = 'سماع التلاوة';
+                audioBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.playVerseAudio(audioUrl, audioBtn, audioKey);
+                });
+                line.appendChild(audioBtn);
+            }
+
             container.appendChild(line);
         });
 
@@ -1072,6 +1592,147 @@ class LiveRecitationController {
         this.verseCardsCache = container.querySelectorAll('.quran-verse-line');
     }
 
+    initializeMushafView() {
+        if (!this.verses || this.verses.length === 0) return;
+        if (!this.currentVerseEl) return;
+
+        const container = document.createElement('div');
+        container.className = 'verses-container mushaf-page-view';
+
+        const surahNum = this.verses[0]?.surah || 1;
+        const surahName = this.getSurahName(surahNum);
+
+        // Page header with surah name and layout badge
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'mushaf-header';
+
+        const layoutBadge = document.createElement('span');
+        layoutBadge.className = 'mushaf-layout-badge';
+        layoutBadge.textContent = this.mushafLayout === 'KFGQPC_V4' ? 'مصحف المدينة' : 'هندوباك';
+
+        const title = document.createElement('h3');
+        title.className = 'mushaf-title';
+        title.textContent = 'سورة ' + surahName;
+
+        headerDiv.appendChild(layoutBadge);
+        headerDiv.appendChild(title);
+
+        if (surahNum !== 9) {
+            const bismillah = document.createElement('p');
+            bismillah.className = 'mushaf-bismillah';
+            bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+            headerDiv.appendChild(bismillah);
+        }
+
+        container.appendChild(headerDiv);
+
+        // Render verses in mushaf style - 15 lines per page simulation
+        const linesContainer = document.createElement('div');
+        linesContainer.className = 'mushaf-lines';
+
+        let currentLineNum = 1;
+        let currentLine = document.createElement('div');
+        currentLine.className = 'mushaf-line';
+        currentLine.dataset.line = currentLineNum;
+
+        this.verses.forEach((verse, index) => {
+            const audioKey = verse.surah + ':' + verse.verse_number;
+
+            // Wrap each verse in a mushaf line
+            const verseWrapper = document.createElement('span');
+            verseWrapper.className = 'mushaf-verse-wrapper' + (index === 0 ? ' active-verse' : '');
+            verseWrapper.dataset.index = index;
+            verseWrapper.dataset.key = audioKey;
+
+            // Tajweed coloring
+            const tajweed = this.tajweedRules[audioKey];
+            let verseHtml = '';
+            if (this.verseWords[audioKey]) {
+                // Word-by-word mushaf rendering with click handler
+                this.verseWords[audioKey].forEach((word, wi) => {
+                    const wordRules = tajweed ? tajweed.filter(r => r.word_position === (wi + 1)) : [];
+                    let wordText = word.text_uthmani || word.text_imlaei || '';
+                    let wordHtml = wordText;
+                    if (wordRules.length > 0) {
+                        wordHtml = this.applyTajweedToWord(wordText, wordRules);
+                    }
+                    verseHtml += `<span class="mushaf-word" data-position="${wi}" data-key="${audioKey}">${wordHtml}</span> `;
+                });
+            } else {
+                if (tajweed && tajweed.length > 0) {
+                    verseHtml = this.applyTajweedToText(verse.text, tajweed);
+                } else {
+                    verseHtml = verse.text;
+                }
+            }
+
+            verseWrapper.innerHTML = verseHtml;
+
+            // Verse number in ornate circle
+            const verseNumEl = document.createElement('span');
+            verseNumEl.className = 'mushaf-verse-number';
+            verseNumEl.textContent = this.convertToArabicNumerals(verse.verse_number);
+            verseWrapper.appendChild(verseNumEl);
+
+            // Click to navigate
+            verseWrapper.addEventListener('click', () => {
+                if (!this.isEvaluating && !this.isEnding) {
+                    this.currentVerseIndex = index;
+                    this.highlightVerse(index);
+                    this.updateProgress();
+                }
+            });
+
+            currentLine.appendChild(verseWrapper);
+
+            // Simulate 15 lines per page
+            if (currentLine.children.length >= 2 || currentLineNum >= 15) {
+                linesContainer.appendChild(currentLine);
+                currentLineNum++;
+                currentLine = document.createElement('div');
+                currentLine.className = 'mushaf-line';
+                currentLine.dataset.line = currentLineNum;
+            }
+        });
+
+        if (currentLine.children.length > 0) {
+            linesContainer.appendChild(currentLine);
+        }
+
+        container.appendChild(linesContainer);
+
+        // Page footer with page info
+        const footerDiv = document.createElement('div');
+        footerDiv.className = 'mushaf-footer';
+        const pageInfo = document.createElement('span');
+        pageInfo.className = 'mushaf-page-info';
+        pageInfo.textContent = 'جزء ' + this.getJuzLabel(surahNum);
+        footerDiv.appendChild(pageInfo);
+        container.appendChild(footerDiv);
+
+        this.currentVerseEl.innerHTML = '';
+        this.currentVerseEl.appendChild(container);
+        this.verseCardsCache = container.querySelectorAll('.mushaf-verse-wrapper');
+
+        // Add click handlers to words for concordance
+        container.querySelectorAll('.mushaf-word').forEach(wordEl => {
+            wordEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const key = wordEl.dataset.key;
+                const pos = parseInt(wordEl.dataset.position);
+                if (key && !isNaN(pos)) {
+                    this.showWordConcordance(key, pos);
+                }
+            });
+        });
+    }
+
+    getJuzLabel(surahNum) {
+        // Approximate juz mapping for display
+        const juzMap = {1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:12,18:15,19:16,23:18,26:19,28:20,33:22,36:23,40:24,46:26,51:27,58:28,67:29,78:30};
+        return juzMap[surahNum] || Math.min(30, Math.ceil(surahNum / 3.8));
+    }
+
     getSurahName(num) {
         const surahs = ['', 'الفاتحة', 'البقرة', 'آل عمران', 'النساء', 'المائدة', 'الأنعام', 'الأعراف', 'الأنفال', 'التوبة', 'يونس', 'هود', 'يوسف', 'الرعد', 'إبراهيم', 'الحجر', 'النحل', 'الإسراء', 'الكهف', 'مريم', 'طه', 'الأنبياء', 'الحج', 'المؤمنون', 'النور', 'الفرقان', 'الشعراء', 'النمل', 'القصص', 'العنكبوت', 'الروم', 'لقمان', 'السجدة', 'الأحزاب', 'سبأ', 'فاطر', 'يس', 'الصافات', 'ص', 'الزمر', 'غافر', 'فصلت', 'الشورى', 'الزخرف', 'الدخان', 'الجاثية', 'الأحقاف', 'محمد', 'الفتح', 'الحجرات', 'ق', 'الذاريات', 'الطور', 'النجم', 'القمر', 'الرحمن', 'الواقعة', 'الحديد', 'المجادلة', 'الحشر', 'الممتحنة', 'الصف', 'الجمعة', 'المنافقون', 'التغابن', 'الطلاق', 'التحريم', 'الملك', 'القلم', 'الحاقة', 'المعارج', 'نوح', 'الجن', 'المزمل', 'المدثر', 'القيامة', 'الإنسان', 'المرسلات', 'النبأ', 'النازعات', 'عبس', 'التكوير', 'الإنفطار', 'المطففين', 'الإنشقاق', 'البروج', 'الطارق', 'الأعلى', 'الغاشية', 'الفجر', 'البلد', 'الشمس', 'الليل', 'الضحى', 'الشرح', 'التين', 'العلق', 'القدر', 'البينة', 'الزلزلة', 'العاديات', 'القارعة', 'التكاثر', 'العصر', 'الهمزة', 'الفيل', 'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر', 'المسد', 'الإخلاص', 'الفلق', 'الناس'];
         return surahs[num] || num;
@@ -1080,6 +1741,113 @@ class LiveRecitationController {
     convertToArabicNumerals(num) {
         const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         return String(num).split('').map(d => arabicNumerals[parseInt(d)] || d).join('');
+    }
+
+    // ==========================================================
+    // SESSION TIMER
+    // ==========================================================
+    startSessionTimer() {
+        this.sessionStartTime = Date.now();
+        this.sessionTimerEl = document.getElementById('sessionTimer');
+        this.sessionTimerSectionEl = document.getElementById('sessionTimerSection');
+        if (this.sessionTimerSectionEl) {
+            this.sessionTimerSectionEl.style.display = 'block';
+        }
+        this.sessionTimerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - this.sessionStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            if (this.sessionTimerEl) {
+                this.sessionTimerEl.textContent = minutes + ':' + seconds;
+            }
+        }, 1000);
+    }
+
+    stopSessionTimer() {
+        if (this.sessionTimerInterval) {
+            clearInterval(this.sessionTimerInterval);
+            this.sessionTimerInterval = null;
+        }
+    }
+
+    // ==========================================================
+    // ACCURACY CHART (Chart.js)
+    // ==========================================================
+    initAccuracyChart() {
+        const wrapper = document.getElementById('accuracyChartWrapper');
+        if (wrapper) wrapper.style.display = 'block';
+
+        const ctx = document.getElementById('accuracyChart')?.getContext('2d');
+        if (!ctx) return;
+
+        this.accuracyData = [];
+        this.verseAccuracyMap = [];
+
+        if (this.accuracyChart) {
+            this.accuracyChart.destroy();
+        }
+
+        this.accuracyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'دقة التلاوة (%)',
+                    data: [],
+                    borderColor: '#1a7a4a',
+                    backgroundColor: 'rgba(26, 122, 74, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1a7a4a',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'الدقة: ' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        ticks: { stepSize: 20 }
+                    },
+                    x: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    updateAccuracyChart(verseIndex, similarity) {
+        if (!this.accuracyChart) return;
+
+        this.verseAccuracyMap[verseIndex] = similarity;
+
+        // Rebuild chart data from verseAccuracyMap to keep order
+        const labels = [];
+        const data = [];
+        for (let i = 0; i < this.verses.length; i++) {
+            if (this.verseAccuracyMap[i] !== undefined) {
+                labels.push('آية ' + (i + 1));
+                data.push(this.verseAccuracyMap[i]);
+            }
+        }
+
+        this.accuracyChart.data.labels = labels;
+        this.accuracyChart.data.datasets[0].data = data;
+        this.accuracyChart.update();
     }
 
     async evaluateCurrentVerse() {
@@ -1098,6 +1866,9 @@ class LiveRecitationController {
         const verse = this.verses[this.currentVerseIndex];
         const expectedText = verse.text;
         const similarity = this.calculateSimilarity(this.transcriptText, expectedText);
+
+        // Update accuracy chart
+        this.updateAccuracyChart(this.currentVerseIndex, similarity);
 
         if (similarity < this.similarityThreshold) {
             this.errorCountForCurrentVerse++;
@@ -1324,14 +2095,29 @@ class LiveRecitationController {
         indicator.className = 'status-indicator ' + state;
     }
 
+    showToast(message, type = 'info') {
+        if (typeof toastr !== 'undefined') {
+            toastr[type](message);
+        } else {
+            this._fallbackToast(message, type);
+        }
+    }
+
     showError(message) {
+        this.showToast(message, 'error');
+    }
+
+    showSuccess(message) {
+        this.showToast(message, 'success');
+    }
+
+    _fallbackToast(message, type) {
         if (!this.toastContainerEl) return;
-
         const toast = document.createElement('div');
-        toast.className = 'toast-error';
-        toast.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + this.escapeHtml(message) + '</span>';
+        toast.className = 'toast-' + type;
+        const icon = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+        toast.innerHTML = '<i class="fas ' + icon + '"></i><span>' + this.escapeHtml(message) + '</span>';
         this.toastContainerEl.appendChild(toast);
-
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(20px)';
@@ -1417,10 +2203,17 @@ class LiveRecitationController {
         this.isEnding = true;
         this.isRecording = false;
         this.cleanupRecording();
+        this.showSuccess('أحسنت! أكملت التسميع بنجاح');
         this.resetUI();
     }
 
     resetUI() {
+        this.stopSessionTimer();
+        const timerSection = document.getElementById('sessionTimerSection');
+        if (timerSection) timerSection.style.display = 'none';
+        const chartWrapper = document.getElementById('accuracyChartWrapper');
+        if (chartWrapper) chartWrapper.style.display = 'none';
+
         this.startBtn.disabled = true;
         this.startBtn.classList.remove('recording');
         this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
@@ -1445,6 +2238,11 @@ class LiveRecitationController {
         this.isPreviewMode = false;
         this.lastProcessedVerseIndex = -1;
         this.errorCountForCurrentVerse = 0;
+        this.wordSegments = {};
+        this.verseWords = {};
+        this.tajweedRules = {};
+        this.concordance = {};
+        this.mutashabihat = {};
         this.previewBtn.disabled = false;
         this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
     }

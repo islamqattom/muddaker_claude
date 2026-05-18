@@ -179,6 +179,7 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(AzkarSeeder::class);
+        $this->call(TajweedRulesSeeder::class);
         $this->command->info('✅ تم إنشاء البيانات الأولية بنجاح!');
         $this->command->table(
             ['المستخدم', 'البريد الإلكتروني', 'كلمة المرور', 'الدور'],

@@ -25,7 +25,7 @@ class LiveRecitationService
      * Start a new live recitation session
      *
      * @param Student $student
-     * @param array $params Session parameters (mode, start_page, end_page, surah, verse_start, verse_end)
+     * @param array $params Session parameters (mode, start_page, end_page, surah, verse_start, verse_end, reciter)
      * @return array{success: bool, session?: LiveRecitationSession, verses?: array, audio_urls?: array, websocket_token?: array, error?: string}
      */
     public function startSession(Student $student, array $params): array
@@ -37,9 +37,10 @@ class LiveRecitationService
             $surah = $params['surah'] ?? null;
             $verseStart = $params['verse_start'] ?? null;
             $verseEnd = $params['verse_end'] ?? null;
+            $reciterSlug = $params['reciter'] ?? null;
 
             // Get verses based on mode
-            $versesData = $this->getVersesForSession($mode, $startPage, $endPage, $surah, $verseStart, $verseEnd);
+            $versesData = $this->getVersesForSession($mode, $startPage, $endPage, $surah, $verseStart, $verseEnd, $reciterSlug);
 
             if (empty($versesData['verses'])) {
                 return ['success' => false, 'error' => 'No verses found for the specified range'];
@@ -73,6 +74,23 @@ class LiveRecitationService
                 'audio_urls' => $versesData['audio_urls'],
             ];
 
+            // Include word-level data if available
+            if (!empty($versesData['word_segments'])) {
+                $result['word_segments'] = $versesData['word_segments'];
+            }
+            if (!empty($versesData['verse_words'])) {
+                $result['verse_words'] = $versesData['verse_words'];
+            }
+            if (!empty($versesData['tajweed_rules'])) {
+                $result['tajweed_rules'] = $versesData['tajweed_rules'];
+            }
+            if (!empty($versesData['concordance'])) {
+                $result['concordance'] = $versesData['concordance'];
+            }
+            if (!empty($versesData['mutashabihat'])) {
+                $result['mutashabihat'] = $versesData['mutashabihat'];
+            }
+
             // Only add WebSocket info if AssemblyAI is configured
             if ($websocketToken && $websocketToken['success']) {
                 $result['websocket_token'] = $websocketToken;
@@ -84,9 +102,7 @@ class LiveRecitationService
             Log::error('Failed to start live recitation session', [
                 'student_id' => $student->id,
                 'mode' => $params['mode'] ?? 'unknown',
-                'start_page' => $params['start_page'] ?? 'unknown',
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -94,22 +110,25 @@ class LiveRecitationService
 
     /**
      * Get verses for a session
-     *
-     * @param string $mode page|range|surah
-     * @param int $startPage
-     * @param int $endPage
-     * @param int|null $surah
-     * @param int|null $verseStart
-     * @param int|null $verseEnd
-     * @return array{verses: array, audio_urls: array}
      */
-    public function getVersesForSession(string $mode, int $startPage, int $endPage, ?int $surah = null, ?int $verseStart = null, ?int $verseEnd = null): array
-    {
+    public function getVersesForSession(
+        string $mode,
+        int $startPage,
+        int $endPage,
+        ?int $surah = null,
+        ?int $verseStart = null,
+        ?int $verseEnd = null,
+        ?string $reciterSlug = null
+    ): array {
         $verses = [];
         $audioUrls = [];
+        $wordSegments = [];
+        $verseWords = [];
+        $tajweedRules = [];
+        $concordance = [];
+        $mutashabihat = [];
 
         if ($mode === 'surah' && $surah && $verseStart && $verseEnd) {
-            // Get specific verse range from a surah
             $versesData = $this->quranApi->getVerses($surah, $verseStart, $verseEnd);
 
             foreach ($versesData as $index => $verse) {
@@ -121,14 +140,39 @@ class LiveRecitationService
                     'text' => $verse['text'],
                     'global_number' => $verse['number'],
                 ];
-                $audioUrls["{$surah}:{$verseIndex}"] = $this->quranApi->getVerseAudioUrl($verse['number']);
+                $audioUrls["{$surah}:{$verseIndex}"] = $this->quranApi->getVerseAudioUrl($verse['number'], $reciterSlug);
+
+                // Get word-level data
+                $words = $this->quranApi->getVerseWords($surah, $verseIndex);
+                if (!empty($words)) {
+                    $verseWords["{$surah}:{$verseIndex}"] = $words;
+                }
+
+                $segments = $this->quranApi->getWordSegments($surah, $verseIndex, $reciterSlug);
+                if (!empty($segments)) {
+                    $wordSegments["{$surah}:{$verseIndex}"] = $segments;
+                }
+
+                $tajweed = $this->quranApi->getTajweedForVerse($surah, $verseIndex);
+                if (!empty($tajweed)) {
+                    $tajweedRules["{$surah}:{$verseIndex}"] = $tajweed;
+                }
+
+                $wordConc = $this->quranApi->getWordConcordance($surah, $verseIndex);
+                if (!empty($wordConc)) {
+                    $concordance["{$surah}:{$verseIndex}"] = $wordConc;
+                }
+
+                $similar = $this->quranApi->getMutashabihat($surah, $verseIndex);
+                if (!empty($similar)) {
+                    $mutashabihat["{$surah}:{$verseIndex}"] = $similar;
+                }
             }
         } else {
-            // Get all verses from page range
             for ($page = $startPage; $page <= $endPage; $page++) {
                 try {
                     $pageData = $this->quranApi->getPage($page);
-                    $pageAudioUrls = $this->quranApi->getAudioUrls($page);
+                    $pageAudioUrls = $this->quranApi->getAudioUrls($page, $reciterSlug);
 
                     foreach ($pageData['ayahs'] as $ayah) {
                         $surahNum = $ayah['surah']['number'];
@@ -144,7 +188,33 @@ class LiveRecitationService
                         ];
 
                         $key = "{$surahNum}:{$verseNum}";
-                        $audioUrls[$key] = $pageAudioUrls[$key] ?? $this->quranApi->getVerseAudioUrl($ayah['number']);
+                        $audioUrls[$key] = $pageAudioUrls[$key] ?? $this->quranApi->getVerseAudioUrl($ayah['number'], $reciterSlug);
+
+                        // Get word-level data
+                        $words = $this->quranApi->getVerseWords($surahNum, $verseNum);
+                        if (!empty($words)) {
+                            $verseWords[$key] = $words;
+                        }
+
+                        $segments = $this->quranApi->getWordSegments($surahNum, $verseNum, $reciterSlug);
+                        if (!empty($segments)) {
+                            $wordSegments[$key] = $segments;
+                        }
+
+                        $tajweed = $this->quranApi->getTajweedForVerse($surahNum, $verseNum);
+                        if (!empty($tajweed)) {
+                            $tajweedRules[$key] = $tajweed;
+                        }
+
+                        $wordConc = $this->quranApi->getWordConcordance($surahNum, $verseNum);
+                        if (!empty($wordConc)) {
+                            $concordance[$key] = $wordConc;
+                        }
+
+                        $similar = $this->quranApi->getMutashabihat($surahNum, $verseNum);
+                        if (!empty($similar)) {
+                            $mutashabihat[$key] = $similar;
+                        }
                     }
                 } catch (\Exception $e) {
                     Log::warning("Failed to fetch page {$page}", ['error' => $e->getMessage()]);
@@ -152,16 +222,19 @@ class LiveRecitationService
             }
         }
 
-        return ['verses' => $verses, 'audio_urls' => $audioUrls];
+        return [
+            'verses' => $verses,
+            'audio_urls' => $audioUrls,
+            'word_segments' => $wordSegments,
+            'verse_words' => $verseWords,
+            'tajweed_rules' => $tajweedRules,
+            'concordance' => $concordance,
+            'mutashabihat' => $mutashabihat,
+        ];
     }
 
     /**
      * Evaluate a transcribed verse against expected text
-     *
-     * @param string $expected Expected Arabic text
-     * @param string $transcribed Transcribed text from speech recognition
-     * @param float $threshold Similarity threshold (0-100)
-     * @return array{is_error: bool, similarity: float, error_type: ?string, details: ?array}
      */
     public function evaluateVerse(string $expected, string $transcribed, float $threshold = 80.0): array
     {
@@ -170,10 +243,6 @@ class LiveRecitationService
 
     /**
      * Record an error for a session
-     *
-     * @param int $sessionId
-     * @param array $errorData Error details
-     * @return LiveRecitationError
      */
     public function recordError(int $sessionId, array $errorData): LiveRecitationError
     {
@@ -190,7 +259,6 @@ class LiveRecitationService
             'occurred_at' => Carbon::now(),
         ]);
 
-        // Update session error count
         $session = LiveRecitationSession::find($sessionId);
         if ($session) {
             $session->increment('total_errors');
@@ -201,11 +269,6 @@ class LiveRecitationService
 
     /**
      * Update session progress
-     *
-     * @param int $sessionId
-     * @param int $verseIndex
-     * @param float $similarity
-     * @return void
      */
     public function updateProgress(int $sessionId, int $verseIndex, float $similarity): void
     {
@@ -216,7 +279,6 @@ class LiveRecitationService
 
         $session->verses_completed = $verseIndex + 1;
 
-        // Update average similarity using incremental average formula
         $newCount = $session->verses_completed;
         $oldCount = $newCount - 1;
         if ($oldCount > 0) {
@@ -230,15 +292,11 @@ class LiveRecitationService
 
     /**
      * End and finalize a session
-     *
-     * @param int $sessionId
-     * @return LiveRecitationSession
      */
     public function endSession(int $sessionId): LiveRecitationSession
     {
         $session = LiveRecitationSession::with('errors')->findOrFail($sessionId);
 
-        // Calculate final score based on average similarity and error count
         $errorPenalty = $session->total_errors * 3;
         $session->final_score = max(0, $session->average_similarity - $errorPenalty);
         $session->status = 'completed';
@@ -250,9 +308,6 @@ class LiveRecitationService
 
     /**
      * Cancel a session
-     *
-     * @param int $sessionId
-     * @return bool
      */
     public function cancelSession(int $sessionId): bool
     {
@@ -270,9 +325,6 @@ class LiveRecitationService
 
     /**
      * Generate a detailed report for a completed session
-     *
-     * @param int $sessionId
-     * @return array
      */
     public function generateReport(int $sessionId): array
     {
@@ -325,9 +377,6 @@ class LiveRecitationService
         ];
     }
 
-    /**
-     * Get the most common error type
-     */
     private function getMostCommonErrorType($errors): ?string
     {
         $counts = [];

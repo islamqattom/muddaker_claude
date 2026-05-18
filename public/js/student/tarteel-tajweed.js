@@ -6,11 +6,9 @@
         quizQuestions: [],
         currentQuizIndex: 0,
         quizScore: 0,
-        surahData: null,
 
         init: function() {
             this.loadTajweedRules();
-            this.initSurahSelect();
             this.initQuizControls();
         },
 
@@ -18,15 +16,26 @@
             return document.querySelector('meta[name=api-token]')?.content || '';
         },
 
+        getFetchOptions: function() {
+            const apiToken = this.getApiToken();
+            const headers = {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            };
+            if (apiToken) {
+                headers['Authorization'] = 'Bearer ' + apiToken;
+            }
+            return {
+                headers: headers,
+                credentials: 'include',
+            };
+        },
+
         loadTajweedRules: function() {
             const container = document.getElementById('tajweedRulesList');
             if (!container) return;
 
-            const apiToken = this.getApiToken();
-
-            fetch('/api/student/tarteel/tajweed-rules', {
-                headers: { 'Authorization': 'Bearer ' + apiToken }
-            })
+            fetch('/api/student/tarteel/tajweed-rules', this.getFetchOptions())
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.data && data.data.length > 0) {
@@ -98,16 +107,13 @@
         },
 
         loadRuleDetail: function(ruleId) {
-            const apiToken = this.getApiToken();
             const detailCard = document.getElementById('tajweedRuleDetail');
 
             if (!detailCard) return;
 
             detailCard.style.display = 'block';
 
-            fetch(`/api/student/tarteel/tajweed-example/${ruleId}`, {
-                headers: { 'Authorization': 'Bearer ' + apiToken }
-            })
+            fetch(`/api/student/tarteel/tajweed-example/${ruleId}`, this.getFetchOptions())
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -175,91 +181,6 @@
             }
         },
 
-        initSurahSelect: function() {
-            const surahSelect = document.getElementById('tajweedSurahSelect');
-            const loadBtn = document.getElementById('loadTajweedVerse');
-
-            if (!surahSelect) return;
-
-            const SURAH_INFO = window.SURAH_INFO || {};
-            Object.keys(SURAH_INFO).forEach(num => {
-                const opt = document.createElement('option');
-                opt.value = num;
-                opt.textContent = `${num} - ${SURAH_INFO[num].name}`;
-                surahSelect.appendChild(opt);
-            });
-
-            if (loadBtn) {
-                loadBtn.addEventListener('click', () => this.loadTajweedVerseDisplay());
-            }
-
-            document.getElementById('playTajweedAudio')?.addEventListener('click', () => this.playVerseAudio());
-            document.getElementById('copyTajweedVerse')?.addEventListener('click', () => this.copyVerse());
-        },
-
-        loadTajweedVerseDisplay: function() {
-            const surahSelect = document.getElementById('tajweedSurahSelect');
-            const verseInput = document.getElementById('tajweedVerseNumber');
-            const displayContainer = document.getElementById('tajweedVerseDisplay');
-            const verseText = document.getElementById('tajweedVerseText');
-
-            if (!surahSelect?.value) {
-                this.showToast('الرجاء اختيار سورة', 'error');
-                return;
-            }
-
-            const surah = surahSelect.value;
-            const verse = verseInput?.value || 1;
-            const verseKey = `${surah}:${verse}`;
-
-            if (displayContainer) displayContainer.style.display = 'block';
-            if (verseText) verseText.textContent = 'جارٍ التحميل...';
-
-            fetch(`https://api.alquran.cloud/v1/verse/${verseKey}`, {
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.data && data.data.text) {
-                    if (verseText) verseText.textContent = data.data.text;
-                } else {
-                    if (verseText) verseText.textContent = 'تعذر تحميل الآية';
-                }
-            })
-            .catch(err => {
-                console.error('Error loading verse:', err);
-                if (verseText) verseText.textContent = 'خطأ في التحميل';
-            });
-        },
-
-        playVerseAudio: function() {
-            const surahSelect = document.getElementById('tajweedSurahSelect');
-            const verseInput = document.getElementById('tajweedVerseNumber');
-
-            if (!surahSelect?.value) return;
-
-            const surah = surahSelect.value;
-            const verse = verseInput?.value || 1;
-            const audioUrl = `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${surah}:${verse}.mp3`;
-
-            const audio = new Audio(audioUrl);
-            audio.play().catch(err => {
-                console.error('Audio play error:', err);
-                this.showToast('فشل في تشغيل الصوت', 'error');
-            });
-        },
-
-        copyVerse: function() {
-            const verseText = document.getElementById('tajweedVerseText');
-            if (verseText && verseText.textContent) {
-                navigator.clipboard.writeText(verseText.textContent).then(() => {
-                    this.showToast('تم نسخ الآية', 'success');
-                }).catch(() => {
-                    this.showToast('فشل في النسخ', 'error');
-                });
-            }
-        },
-
         initQuizControls: function() {
             const startBtn = document.getElementById('startTajweedQuiz');
             const nextBtn = document.getElementById('nextQuizQuestion');
@@ -283,11 +204,7 @@
             if (placeholder) placeholder.style.display = 'none';
             if (content) content.style.display = 'block';
 
-            const apiToken = this.getApiToken();
-
-            fetch('/api/student/tarteel/tajweed-rules', {
-                headers: { 'Authorization': 'Bearer ' + apiToken }
-            })
+            fetch('/api/student/tarteel/tajweed-rules', this.getFetchOptions())
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.data && data.data.length > 0) {

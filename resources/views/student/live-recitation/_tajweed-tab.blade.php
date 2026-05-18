@@ -18,7 +18,7 @@
     </div>
 
     <div class="col-lg-8">
-        <div class="card mb-4" id="tajweedRuleDetail">
+        <div class="card mb-4" id="tajweedRuleDetail" style="display: none;">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0" id="ruleDetailTitle"><i class="fas fa-info-circle me-2"></i>تفاصيل القاعدة</h5>
                 <button class="btn btn-sm btn-outline-secondary" id="closeRuleDetail">
@@ -41,45 +41,6 @@
                 <div class="mt-4" id="ruleExamplesSection" style="display: none;">
                     <h6 class="mb-3"><i class="fas fa-list me-2"></i>أمثلة إضافية</h6>
                     <ul class="list-group" id="ruleExamplesList"></ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-language me-2"></i>التشكيل التفاعلي</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted mb-3">اختر آية لعرضها بالتشكيل الكامل مع إمكانية التشغيل الصوتي</p>
-                <div class="row g-3 mb-3">
-                    <div class="col-md-5">
-                        <label class="form-label">السورة</label>
-                        <select class="form-select" id="tajweedSurahSelect">
-                            <option value="">اختر السورة</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">رقم الآية</label>
-                        <input type="number" class="form-control" id="tajweedVerseNumber" value="1" min="1">
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button class="btn btn-success w-100" id="loadTajweedVerse">
-                            <i class="fas fa-search me-2"></i>عرض الآية
-                        </button>
-                    </div>
-                </div>
-                <div class="text-center p-4 bg-light rounded" id="tajweedVerseDisplay" style="display: none;">
-                    <div class="mb-3" dir="rtl">
-                        <span class="verse-text" id="tajweedVerseText" style="font-family: 'Amiri', serif; font-size: 1.8rem; line-height: 2.2;"></span>
-                    </div>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn btn-sm btn-outline-secondary" id="playTajweedAudio">
-                            <i class="fas fa-volume-up me-1"></i>تشغيل
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary" id="copyTajweedVerse">
-                            <i class="fas fa-copy me-1"></i>نسخ
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

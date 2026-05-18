@@ -14,7 +14,7 @@
 </a>
 <a href="{{ route('student.live-recitation') }}" class="nav-link {{ request()->routeIs('student.live-recitation*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-microphone-alt"></i></div>
-    <span>مركز ترتيل</span>
+    <span>تسميع القرآن</span>
 </a>
 <a href="{{ route('student.voice-search') }}" class="nav-link {{ request()->routeIs('student.voice-search') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>

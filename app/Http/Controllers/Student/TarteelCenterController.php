@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\StudentPartRecord;
 use App\Models\ReviewItem;
-use App\Models\TajweedRule;
+use App\Models\TajweedRuleDefinition;
 use App\Services\QuranApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -129,7 +129,7 @@ class TarteelCenterController extends Controller
 
     public function getTajweedRules()
     {
-        $rules = TajweedRule::orderBy('category')->orderBy('order')->get();
+        $rules = TajweedRuleDefinition::orderBy('category')->orderBy('order')->get();
 
         return response()->json([
             'success' => true,
@@ -139,7 +139,7 @@ class TarteelCenterController extends Controller
 
     public function getTajweedExample($ruleId)
     {
-        $rule = TajweedRule::find($ruleId);
+        $rule = TajweedRuleDefinition::find($ruleId);
 
         if (!$rule) {
             return response()->json([
@@ -150,13 +150,16 @@ class TarteelCenterController extends Controller
 
         $exampleVerse = null;
         if ($rule->example_verse_key) {
-            $verseData = $this->quranApiService->getVerse($rule->example_verse_key);
-            if ($verseData) {
-                $exampleVerse = [
-                    'text' => $verseData['text'] ?? null,
-                    'surah' => $verseData['surah'] ?? null,
-                    'verse_number' => $verseData['verse_number'] ?? null,
-                ];
+            $parts = explode(':', $rule->example_verse_key);
+            if (count($parts) === 2) {
+                $verseData = $this->quranApiService->getVerse((int) $parts[0], (int) $parts[1]);
+                if ($verseData) {
+                    $exampleVerse = [
+                        'text' => $verseData['text'] ?? null,
+                        'surah' => $verseData['surah'] ?? null,
+                        'verse_number' => $verseData['numberInSurah'] ?? null,
+                    ];
+                }
             }
         }
 

@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/live-recita
     Route::post('/error', [LiveRecitationController::class, 'recordError'])->name('api.live-recitation.error');
     Route::post('/progress', [LiveRecitationController::class, 'updateProgress'])->name('api.live-recitation.progress');
     Route::get('/session/{id}/report', [LiveRecitationController::class, 'getReport'])->name('api.live-recitation.report');
+    Route::get('/reciters', [LiveRecitationController::class, 'getReciters'])->name('api.live-recitation.reciters');
 });
 
 // Exam API

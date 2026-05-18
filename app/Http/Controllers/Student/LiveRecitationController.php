@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Services\LiveRecitationService;
+use App\Services\QuranApiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\Validator;
 class LiveRecitationController extends Controller
 {
     public function __construct(
-        private LiveRecitationService $liveRecitationService
+        private LiveRecitationService $liveRecitationService,
+        private QuranApiService $quranApi
     ) {}
 
     /**
@@ -86,6 +88,7 @@ class LiveRecitationController extends Controller
                 $request->input('surah') ? (int) $request->input('surah') : null,
                 $request->input('verse_start') ? (int) $request->input('verse_start') : null,
                 $request->input('verse_end') ? (int) $request->input('verse_end') : null,
+                $request->input('reciter') ?: null,
             );
 
             if (empty($versesData['verses'])) {
@@ -100,6 +103,11 @@ class LiveRecitationController extends Controller
                 'data' => [
                     'verses' => $versesData['verses'],
                     'audio_urls' => $versesData['audio_urls'],
+                    'word_segments' => $versesData['word_segments'] ?? null,
+                    'verse_words' => $versesData['verse_words'] ?? null,
+                    'tajweed_rules' => $versesData['tajweed_rules'] ?? null,
+                    'concordance' => $versesData['concordance'] ?? null,
+                    'mutashabihat' => $versesData['mutashabihat'] ?? null,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -171,6 +179,7 @@ class LiveRecitationController extends Controller
                 'surah' => $request->input('surah'),
                 'verse_start' => $request->input('verse_start'),
                 'verse_end' => $request->input('verse_end'),
+                'reciter' => $request->input('reciter') ?: null,
             ]);
         } catch (\Exception $e) {
             Log::error('Live recitation start error', [
@@ -193,15 +202,23 @@ class LiveRecitationController extends Controller
             ], 400);
         }
 
+        $responseData = [
+            'session_id' => $result['session']->id,
+            'verses' => $result['verses'],
+            'audio_urls' => $result['audio_urls'],
+            'websocket_token' => $result['websocket_token']['token'] ?? null,
+            'websocket_url' => $result['websocket_url'] ?? null,
+        ];
+
+        foreach (['word_segments', 'verse_words', 'tajweed_rules', 'concordance', 'mutashabihat'] as $field) {
+            if (!empty($result[$field])) {
+                $responseData[$field] = $result[$field];
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'session_id' => $result['session']->id,
-                'verses' => $result['verses'],
-                'audio_urls' => $result['audio_urls'],
-                'websocket_token' => $result['websocket_token']['token'] ?? null,
-                'websocket_url' => $result['websocket_url'] ?? null,
-            ],
+            'data' => $responseData,
         ]);
     }
 
@@ -423,6 +440,17 @@ class LiveRecitationController extends Controller
         return response()->json([
             'success' => true,
             'data' => $report,
+        ]);
+    }
+
+    /**
+     * Get available reciters
+     */
+    public function getReciters()
+    {
+        return response()->json([
+            'success' => true,
+            'reciters' => $this->quranApi->getAvailableReciters(),
         ]);
     }
 }
