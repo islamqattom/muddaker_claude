@@ -46,13 +46,14 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/achievement
 
 // Live Recitation API
 Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/live-recitation')->group(function () {
-    Route::post('/start', [LiveRecitationController::class, 'start']);
-    Route::get('/session/{id}', [LiveRecitationController::class, 'getSession']);
-    Route::post('/session/{id}/end', [LiveRecitationController::class, 'endSession']);
-    Route::delete('/session/{id}', [LiveRecitationController::class, 'cancelSession']);
-    Route::post('/error', [LiveRecitationController::class, 'recordError']);
-    Route::post('/progress', [LiveRecitationController::class, 'updateProgress']);
-    Route::get('/session/{id}/report', [LiveRecitationController::class, 'getReport']);
+    Route::post('/preview', [LiveRecitationController::class, 'previewVerses'])->name('api.live-recitation.preview');
+    Route::post('/start', [LiveRecitationController::class, 'start'])->name('api.live-recitation.start');
+    Route::get('/session/{id}', [LiveRecitationController::class, 'getSession'])->name('api.live-recitation.session');
+    Route::post('/session/{id}/end', [LiveRecitationController::class, 'endSession'])->name('api.live-recitation.end');
+    Route::delete('/session/{id}', [LiveRecitationController::class, 'cancelSession'])->name('api.live-recitation.cancel');
+    Route::post('/error', [LiveRecitationController::class, 'recordError'])->name('api.live-recitation.error');
+    Route::post('/progress', [LiveRecitationController::class, 'updateProgress'])->name('api.live-recitation.progress');
+    Route::get('/session/{id}/report', [LiveRecitationController::class, 'getReport'])->name('api.live-recitation.report');
 });
 
 // Exam API

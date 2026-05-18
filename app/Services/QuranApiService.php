@@ -255,26 +255,31 @@ class QuranApiService
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($surah, $verseStart, $verseEnd) {
             $response = Http::get(
-                self::BASE_URL . "/ayah/{$surah}:{$verseStart}-{$verseEnd}/quran-quranuthmani"
+                self::BASE_URL . "/surah/{$surah}/quran-quranuthmani"
             );
 
             if ($response->failed()) {
-                Log::error('QuranApiService: Failed to fetch verse range', [
+                Log::error('QuranApiService: Failed to fetch surah', [
                     'surah' => $surah,
-                    'verseStart' => $verseStart,
-                    'verseEnd' => $verseEnd,
                     'status' => $response->status(),
                 ]);
-                throw new \Exception("Failed to fetch verses {$surah}:{$verseStart}-{$verseEnd}");
+                throw new \Exception("Failed to fetch surah {$surah}");
             }
 
             $data = $response->json()['data'] ?? [];
+            $allVerses = $data['ayahs'] ?? [];
 
-            if (isset($data[0])) {
-                return array_map(fn($v) => $this->mapVerseData($v, $surah, $verseStart), $data);
+            if (empty($allVerses)) {
+                return [];
             }
 
-            return [];
+            $verses = [];
+            for ($i = $verseStart - 1; $i < $verseEnd && $i < count($allVerses); $i++) {
+                $verse = $allVerses[$i];
+                $verses[] = $this->mapVerseData($verse, $surah, $i + 1);
+            }
+
+            return $verses;
         });
     }
 
@@ -287,7 +292,7 @@ class QuranApiService
             'text' => $data['text'] ?? '',
             'surah_name' => $data['surah']['name'] ?? '',
             'number' => $data['number'] ?? 0,
-            'surah' => $data['surah']['number'] ?? $surah,
+            'surah' => $data['surah']['number'] ?? ($data['surah'] ?? $surah),
             'numberInSurah' => $data['numberInSurah'] ?? $verse,
         ];
     }

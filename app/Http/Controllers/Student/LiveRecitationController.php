@@ -55,6 +55,66 @@ class LiveRecitationController extends Controller
     }
 
     /**
+     * Preview verses without creating a session
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function previewVerses(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mode' => 'required|in:page,range,surah',
+            'start_page' => 'required_if:mode,page,range|integer|min:1|max:604',
+            'end_page' => 'required_if:mode,range|integer|min:1|max:604|gte:start_page',
+            'surah' => 'required_if:mode,surah|integer|min:1|max:114',
+            'verse_start' => 'required_if:mode,surah|integer|min:1',
+            'verse_end' => 'required_if:mode,surah|integer|gte:verse_start',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $versesData = $this->liveRecitationService->getVersesForSession(
+                $request->input('mode'),
+                (int) $request->input('start_page', 1),
+                (int) $request->input('end_page', $request->input('start_page', 1)),
+                $request->input('surah') ? (int) $request->input('surah') : null,
+                $request->input('verse_start') ? (int) $request->input('verse_start') : null,
+                $request->input('verse_end') ? (int) $request->input('verse_end') : null,
+            );
+
+            if (empty($versesData['verses'])) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'لم يتم العثور على آيات للنطاق المحدد',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'verses' => $versesData['verses'],
+                    'audio_urls' => $versesData['audio_urls'],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Live recitation preview error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'خطأ في جلب الآيات: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Start a new live recitation session
      *
      * @param Request $request

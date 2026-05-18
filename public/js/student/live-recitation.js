@@ -32,6 +32,8 @@ class LiveRecitationController {
         this.reconnectDelay = 1000;
         this.lastErrorFeedbackTime = 0;
         this.errorFeedbackThrottle = 1500;
+        this.isPreviewMode = false;
+        this.viewMode = 'cards'; // 'cards' or 'quran'
 
         // Web Speech API fallback
         this.speechRecognition = null;
@@ -94,6 +96,7 @@ class LiveRecitationController {
         this.endPageInput = document.getElementById('endPage');
         this.endPageInputContainer = document.getElementById('endPageInput');
         this.similarityThresholdInput = document.getElementById('similarityThreshold');
+        this.previewBtn = document.getElementById('previewVerses');
         this.startBtn = document.getElementById('startRecitation');
         this.stopBtn = document.getElementById('stopRecitation');
         this.nextVerseBtn = document.getElementById('nextVerse');
@@ -108,6 +111,13 @@ class LiveRecitationController {
         this.csrfToken = document.querySelector('meta[name=csrf-token]')?.content || '';
         // Read API token from meta tag if available
         this.apiToken = document.querySelector('meta[name=api-token]')?.content || '';
+        // Read route URLs from meta tags
+        this.tokenUrl = document.querySelector('meta[name=token-url]')?.content || '/student/live-recitation/token';
+        this.previewUrl = document.querySelector('meta[name=preview-url]')?.content || '/api/student/live-recitation/preview';
+        this.startUrl = document.querySelector('meta[name=start-url]')?.content || '/api/student/live-recitation/start';
+        this.errorUrl = document.querySelector('meta[name=error-url]')?.content || '/api/student/live-recitation/error';
+        this.progressUrl = document.querySelector('meta[name=progress-url]')?.content || '/api/student/live-recitation/progress';
+        this.reportUrlTemplate = document.querySelector('meta[name=report-url-template]')?.content || '/api/student/live-recitation/session/__ID__/report';
 
         // Validate critical elements
         if (!this.startBtn || !this.modeSelect || !this.startPageInput) {
@@ -120,6 +130,7 @@ class LiveRecitationController {
         }
 
         this.modeSelect.addEventListener('change', () => this.togglePageInputs());
+        this.previewBtn.addEventListener('click', () => this.loadVersesPreview());
         this.startBtn.addEventListener('click', () => this.startRecitation());
         this.stopBtn.addEventListener('click', () => this.stopRecitation());
         this.nextVerseBtn.addEventListener('click', () => this.nextVerse());
@@ -163,6 +174,8 @@ class LiveRecitationController {
                 }
             });
         }
+
+        // View mode toggle is handled via onclick in HTML
     }
 
     togglePageInputs() {
@@ -240,6 +253,126 @@ class LiveRecitationController {
         });
     }
 
+    async loadVersesPreview() {
+        const mode = this.modeSelect.value;
+        const startPage = parseInt(this.startPageInput.value);
+        const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
+
+        // Validate inputs before sending
+        if (mode === 'surah') {
+            const surahSelect = document.getElementById('surahSelect');
+            const verseStart = parseInt(document.getElementById('verseStart').value);
+            const verseEnd = parseInt(document.getElementById('verseEnd').value);
+            if (!surahSelect.value) {
+                this.showError('يرجى اختيار السورة');
+                return;
+            }
+            if (isNaN(verseStart) || verseStart < 1) {
+                this.showError('يرجى إدخال رقم آية البداية بشكل صحيح');
+                return;
+            }
+            if (isNaN(verseEnd) || verseEnd < verseStart) {
+                this.showError('يرجى إدخال رقم آية النهاية بشكل صحيح (يجب أن يكون أكبر من أو يساوي آية البداية)');
+                return;
+            }
+        }
+
+        this.previewBtn.disabled = true;
+        this.previewBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جارٍ التحميل...';
+        this.updateStatus('جارٍ تحميل الآيات...');
+
+        // Get API token if not available
+        if (!this.apiToken) {
+            try {
+                const tokenResponse = await fetch(this.tokenUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'include'
+                });
+                if (!tokenResponse.ok) throw new Error('Token request failed');
+                const tokenData = await tokenResponse.json();
+                if (tokenData.success && tokenData.token) {
+                    this.apiToken = tokenData.token;
+                }
+            } catch (error) {
+                console.error('Failed to get API token:', error);
+            }
+        }
+
+        try {
+            const requestBody = { mode: mode };
+
+            if (mode === 'page') {
+                requestBody.start_page = startPage;
+                requestBody.end_page = startPage;
+            } else if (mode === 'range') {
+                requestBody.start_page = startPage;
+                requestBody.end_page = endPage;
+            } else if (mode === 'surah') {
+                const surahSelect = document.getElementById('surahSelect');
+                const verseStart = parseInt(document.getElementById('verseStart').value);
+                const verseEnd = parseInt(document.getElementById('verseEnd').value);
+                requestBody.surah = parseInt(surahSelect.value);
+                requestBody.verse_start = verseStart;
+                requestBody.verse_end = verseEnd;
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            };
+            if (this.apiToken) {
+                headers['Authorization'] = 'Bearer ' + this.apiToken;
+            }
+
+            const response = await fetch(this.previewUrl, {
+                method: 'POST',
+                headers: headers,
+                credentials: 'include',
+                body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                let errorMsg = data.error || 'فشل في تحميل الآيات';
+                if (response.status === 422 && data.errors) {
+                    errorMsg = Object.values(data.errors).flat().join(' / ') || errorMsg;
+                }
+                this.showError(errorMsg);
+                this.previewBtn.disabled = false;
+                this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
+                return;
+            }
+
+            if (!data.data || !data.data.verses || data.data.verses.length === 0) {
+                this.showError('لم يتم العثور على آيات للنطاق المحدد');
+                this.previewBtn.disabled = false;
+                this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
+                return;
+            }
+
+            this.verses = data.data.verses;
+            this.currentVerseIndex = 0;
+            this.totalErrors = 0;
+            this.isPreviewMode = true;
+            this.updateProgress();
+            this.initializeVersesDisplay();
+            this.highlightVerse(0);
+
+            // Enable start button after successful preview
+            this.startBtn.disabled = false;
+            this.previewBtn.disabled = false;
+            this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
+            this.updateStatus('تم تحميل الآيات - جاهز للتسميع');
+        } catch (error) {
+            console.error('Error loading verses preview:', error);
+            this.showError('حدث خطأ أثناء تحميل الآيات');
+            this.previewBtn.disabled = false;
+            this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
+        }
+    }
+
     async startRecitation() {
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
@@ -254,14 +387,37 @@ class LiveRecitationController {
         this.reconnectAttempts = 0;
         this.updateStatus('جارٍ البدء...');
 
+        // Validate surah mode inputs
+        if (mode === 'surah') {
+            const surahSelect = document.getElementById('surahSelect');
+            const verseStart = parseInt(document.getElementById('verseStart').value);
+            const verseEnd = parseInt(document.getElementById('verseEnd').value);
+            if (!surahSelect.value) {
+                this.showError('يرجى اختيار السورة');
+                this.startBtn.disabled = false;
+                return;
+            }
+            if (isNaN(verseStart) || verseStart < 1) {
+                this.showError('يرجى إدخال رقم آية البداية بشكل صحيح');
+                this.startBtn.disabled = false;
+                return;
+            }
+            if (isNaN(verseEnd) || verseEnd < verseStart) {
+                this.showError('يرجى إدخال رقم آية النهاية بشكل صحيح');
+                this.startBtn.disabled = false;
+                return;
+            }
+        }
+
         // Check if we have API token (from meta tag or previous fetch)
         if (!this.apiToken) {
             try {
-                const tokenResponse = await fetch('/student/live-recitation/token', {
+                const tokenResponse = await fetch(this.tokenUrl, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                     },
+                    credentials: 'include'
                 });
                 if (!tokenResponse.ok) {
                     throw new Error('Token request failed: ' + tokenResponse.status);
@@ -299,13 +455,14 @@ class LiveRecitationController {
                 requestBody.verse_end = verseEnd;
             }
 
-            const response = await fetch('/api/student/live-recitation/start', {
+            const response = await fetch(this.startUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + this.apiToken,
                     'Accept': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(requestBody)
             });
             let data;
@@ -335,31 +492,49 @@ class LiveRecitationController {
                 return;
             }
 
-            // Validate API response has required data
-            if (!data.data || !data.data.verses || !Array.isArray(data.data.verses) || data.data.verses.length === 0) {
-                console.error('Invalid API response - missing verses:', data);
-                this.showError('لم يتم العثور على آيات للنطاق المحدد');
+            // Validate API response has required session data
+            if (!data.data || !data.data.session_id) {
+                console.error('Invalid API response - missing session:', data);
+                this.showError('فشل في بدء جلسة التسميع');
                 this.startBtn.disabled = false;
                 return;
             }
 
             this.sessionId = data.data.session_id;
-            this.verses = data.data.verses;
             this.currentSession = {
                 id: data.data.session_id,
                 audioUrls: data.data.audio_urls,
                 websocketToken: data.data.websocket_token,
                 websocketUrl: data.data.websocket_url
             };
-            this.currentVerseIndex = 0;
-            this.totalErrors = 0;
-            this.transcriptText = '';
+
+            // If not in preview mode, load verses from response
+            if (!this.isPreviewMode) {
+                if (!data.data.verses || !Array.isArray(data.data.verses) || data.data.verses.length === 0) {
+                    console.error('Invalid API response - missing verses:', data);
+                    this.showError('لم يتم العثور على آيات للنطاق المحدد');
+                    this.startBtn.disabled = false;
+                    return;
+                }
+                this.verses = data.data.verses;
+                this.currentVerseIndex = 0;
+                this.totalErrors = 0;
+                this.updateProgress();
+                this.initializeVersesDisplay();
+                this.highlightVerse(0);
+            } else {
+                // In preview mode: reset tracking state but keep verses display
+                this.currentVerseIndex = 0;
+                this.totalErrors = 0;
+                this.errorCountEl.textContent = '0';
+                this.transcriptText = '';
+                this.lastProcessedVerseIndex = -1;
+                this.errorCountForCurrentVerse = 0;
+                this.updateProgress();
+                this.highlightVerse(0);
+            }
+
             this.isEnding = false;
-            this.lastProcessedVerseIndex = -1;
-            this.errorCountForCurrentVerse = 0;
-            this.updateProgress();
-            this.initializeVersesDisplay();
-            this.highlightVerse(0);
             this.stopBtn.classList.remove('d-none');
             this.nextVerseBtn.classList.remove('d-none');
 
@@ -751,6 +926,142 @@ class LiveRecitationController {
         this.verseCardsCache = container.querySelectorAll('.verse-card');
     }
 
+    refreshVersesDisplay() {
+        if (!this.verses || this.verses.length === 0) return;
+        if (this.viewMode === 'quran') {
+            this.initializeQuranPageView();
+        } else {
+            this.initializeVersesDisplay();
+        }
+        this.highlightVerse(this.currentVerseIndex);
+    }
+
+    setViewMode(mode) {
+        this.viewMode = mode;
+        const viewModeCards = document.getElementById('viewModeCards');
+        const viewModeQuran = document.getElementById('viewModeQuran');
+        if (viewModeCards && viewModeQuran) {
+            if (mode === 'cards') {
+                viewModeCards.classList.add('active');
+                viewModeQuran.classList.remove('active');
+            } else {
+                viewModeQuran.classList.add('active');
+                viewModeCards.classList.remove('active');
+            }
+        }
+        this.refreshVersesDisplay();
+    }
+
+    initializeQuranPageView() {
+        if (!this.verses || this.verses.length === 0) return;
+        if (!this.currentVerseEl) return;
+
+        const container = document.createElement('div');
+        container.className = 'verses-container quran-page-view';
+
+        const surahNum = this.verses[0]?.surah || 1;
+        const surahName = this.getSurahName(surahNum);
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'surah-header';
+
+        const title = document.createElement('h3');
+        title.className = 'surah-title';
+        title.textContent = 'سورة ' + surahName;
+        headerDiv.appendChild(title);
+
+        if (surahNum !== 9) {
+            const bismillah = document.createElement('p');
+            bismillah.className = 'bismillah';
+            bismillah.textContent = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+            headerDiv.appendChild(bismillah);
+        }
+
+        container.appendChild(headerDiv);
+
+        this.verses.forEach((verse, index) => {
+            const line = document.createElement('div');
+            line.className = 'quran-verse-line' + (index === 0 ? ' active-verse' : '');
+            line.dataset.index = index;
+            line.setAttribute('tabindex', '0');
+            line.setAttribute('role', 'button');
+            line.setAttribute('aria-label', 'آية ' + (index + 1));
+
+            line.addEventListener('click', () => {
+                if (!this.isEvaluating && !this.isEnding) {
+                    this.currentVerseIndex = index;
+                    this.highlightVerse(index);
+                    this.updateProgress();
+                }
+            });
+
+            line.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    line.click();
+                }
+            });
+
+            const verseText = document.createElement('span');
+            verseText.className = 'quran-verse-text';
+            verseText.textContent = verse.text;
+            verseText.dir = 'rtl';
+
+            const verseNum = document.createElement('span');
+            verseNum.className = 'quran-verse-number';
+            verseNum.textContent = this.convertToArabicNumerals(verse.verse_number);
+
+            line.appendChild(verseText);
+            line.appendChild(verseNum);
+            container.appendChild(line);
+        });
+
+        const navDiv = document.createElement('div');
+        navDiv.className = 'quran-page-nav';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'verse-nav-btn';
+        prevBtn.textContent = 'السابق';
+        prevBtn.disabled = this.currentVerseIndex === 0;
+        prevBtn.addEventListener('click', () => {
+            if (this.currentVerseIndex > 0) {
+                this.currentVerseIndex--;
+                this.highlightVerse(this.currentVerseIndex);
+                this.updateProgress();
+            }
+        });
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'verse-nav-btn';
+        nextBtn.textContent = 'التالي';
+        nextBtn.disabled = this.currentVerseIndex >= this.verses.length - 1;
+        nextBtn.addEventListener('click', () => {
+            if (this.currentVerseIndex < this.verses.length - 1) {
+                this.currentVerseIndex++;
+                this.highlightVerse(this.currentVerseIndex);
+                this.updateProgress();
+            }
+        });
+
+        navDiv.appendChild(prevBtn);
+        navDiv.appendChild(nextBtn);
+        container.appendChild(navDiv);
+
+        this.currentVerseEl.innerHTML = '';
+        this.currentVerseEl.appendChild(container);
+        this.verseCardsCache = container.querySelectorAll('.quran-verse-line');
+    }
+
+    getSurahName(num) {
+        const surahs = ['', 'الفاتحة', 'البقرة', 'آل عمران', 'النساء', 'المائدة', 'الأنعام', 'الأعراف', 'الأنفال', 'التوبة', 'يونس', 'هود', 'يوسف', 'الرعد', 'إبراهيم', 'الحجر', 'النحل', 'الإسراء', 'الكهف', 'مريم', 'طه', 'الأنبياء', 'الحج', 'المؤمنون', 'النور', 'الفرقان', 'الشعراء', 'النمل', 'القصص', 'العنكبوت', 'الروم', 'لقمان', 'السجدة', 'الأحزاب', 'سبأ', 'فاطر', 'يس', 'الصافات', 'ص', 'الزمر', 'غافر', 'فصلت', 'الشورى', 'الزخرف', 'الدخان', 'الجاثية', 'الأحقاف', 'محمد', 'الفتح', 'الحجرات', 'ق', 'الذاريات', 'الطور', 'النجم', 'القمر', 'الرحمن', 'الواقعة', 'الحديد', 'المجادلة', 'الحشر', 'الممتحنة', 'الصف', 'الجمعة', 'المنافقون', 'التغابن', 'الطلاق', 'التحريم', 'الملك', 'القلم', 'الحاقة', 'المعارج', 'نوح', 'الجن', 'المزمل', 'المدثر', 'القيامة', 'الإنسان', 'المرسلات', 'النبأ', 'النازعات', 'عبس', 'التكوير', 'الإنفطار', 'المطففين', 'الإنشقاق', 'البروج', 'الطارق', 'الأعلى', 'الغاشية', 'الفجر', 'البلد', 'الشمس', 'الليل', 'الضحى', 'الشرح', 'التين', 'العلق', 'القدر', 'البينة', 'الزلزلة', 'العاديات', 'القارعة', 'التكاثر', 'العصر', 'الهمزة', 'الفيل', 'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر', 'المسد', 'الإخلاص', 'الفلق', 'الناس'];
+        return surahs[num] || num;
+    }
+
+    convertToArabicNumerals(num) {
+        const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        return String(num).split('').map(d => arabicNumerals[parseInt(d)] || d).join('');
+    }
+
     async evaluateCurrentVerse() {
         // Skip if ending or if we've already processed this verse
         if (this.isEnding || this.currentVerseIndex <= this.lastProcessedVerseIndex) {
@@ -882,7 +1193,7 @@ class LiveRecitationController {
         this.errorCountEl.textContent = this.totalErrors;
 
         try {
-            const response = await fetch('/api/student/live-recitation/error', {
+            const response = await fetch(this.errorUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -911,7 +1222,7 @@ class LiveRecitationController {
 
     async updateProgressOnServer(similarity) {
         try {
-            await fetch('/api/student/live-recitation/progress', {
+            await fetch(this.progressUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1057,7 +1368,8 @@ class LiveRecitationController {
         this.cleanupRecording();
 
         try {
-            const response = await fetch(`/api/student/live-recitation/session/${this.sessionId}/end`, {
+            const endUrl = this.reportUrlTemplate.replace('__ID__', this.sessionId).replace('/report', '/end');
+            const response = await fetch(endUrl, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + this.apiToken,
@@ -1089,7 +1401,7 @@ class LiveRecitationController {
     }
 
     resetUI() {
-        this.startBtn.disabled = false;
+        this.startBtn.disabled = true;
         this.startBtn.classList.remove('recording');
         this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
         this.stopBtn.classList.add('d-none');
@@ -1097,7 +1409,7 @@ class LiveRecitationController {
         this.updateStatusIndicator('');
         this.updateStatus('في انتظار البدء');
         if (this.currentVerseEl) {
-            this.currentVerseEl.innerHTML = '<div class="idle-state"><i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i><h5>اضغط "ابدأ التسميع" للبدء</h5><p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p></div>';
+            this.currentVerseEl.innerHTML = '<div class="idle-state"><i class="fas fa-book-quran fa-4x mb-3 opacity-25"></i><h5>اختر الإعدادات ثم اضغط "عرض الآيات"</h5><p class="text-muted">ستظهر الآيات هنا للمعاينة قبل بدء التسميع</p></div>';
         }
         if (this.transcriptEl) {
             this.transcriptEl.innerHTML = '<span class="text-muted">جارٍ الاستماع...</span>';
@@ -1110,8 +1422,11 @@ class LiveRecitationController {
         this.audioChunks = [];
         this.isEvaluating = false;
         this.isEnding = false;
+        this.isPreviewMode = false;
         this.lastProcessedVerseIndex = -1;
         this.errorCountForCurrentVerse = 0;
+        this.previewBtn.disabled = false;
+        this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
     }
 
     showReport(report) {
@@ -1136,4 +1451,9 @@ class LiveRecitationController {
 
 document.addEventListener('DOMContentLoaded', () => {
     window.liveRecitation = new LiveRecitationController();
+    window.toggleViewMode = (mode) => {
+        if (window.liveRecitation) {
+            window.liveRecitation.setViewMode(mode);
+        }
+    };
 });

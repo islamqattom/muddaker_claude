@@ -19,6 +19,14 @@ $apiToken = $token ? $token->token : null;
 <meta name="api-token" content="{{ $apiToken }}">
 @endif
 
+{{-- Route URLs for JavaScript --}}
+<meta name="token-url" content="{{ route('student.live-recitation.token') }}">
+<meta name="preview-url" content="{{ route('api.live-recitation.preview') }}">
+<meta name="start-url" content="{{ route('api.live-recitation.start') }}">
+<meta name="error-url" content="{{ route('api.live-recitation.error') }}">
+<meta name="progress-url" content="{{ route('api.live-recitation.progress') }}">
+<meta name="report-url-template" content="{{ route('api.live-recitation.report', ['id' => '__ID__']) }}">
+
 {{-- Live region for screen readers --}}
 <div id="recitationAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
@@ -82,7 +90,12 @@ $apiToken = $token ? $token->token : null;
                         <small id="thresholdHelp" class="text-muted">إذا كان التشابه أقل من هذه القيمة يعتبر خطأ</small>
                     </div>
 
-                    <button class="btn btn-start w-100" id="startRecitation" aria-describedby="startHelp">
+                    <button class="btn btn-outline-primary w-100 mb-2" id="previewVerses" aria-describedby="previewHelp">
+                        <i class="fas fa-eye me-2"></i>عرض الآيات
+                    </button>
+                    <small id="previewHelp" class="text-muted d-block mb-3 text-center">اضغط لمعاينة الآيات قبل البدء</small>
+
+                    <button class="btn btn-start w-100" id="startRecitation" disabled aria-describedby="startHelp">
                         <i class="fas fa-microphone me-2"></i>ابدأ التسميع
                     </button>
                     <small id="startHelp" class="text-muted d-block mt-2 text-center">اضغط للبدء أو اضغط空格</small>
@@ -134,14 +147,24 @@ $apiToken = $token ? $token->token : null;
             <div class="card verses-card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-book-quran me-2"></i>الآيات</h5>
-                    <small class="text-muted hint-text">اضغط على آية للانتقال إليها</small>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted hint-text">اضغط على آية للانتقال إليها</small>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="عرض الآيات" id="viewModeToggle">
+                            <button type="button" class="btn btn-outline-secondary active" id="viewModeCards" title="عرض البطاقات" onclick="window.toggleViewMode('cards')">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="viewModeQuran" title="عرض مصحف" onclick="window.toggleViewMode('quran')">
+                                <i class="fas fa-book-open"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body text-center">
                     <div id="currentVerse">
                         <div class="idle-state">
-                            <i class="fas fa-microphone-alt fa-4x mb-3 opacity-25"></i>
-                            <h5>اضغط "ابدأ التسميع" للبدء</h5>
-                            <p class="text-muted">سيتم الاستماع إليك ومقارنة نطقك بالنص القرآني</p>
+                            <i class="fas fa-book-quran fa-4x mb-3 opacity-25"></i>
+                            <h5>اختر الإعدادات ثم اضغط "عرض الآيات"</h5>
+                            <p class="text-muted">ستظهر الآيات هنا للمعاينة قبل بدء التسميع</p>
                         </div>
                     </div>
                 </div>
@@ -175,15 +198,31 @@ $apiToken = $token ? $token->token : null;
                         </li>
                         <li class="mb-2">
                             <span class="step-number">٢</span>
-                            <span>اضغط "ابدأ التسميع" وامنح الإذن لاستخدام الميكروفون</span>
+                            <span>اضغط "عرض الآيات" لمعاينة الآيات قبل البدء</span>
                         </li>
                         <li class="mb-2">
                             <span class="step-number">٣</span>
-                            <span>ستظهر جميع الآيات - ابدأ بتلاوة الآية الأولى</span>
+                            <span>اضغط "ابدأ التسميع" وامنح الإذن لاستخدام الميكروفون</span>
                         </li>
                         <li class="mb-2">
                             <span class="step-number">٤</span>
+                            <span>ابدأ بتلاوة الآية الأولى - ستُظلل بالأخضر</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="step-number">5</span>
                             <span>سيتم الاستماع إليك ومطابقة نطقك مع الآيات تلقائياً</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="step-number">6</span>
+                            <span>عند اكتشاف خطأ، ستسمع صوت تنبيه وتُضاء الآية باللون الأحمر</span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="step-number">7</span>
+                            <span>عند إكمال آية بنجاح، يتم الانتقال تلقائياً للآية التالية</span>
+                        </li>
+                        <li>
+                            <span class="step-number">٨</span>
+                            <span>عند الانتهاء، سيظهر تقرير مفصل بالأخطاء</span>
                         </li>
                         <li class="mb-2">
                             <span class="step-number">٥</span>
@@ -699,9 +738,133 @@ $apiToken = $token ? $token->token : null;
     outline: 3px solid rgba(26, 122, 74, 0.4);
     outline-offset: 2px;
 }
+
+/* View Mode Toggle */
+.btn-group.btn-group-sm .btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-group .btn.active {
+    background: #1a7a4a;
+    color: white;
+    border-color: #1a7a4a;
+}
+
+/* Quran Page View Mode */
+.quran-page-view {
+    background: #f9f7f2;
+    border: 2px solid #d4cfc4;
+    border-radius: 8px;
+    padding: 1.5rem;
+    min-height: 400px;
+}
+
+.quran-page-view .surah-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e8e4dc;
+}
+
+.quran-page-view .surah-title {
+    font-family: 'Amiri', serif;
+    font-size: 1.8rem;
+    color: #2c3e2c;
+    margin-bottom: 0.25rem;
+}
+
+.quran-page-view .bismillah {
+    font-family: 'Amiri', serif;
+    font-size: 1.5rem;
+    color: #4a5568;
+    margin-bottom: 1rem;
+}
+
+.quran-verse-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.quran-verse-line:hover {
+    background: rgba(26, 122, 74, 0.05);
+}
+
+.quran-verse-line.active-verse {
+    background: rgba(26, 122, 74, 0.15);
+    border-right: 3px solid #1a7a4a;
+}
+
+.quran-verse-line.error-verse {
+    background: rgba(220, 53, 69, 0.15);
+    border-right: 3px solid #dc3545;
+}
+
+.quran-verse-text {
+    font-family: 'Amiri', serif;
+    font-size: 1.4rem;
+    line-height: 2;
+    color: #2c3e2c;
+    flex: 1;
+    text-align: right;
+    direction: rtl;
+}
+
+.quran-verse-number {
+    font-family: 'Amiri', serif;
+    font-size: 1rem;
+    color: #6c757d;
+    margin-right: 1rem;
+    min-width: 30px;
+}
+
+.quran-page-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e8e4dc;
+}
+
+.quran-page-nav .verse-nav-btn {
+    background: #fffef9;
+    border: 1px solid #d4cfc4;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quran-page-nav .verse-nav-btn:hover:not(:disabled) {
+    background: #1a7a4a;
+    color: white;
+    border-color: #1a7a4a;
+}
+
+.quran-page-nav .verse-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .quran-verse-text {
+        font-size: 1.2rem;
+    }
+
+    .quran-verse-line {
+        padding: 0.4rem 0.75rem;
+    }
+}
 </style>
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/student/live-recitation.js') }}"></script>
+<script src="{{ asset('js/student/live-recitation.js') }}?v={{ time() }}"></script>
 @endpush
