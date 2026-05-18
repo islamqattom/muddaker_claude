@@ -768,13 +768,20 @@ class LiveRecitationController {
         const now = Date.now();
         if (now - this.lastErrorFeedbackTime < this.errorFeedbackThrottle) return;
 
-        // If similarity drops below threshold during recitation, show warning
-        if (similarity < this.similarityThreshold && similarity > 20) {
+        // If similarity drops below threshold during recitation, show real-time error feedback
+        // Only trigger if similarity is reasonable (not too low, to avoid false positives on partial text)
+        if (similarity < this.similarityThreshold && similarity > 30) {
             this.lastErrorFeedbackTime = now;
-            // Show real-time error feedback - verse glows red to indicate mistake
-            this.setVerseErrorState(this.currentVerseIndex, 1000);
-            // Play short error tone for immediate feedback
+            // Show real-time error feedback - verse glows red immediately
+            this.setVerseErrorState(this.currentVerseIndex, 1500);
+            // Play error tone for immediate feedback
             this.playErrorTone();
+
+            // Also update error count
+            this.totalErrors++;
+            if (this.errorCountEl) {
+                this.errorCountEl.textContent = this.totalErrors;
+            }
         }
     }
 
@@ -787,13 +794,14 @@ class LiveRecitationController {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
 
-            oscillator.frequency.value = 400;
-            oscillator.type = 'sine';
-            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            // Error tone: 300Hz + 400Hz for a dissonant "wrong" sound
+            oscillator.frequency.value = 350;
+            oscillator.type = 'sawtooth'; // Harsher sound for error
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
 
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.15);
+            oscillator.stop(audioContext.currentTime + 0.25);
 
             oscillator.onended = () => audioContext.close();
         } catch (e) {
@@ -849,18 +857,30 @@ class LiveRecitationController {
     }
 
     playFaultSound() {
-        this.faultAudio.play().catch((error) => {
-            console.warn('Fault audio playback failed:', error.message);
-        });
-        this.setVerseErrorState(this.currentVerseIndex, 1500);
+        // Use the programmatic error tone since fault.mp3 may not exist
+        this.playErrorTone();
+        this.setVerseErrorState(this.currentVerseIndex, 2000);
     }
 
     setVerseErrorState(index, duration = 1500) {
-        if (this.verseCardsCache[index]) {
-            this.verseCardsCache[index].classList.add('error-verse');
-            setTimeout(() => {
-                this.verseCardsCache[index].classList.remove('error-verse');
-            }, duration);
+        if (this.verseCardsCache && this.verseCardsCache[index]) {
+            const card = this.verseCardsCache[index];
+
+            // Remove any existing timeout to avoid conflicts
+            if (card._errorTimeout) {
+                clearTimeout(card._errorTimeout);
+            }
+
+            // Add error state
+            card.classList.add('error-verse');
+
+            // If there have been multiple errors on this verse, keep it red longer
+            const actualDuration = this.errorCountForCurrentVerse > 2 ? duration * 2 : duration;
+
+            card._errorTimeout = setTimeout(() => {
+                card.classList.remove('error-verse');
+                card._errorTimeout = null;
+            }, actualDuration);
         }
     }
 

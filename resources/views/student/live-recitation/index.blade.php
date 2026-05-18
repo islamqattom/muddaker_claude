@@ -82,7 +82,34 @@ $apiToken = $token ? $token->token : null;
     </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div class="toast-container position-fixed bottom-0 start-50 translate-middle-x mb-4 z-index-1050" id="toastContainer"></div>
+
+<style>
+.toast-container .toast-error,
+.toast-container .toast-success {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s ease;
+    font-weight: 500;
+}
+
+.toast-container .toast-error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.toast-container .toast-success {
+    background: linear-gradient(135deg, #1a7a4a, #2d9d63);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
 <style>
 .tarteel-center {
