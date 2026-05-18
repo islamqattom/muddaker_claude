@@ -10,15 +10,11 @@
 
 @section('content')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<meta name="api-token" content="{{ session('api_token', '') }}">
 
 @php
 $user = Auth::user();
 $token = $user->currentAccessToken();
 $apiToken = $token ? $token->token : null;
-if ($apiToken) {
-    session(['api_token' => $apiToken]);
-}
 @endphp
 
 @if($apiToken)
@@ -32,130 +28,127 @@ if ($apiToken) {
 <meta name="progress-url" content="{{ route('api.live-recitation.progress') }}">
 <meta name="report-url-template" content="{{ route('api.live-recitation.report', ['id' => '__ID__']) }}">
 
+<meta name="memorization-plan-url" content="{{ route('api.student.tarteel.memorization-plan') }}">
+<meta name="memorization-stats-url" content="{{ route('api.student.tarteel.memorization-stats') }}">
+<meta name="daily-goal-url" content="{{ route('api.student.tarteel.daily-goal') }}">
+<meta name="tajweed-rules-url" content="{{ route('api.student.tarteel.tajweed-rules') }}">
+<meta name="tajweed-example-url" content="{{ route('api.student.tarteel.tajweed-example', ['id' => '__ID__']) }}">
+
 <div id="recitationAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
 <link rel="stylesheet" href="{{ asset('css/student/tarteel-center.css') }}?v={{ time() }}">
 
-<div class="recitation-wrapper">
-    <div class="tarteeel-tabs">
-        <button class="tarteeel-tab active" data-tab="recitation">
-            <i class="fas fa-microphone-alt"></i>
-            <span>التلاوة</span>
-        </button>
-        <button class="tarteeel-tab" data-tab="memorization">
-            <i class="fas fa-book"></i>
-            <span>الحفظ</span>
-        </button>
-        <button class="tarteeel-tab" data-tab="tajweed">
-            <i class="fas fa-book-open"></i>
-            <span>التجويد</span>
-        </button>
-    </div>
+<div class="tarteel-center">
+    <div class="container-fluid">
+        <div class="row g-0">
+            <div class="col-12">
+                <ul class="nav nav-tabs tartteel-nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-recitation" data-bs-toggle="tab" data-bs-target="#panel-recitation" type="button" role="tab">
+                            <i class="fas fa-microphone-alt me-2"></i>التلاوة
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-memorization" data-bs-toggle="tab" data-bs-target="#panel-memorization" type="button" role="tab">
+                            <i class="fas fa-book me-2"></i>الحفظ
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-tajweed" data-bs-toggle="tab" data-bs-target="#panel-tajweed" type="button" role="tab">
+                            <i class="fas fa-book-open me-2"></i>التجويد
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-    <div class="tarteeel-content active" id="recitation-tab">
-        @include('student.live-recitation._recitation-tab')
-    </div>
-
-    <div class="tarteeel-content" id="memorization-tab">
-        @include('student.live-recitation._memorization-tab')
-    </div>
-
-    <div class="tarteeel-content" id="tajweed-tab">
-        @include('student.live-recitation._tajweed-tab')
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="panel-recitation" role="tabpanel">
+                <div class="tarteel-panel">
+                    @include('student.live-recitation._recitation-tab')
+                </div>
+            </div>
+            <div class="tab-pane fade" id="panel-memorization" role="tabpanel">
+                <div class="tarteel-panel">
+                    @include('student.live-recitation._memorization-tab')
+                </div>
+            </div>
+            <div class="tab-pane fade" id="panel-tajweed" role="tabpanel">
+                <div class="tarteel-panel">
+                    @include('student.live-recitation._tajweed-tab')
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <style>
-.tarteeel-tabs {
-    display: flex;
-    gap: 0.5rem;
-    border-bottom: 2px solid #e8e4dc;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+.tarteel-center {
+    background: linear-gradient(135deg, #faf9f7 0%, #f5f3f0 100%);
+    min-height: calc(100vh - 140px);
+    padding: 0;
+    border-radius: 0;
 }
 
-.tarteeel-tab {
-    padding: 0.875rem 1.5rem;
+.tartteel-nav-tabs {
+    background: #fff;
+    border-bottom: 2px solid #e8e4dc;
+    padding: 1rem 1.5rem 0;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.tartteel-nav-tabs .nav-link {
     border: none;
-    background: transparent;
-    color: #4a5568;
-    font-weight: 500;
-    font-size: 1rem;
-    cursor: pointer;
     border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
+    border-radius: 8px 8px 0 0;
+    padding: 0.875rem 1.5rem;
+    color: #6c757d;
+    font-weight: 500;
+    white-space: nowrap;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    border-radius: 8px 8px 0 0;
 }
 
-.tarteeel-tab:hover {
+.tartteel-nav-tabs .nav-link:hover {
     color: #1a7a4a;
     background: rgba(26, 122, 74, 0.05);
 }
 
-.tarteeel-tab.active {
+.tartteel-nav-tabs .nav-link.active {
     color: #1a7a4a;
-    border-bottom-color: #1a7a4a;
     background: rgba(26, 122, 74, 0.08);
+    border-bottom-color: #1a7a4a;
 }
 
-.tarteeel-tab i {
+.tartteel-nav-tabs .nav-link i {
     font-size: 1.1rem;
 }
 
-.tarteeel-content {
-    display: none;
-}
-
-.tarteeel-content.active {
-    display: block;
-}
-
-.recitation-wrapper {
-    background: linear-gradient(135deg, rgba(250, 248, 245, 0.97) 0%, rgba(249, 246, 242, 0.97) 100%);
-    min-height: calc(100vh - 120px);
+.tarteel-panel {
     padding: 1.5rem;
-    border-radius: 16px;
+    background: transparent;
 }
 
 @media (max-width: 768px) {
-    .tarteeel-tabs {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
+    .tartteel-nav-tabs {
+        padding: 0.75rem 1rem 0;
     }
-    .tarteeel-tab {
-        white-space: nowrap;
-        padding: 0.75rem 1rem;
+    .tartteel-nav-tabs .nav-link {
+        padding: 0.625rem 1rem;
         font-size: 0.9rem;
+    }
+    .tarteel-panel {
+        padding: 1rem;
     }
 }
 </style>
 
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.tarteeel-tab');
-    const contents = document.querySelectorAll('.tarteeel-content');
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const targetId = this.dataset.tab;
-
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-
-            this.classList.add('active');
-            document.getElementById(targetId + '-tab').classList.add('active');
-        });
-    });
-});
-</script>
 <script src="{{ asset('js/student/live-recitation.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/student/tarteel-memorization.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('js/student/tarteel-tajweed.js') }}?v={{ time() }}"></script>
