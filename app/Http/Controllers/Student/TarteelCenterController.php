@@ -229,4 +229,230 @@ class TarteelCenterController extends Controller
             ],
         ]);
     }
+
+    public function voiceSearch(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'query' => 'required|string|min:2|max:500',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $query = $request->input('query');
+
+        try {
+            $searchResults = $this->quranApiService->search($query);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'results' => $searchResults,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Search failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getTafseer(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'surah' => 'required|integer|min:1|max:114',
+            'verse' => 'required|integer|min:1',
+            'interpretation' => 'nullable|string|in:ibn_kathir,saadi,tabari',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $surah = $request->input('surah');
+        $verse = $request->input('verse');
+        $interpretation = $request->input('interpretation', 'ibn_kathir');
+
+        try {
+            $verseKey = "{$surah}:{$verse}";
+            $verseData = $this->quranApiService->getVerse($verseKey);
+
+            if (!$verseData) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Verse not found',
+                ], 404);
+            }
+
+            $tafseerData = $this->quranApiService->getTafseer($verseKey, $interpretation);
+
+            $translations = [];
+            try {
+                $translations = $this->quranApiService->getTranslation($verseKey);
+            } catch (\Exception $e) {
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'verse' => $verseData,
+                    'tafseer' => $tafseerData,
+                    'translation' => $translations,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to load tafseer: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getChallenges()
+    {
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Student profile not found',
+            ], 404);
+        }
+
+        $challenges = \App\Models\Challenge::where(function ($query) use ($student) {
+            $query->where('challenger_id', $student->id)
+                  ->orWhere('challenged_id', $student->id);
+        })
+        ->whereIn('status', ['pending', 'accepted'])
+        ->with(['challenger', 'challenged'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        $formattedChallenges = $challenges->map(function ($challenge) use ($student) {
+            $isChallenger = $challenge->challenger_id === $student->id;
+            return [
+                'id' => $challenge->id,
+                'surah' => $challenge->surah,
+                'verse_start' => $challenge->verse_start,
+                'verse_end' => $challenge->verse_end,
+                'target_date' => $challenge->target_date,
+                'status' => $challenge->status,
+                'is_challenger' => $isChallenger,
+                'challenger' => $challenge->challenger->user->name ?? 'غير معروف',
+                'challenged' => $challenge->challenged->user->name ?? 'غير معروف',
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $formattedChallenges,
+        ]);
+    }
+
+    public function createChallenge(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'challenged_id' => 'required|integer|exists:students,id',
+            'surah' => 'required|integer|min:1|max:114',
+            'verse_start' => 'required|integer|min:1',
+            'verse_end' => 'required|integer|gte:verse_start',
+            'target_date' => 'required|date|after:today',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Student profile not found',
+            ], 404);
+        }
+
+        if ($request->input('challenged_id') === $student->id) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Cannot challenge yourself',
+            ], 400);
+        }
+
+        $challenge = \App\Models\Challenge::create([
+            'challenger_id' => $student->id,
+            'challenged_id' => $request->input('challenged_id'),
+            'surah' => $request->input('surah'),
+            'verse_start' => $request->input('verse_start'),
+            'verse_end' => $request->input('verse_end'),
+            'target_date' => $request->input('target_date'),
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $challenge,
+        ]);
+    }
+
+    public function respondToChallenge(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'response' => 'required|in:accept,decline',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = Auth::user();
+        $student = $user->student;
+
+        if (!$student) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Student profile not found',
+            ], 404);
+        }
+
+        $challenge = \App\Models\Challenge::where('id', $id)
+            ->where('challenged_id', $student->id)
+            ->first();
+
+        if (!$challenge) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Challenge not found',
+            ], 404);
+        }
+
+        $challenge->status = $request->input('response') === 'accept' ? 'accepted' : 'declined';
+        $challenge->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $challenge,
+        ]);
+    }
+
+    public function challengesPage()
+    {
+        return view('student.live-recitation.tarteel-challenges');
+    }
 }

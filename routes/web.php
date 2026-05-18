@@ -361,6 +361,11 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::get('/events/{event}', [Student\GroupEventController::class, 'show'])->name('events.show');
     Route::post('/events/{event}/join', [Student\GroupEventController::class, 'join'])->name('events.join');
     Route::post('/events/{event}/leave', [Student\GroupEventController::class, 'leave'])->name('events.leave');
+
+    // Tarteel Center Pages
+    Route::get('/voice-search', [Student\VoiceSearchController::class, 'index'])->name('voice-search');
+    Route::get('/tafseer', [Student\TafseerController::class, 'index'])->name('tafseer');
+    Route::get('/tarteel-challenges', [Student\TarteelCenterController::class, 'challengesPage'])->name('tarteel-challenges');
 });
 
 // ============================

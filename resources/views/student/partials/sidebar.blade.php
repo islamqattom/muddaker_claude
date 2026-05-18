@@ -14,7 +14,19 @@
 </a>
 <a href="{{ route('student.live-recitation') }}" class="nav-link {{ request()->routeIs('student.live-recitation*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-microphone-alt"></i></div>
-    <span>التسميع المباشر</span>
+    <span>مركز ترتيل</span>
+</a>
+<a href="{{ route('student.voice-search') }}" class="nav-link {{ request()->routeIs('student.voice-search') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>
+    <span>البحث الصوتي</span>
+</a>
+<a href="{{ route('student.tafseer') }}" class="nav-link {{ request()->routeIs('student.tafseer') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book"></i></div>
+    <span>التفسير والترجمة</span>
+</a>
+<a href="{{ route('student.tarteel-challenges') }}" class="nav-link {{ request()->routeIs('student.tarteel-challenges') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-trophy"></i></div>
+    <span>التحديات</span>
 </a>
 <span class="nav-section-title">المتابعة</span>
 <a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">

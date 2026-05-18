@@ -7,6 +7,7 @@ use App\Http\Controllers\Student\BookmarkController;
 use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\AchievementController;
 use App\Http\Controllers\Student\LiveRecitationController;
+use App\Http\Controllers\Student\TarteelCenterController;
 use App\Http\Controllers\Api\ExamController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -65,4 +66,18 @@ Route::middleware(['auth', 'role:supervisor'])->group(function () {
     Route::delete('/exam/{id}', [ExamController::class, 'destroy']);
     Route::get('/exam/{examId}/questions', [ExamController::class, 'getQuestions']);
     Route::get('/exam/in-progress', [ExamController::class, 'getInProgress']);
+});
+
+// Tarteel Center API (Memorization, Tajweed, Voice Search, Tafseer, Challenges)
+Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/tarteel')->group(function () {
+    Route::get('/memorization-plan', [TarteelCenterController::class, 'getMemorizationPlan'])->name('api.student.tarteel.memorization-plan');
+    Route::post('/daily-goal', [TarteelCenterController::class, 'setDailyGoal'])->name('api.student.tarteel.daily-goal');
+    Route::get('/memorization-stats', [TarteelCenterController::class, 'getMemorizationStats'])->name('api.student.tarteel.memorization-stats');
+    Route::get('/tajweed-rules', [TarteelCenterController::class, 'getTajweedRules'])->name('api.student.tarteel.tajweed-rules');
+    Route::get('/tajweed-example/{id}', [TarteelCenterController::class, 'getTajweedExample'])->name('api.student.tarteel.tajweed-example');
+    Route::post('/voice-search', [TarteelCenterController::class, 'voiceSearch'])->name('api.student.tarteel.voice-search');
+    Route::get('/tafseer', [TarteelCenterController::class, 'getTafseer'])->name('api.student.tarteel.tafseer');
+    Route::get('/challenges', [TarteelCenterController::class, 'getChallenges'])->name('api.student.tarteel.challenges');
+    Route::post('/challenges', [TarteelCenterController::class, 'createChallenge'])->name('api.student.tarteel.create-challenge');
+    Route::post('/challenges/{id}/respond', [TarteelCenterController::class, 'respondToChallenge'])->name('api.student.tarteel.respond-challenge');
 });
