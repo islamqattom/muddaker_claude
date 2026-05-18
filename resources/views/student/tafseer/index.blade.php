@@ -13,7 +13,6 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <meta name="tafseer-url" content="{{ route('api.student.tarteel.tafseer') }}">
-<meta name="surahs-url" content="{{ route('api.student.tarteel.surahs') }}">
 
 <div class="recitation-wrapper">
     <div class="row g-4">
