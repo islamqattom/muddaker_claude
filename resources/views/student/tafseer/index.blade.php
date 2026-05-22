@@ -47,18 +47,6 @@
                         <i class="fas fa-search me-2"></i>عرض التفسير
                     </button>
                 </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-language me-2"></i>الترجمة</h5>
-                </div>
-                <div class="card-body">
-                    <div class="tafseer-translation" id="translationContent">
-                        <p class="text-muted">اختر آية لعرض ترجمتها</p>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-lg-8">
@@ -166,14 +154,6 @@
                     <div class="tafseer-source mb-3">${data.data.tafseer.source}</div>
                     <p class="tafseer-text" dir="rtl">${data.data.tafseer.text.join('')}</p>
                 `;
-
-                const translations = data.data.translation;
-                let transHtml = '<dl class="row mb-0">';
-                if (translations.en) transHtml += `<dt>الإنجليزية:</dt><dd>${translations.en}</dd>`;
-                if (translations.ur) transHtml += `<dt>الأردية:</dt><dd>${translations.ur}</dd>`;
-                if (translations.id) transHtml += `<dt>الإندونيسية:</dt><dd>${translations.id}</dd>`;
-                transHtml += '</dl>';
-                translationContent.innerHTML = transHtml;
             } else {
                 verseDisplay.innerHTML = '<div class="text-danger">فشل في تحميل الآية</div>';
                 tafseerContent.innerHTML = '<div class="text-danger">فشل في تحميل التفسير</div>';
