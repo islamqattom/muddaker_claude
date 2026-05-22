@@ -303,9 +303,8 @@ class QuranApiService
         $cacheKey = "tafseer_{$verseKey}_{$edition}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $edition) {
-            $response = Http::timeout(10)->get(self::BASE_URL . "/tafseer/" . $verseKey, [
-                'edition' => $edition,
-            ]);
+            // Use ayah endpoint with tafsir edition
+            $response = Http::timeout(10)->get(self::BASE_URL . "/ayah/" . $verseKey . "/" . $edition);
 
             if ($response->status() === 404 || $response->failed()) {
                 Log::warning("Tafseer API failed for {$verseKey}", ['status' => $response->status()]);
@@ -318,7 +317,7 @@ class QuranApiService
             $data = $response->json()['data'] ?? [];
             return [
                 'source' => $data['edition']['name'] ?? 'التفسير',
-                'text' => $this->extractTafseerText($data),
+                'text' => [$data['text'] ?? ''],
             ];
         });
     }
@@ -326,10 +325,10 @@ class QuranApiService
     private function mapInterpretationToEdition(string $interpretation): string
     {
         return match ($interpretation) {
-            'ar.tafseer_ibn_kathir' => 'ar.medina',
+            'ar.tafseer_ibn_kathir' => 'ar.jalalayn',
             'ar.tafseer_saadi' => 'ar.sadi',
-            'ar.tafseer_tabari' => 'ar.tabari',
-            default => 'ar.medina',
+            'ar.tafseer_tabari' => 'ar.waseet',
+            default => 'ar.jalalayn',
         };
     }
 
