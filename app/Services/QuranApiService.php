@@ -299,36 +299,37 @@ class QuranApiService
      */
     public function getTafseer(string $verseKey, string $interpretation = 'ibn_kathir'): array
     {
-        $cacheKey = "tafseer_{$verseKey}_{$interpretation}";
+        $edition = $this->mapInterpretationToEdition($interpretation);
+        $cacheKey = "tafseer_{$verseKey}_{$edition}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $interpretation) {
-            $response = Http::get(self::BASE_URL . "/tafseer/{$verseKey}", [
-                'edition' => $interpretation,
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $edition) {
+            $response = Http::timeout(10)->get(self::BASE_URL . "/tafseer/" . $verseKey, [
+                'edition' => $edition,
             ]);
 
-            if ($response->failed()) {
+            if ($response->status() === 404 || $response->failed()) {
                 Log::warning("Tafseer API failed for {$verseKey}", ['status' => $response->status()]);
                 return [
-                    'source' => $this->getTafseerSourceName($interpretation),
+                    'source' => 'التفسير',
                     'text' => ['التفسير غير متاح حالياً'],
                 ];
             }
 
             $data = $response->json()['data'] ?? [];
             return [
-                'source' => $data['edition']['name'] ?? $this->getTafseerSourceName($interpretation),
+                'source' => $data['edition']['name'] ?? 'التفسير',
                 'text' => $this->extractTafseerText($data),
             ];
         });
     }
 
-    private function getTafseerSourceName(string $interpretation): string
+    private function mapInterpretationToEdition(string $interpretation): string
     {
         return match ($interpretation) {
-            'ar.tafseer_ibn_kathir' => 'تفسير ابن كثير',
-            'ar.tafseer_saadi' => 'تيسير الكريم الرحمن',
-            'ar.tafseer_tabari' => 'جامع البيان',
-            default => 'التفسير',
+            'ar.tafseer_ibn_kathir' => 'ar.medina',
+            'ar.tafseer_saadi' => 'ar.sadi',
+            'ar.tafseer_tabari' => 'ar.tabari',
+            default => 'ar.medina',
         };
     }
 
