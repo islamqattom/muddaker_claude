@@ -35,9 +35,12 @@
                     <div class="mb-3">
                         <label class="form-label">التفسير</label>
                         <select class="form-select" id="tafseerType">
-                            <option value="ar.tafseer_ibn_kathir">تفسير الجلالين</option>
-                            <option value="ar.tafseer_saadi">تفسير السعدي</option>
-                            <option value="ar.tafseer_tabari">التفسير الوسيط</option>
+                            <option value="ar.muyassar">التفسير الميسر</option>
+                            <option value="ar.jalalayn">تفسير الجلالين</option>
+                            <option value="ar.qurtubi">تفسير القرطبي</option>
+                            <option value="ar.sadi">تفسير السعدي</option>
+                            <option value="ar.waseet">التفسير الوسيط</option>
+                            <option value="ar.baghawi">تفسير البغوي</option>
                         </select>
                     </div>
                     <button class="btn btn-outline-primary w-100" id="loadTafseer">

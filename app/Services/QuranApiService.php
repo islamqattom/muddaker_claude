@@ -325,9 +325,12 @@ class QuranApiService
     private function mapInterpretationToEdition(string $interpretation): string
     {
         return match ($interpretation) {
-            'ar.tafseer_ibn_kathir' => 'ar.jalalayn',
-            'ar.tafseer_saadi' => 'ar.sadi',
-            'ar.tafseer_tabari' => 'ar.waseet',
+            'ar.muyassar' => 'ar.muyassar',
+            'ar.jalalayn' => 'ar.jalalayn',
+            'ar.qurtubi' => 'ar.qurtubi',
+            'ar.sadi' => 'ar.sadi',
+            'ar.waseet' => 'ar.waseet',
+            'ar.baghawi' => 'ar.baghawi',
             default => 'ar.jalalayn',
         };
     }
