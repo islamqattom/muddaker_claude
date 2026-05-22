@@ -11,7 +11,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/student/tarteel-center.css') }}?v={{ time() }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
+<meta name="api-token" content="{{ $apiToken ?? '' }}">
 <meta name="tafseer-url" content="{{ route('api.student.tarteel.tafseer') }}">
 
 <div class="recitation-wrapper">
