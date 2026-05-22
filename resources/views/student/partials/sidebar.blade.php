@@ -49,19 +49,6 @@
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>
 </a>
-<span class="nav-section-title">التقدم والإنجازات</span>
-<a href="{{ route('student.progress') }}" class="nav-link {{ request()->routeIs('student.progress*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-chart-line"></i></div>
-    <span>تقدمي</span>
-</a>
-<a href="{{ route('student.achievements') }}" class="nav-link {{ request()->routeIs('student.achievements*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-trophy"></i></div>
-    <span>إنجازاتي</span>
-</a>
-<a href="{{ route('student.bookmarks') }}" class="nav-link {{ request()->routeIs('student.bookmarks*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-bookmark"></i></div>
-    <span>علاماتي</span>
-</a>
 <a href="{{ route('student.azkar') }}" class="nav-link {{ request()->routeIs('student.azkar*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
     <span>أذكار المسلم</span>

@@ -35,9 +35,9 @@
                     <div class="mb-3">
                         <label class="form-label">التفسير</label>
                         <select class="form-select" id="tafseerType">
-                            <option value="ibn_kathir">تفسير ابن كثير</option>
-                            <option value="saadi">تيسير الكريم الرحمن</option>
-                            <option value="tabari">جامع البيان</option>
+                            <option value="ar.tafseer_ibn_kathir">تفسير ابن كثير</option>
+                            <option value="ar.tafseer_saadi">تيسير الكريم الرحمن</option>
+                            <option value="ar.tafseer_tabari">جامع البيان</option>
                         </select>
                     </div>
                     <button class="btn btn-outline-primary w-100" id="loadTafseer">

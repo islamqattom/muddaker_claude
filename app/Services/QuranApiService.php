@@ -295,6 +295,99 @@ class QuranApiService
     }
 
     /**
+     * Get tafseer (interpretation) for a verse from open sources
+     */
+    public function getTafseer(string $verseKey, string $interpretation = 'ibn_kathir'): array
+    {
+        $cacheKey = "tafseer_{$verseKey}_{$interpretation}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $interpretation) {
+            $response = Http::get(self::BASE_URL . "/tafseer/{$verseKey}", [
+                'edition' => $interpretation,
+            ]);
+
+            if ($response->failed()) {
+                Log::warning("Tafseer API failed for {$verseKey}", ['status' => $response->status()]);
+                return [
+                    'source' => $this->getTafseerSourceName($interpretation),
+                    'text' => ['التفسير غير متاح حالياً'],
+                ];
+            }
+
+            $data = $response->json()['data'] ?? [];
+            return [
+                'source' => $data['edition']['name'] ?? $this->getTafseerSourceName($interpretation),
+                'text' => $this->extractTafseerText($data),
+            ];
+        });
+    }
+
+    private function getTafseerSourceName(string $interpretation): string
+    {
+        return match ($interpretation) {
+            'ar.tafseer_ibn_kathir' => 'تفسير ابن كثير',
+            'ar.tafseer_saadi' => 'تيسير الكريم الرحمن',
+            'ar.tafseer_tabari' => 'جامع البيان',
+            default => 'التفسير',
+        };
+    }
+
+    private function extractTafseerText(array $data): array
+    {
+        $texts = [];
+        if (isset($data['text'])) {
+            $texts[] = $data['text'];
+        }
+        if (isset($data['ayahs']) && is_array($data['ayahs'])) {
+            foreach ($data['ayahs'] as $ayah) {
+                if (isset($ayah['text'])) {
+                    $texts[] = $ayah['text'];
+                }
+            }
+        }
+        return array_filter($texts);
+    }
+
+    /**
+     * Get translations for a verse from open sources
+     */
+    public function getTranslation(string $verseKey): array
+    {
+        $cacheKey = "translation_{$verseKey}";
+
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey) {
+            $translations = [];
+
+            $editionMap = [
+                'en' => 'en.sahih',
+                'ur' => 'ur.ahmedali',
+                'id' => 'id.indonesian',
+            ];
+
+            foreach ($editionMap as $lang => $edition) {
+                try {
+                    $response = Http::get(self::BASE_URL . "/ayah/{$verseKey}", [
+                        'edition' => $edition,
+                    ]);
+                    if (!$response->failed()) {
+                        $data = $response->json()['data'] ?? [];
+                        if (isset($data['text'])) {
+                            $translations[$lang] = $data['text'];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Translation fetch failed for {$verseKey}", [
+                        'lang' => $lang,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            return $translations;
+        });
+    }
+
+    /**
      * Get range of verses
      */
     public function getVerses(int $surah, int $verseStart, int $verseEnd): array
@@ -476,7 +569,8 @@ class QuranApiService
 
             if (!$ayah) return [];
 
-            $parts = preg_split('/\s+/', trim($ayah->text));
+            $cleanText = preg_replace('/[\x{2000}-\x{200F}\x{2028}\x{2029}\x{205F}\x{2060}\x{FEFF}]/u', '', trim($ayah->text));
+            $parts = preg_split('/\s+/', $cleanText);
             return array_map(fn($text, $i) => [
                 'word_position' => $i + 1,
                 'text_uthmani' => $text,
@@ -770,7 +864,7 @@ class QuranApiService
         $cacheKey = "quran_search_" . md5($query);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
-            $response = Http::get(self::BASE_URL . "/search/" . urlencode($query) . "/quran-quranuthmani");
+            $response = Http::get(self::BASE_URL . "/search/" . urlencode($query));
 
             if ($response->failed()) {
                 Log::error('QuranApiService: Search failed', [
@@ -780,8 +874,46 @@ class QuranApiService
                 throw new \Exception("Quran search failed for query: {$query}");
             }
 
-            return $response->json()['data']['matches'] ?? [];
+            $json = $response->json();
+            if (($json['code'] ?? 0) == 404) {
+                return [];
+            }
+
+            $matches = $json['data']['matches'] ?? [];
+
+            // Fetch actual verse texts with Uthmani edition
+            $results = [];
+            foreach ($matches as $match) {
+                $surah = $match['surah'] ?? [];
+                $surahNum = $surah['number'] ?? 0;
+                $verseNum = $match['numberInSurah'] ?? 0;
+                if ($surahNum && $verseNum) {
+                    $verseKey = "$surahNum:$verseNum";
+                    $verseData = $this->getVerseText($verseKey);
+                    $results[] = [
+                        'surah' => $surahNum,
+                        'surah_name' => $surah['name'] ?? $this->getSurahName($surahNum),
+                        'verse' => $verseNum,
+                        'text' => $verseData,
+                    ];
+                }
+            }
+
+            return $results;
         });
+    }
+
+    private function getVerseText(string $verseKey): string
+    {
+        try {
+            $response = Http::get(self::BASE_URL . "/ayah/" . $verseKey . "/quran-uthmani");
+            if ($response->successful()) {
+                return $response->json()['data']['text'] ?? '';
+            }
+        } catch (\Exception $e) {
+            Log::warning('QuranApiService: Failed to get verse text', ['key' => $verseKey, 'error' => $e->getMessage()]);
+        }
+        return '';
     }
 
     // Juz helpers

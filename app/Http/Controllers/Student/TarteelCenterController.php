@@ -249,7 +249,7 @@ class TarteelCenterController extends Controller
         $query = $request->input('query');
 
         try {
-            $searchResults = $this->quranApiService->search($query);
+            $searchResults = $this->quranApiService->searchVerse($query);
 
             return response()->json([
                 'success' => true,
@@ -270,7 +270,7 @@ class TarteelCenterController extends Controller
         $validator = Validator::make($request->all(), [
             'surah' => 'required|integer|min:1|max:114',
             'verse' => 'required|integer|min:1',
-            'interpretation' => 'nullable|string|in:ibn_kathir,saadi,tabari',
+            'interpretation' => 'nullable|string|in:ar.tafseer_ibn_kathir,ar.tafseer_saadi,ar.tafseer_tabari',
         ]);
 
         if ($validator->fails()) {
@@ -282,11 +282,11 @@ class TarteelCenterController extends Controller
 
         $surah = $request->input('surah');
         $verse = $request->input('verse');
-        $interpretation = $request->input('interpretation', 'ibn_kathir');
+        $interpretation = $request->input('interpretation', 'ar.tafseer_ibn_kathir');
 
         try {
             $verseKey = "{$surah}:{$verse}";
-            $verseData = $this->quranApiService->getVerse($verseKey);
+            $verseData = $this->quranApiService->getVerse((int)$surah, (int)$verse);
 
             if (!$verseData) {
                 return response()->json([
