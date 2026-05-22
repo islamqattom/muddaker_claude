@@ -864,10 +864,9 @@ public function searchVerse(string $query): array
         $cacheKey = "quran_search_" . md5($query);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
-            $response = Http::timeout(10)->get(self::BASE_URL . "/search", [
-                'query' => $query,
-                'size' => 50
-            ]);
+            $encodedQuery = rawurlencode($query);
+            $url = self::BASE_URL . "/search/" . $encodedQuery;
+            $response = Http::timeout(10)->get($url);
 
             if ($response->status() === 404) {
                 return [];
@@ -877,6 +876,7 @@ public function searchVerse(string $query): array
                 Log::error('QuranApiService: Search failed', [
                     'query' => $query,
                     'status' => $response->status(),
+                    'body' => $response->body(),
                 ]);
                 throw new \Exception("Quran search failed for query: {$query}");
             }
