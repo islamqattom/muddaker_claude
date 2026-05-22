@@ -24,10 +24,12 @@ class TajweedRuleDefinition extends Model
         'example_verse_key',
         'audio_url',
         'examples',
+        'colored_examples',
     ];
 
     protected $casts = [
         'examples' => 'array',
+        'colored_examples' => 'array',
     ];
 
     public $timestamps = true;

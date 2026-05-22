@@ -74,6 +74,7 @@
                     <div class="col-md-3 col-6">
                         <label class="form-label">إلى آية</label>
                         <input type="number" class="form-control" id="smartMemoTo" value="3" min="1">
+                        <small id="smartMemoToHint" class="text-muted"></small>
                     </div>
                     <div class="col-md-2 col-12 d-flex align-items-end">
                         <button class="btn btn-outline-primary w-100" id="smartMemoLoadBtn">

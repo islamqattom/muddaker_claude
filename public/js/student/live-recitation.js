@@ -15,8 +15,8 @@ class LiveRecitationController {
         this.isEvaluating = false;
         this.transcriptText = '';
         this.audioChunks = [];
-        this.similarityThreshold = 80;
         this.apiToken = '';
+        this.similarityThreshold = 80;
         this.faultAudio = new Audio('/sounds/fault.mp3');
         this.faultAudio.onerror = () => {
             console.warn('Fault sound file not found, continuing without audio feedback');
@@ -34,8 +34,7 @@ class LiveRecitationController {
         this.lastErrorFeedbackTime = 0;
         this.errorFeedbackThrottle = 1500;
         this.isPreviewMode = false;
-        this.viewMode = 'cards'; // 'cards', 'quran', or 'mushaf'
-        this.mushafLayout = 'KFGQPC_V4'; // default mushaf layout
+        this.viewMode = 'cards'; // 'cards' or 'mushaf'
 
         // Web Speech API fallback
         this.speechRecognition = null;
@@ -60,6 +59,8 @@ class LiveRecitationController {
         this.mutashabihat = {};
         this.currentReciter = '';
         this.wordHighlightTimer = null;
+        this.mushafLayout = 'KFGQPC_V4';
+        this.showTajweed = true;
 
         this.init();
     }
@@ -78,20 +79,47 @@ class LiveRecitationController {
             this.speechRecognition.lang = 'ar-SA';
 
             this.speechRecognition.onresult = (event) => {
-                let transcript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
-                }
-                if (transcript.trim().length > 0) {
-                    this.transcriptText = transcript;
-                    this.updateTranscript(transcript);
+                let finalTranscript = '';
+                let interimTranscript = '';
 
-                    // Real-time error detection during speech
+                for (let i = event.resultIndex; i < event.results.length; i++) {
                     if (event.results[i].isFinal) {
-                        this.checkForErrorsDuringRecitation(transcript);
-                        this.processRecitation(transcript);
+                        const part = event.results[i][0].transcript.trim();
+                        // Track processed final results to avoid duplicates on recognition restart
+                        if (!this._processedFinalResults) {
+                            this._processedFinalResults = new Set();
+                        }
+                        const resultKey = i + ':' + part;
+                        if (part && !this._processedFinalResults.has(resultKey)) {
+                            this._processedFinalResults.add(resultKey);
+                            finalTranscript += ' ' + part;
+                        }
                     } else {
-                        this.checkForErrorsDuringRecitation(transcript);
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                // Build display transcript (accumulated final + current interim)
+                const displayTranscript = (this.transcriptText || '') +
+                    (interimTranscript ? ' ' + interimTranscript : '');
+
+                if (displayTranscript.trim().length > 0) {
+                    this.updateTranscript(displayTranscript.trim());
+                }
+
+                // Accumulate final transcript so the full verse is available for evaluation
+                if (finalTranscript.trim().length > 0) {
+                    this.transcriptText = (this.transcriptText || '') + finalTranscript.trim();
+                    this.transcriptText = this.transcriptText.trim();
+                }
+
+                // Process for recitation matching
+                if (this.transcriptText.length > 0) {
+                    if (finalTranscript.trim().length > 0) {
+                        this.checkForErrorsDuringRecitation(this.transcriptText);
+                        this.processRecitation(this.transcriptText);
+                    } else {
+                        this.checkForErrorsDuringRecitation(this.transcriptText);
                     }
                 }
             };
@@ -118,9 +146,7 @@ class LiveRecitationController {
         this.modeSelect = document.getElementById('modeSelect');
         this.endPageInput = document.getElementById('endPage');
         this.endPageInputContainer = document.getElementById('endPageInput');
-        this.similarityThresholdInput = document.getElementById('similarityThreshold');
         this.previewBtn = document.getElementById('previewVerses');
-        this.startBtn = document.getElementById('startRecitation');
         this.stopBtn = document.getElementById('stopRecitation');
         this.nextVerseBtn = document.getElementById('nextVerse');
         this.statusEl = document.getElementById('recitationStatus');
@@ -143,20 +169,18 @@ class LiveRecitationController {
         this.reportUrlTemplate = document.querySelector('meta[name=report-url-template]')?.content || '/api/student/live-recitation/session/__ID__/report';
 
         // Validate critical elements
-        if (!this.startBtn || !this.modeSelect || !this.startPageInput) {
+        if (!this.modeSelect || !this.startPageInput) {
             console.error('Failed to initialize LiveRecitationController: missing critical DOM elements', {
-                startBtn: this.startBtn,
                 modeSelect: this.modeSelect,
                 startPageInput: this.startPageInput
             });
             return;
         }
 
-        this.modeSelect.addEventListener('change', () => this.togglePageInputs());
-        this.previewBtn.addEventListener('click', () => this.loadVersesPreview());
-        this.startBtn.addEventListener('click', () => this.startRecitation());
-        this.stopBtn.addEventListener('click', () => this.stopRecitation());
-        this.nextVerseBtn.addEventListener('click', () => this.nextVerse());
+        if (this.modeSelect) this.modeSelect.addEventListener('change', () => this.togglePageInputs());
+        if (this.previewBtn) this.previewBtn.addEventListener('click', () => this.loadVersesPreview());
+        if (this.stopBtn) this.stopBtn.addEventListener('click', () => this.stopRecitation());
+        if (this.nextVerseBtn) this.nextVerseBtn.addEventListener('click', () => this.nextVerse());
 
         // Load reciters
         this.loadReciters();
@@ -175,20 +199,7 @@ class LiveRecitationController {
             if (e.key === 'Escape' && this.isRecording && !this.isEnding) {
                 this.stopRecitation();
             }
-            if ((e.key === ' ' || e.key === 'Enter') && !this.isRecording && document.activeElement === this.startBtn) {
-                e.preventDefault();
-                this.startRecitation();
-            }
         });
-
-        // Threshold slider display
-        const thresholdInput = document.getElementById('similarityThreshold');
-        const thresholdValue = document.getElementById('thresholdValue');
-        if (thresholdInput && thresholdValue) {
-            thresholdInput.addEventListener('input', () => {
-                thresholdValue.textContent = thresholdInput.value + '%';
-            });
-        }
 
         // Clear transcript button
         const clearTranscriptBtn = document.getElementById('clearTranscript');
@@ -231,51 +242,68 @@ class LiveRecitationController {
         if (surahSelect.options.length > 1) return; // Already loaded
 
         const surahs = [
-            { number: 1, name: 'الفاتحة'}, { number: 2, name: 'البقرة'}, { number: 3, name: 'آل عمران'},
-            { number: 4, name: 'النساء'}, { number: 5, name: 'المائدة'}, { number: 6, name: 'الأنعام'},
-            { number: 7, name: 'الأعراف'}, { number: 8, name: 'الأنفال'}, { number: 9, name: 'التوبة'},
-            { number: 10, name: 'يونس'}, { number: 11, name: 'هود'}, { number: 12, name: 'يوسف'},
-            { number: 13, name: 'الرعد'}, { number: 14, name: 'إبراهيم'}, { number: 15, name: 'الحجر'},
-            { number: 16, name: 'النحل'}, { number: 17, name: 'الإسراء'}, { number: 18, name: 'الكهف'},
-            { number: 19, name: 'مريم'}, { number: 20, name: 'طه'}, { number: 21, name: 'الأنبياء'},
-            { number: 22, name: 'الحج'}, { number: 23, name: 'المؤمنون'}, { number: 24, name: 'النور'},
-            { number: 25, name: 'الفرقان'}, { number: 26, name: 'الشعراء'}, { number: 27, name: 'النمل'},
-            { number: 28, name: 'القصص'}, { number: 29, name: 'العنكبوت'}, { number: 30, name: 'الروم'},
-            { number: 31, name: 'لقمان'}, { number: 32, name: 'السجدة'}, { number: 33, name: 'الأحزاب'},
-            { number: 34, name: 'سبأ'}, { number: 35, name: 'فاطر'}, { number: 36, name: 'يس'},
-            { number: 37, name: 'الصافات'}, { number: 38, name: 'ص'}, { number: 39, name: 'الزمر'},
-            { number: 40, name: 'غافر'}, { number: 41, name: 'فصلت'}, { number: 42, name: 'الشورى'},
-            { number: 43, name: 'الزخرف'}, { number: 44, name: 'الدخان'}, { number: 45, name: 'الجاثية'},
-            { number: 46, name: 'الأحقاف'}, { number: 47, name: 'محمد'}, { number: 48, name: 'الفتح'},
-            { number: 49, name: 'الحجرات'}, { number: 50, name: 'ق'}, { number: 51, name: 'الذاريات'},
-            { number: 52, name: 'الطور'}, { number: 53, name: 'النجم'}, { number: 54, name: 'القمر'},
-            { number: 55, name: 'الرحمن'}, { number: 56, name: 'الواقعة'}, { number: 57, name: 'الحديد'},
-            { number: 58, name: 'المجادلة'}, { number: 59, name: 'الحشر'}, { number: 60, name: 'الممتحنة'},
-            { number: 61, name: 'الصف'}, { number: 62, name: 'الجمعة'}, { number: 63, name: 'المنافقون'},
-            { number: 64, name: 'التغابن'}, { number: 65, name: 'الطلاق'}, { number: 66, name: 'التحريم'},
-            { number: 67, name: 'الملك'}, { number: 68, name: 'القلم'}, { number: 69, name: 'الحاقة'},
-            { number: 70, name: 'المعارج'}, { number: 71, name: 'نوح'}, { number: 72, name: 'الجن'},
-            { number: 73, name: 'المزمل'}, { number: 74, name: 'المدثر'}, { number: 75, name: 'القيامة'},
-            { number: 76, name: 'الإنسان'}, { number: 77, name: 'المرسلات'}, { number: 78, name: 'النبأ'},
-            { number: 79, name: 'النازعات'}, { number: 80, name: 'عبس'}, { number: 81, name: 'التكوير'},
-            { number: 82, name: 'الإنفطار'}, { number: 83, name: 'المطففين'}, { number: 84, name: 'الإنشقاق'},
-            { number: 85, name: 'البروج'}, { number: 86, name: 'الطارق'}, { number: 87, name: 'الأعلى'},
-            { number: 88, name: 'الغاشية'}, { number: 89, name: 'الفجر'}, { number: 90, name: 'البلد'},
-            { number: 91, name: 'الشمس'}, { number: 92, name: 'الليل'}, { number: 93, name: 'الضحى'},
-            { number: 94, name: 'الشرح'}, { number: 95, name: 'التين'}, { number: 96, name: 'العلق'},
-            { number: 97, name: 'القدر'}, { number: 98, name: 'البينة'}, { number: 99, name: 'الزلزلة'},
-            { number: 100, name: 'العاديات'}, { number: 101, name: 'القارعة'}, { number: 102, name: 'التكاثر'},
-            { number: 103, name: 'العصر'}, { number: 104, name: 'الهمزة'}, { number: 105, name: 'الفيل'},
-            { number: 106, name: 'قريش'}, { number: 107, name: 'الماعون'}, { number: 108, name: 'الكوثر'},
-            { number: 109, name: 'الكافرون'}, { number: 110, name: 'النصر'}, { number: 111, name: 'المسد'},
-            { number: 112, name: 'الإخلاص'}, { number: 113, name: 'الفلق'}, { number: 114, name: 'الناس'}
+            { number: 1, name: 'الفاتحة', ayahs: 7 }, { number: 2, name: 'البقرة', ayahs: 286 }, { number: 3, name: 'آل عمران', ayahs: 200 },
+            { number: 4, name: 'النساء', ayahs: 176 }, { number: 5, name: 'المائدة', ayahs: 120 }, { number: 6, name: 'الأنعام', ayahs: 165 },
+            { number: 7, name: 'الأعراف', ayahs: 206 }, { number: 8, name: 'الأنفال', ayahs: 75 }, { number: 9, name: 'التوبة', ayahs: 129 },
+            { number: 10, name: 'يونس', ayahs: 109 }, { number: 11, name: 'هود', ayahs: 123 }, { number: 12, name: 'يوسف', ayahs: 111 },
+            { number: 13, name: 'الرعد', ayahs: 43 }, { number: 14, name: 'إبراهيم', ayahs: 52 }, { number: 15, name: 'الحجر', ayahs: 99 },
+            { number: 16, name: 'النحل', ayahs: 128 }, { number: 17, name: 'الإسراء', ayahs: 111 }, { number: 18, name: 'الكهف', ayahs: 110 },
+            { number: 19, name: 'مريم', ayahs: 98 }, { number: 20, name: 'طه', ayahs: 135 }, { number: 21, name: 'الأنبياء', ayahs: 112 },
+            { number: 22, name: 'الحج', ayahs: 78 }, { number: 23, name: 'المؤمنون', ayahs: 118 }, { number: 24, name: 'النور', ayahs: 64 },
+            { number: 25, name: 'الفرقان', ayahs: 77 }, { number: 26, name: 'الشعراء', ayahs: 227 }, { number: 27, name: 'النمل', ayahs: 93 },
+            { number: 28, name: 'القصص', ayahs: 88 }, { number: 29, name: 'العنكبوت', ayahs: 69 }, { number: 30, name: 'الروم', ayahs: 60 },
+            { number: 31, name: 'لقمان', ayahs: 34 }, { number: 32, name: 'السجدة', ayahs: 30 }, { number: 33, name: 'الأحزاب', ayahs: 73 },
+            { number: 34, name: 'سبأ', ayahs: 54 }, { number: 35, name: 'فاطر', ayahs: 45 }, { number: 36, name: 'يس', ayahs: 83 },
+            { number: 37, name: 'الصافات', ayahs: 182 }, { number: 38, name: 'ص', ayahs: 88 }, { number: 39, name: 'الزمر', ayahs: 75 },
+            { number: 40, name: 'غافر', ayahs: 85 }, { number: 41, name: 'فصلت', ayahs: 54 }, { number: 42, name: 'الشورى', ayahs: 53 },
+            { number: 43, name: 'الزخرف', ayahs: 89 }, { number: 44, name: 'الدخان', ayahs: 59 }, { number: 45, name: 'الجاثية', ayahs: 37 },
+            { number: 46, name: 'الأحقاف', ayahs: 35 }, { number: 47, name: 'محمد', ayahs: 38 }, { number: 48, name: 'الفتح', ayahs: 29 },
+            { number: 49, name: 'الحجرات', ayahs: 18 }, { number: 50, name: 'ق', ayahs: 45 }, { number: 51, name: 'الذاريات', ayahs: 60 },
+            { number: 52, name: 'الطور', ayahs: 49 }, { number: 53, name: 'النجم', ayahs: 62 }, { number: 54, name: 'القمر', ayahs: 55 },
+            { number: 55, name: 'الرحمن', ayahs: 78 }, { number: 56, name: 'الواقعة', ayahs: 96 }, { number: 57, name: 'الحديد', ayahs: 29 },
+            { number: 58, name: 'المجادلة', ayahs: 22 }, { number: 59, name: 'الحشر', ayahs: 24 }, { number: 60, name: 'الممتحنة', ayahs: 13 },
+            { number: 61, name: 'الصف', ayahs: 14 }, { number: 62, name: 'الجمعة', ayahs: 11 }, { number: 63, name: 'المنافقون', ayahs: 11 },
+            { number: 64, name: 'التغابن', ayahs: 18 }, { number: 65, name: 'الطلاق', ayahs: 12 }, { number: 66, name: 'التحريم', ayahs: 12 },
+            { number: 67, name: 'الملك', ayahs: 30 }, { number: 68, name: 'القلم', ayahs: 52 }, { number: 69, name: 'الحاقة', ayahs: 52 },
+            { number: 70, name: 'المعارج', ayahs: 44 }, { number: 71, name: 'نوح', ayahs: 28 }, { number: 72, name: 'الجن', ayahs: 28 },
+            { number: 73, name: 'المزمل', ayahs: 20 }, { number: 74, name: 'المدثر', ayahs: 56 }, { number: 75, name: 'القيامة', ayahs: 40 },
+            { number: 76, name: 'الإنسان', ayahs: 31 }, { number: 77, name: 'المرسلات', ayahs: 50 }, { number: 78, name: 'النبأ', ayahs: 40 },
+            { number: 79, name: 'النازعات', ayahs: 46 }, { number: 80, name: 'عبس', ayahs: 42 }, { number: 81, name: 'التكوير', ayahs: 29 },
+            { number: 82, name: 'الإنفطار', ayahs: 19 }, { number: 83, name: 'المطففين', ayahs: 36 }, { number: 84, name: 'الإنشقاق', ayahs: 25 },
+            { number: 85, name: 'البروج', ayahs: 22 }, { number: 86, name: 'الطارق', ayahs: 17 }, { number: 87, name: 'الأعلى', ayahs: 19 },
+            { number: 88, name: 'الغاشية', ayahs: 26 }, { number: 89, name: 'الفجر', ayahs: 30 }, { number: 90, name: 'البلد', ayahs: 20 },
+            { number: 91, name: 'الشمس', ayahs: 15 }, { number: 92, name: 'الليل', ayahs: 21 }, { number: 93, name: 'الضحى', ayahs: 11 },
+            { number: 94, name: 'الشرح', ayahs: 8 }, { number: 95, name: 'التين', ayahs: 8 }, { number: 96, name: 'العلق', ayahs: 19 },
+            { number: 97, name: 'القدر', ayahs: 5 }, { number: 98, name: 'البينة', ayahs: 8 }, { number: 99, name: 'الزلزلة', ayahs: 8 },
+            { number: 100, name: 'العاديات', ayahs: 11 }, { number: 101, name: 'القارعة', ayahs: 11 }, { number: 102, name: 'التكاثر', ayahs: 8 },
+            { number: 103, name: 'العصر', ayahs: 3 }, { number: 104, name: 'الهمزة', ayahs: 9 }, { number: 105, name: 'الفيل', ayahs: 5 },
+            { number: 106, name: 'قريش', ayahs: 4 }, { number: 107, name: 'الماعون', ayahs: 7 }, { number: 108, name: 'الكوثر', ayahs: 3 },
+            { number: 109, name: 'الكافرون', ayahs: 6 }, { number: 110, name: 'النصر', ayahs: 3 }, { number: 111, name: 'المسد', ayahs: 5 },
+            { number: 112, name: 'الإخلاص', ayahs: 4 }, { number: 113, name: 'الفلق', ayahs: 5 }, { number: 114, name: 'الناس', ayahs: 6 }
         ];
 
         surahs.forEach(surah => {
             const option = document.createElement('option');
             option.value = surah.number;
             option.textContent = surah.number + '. ' + surah.name;
+            option.dataset.ayahs = surah.ayahs;
             surahSelect.appendChild(option);
+        });
+
+        surahSelect.addEventListener('change', () => {
+            const selected = surahSelect.options[surahSelect.selectedIndex];
+            const ayahs = selected?.dataset?.ayahs;
+            const verseEndInput = document.getElementById('verseEnd');
+            const verseEndHint = document.getElementById('verseEndHint');
+            if (ayahs && verseEndInput) {
+                verseEndInput.value = ayahs;
+                verseEndInput.max = ayahs;
+                if (verseEndHint) {
+                    verseEndHint.textContent = 'الحد الأقصى: ' + ayahs + ' آية';
+                }
+            } else if (verseEndHint) {
+                verseEndHint.textContent = '';
+            }
         });
     }
 
@@ -339,13 +367,14 @@ class LiveRecitationController {
                     headers: { 'Accept': 'application/json' },
                     credentials: 'include'
                 });
-                if (!tokenResponse.ok) throw new Error('Token request failed');
+                if (!tokenResponse.ok) throw new Error('Token request failed: ' + tokenResponse.status);
                 const tokenData = await tokenResponse.json();
                 if (tokenData.success && tokenData.token) {
                     this.apiToken = tokenData.token;
                 }
             } catch (error) {
                 console.error('Failed to get API token:', error);
+                this.showError('فشل في الحصول على رمز الدخول: ' + (error.message || 'خطأ غير معروف'));
             }
         }
 
@@ -385,23 +414,31 @@ class LiveRecitationController {
                 body: JSON.stringify(requestBody)
             });
 
+            if (!response.ok) {
+                let errorText = 'فشل في تحميل الآيات (HTTP ' + response.status + ')';
+                try {
+                    const errorData = await response.json();
+                    errorText = errorData.error || errorData.message || errorText;
+                } catch (e) {
+                    // ignore JSON parse error on error response
+                }
+                this.showError(errorText);
+                return;
+            }
+
             const data = await response.json();
 
             if (!data.success) {
-                let errorMsg = data.error || 'فشل في تحميل الآيات';
+                let errorMsg = data.error || data.message || 'فشل في تحميل الآيات';
                 if (response.status === 422 && data.errors) {
                     errorMsg = Object.values(data.errors).flat().join(' / ') || errorMsg;
                 }
                 this.showError(errorMsg);
-                this.previewBtn.disabled = false;
-                this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
                 return;
             }
 
             if (!data.data || !data.data.verses || data.data.verses.length === 0) {
                 this.showError('لم يتم العثور على آيات للنطاق المحدد');
-                this.previewBtn.disabled = false;
-                this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
                 return;
             }
 
@@ -419,14 +456,12 @@ class LiveRecitationController {
             this.refreshVersesDisplay();
             this.highlightVerse(0);
 
-            // Enable start button after successful preview
-            this.startBtn.disabled = false;
-            this.previewBtn.disabled = false;
-            this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
             this.updateStatus('تم تحميل الآيات - جاهز للتسميع');
         } catch (error) {
             console.error('Error loading verses preview:', error);
-            this.showError('حدث خطأ أثناء تحميل الآيات');
+            this.showError('حدث خطأ أثناء تحميل الآيات: ' + (error.message || 'خطأ غير معروف'));
+        } finally {
+            // Always reset the button state
             this.previewBtn.disabled = false;
             this.previewBtn.innerHTML = '<i class="fas fa-eye me-2"></i>عرض الآيات';
         }
@@ -436,8 +471,6 @@ class LiveRecitationController {
         const mode = this.modeSelect.value;
         const startPage = parseInt(this.startPageInput.value);
         const endPage = mode === 'range' ? parseInt(this.endPageInput.value) : startPage;
-        this.similarityThreshold = parseInt(this.similarityThresholdInput.value);
-        this.startBtn.disabled = true;
 
         // Update status indicator
         this.updateStatusIndicator('connecting');
@@ -453,17 +486,17 @@ class LiveRecitationController {
             const verseEnd = parseInt(document.getElementById('verseEnd').value);
             if (!surahSelect.value) {
                 this.showError('يرجى اختيار السورة');
-                this.startBtn.disabled = false;
+                
                 return;
             }
             if (isNaN(verseStart) || verseStart < 1) {
                 this.showError('يرجى إدخال رقم آية البداية بشكل صحيح');
-                this.startBtn.disabled = false;
+                
                 return;
             }
             if (isNaN(verseEnd) || verseEnd < verseStart) {
                 this.showError('يرجى إدخال رقم آية النهاية بشكل صحيح');
-                this.startBtn.disabled = false;
+                
                 return;
             }
         }
@@ -484,14 +517,14 @@ class LiveRecitationController {
                 const tokenData = await tokenResponse.json();
                 if (!tokenData.success || !tokenData.token) {
                     this.showError('فشل في الحصول على رمز الدخول');
-                    this.startBtn.disabled = false;
+                    
                     return;
                 }
                 this.apiToken = tokenData.token;
             } catch (error) {
                 console.error('Failed to get API token:', error);
                 this.showError('فشل في الاتصال بالخادم: ' + error.message);
-                this.startBtn.disabled = false;
+                
                 return;
             }
         }
@@ -548,9 +581,8 @@ class LiveRecitationController {
                 }
                 console.error('API Error:', errorMsg);
                 this.showError(errorMsg);
-                this.startBtn.disabled = false;
-                this.startBtn.classList.remove('recording');
-                this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
+                
+                
                 return;
             }
 
@@ -558,7 +590,7 @@ class LiveRecitationController {
             if (!data.data || !data.data.session_id) {
                 console.error('Invalid API response - missing session:', data);
                 this.showError('فشل في بدء جلسة التسميع');
-                this.startBtn.disabled = false;
+                
                 return;
             }
 
@@ -575,7 +607,7 @@ class LiveRecitationController {
                 if (!data.data.verses || !Array.isArray(data.data.verses) || data.data.verses.length === 0) {
                     console.error('Invalid API response - missing verses:', data);
                     this.showError('لم يتم العثور على آيات للنطاق المحدد');
-                    this.startBtn.disabled = false;
+                    
                     return;
                 }
                 this.verses = data.data.verses;
@@ -600,7 +632,7 @@ class LiveRecitationController {
                 this.mutashabihat = data.data.mutashabihat || {};
                 this.currentVerseIndex = 0;
                 this.totalErrors = 0;
-                this.errorCountEl.textContent = '0';
+                if (this.errorCountEl) this.errorCountEl.textContent = '0';
                 this.transcriptText = '';
                 this.lastProcessedVerseIndex = -1;
                 this.errorCountForCurrentVerse = 0;
@@ -609,8 +641,8 @@ class LiveRecitationController {
             }
 
             this.isEnding = false;
-            this.stopBtn.classList.remove('d-none');
-            this.nextVerseBtn.classList.remove('d-none');
+            if (this.stopBtn) this.stopBtn.classList.remove('d-none');
+            if (this.nextVerseBtn) this.nextVerseBtn.classList.remove('d-none');
 
             // Start session timer and accuracy chart
             this.startSessionTimer();
@@ -625,12 +657,9 @@ class LiveRecitationController {
             }
         } catch (error) {
             console.error('Error starting recitation:', error);
-            console.error('Response status:', response?.status);
-            console.error('Response body:', response?.body);
-            this.showError('حدث خطأ أثناء بدء التسميع');
-            this.startBtn.disabled = false;
-            this.startBtn.classList.remove('recording');
-            this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
+            this.showError('حدث خطأ أثناء بدء التسميع: ' + (error.message || 'خطأ غير معروف'));
+            this.updateStatusIndicator('error');
+            this.updateStatus('فشل في بدء التسميع');
         }
     }
 
@@ -644,8 +673,7 @@ class LiveRecitationController {
         this.updateStatusIndicator('active');
         this.updateStatus('متصل - جارٍ الاستماع...');
         this.isRecording = true;
-        this.startBtn.classList.add('recording');
-        this.startBtn.innerHTML = '<i class="fas fa-circle me-2"></i>جارٍ التسجيل...';
+        
 
         try {
             this.speechRecognition.start();
@@ -681,8 +709,6 @@ class LiveRecitationController {
             this.updateStatusIndicator('active');
             this.updateStatus('متصل - جارٍ الاستماع...');
             this.isRecording = true;
-            this.startBtn.classList.add('recording');
-            this.startBtn.innerHTML = '<i class="fas fa-circle me-2"></i>جارٍ التسجيل...';
             this.startRecording();
         };
         this.ws.onmessage = (event) => {
@@ -841,7 +867,8 @@ class LiveRecitationController {
         const currentVerse = this.verses[this.currentVerseIndex];
         if (!currentVerse) return;
 
-        const similarity = this.calculateSimilarity(transcript, currentVerse.text);
+        // Use findBestMatchingSegment to handle cumulative transcripts
+        const similarity = this.findBestMatchingSegment(transcript, currentVerse.text);
 
         // Throttle error feedback to avoid too many alerts
         const now = Date.now();
@@ -1274,6 +1301,7 @@ class LiveRecitationController {
     }
 
     highlightVerse(index) {
+        if (!this.verseCardsCache || this.verseCardsCache.length === 0) return;
         this.verseCardsCache.forEach((card, i) => {
             card.classList.toggle('active-verse', i === index);
         });
@@ -1446,11 +1474,12 @@ class LiveRecitationController {
     }
 
     refreshVersesDisplay() {
+        console.log('[refreshVersesDisplay] viewMode:', this.viewMode, 'verses:', this.verses?.length);
         if (!this.verses || this.verses.length === 0) return;
-        if (this.viewMode === 'quran') {
-            this.initializeQuranPageView();
-        } else if (this.viewMode === 'mushaf') {
+        if (this.viewMode === 'mushaf') {
             this.initializeMushafView();
+        } else if (this.viewMode === 'quran') {
+            this.initializeQuranPageView();
         } else {
             this.initializeVersesDisplay();
         }
@@ -1458,14 +1487,17 @@ class LiveRecitationController {
     }
 
     setViewMode(mode) {
+        console.log('[setViewMode] called with mode:', mode, 'verses count:', this.verses?.length);
+        if (!this.verses || this.verses.length === 0) {
+            this.showToast('يرجى تحميل الآيات أولاً بالضغط على "عرض الآيات"', 'warning');
+            return;
+        }
         this.viewMode = mode;
         const viewModeCards = document.getElementById('viewModeCards');
-        const viewModeQuran = document.getElementById('viewModeQuran');
         const viewModeMushaf = document.getElementById('viewModeMushaf');
         if (viewModeCards) viewModeCards.classList.remove('active');
-        if (viewModeQuran) viewModeQuran.classList.remove('active');
         if (viewModeMushaf) viewModeMushaf.classList.remove('active');
-        const activeBtn = mode === 'cards' ? viewModeCards : mode === 'quran' ? viewModeQuran : viewModeMushaf;
+        const activeBtn = mode === 'cards' ? viewModeCards : viewModeMushaf;
         if (activeBtn) activeBtn.classList.add('active');
         this.refreshVersesDisplay();
     }
@@ -1593,6 +1625,7 @@ class LiveRecitationController {
     }
 
     initializeMushafView() {
+        console.log('[initializeMushafView] start, verses:', this.verses?.length, 'currentVerseEl:', !!this.currentVerseEl);
         if (!this.verses || this.verses.length === 0) return;
         if (!this.currentVerseEl) return;
 
@@ -1645,7 +1678,7 @@ class LiveRecitationController {
             verseWrapper.dataset.key = audioKey;
 
             // Tajweed coloring
-            const tajweed = this.tajweedRules[audioKey];
+            const tajweed = this.showTajweed ? this.tajweedRules[audioKey] : null;
             let verseHtml = '';
             if (this.verseWords[audioKey]) {
                 // Word-by-word mushaf rendering with click handler
@@ -1865,7 +1898,9 @@ class LiveRecitationController {
 
         const verse = this.verses[this.currentVerseIndex];
         const expectedText = verse.text;
-        const similarity = this.calculateSimilarity(this.transcriptText, expectedText);
+        // Use findBestMatchingSegment to handle cumulative transcripts that may contain
+        // text from previous or next verses
+        const similarity = this.findBestMatchingSegment(this.transcriptText, expectedText);
 
         // Update accuracy chart
         this.updateAccuracyChart(this.currentVerseIndex, similarity);
@@ -1920,6 +1955,53 @@ class LiveRecitationController {
         }, 500);
     }
 
+    /**
+     * Find the best matching segment of transcript against expected text.
+     * Handles cumulative transcripts by searching for the most similar
+     * contiguous block of words within the transcript.
+     */
+    findBestMatchingSegment(transcript, expected) {
+        const normTranscript = this.normalizeArabic(transcript);
+        const normExpected = this.normalizeArabic(expected);
+
+        if (!normTranscript || !normExpected) return 0;
+        if (normTranscript === normExpected) return 100;
+
+        const expectedWords = normExpected.trim().split(/\s+/).filter(w => w.length > 0);
+        const transcriptWords = normTranscript.trim().split(/\s+/).filter(w => w.length > 0);
+
+        if (expectedWords.length === 0) return 0;
+        if (transcriptWords.length === 0) return 0;
+
+        // If transcript is shorter or equal, just do direct comparison
+        if (transcriptWords.length <= expectedWords.length) {
+            return this.calculateSimilarity(normTranscript, normExpected);
+        }
+
+        let bestSim = 0;
+
+        // Search for best matching window in transcript
+        // Try window sizes around expected word count
+        for (const windowSize of [expectedWords.length, expectedWords.length + 1, expectedWords.length - 1]) {
+            if (windowSize <= 0) continue;
+            for (let i = 0; i <= transcriptWords.length - windowSize; i++) {
+                const segment = transcriptWords.slice(i, i + windowSize).join(' ');
+                const sim = this.calculateSimilarity(segment, normExpected);
+                if (sim > bestSim) {
+                    bestSim = sim;
+                }
+            }
+        }
+
+        // Also try direct comparison in case it's a close match overall
+        const directSim = this.calculateSimilarity(normTranscript, normExpected);
+        if (directSim > bestSim) {
+            bestSim = directSim;
+        }
+
+        return bestSim;
+    }
+
     // Character-based Levenshtein for proper UTF-8/Arabic support
     mbLevenshtein(str1, str2) {
         const chars1 = Array.from(str1);
@@ -1963,10 +2045,18 @@ class LiveRecitationController {
 
     normalizeArabic(text) {
         if (!text) return '';
-        // Remove Arabic diacritics (tashkeel): \x{064B}-\x{065F} and \x{0670}
-        text = text.replace(/[\u064B-\u065F\u0670]/g, '');
-        // Normalize alef variations: أ إ آ ا -> ا
-        text = text.replace(/[آأإا]/g, 'ا');
+        // Remove Uthmani-script invisible separators (hair space U+200A,
+        // word joiner U+2060, etc.) that split words like "صِرَٰطَ".
+        text = text.replace(/[\u2000-\u200F\u2028\u2029\u205F\u2060\uFEFF]/g, '');
+        // Convert dagger alef (U+0670) to regular alef — in Uthmani script
+        // it represents a spoken alef (e.g. مَٰلِكِ -> مالك, صِرَٰطَ -> صراط)
+        text = text.replace(/\u0670/g, 'ا');
+        // Remove Arabic diacritics (tashkeel) and tatweel
+        text = text.replace(/[\u064B-\u065F\u0640]/g, '');
+        // Fix: U+0670 in 'رَحْمَٰنِ' does not represent a spoken alef
+        text = text.replace(/رحمان/g, 'رحمن');
+        // Normalize alef variations: أ إ آ ٱ ا -> ا (includes alef wasla U+0671)
+        text = text.replace(/[آأإٱا]/g, 'ا');
         // Normalize teh marbuta:ة -> ت
         text = text.replace(/ة/g, 'ت');
         // Normalize ya-al-maqsura: ى -> ي
@@ -1981,7 +2071,7 @@ class LiveRecitationController {
     async recordError(verse, similarity) {
         // Always update local state first
         this.totalErrors++;
-        this.errorCountEl.textContent = this.totalErrors;
+        if (this.errorCountEl) this.errorCountEl.textContent = this.totalErrors;
 
         try {
             const response = await fetch(this.errorUrl, {
@@ -2075,8 +2165,12 @@ class LiveRecitationController {
     }
 
     updateProgress() {
-        this.progressEl.textContent = this.currentVerseIndex + ' / ' + this.verses.length;
-        this.versesCountEl.textContent = this.verses.length;
+        if (this.progressEl) {
+            this.progressEl.textContent = this.currentVerseIndex + ' / ' + this.verses.length;
+        }
+        if (this.versesCountEl) {
+            this.versesCountEl.textContent = this.verses.length;
+        }
 
         if (this.progressBarEl && this.verses.length > 0) {
             const percentage = (this.currentVerseIndex / this.verses.length) * 100;
@@ -2086,7 +2180,9 @@ class LiveRecitationController {
     }
 
     updateStatus(text) {
-        this.statusEl.textContent = text;
+        if (this.statusEl) {
+            this.statusEl.textContent = text;
+        }
     }
 
     updateStatusIndicator(state) {
@@ -2214,11 +2310,8 @@ class LiveRecitationController {
         const chartWrapper = document.getElementById('accuracyChartWrapper');
         if (chartWrapper) chartWrapper.style.display = 'none';
 
-        this.startBtn.disabled = true;
-        this.startBtn.classList.remove('recording');
-        this.startBtn.innerHTML = '<i class="fas fa-microphone me-2"></i>ابدأ التسميع';
-        this.stopBtn.classList.add('d-none');
-        this.nextVerseBtn.classList.add('d-none');
+        if (this.stopBtn) this.stopBtn.classList.add('d-none');
+        if (this.nextVerseBtn) this.nextVerseBtn.classList.add('d-none');
         this.updateStatusIndicator('');
         this.updateStatus('في انتظار البدء');
         if (this.currentVerseEl) {

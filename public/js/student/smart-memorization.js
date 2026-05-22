@@ -226,42 +226,61 @@
         populateSurahSelect() {
             if (!this.surahSelectEl) return;
             const surahs = [
-                {n:1, name:'الفاتحة'},{n:2, name:'البقرة'},{n:3, name:'آل عمران'},{n:4, name:'النساء'},
-                {n:5, name:'المائدة'},{n:6, name:'الأنعام'},{n:7, name:'الأعراف'},{n:8, name:'الأنفال'},
-                {n:9, name:'التوبة'},{n:10, name:'يونس'},{n:11, name:'هود'},{n:12, name:'يوسف'},
-                {n:13, name:'الرعد'},{n:14, name:'إبراهيم'},{n:15, name:'الحجر'},{n:16, name:'النحل'},
-                {n:17, name:'الإسراء'},{n:18, name:'الكهف'},{n:19, name:'مريم'},{n:20, name:'طه'},
-                {n:21, name:'الأنبياء'},{n:22, name:'الحج'},{n:23, name:'المؤمنون'},{n:24, name:'النور'},
-                {n:25, name:'الفرقان'},{n:26, name:'الشعراء'},{n:27, name:'النمل'},{n:28, name:'القصص'},
-                {n:29, name:'العنكبوت'},{n:30, name:'الروم'},{n:31, name:'لقمان'},{n:32, name:'السجدة'},
-                {n:33, name:'الأحزاب'},{n:34, name:'سبأ'},{n:35, name:'فاطر'},{n:36, name:'يس'},
-                {n:37, name:'الصافات'},{n:38, name:'ص'},{n:39, name:'الزمر'},{n:40, name:'غافر'},
-                {n:41, name:'فصلت'},{n:42, name:'الشورى'},{n:43, name:'الزخرف'},{n:44, name:'الدخان'},
-                {n:45, name:'الجاثية'},{n:46, name:'الأحقاف'},{n:47, name:'محمد'},{n:48, name:'الفتح'},
-                {n:49, name:'الحجرات'},{n:50, name:'ق'},{n:51, name:'الذاريات'},{n:52, name:'الطور'},
-                {n:53, name:'النجم'},{n:54, name:'القمر'},{n:55, name:'الرحمن'},{n:56, name:'الواقعة'},
-                {n:57, name:'الحديد'},{n:58, name:'المجادلة'},{n:59, name:'الحشر'},{n:60, name:'الممتحنة'},
-                {n:61, name:'الصف'},{n:62, name:'الجمعة'},{n:63, name:'المنافقون'},{n:64, name:'التغابن'},
-                {n:65, name:'الطلاق'},{n:66, name:'التحريم'},{n:67, name:'الملك'},{n:68, name:'القلم'},
-                {n:69, name:'الحاقة'},{n:70, name:'المعارج'},{n:71, name:'نوح'},{n:72, name:'الجن'},
-                {n:73, name:'المزمل'},{n:74, name:'المدثر'},{n:75, name:'القيامة'},{n:76, name:'الإنسان'},
-                {n:77, name:'المرسلات'},{n:78, name:'النبأ'},{n:79, name:'النازعات'},{n:80, name:'عبس'},
-                {n:81, name:'التكوير'},{n:82, name:'الإنفطار'},{n:83, name:'المطففين'},{n:84, name:'الإنشقاق'},
-                {n:85, name:'البروج'},{n:86, name:'الطارق'},{n:87, name:'الأعلى'},{n:88, name:'الغاشية'},
-                {n:89, name:'الفجر'},{n:90, name:'البلد'},{n:91, name:'الشمس'},{n:92, name:'الليل'},
-                {n:93, name:'الضحى'},{n:94, name:'الشرح'},{n:95, name:'التين'},{n:96, name:'العلق'},
-                {n:97, name:'القدر'},{n:98, name:'البينة'},{n:99, name:'الزلزلة'},{n:100, name:'العاديات'},
-                {n:101, name:'القارعة'},{n:102, name:'التكاثر'},{n:103, name:'العصر'},{n:104, name:'الهمزة'},
-                {n:105, name:'الفيل'},{n:106, name:'قريش'},{n:107, name:'الماعون'},{n:108, name:'الكوثر'},
-                {n:109, name:'الكافرون'},{n:110, name:'النصر'},{n:111, name:'المسد'},{n:112, name:'الإخلاص'},
-                {n:113, name:'الفلق'},{n:114, name:'الناس'}
+                {n:1, name:'الفاتحة', a:7},{n:2, name:'البقرة', a:286},{n:3, name:'آل عمران', a:200},{n:4, name:'النساء', a:176},
+                {n:5, name:'المائدة', a:120},{n:6, name:'الأنعام', a:165},{n:7, name:'الأعراف', a:206},{n:8, name:'الأنفال', a:75},
+                {n:9, name:'التوبة', a:129},{n:10, name:'يونس', a:109},{n:11, name:'هود', a:123},{n:12, name:'يوسف', a:111},
+                {n:13, name:'الرعد', a:43},{n:14, name:'إبراهيم', a:52},{n:15, name:'الحجر', a:99},{n:16, name:'النحل', a:128},
+                {n:17, name:'الإسراء', a:111},{n:18, name:'الكهف', a:110},{n:19, name:'مريم', a:98},{n:20, name:'طه', a:135},
+                {n:21, name:'الأنبياء', a:112},{n:22, name:'الحج', a:78},{n:23, name:'المؤمنون', a:118},{n:24, name:'النور', a:64},
+                {n:25, name:'الفرقان', a:77},{n:26, name:'الشعراء', a:227},{n:27, name:'النمل', a:93},{n:28, name:'القصص', a:88},
+                {n:29, name:'العنكبوت', a:69},{n:30, name:'الروم', a:60},{n:31, name:'لقمان', a:34},{n:32, name:'السجدة', a:30},
+                {n:33, name:'الأحزاب', a:73},{n:34, name:'سبأ', a:54},{n:35, name:'فاطر', a:45},{n:36, name:'يس', a:83},
+                {n:37, name:'الصافات', a:182},{n:38, name:'ص', a:88},{n:39, name:'الزمر', a:75},{n:40, name:'غافر', a:85},
+                {n:41, name:'فصلت', a:54},{n:42, name:'الشورى', a:53},{n:43, name:'الزخرف', a:89},{n:44, name:'الدخان', a:59},
+                {n:45, name:'الجاثية', a:37},{n:46, name:'الأحقاف', a:35},{n:47, name:'محمد', a:38},{n:48, name:'الفتح', a:29},
+                {n:49, name:'الحجرات', a:18},{n:50, name:'ق', a:45},{n:51, name:'الذاريات', a:60},{n:52, name:'الطور', a:49},
+                {n:53, name:'النجم', a:62},{n:54, name:'القمر', a:55},{n:55, name:'الرحمن', a:78},{n:56, name:'الواقعة', a:96},
+                {n:57, name:'الحديد', a:29},{n:58, name:'المجادلة', a:22},{n:59, name:'الحشر', a:24},{n:60, name:'الممتحنة', a:13},
+                {n:61, name:'الصف', a:14},{n:62, name:'الجمعة', a:11},{n:63, name:'المنافقون', a:11},{n:64, name:'التغابن', a:18},
+                {n:65, name:'الطلاق', a:12},{n:66, name:'التحريم', a:12},{n:67, name:'الملك', a:30},{n:68, name:'القلم', a:52},
+                {n:69, name:'الحاقة', a:52},{n:70, name:'المعارج', a:44},{n:71, name:'نوح', a:28},{n:72, name:'الجن', a:28},
+                {n:73, name:'المزمل', a:20},{n:74, name:'المدثر', a:56},{n:75, name:'القيامة', a:40},{n:76, name:'الإنسان', a:31},
+                {n:77, name:'المرسلات', a:50},{n:78, name:'النبأ', a:40},{n:79, name:'النازعات', a:46},{n:80, name:'عبس', a:42},
+                {n:81, name:'التكوير', a:29},{n:82, name:'الإنفطار', a:19},{n:83, name:'المطففين', a:36},{n:84, name:'الإنشقاق', a:25},
+                {n:85, name:'البروج', a:22},{n:86, name:'الطارق', a:17},{n:87, name:'الأعلى', a:19},{n:88, name:'الغاشية', a:26},
+                {n:89, name:'الفجر', a:30},{n:90, name:'البلد', a:20},{n:91, name:'الشمس', a:15},{n:92, name:'الليل', a:21},
+                {n:93, name:'الضحى', a:11},{n:94, name:'الشرح', a:8},{n:95, name:'التين', a:8},{n:96, name:'العلق', a:19},
+                {n:97, name:'القدر', a:5},{n:98, name:'البينة', a:8},{n:99, name:'الزلزلة', a:8},{n:100, name:'العاديات', a:11},
+                {n:101, name:'القارعة', a:11},{n:102, name:'التكاثر', a:8},{n:103, name:'العصر', a:3},{n:104, name:'الهمزة', a:9},
+                {n:105, name:'الفيل', a:5},{n:106, name:'قريش', a:4},{n:107, name:'الماعون', a:7},{n:108, name:'الكوثر', a:3},
+                {n:109, name:'الكافرون', a:6},{n:110, name:'النصر', a:3},{n:111, name:'المسد', a:5},{n:112, name:'الإخلاص', a:4},
+                {n:113, name:'الفلق', a:5},{n:114, name:'الناس', a:6}
             ];
 
             surahs.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.n;
                 opt.textContent = s.n + '. ' + s.name;
+                opt.dataset.ayahs = s.a;
                 this.surahSelectEl.appendChild(opt);
+            });
+
+            this.surahSelectEl.addEventListener('change', () => {
+                const selected = this.surahSelectEl.options[this.surahSelectEl.selectedIndex];
+                const ayahs = selected?.dataset?.ayahs;
+                if (ayahs && this.toInputEl) {
+                    this.toInputEl.value = ayahs;
+                    this.toInputEl.max = ayahs;
+                    const hint = document.getElementById('smartMemoToHint');
+                    if (hint) {
+                        hint.textContent = 'الحد الأقصى: ' + ayahs + ' آية';
+                    }
+                } else {
+                    const hint = document.getElementById('smartMemoToHint');
+                    if (hint) {
+                        hint.textContent = '';
+                    }
+                }
             });
         }
 
@@ -317,11 +336,22 @@
                     })
                 });
 
+                if (!response.ok) {
+                    let errorText = 'فشل في تحميل الآيات (HTTP ' + response.status + ')';
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.error || errorData.message || errorText;
+                    } catch (e) {
+                        // ignore JSON parse error on error response
+                    }
+                    this.showToast(errorText, 'error');
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!data.success || !data.data || !data.data.verses || data.data.verses.length === 0) {
-                    this.showToast(data.error || 'لم يتم العثور على آيات', 'error');
-                    this.setLoadingState(false);
+                    this.showToast(data.error || data.message || 'لم يتم العثور على آيات', 'error');
                     return;
                 }
 
@@ -335,7 +365,7 @@
                 this.showToast('تم تحميل الآيات - اضغط "بدء التسميع الذكي" لإخفاء النص', 'success');
             } catch (err) {
                 console.error('[SmartMemorization] Load verses error:', err);
-                this.showToast('حدث خطأ أثناء تحميل الآيات', 'error');
+                this.showToast('حدث خطأ أثناء تحميل الآيات: ' + (err.message || 'خطأ غير معروف'), 'error');
             } finally {
                 this.setLoadingState(false);
             }
@@ -373,8 +403,13 @@
 
             this.verses.forEach((verse, vIndex) => {
                 if (!verse.text) return;
+                // Uthmani script uses hair spaces (U+200A) and word joiners (U+2060)
+                // inside words (e.g. صِرَٰطَ). Remove them before splitting so the
+                // word stays as one unit in display and matching.
+                const cleanText = verse.text
+                    .replace(/[\u2000-\u200F\u2028\u2029\u205F\u2060\uFEFF]/g, '');
                 // Split by whitespace and filter empty strings
-                const verseWords = verse.text.trim().split(/\s+/);
+                const verseWords = cleanText.trim().split(/\s+/);
                 verseWords.forEach((w) => {
                     this.words.push({
                         id: globalIndex,
@@ -516,6 +551,14 @@
          *   → do NOT reveal the spoken word
          *   → do NOT advance
          *   → user MUST say the current word correctly to proceed.
+         *
+         * SPLIT-WORD HANDLING:
+         * The Web Speech API sometimes splits a single Arabic word into
+         * multiple recognition segments (e.g. "الصراط" → "الصر" + "اط").
+         * We try matching 1, 2, or 3 consecutive spoken words against the
+         * current expected word. If the last unprocessed word looks like
+         * a prefix of the expected word, we hold it back to allow the
+         * next recognition result to complete the match.
          */
         processNewSpokenWordsIncremental() {
             const allSpokenWords = this.runningTranscript
@@ -527,35 +570,94 @@
             if (allSpokenWords.length === 0) return;
             if (allSpokenWords.length <= this.lastProcessedSpokenCount) return;
 
-            // Process ONLY the newly arrived words
-            for (let s = this.lastProcessedSpokenCount; s < allSpokenWords.length; s++) {
-                const spoken = allSpokenWords[s];
-                const match = this.findStrictWordMatch(spoken);
-
-                if (match.correct) {
-                    // ✅ Current word pronounced correctly
-                    this.words[this.currentWordIndex].revealed = true;
-                    this.words[this.currentWordIndex].error = false;
-                    this.currentWordIndex++;
-                    this.renderWords();
-                } else {
-                    // ❌ Wrong word or skipped ahead
-                    // Play error sound
-                    this.playErrorTone();
-                    // Flash current expected word in red
-                    this.flashErrorWord(this.currentWordIndex);
-                }
-
-                this.updateProgressUI();
-
+            let s = this.lastProcessedSpokenCount;
+            while (s < allSpokenWords.length) {
                 if (this.currentWordIndex >= this.words.length) {
                     this.handleCompletion();
                     return;
                 }
+
+                const expected = this.words[this.currentWordIndex].normalized;
+                let matchFound = false;
+                let wordsConsumed = 1;
+                let bestSim = 0;
+
+                // Try matching 1, 2, or 3 consecutive spoken words against
+                // the current expected word (handles recognizer split words)
+                for (let count = 1; count <= 3 && s + count <= allSpokenWords.length; count++) {
+                    const spokenSlice = allSpokenWords.slice(s, s + count);
+                    const spokenJoined = spokenSlice.join('');
+                    const spokenSpaced = spokenSlice.join(' ');
+
+                    const simJoined = this.calculateSimilarity(spokenJoined, expected);
+                    const simSpaced = this.calculateSimilarity(spokenSpaced, expected);
+                    const sim = Math.max(simJoined, simSpaced);
+
+                    if (sim > bestSim) bestSim = sim;
+
+                    const threshold = expected.length <= 3 ? 60 : expected.length <= 4 ? 65 : 70;
+
+                    if (sim >= threshold) {
+                        matchFound = true;
+                        wordsConsumed = count;
+                        break;
+                    }
+                }
+
+                if (matchFound) {
+                    // ✅ Matched (possibly across multiple spoken segments)
+                    this.words[this.currentWordIndex].revealed = true;
+                    this.words[this.currentWordIndex].error = false;
+                    this.currentWordIndex++;
+                    this.renderWords();
+                    s += wordsConsumed;
+                } else {
+                    // No match. If this is the last unprocessed spoken word
+                    // and it looks like a prefix of the expected word, hold
+                    // it back — the recognizer may have split the word and
+                    // the remaining part will arrive in the next result.
+                    const isLastWord = s + 1 >= allSpokenWords.length;
+                    const spoken = allSpokenWords[s];
+                    const isSubstantialPrefix = expected.startsWith(spoken)
+                        && spoken.length >= 3
+                        && spoken.length >= expected.length * 0.4;
+
+                    if (isLastWord && isSubstantialPrefix) {
+                        // Don't error yet; wait for more speech results
+                        break;
+                    }
+
+                    // ❌ Confirmed error
+                    this.playErrorTone();
+                    this.flashErrorWord(this.currentWordIndex);
+                    s += 1;
+                }
+
+                this.updateProgressUI();
             }
 
-            // Remember how far we've processed
-            this.lastProcessedSpokenCount = allSpokenWords.length;
+            this.lastProcessedSpokenCount = s;
+        }
+
+        /**
+         * Flush any spoken words that were held back as potential split-word
+         * prefixes. Called on silence detection or when the user gives up
+         * (e.g. presses hint). Pending words are marked as errors.
+         */
+        flushPendingWords() {
+            const allSpokenWords = this.runningTranscript
+                .trim()
+                .split(/\s+/)
+                .map(w => this.normalizeArabic(w))
+                .filter(w => w.length > 0);
+
+            while (this.lastProcessedSpokenCount < allSpokenWords.length) {
+                if (this.currentWordIndex >= this.words.length) break;
+                this.playErrorTone();
+                this.flashErrorWord(this.currentWordIndex);
+                this.lastProcessedSpokenCount++;
+                this.updateProgressUI();
+            }
         }
 
         /**
@@ -569,12 +671,15 @@
                 return { correct: false };
             }
 
-            const sim = this.calculateSimilarity(
-                spoken,
-                this.words[this.currentWordIndex].normalized
-            );
+            const expected = this.words[this.currentWordIndex].normalized;
+            const sim = this.calculateSimilarity(spoken, expected);
 
-            return { correct: sim >= 70 };
+            // Adaptive threshold: very short words need more tolerance because
+            // a single character error (e.g. 'يام' vs 'يوم') drops similarity
+            // below the standard 70% threshold.
+            const threshold = expected.length <= 3 ? 60 : expected.length <= 4 ? 65 : 70;
+
+            return { correct: sim >= threshold };
         }
 
         /**
@@ -611,11 +716,19 @@
          */
         normalizeArabic(text) {
             if (!text) return '';
+            // Remove Uthmani-script invisible separators (hair space U+200A,
+            // word joiner U+2060, etc.) that split words like "صِرَٰطَ".
+            text = text.replace(/[\u2000-\u200F\u2028\u2029\u205F\u2060\uFEFF]/g, '');
+            // Convert dagger alef (U+0670) to regular alef — in Uthmani script
+            // it represents a spoken alef (e.g. مَٰلِكِ -> مالك, صِرَٰطَ -> صراط)
+            text = text.replace(/\u0670/g, 'ا');
             // Remove tashkeel (diacritics) — required because browser speech
             // recognition does NOT return vocalized Arabic.
-            text = text.replace(/[\u064B-\u065F\u0670\u0640]/g, '');
-            // Normalize alef variants -> ا
-            text = text.replace(/[آأإا]/g, 'ا');
+            text = text.replace(/[\u064B-\u065F\u0640]/g, '');
+            // Fix: U+0670 in 'رَحْمَٰنِ' does not represent a spoken alef
+            text = text.replace(/رحمان/g, 'رحمن');
+            // Normalize alef variants -> ا (includes alef wasla U+0671)
+            text = text.replace(/[آأإٱا]/g, 'ا');
             // Normalize ta marbuta -> ت
             text = text.replace(/ة/g, 'ت');
             // Normalize alif maqsura -> ي
@@ -708,6 +821,11 @@
         onSilenceDetected() {
             if (!this.isSessionActive || this.currentWordIndex >= this.words.length) return;
 
+            // Any spoken words held back as potential split-word prefixes
+            // should now be flushed as errors — the user has paused long enough
+            // that the recognizer is unlikely to complete the word.
+            this.flushPendingWords();
+
             // Show hint button with gentle pulse animation
             this.hintBtnEl.classList.remove('d-none');
             this.hintBtnEl.classList.add('hint-pulse');
@@ -720,6 +838,9 @@
          */
         revealNextWordAsHint() {
             if (!this.isSessionActive || this.currentWordIndex >= this.words.length) return;
+
+            // Discard any pending spoken words — user gave up on this word
+            this.flushPendingWords();
 
             const wordObj = this.words[this.currentWordIndex];
             wordObj.revealed = true;

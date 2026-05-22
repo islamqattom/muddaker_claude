@@ -146,7 +146,13 @@
             const verseRefEl = document.getElementById('ruleDetailVerseRef');
 
             if (data.example_verse && data.example_verse.text) {
-                if (verseEl) verseEl.textContent = data.example_verse.text;
+                if (verseEl) {
+                    if (data.rule.colored_examples && data.rule.colored_examples[0]) {
+                        verseEl.innerHTML = `<span class="tajweed-example-text">${data.rule.colored_examples[0]}</span>`;
+                    } else {
+                        verseEl.textContent = data.example_verse.text;
+                    }
+                }
                 if (verseRefEl) {
                     const surahName = window.SURAH_INFO?.[data.example_verse.surah]?.name || `سورة ${data.example_verse.surah}`;
                     verseRefEl.textContent = `${surahName} - الآية ${data.example_verse.verse_number}`;
@@ -161,14 +167,22 @@
 
             if (data.rule.examples && examplesList) {
                 try {
-                    const examples = typeof data.rule.examples === 'string'
+                    let examples = typeof data.rule.examples === 'string'
                         ? JSON.parse(data.rule.examples)
                         : data.rule.examples;
 
+                    let coloredExamples = [];
+                    if (data.rule.colored_examples) {
+                        coloredExamples = typeof data.rule.colored_examples === 'string'
+                            ? JSON.parse(data.rule.colored_examples)
+                            : data.rule.colored_examples;
+                    }
+
                     if (Array.isArray(examples) && examples.length > 0) {
-                        examplesList.innerHTML = examples.map(ex =>
-                            `<li class="list-group-item">${ex}</li>`
-                        ).join('');
+                        examplesList.innerHTML = examples.map((ex, idx) => {
+                            const colored = coloredExamples[idx] || ex;
+                            return `<li class="list-group-item"><span class="tajweed-example-text">${colored}</span></li>`;
+                        }).join('');
                         if (examplesSection) examplesSection.style.display = 'block';
                     } else {
                         if (examplesSection) examplesSection.style.display = 'none';

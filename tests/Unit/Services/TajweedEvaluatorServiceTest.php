@@ -144,6 +144,28 @@ class TajweedEvaluatorServiceTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function test_normalize_arabic_normalizes_alef_wasla(): void
+    {
+        // Alef wasla (ٱ U+0671) is normalized to plain alef (ا)
+        $input = 'ٱلله';
+        $expected = 'الله';
+
+        $result = $this->service->normalizeArabic($input);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_normalize_arabic_normalizes_alef_wasla_in_phrase(): void
+    {
+        // Bismillah with alef wasla on al-rahman and al-rahim
+        $input = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+        $expected = 'بسم الله الرحمن الرحيم';
+
+        $result = $this->service->normalizeArabic($input);
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function test_calculate_similarity_identical_strings(): void
     {
         $result = $this->service->calculateSimilarity('بسم', 'بسم');

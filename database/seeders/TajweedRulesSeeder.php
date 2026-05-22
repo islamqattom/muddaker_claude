@@ -21,16 +21,18 @@ class TajweedRulesSeeder extends Seeder
                 'description' => 'أقصى الحلق، من الجوف. وهو أبعد الحروف عن الفم. يُنطق بانفتاح الحلقوم دون شدّة ولا ضغط.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 1,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:21',
+                'examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
+                'colored_examples' => ['<span class="tajweed-hamza">يَـ</span>َ <span class="tajweed-hamza">أ</span>َيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
             ],
             [
                 'name' => 'مخرج حرف الباء',
                 'description' => 'من الشفتين مع اجتماعهما برفق، مع خروج النفس. حرف شفويّ انفجاريّ مهموس.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 2,
-                'example_verse_key' => '2:255',
-                'examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
+                'example_verse_key' => '2:21',
+                'examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
+                'colored_examples' => ['يَا أَيُّهَا النَّاسُ اعْ<span class="tajweed-ba">بُ</span>دُوا رَبَّكُمُ'],
             ],
             [
                 'name' => 'مخرج حرف التاء',
@@ -39,6 +41,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 3,
                 'example_verse_key' => '2:23',
                 'examples' => ['وَكَذَٰلِكَ أَنزَلْنَا إِلَيْكَ الْكِتَابَ'],
+                'colored_examples' => ['وَكَذَٰلِكَ أَنزَلْنَا إِلَ<span class="tajweed-ta">يْ</span>كَ الْكِتَابَ'],
             ],
             [
                 'name' => 'مخرج حرف الثاء',
@@ -47,6 +50,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 4,
                 'example_verse_key' => '3:18',
                 'examples' => ['شَهِدَ اللَّهُ أَنَّهُ لَا إِلَٰهَ إِلَّا هُوَ'],
+                'colored_examples' => ['شَ<span class="tajweed-tha">هِ</span>دَ اللَّهُ أَنَّهُ لَا إِلَٰهَ إِلَّا هُوَ'],
             ],
             [
                 'name' => 'مخرج حرف الجيم',
@@ -54,23 +58,26 @@ class TajweedRulesSeeder extends Seeder
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 5,
                 'example_verse_key' => '2:46',
-                'examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُو رَبِّهِمْ'],
+                'examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُوا رَبِّهِمْ'],
+                'colored_examples' => ['الَّذِينَ يَ<span class="tajweed-jeem">ظُنُّونَ</span> أَنَّهُم مُّلَاقُوا رَبِّهِمْ'],
             ],
             [
                 'name' => 'مخرج حرف الحاء',
                 'description' => 'أقصى وسط اللسان مع ما يُحاذيه من الحنك الأعلى. حرف لثويّ أقصى وسطيّ.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 6,
-                'example_verse_key' => '1:1',
-                'examples' => ['الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'],
+                'example_verse_key' => '2:256',
+                'examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
+                'colored_examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْ<span class="tajweed-ha">حَ</span>يُّ الْقَيُّومُ'],
             ],
             [
                 'name' => 'مخرج حرف الخاء',
                 'description' => 'أقصى اللسان مع ما يُحاذيه من الحنك الأعلى. حرف لثويّ أقصى. يشارك الغين في المخرج ويفارقها في الصفة (الخاء مهموسة).',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 7,
-                'example_verse_key' => '1:1',
-                'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:22',
+                'examples' => ['الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
+                'colored_examples' => ['الَّذِي جَعَلَ لَ<span class="tajweed-kha">كُ</span>مُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
             ],
             [
                 'name' => 'مخرج حرف الدال',
@@ -79,6 +86,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 8,
                 'example_verse_key' => '2:47',
                 'examples' => ['يَا بَنِي إِسْرَائِيلَ'],
+                'colored_examples' => ['يَا بَ<span class="tajweed-dal">نِ</span>ي إِسْرَائِيلَ'],
             ],
             [
                 'name' => 'مخرج حرف الذال',
@@ -87,14 +95,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 9,
                 'example_verse_key' => '3:118',
                 'examples' => ['لَا يَأْلُونَكُمْ خَبَالًا'],
+                'colored_examples' => ['لَا يَأْلُونَكُمْ خَ<span class="tajweed-dhal">بَ</span>الًا'],
             ],
             [
                 'name' => 'مخرج حرف الراء',
                 'description' => 'من طرف اللسان مع ما يُحاذيه من الحنك الأعلى (أقرب من الخاء). حرف لثويّ حافيّ.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 10,
-                'example_verse_key' => '1:1',
-                'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:23',
+                'examples' => ['وَإِن كُنتُمْ فِي رَيْبٍ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا'],
+                'colored_examples' => ['وَإِن كُنتُمْ فِي <span class="tajweed-ra">رَيْبٍ</span> مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا'],
             ],
             [
                 'name' => 'مخرج حرف الزاي',
@@ -103,6 +113,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 11,
                 'example_verse_key' => '2:125',
                 'examples' => ['وَاتَّخَذُوا مِن مَّقَامِ إِبْرَاهِيمَ مُصَلًّى'],
+                'colored_examples' => ['وَاتَّخَذُوا مِن مَّقَامِ إِبْرَاهِيمَ مُ<span class="tajweed-zay">صَ</span>لىٰ'],
             ],
             [
                 'name' => 'مخرج حرف السين',
@@ -111,6 +122,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 12,
                 'example_verse_key' => '1:7',
                 'examples' => ['صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ'],
+                'colored_examples' => ['<span class="tajweed-seen">صِ</span>رَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ'],
             ],
             [
                 'name' => 'مخرج حرف الشين',
@@ -119,6 +131,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 13,
                 'example_verse_key' => '2:185',
                 'examples' => ['شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ'],
+                'colored_examples' => ['<span class="tajweed-sheeen">شَ</span>هْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ'],
             ],
             [
                 'name' => 'مخرج حرف الصاد',
@@ -127,6 +140,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 14,
                 'example_verse_key' => '1:6',
                 'examples' => ['اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'],
+                'colored_examples' => ['اهْدِنَا <span class="tajweed-sad">صِ</span>رَاطَ الْمُسْتَقِيمَ'],
             ],
             [
                 'name' => 'مخرج حرف الضاد',
@@ -135,6 +149,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 15,
                 'example_verse_key' => '2:27',
                 'examples' => ['الَّذِينَ يَنقُضُونَ عَهْدَ اللَّهِ مِن بَعْدِ مِيثَاقِهِ'],
+                'colored_examples' => ['الَّذِينَ يَنقُضُونَ عَهْدَ اللَّهِ مِن بَعْدِ مِيثَاقِهِ'],
             ],
             [
                 'name' => 'مخرج حرف الطاء',
@@ -143,6 +158,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 16,
                 'example_verse_key' => '2:45',
                 'examples' => ['وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ'],
+                'colored_examples' => ['وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَ<span class="tajweed-tah">اةِ</span>'],
             ],
             [
                 'name' => 'مخرج حرف الظاء',
@@ -151,14 +167,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 17,
                 'example_verse_key' => '2:19',
                 'examples' => ['أَوْ كَصَيِّبٍ مِّنَ السَّمَاءِ فِيهِ ظُلُمَاتٌ'],
+                'colored_examples' => ['أَوْ كَصَيِّبٍ مِّنَ السَّمَاءِ فِيهِ <span class="tajweed-dha">ظُ</span>لُمَاتٌ'],
             ],
             [
                 'name' => 'مخرج حرف العين',
                 'description' => 'من أوسط الحلق (وسط الجوف). حرف حلقيّ أوسط. يُنطق بانضغاط الحلق الأوسط.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 18,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:21',
+                'examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
+                'colored_examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
             ],
             [
                 'name' => 'مخرج حرف الغين',
@@ -167,6 +185,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 19,
                 'example_verse_key' => '2:35',
                 'examples' => ['وَقُلْنَا يَا آدَمُ اسْكُنْ أَنتَ وَزَوْجُكَ الْجَنَّةَ'],
+                'colored_examples' => ['وَقُلْنَا يَا آدَمُ اسْكُنْ أَنتَ وَزَوْجُكَ الْجَنَّةَ'],
             ],
             [
                 'name' => 'مخرج حرف الفاء',
@@ -175,6 +194,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 20,
                 'example_verse_key' => '2:22',
                 'examples' => ['فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ'],
+                'colored_examples' => ['<span class="tajweed-fa">فَ</span>اطِرَ السَّمَاوَاتِ وَالْأَرْضِ'],
             ],
             [
                 'name' => 'مخرج حرف القاف',
@@ -183,6 +203,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 21,
                 'example_verse_key' => '2:21',
                 'examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
+                'colored_examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
             ],
             [
                 'name' => 'مخرج حرف الكاف',
@@ -191,6 +212,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 22,
                 'example_verse_key' => '2:25',
                 'examples' => ['وَبَشِّرِ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ'],
+                'colored_examples' => ['وَبَشِّرِ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ'],
             ],
             [
                 'name' => 'مخرج حرف اللام',
@@ -199,6 +221,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 23,
                 'example_verse_key' => '1:1',
                 'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
             [
                 'name' => 'مخرج حرف الميم',
@@ -207,6 +230,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 24,
                 'example_verse_key' => '1:1',
                 'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
             [
                 'name' => 'مخرج حرف النون',
@@ -215,6 +239,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 25,
                 'example_verse_key' => '1:6',
                 'examples' => ['اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'],
+                'colored_examples' => ['اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'],
             ],
             [
                 'name' => 'مخرج حرف الهاء',
@@ -223,22 +248,25 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 26,
                 'example_verse_key' => '1:2',
                 'examples' => ['الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'],
+                'colored_examples' => ['الْحَمْدُ لِلَّ<span class="tajweed-ha">هِ</span> رَبِّ الْعَالَمِينَ'],
             ],
             [
                 'name' => 'مخرج حرف الواو',
                 'description' => 'من الشفتين مع تدويرهما (مَضْمُومَتَيْنِ). حرف شفويّ لين.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 27,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:21',
+                'examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
+                'colored_examples' => ['يَا أَيُّهَا النَّاسُ اعْبُدُوا رَبَّكُمُ'],
             ],
             [
                 'name' => 'مخرج حرف الياء',
                 'description' => 'من وسط اللسان مع ما يُحاذيه من الحنك الأعلى (مكسورتين). حرف لثويّ وسطيّ لين.',
                 'category' => TajweedRuleDefinition::CATEGORY_MAKHRAJ,
                 'order' => 28,
-                'example_verse_key' => '1:2',
-                'examples' => ['الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'],
+                'example_verse_key' => '2:25',
+                'examples' => ['وَبَشِّرِ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ'],
+                'colored_examples' => ['وَبَشِّرِ الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ'],
             ],
             [
                 'name' => 'مخرج حرف المد (الألف المدية)',
@@ -247,8 +275,10 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 29,
                 'example_verse_key' => '1:1',
                 'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
-
+// ============================
+            // صفات الحروف
             // ============================
             // صفات الحروف
             // ============================
@@ -257,40 +287,45 @@ class TajweedRulesSeeder extends Seeder
                 'description' => 'إعلاء الصوت بحيث يُسمع للحرف صوت عند النطق به. الحروف المجهورة: ب ج د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ه و ي (الجيم والشين والصاد والضاد والطاء والظاء ساكنة فقط).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 100,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:23',
+                'examples' => ['وَإِن كُنتُمْ فِي رَيْبٍ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا فَأْتُوا بِسُورَةٍ مِّن مِّثْلِهِ'],
+                'colored_examples' => ['وَإِن كُنتُمْ فِي رَيْبٍ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا فَأْتُوا بِسُورَةٍ مِّن مِّثْلِهِ'],
             ],
             [
                 'name' => 'صفة الهمس',
                 'description' => 'جريان النفس عند النطق بالحرف. الحروف المهموسة: ف ح ث ه ش خ ص س ك ت (عدا الجيم والشين والصاد والضاد والطاء والظاء).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 101,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:22',
+                'examples' => ['الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
+                'colored_examples' => ['الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
             ],
             [
                 'name' => 'صفة الشدة (الاستعلاء)',
                 'description' => 'منع مخرج الحرف من الانفتاح وضغطه. الحروف الشديدة: أجْدَ قِطْ بَكَتْ (ألف همزة-الجيم-الدال-القاف-الطاء-الباء-الكاف-التاء).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 102,
-                'example_verse_key' => '2:2',
-                'examples' => ['ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ'],
+                'example_verse_key' => '2:19',
+                'examples' => ['أَوۡ كَصَیِّبࣲ مِّنَ السَّمَاۤءِ فِیهِ ظُلُمَـٰتࣱ وَرَعۡدࣱ وَبَرۡقࣱ'],
+                'colored_examples' => ['أَوْ كَصَيِّبٍ مِّنَ السَّمَاءِ فِيهِ ظُلُمَاتٌ وَرَعْدٌ وَبَرْقٌ'],
             ],
             [
                 'name' => 'صفة الرخاوة',
                 'description' => 'بقاء جزء من الصوت والنفس عند النطق بالحرف. الحروف الرخوة: باقي الحروف (عدا الشديدة واللينة).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 103,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:255',
+                'examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
+                'colored_examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
             ],
             [
                 'name' => 'صفة الاستعلاء',
                 'description' => 'ارتفاع اللسان إلى الحنك عند النطق بالحرف. الحروف المستعلية: خُصَّ ضَغْطٍ قِظْ (الخاء-الصاد-الضاد-الغين-الطاء-القاف-الظاء).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 104,
-                'example_verse_key' => '1:1',
-                'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:22',
+                'examples' => ['الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
+                'colored_examples' => ['الَّذِي جَعَلَ لَكُمُ الْأَرْضَ فِرَاشًا وَالسَّمَاءَ بِنَاءً'],
             ],
             [
                 'name' => 'صفة الاستفال',
@@ -299,6 +334,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 105,
                 'example_verse_key' => '1:2',
                 'examples' => ['الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ'],
+                'colored_examples' => ['الْحَمْدُ لِلَّ<span class="tajweed-ha">هِ</span> رَبِّ الْعَالَمِينَ'],
             ],
             [
                 'name' => 'صفة الإطباق',
@@ -307,22 +343,25 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 106,
                 'example_verse_key' => '1:6',
                 'examples' => ['اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'],
+                'colored_examples' => ['اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'],
             ],
             [
                 'name' => 'صفة الانفتاح',
                 'description' => 'بقاء اللسان منخفضاً عن الحنك. باقي الحروف غير المطبقة.',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 107,
-                'example_verse_key' => '1:1',
-                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'example_verse_key' => '2:255',
+                'examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
+                'colored_examples' => ['اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'],
             ],
             [
                 'name' => 'صفة الإذلاق',
                 'description' => 'جريان الصوت سريعاً عند النطق. الحروف المذلقة: فِرَّ مِنْ لُبٍّ (الفاء-الراء-الميم-النون-اللام-الباء).',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 108,
-                'example_verse_key' => '2:36',
-                'examples' => ['فَتَلَقَّى آدَمُ مِن رَّبِّهِ كَلِمَاتٍ'],
+                'example_verse_key' => '2:46',
+                'examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُوا رَبِّهِمْ وَأَنَّهُمْ إِلَيْهِ رَاجِعُونَ'],
+                'colored_examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُوا رَبِّهِمْ وَأَنَّهُمْ إِلَيْهِ رَاجِعُونَ'],
             ],
             [
                 'name' => 'صفة الإصمات',
@@ -331,14 +370,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 109,
                 'example_verse_key' => '2:30',
                 'examples' => ['وَإِذْ قَالَ رَبُّكَ لِلْمَلَائِكَةِ'],
+                'colored_examples' => ['وَإِذْ قَالَ رَبُّكَ لِلْمَلَائِكَةِ'],
             ],
             [
                 'name' => 'صفة اللين',
                 'description' => 'سهولة النطق بالحرف. حروف اللين: الواو الساكنة المضمومة ما قبلها، والياء الساكنة المكسورة ما قبلها.',
                 'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 110,
-                'example_verse_key' => '2:11',
-                'examples' => ['قَالُوا لَن نَّدْخُلَهَا أَبَدًا'],
+                'example_verse_key' => '2:46',
+                'examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُوا رَبِّهِمْ'],
+                'colored_examples' => ['الَّذِينَ يَظُنُّونَ أَنَّهُم مُّلَاقُوا رَبِّهِمْ'],
             ],
 
             // ============================
@@ -351,6 +392,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 200,
                 'example_verse_key' => '1:5',
                 'examples' => ['إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ'],
+                'colored_examples' => ['إِيَّاكَ <span class="tajweed-noon-sakin">نَ</span>عْبُدُ وَإِيَّاكَ <span class="tajweed-noon-sakin">نَ</span>سْتَعِينُ'],
             ],
             [
                 'name' => 'الإدغام بغنة',
@@ -359,6 +401,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 201,
                 'example_verse_key' => '2:8',
                 'examples' => ['مِنَ النَّاسِ مَن يَقُولُ آمَنَّا بِاللَّهِ'],
+                'colored_examples' => ['مِنَ النَّاسِ مَن يَقُولُ آمَنَّا بِاللَّهِ'],
             ],
             [
                 'name' => 'الإدغام بلا غنة',
@@ -367,6 +410,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 202,
                 'example_verse_key' => '2:10',
                 'examples' => ['قُلْ هَلْ نُنَبِّئُكُمْ بِالْأَخْسَرِينَ أَعْمَالًا'],
+                'colored_examples' => ['قُلْ هَلْ نُنَبِّئُكُمْ بِالْأَخْسَرِينَ أَعْمَالًا'],
             ],
             [
                 'name' => 'الإقلاب',
@@ -375,6 +419,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 203,
                 'example_verse_key' => '2:8',
                 'examples' => ['يُخَادِعُونَ اللَّهَ وَالَّذِينَ آمَنُوا'],
+                'colored_examples' => ['يُخَادِعُونَ اللَّهَ وَالَّذِينَ آمَنُوا'],
             ],
             [
                 'name' => 'الإخفاء الحقيقي',
@@ -383,6 +428,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 204,
                 'example_verse_key' => '2:6',
                 'examples' => ['إِنَّ الَّذِينَ كَفَرُوا سَوَاءٌ عَلَيْهِمْ'],
+                'colored_examples' => ['إِنَّ الَّذِينَ كَفَرُوا سَوَاءٌ عَلَيْهِمْ'],
             ],
 
             // ============================
@@ -393,8 +439,9 @@ class TajweedRulesSeeder extends Seeder
                 'description' => 'إخفاء الميم الساكنة عند الباء، مع بقاء الغنة الشفوية.',
                 'category' => TajweedRuleDefinition::CATEGORY_MEEM_SAKIN,
                 'order' => 300,
-                'example_verse_key' => '2:14',
-                'examples' => ['وَإِذَا لَقُوا الَّذِينَ آمَنُوا قَالُوا آمَنَّا'],
+                'example_verse_key' => '2:19',
+                'examples' => ['أَوۡ كَصَیِّبࣲ مِّنَ السَّمَاۤءِ فِیهِ ظُلُمَـٰتࣱ'],
+                'colored_examples' => ['أَوْ كَصَيِّبٍ مِّنَ السَّمَاءِ فِيهِ ظُلُمَاتٌ'],
             ],
             [
                 'name' => 'الإدغام الشفوي المتماثل',
@@ -403,6 +450,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 301,
                 'example_verse_key' => '2:7',
                 'examples' => ['خَتَمَ اللَّهُ عَلَىٰ قُلُوبِهِمْ وَعَلَىٰ سَمْعِهِمْ'],
+                'colored_examples' => ['خَتَمَ اللَّهُ عَلَىٰ قُلُوبِهِمْ وَعَلَىٰ سَمْعِهِمْ'],
             ],
             [
                 'name' => 'الإظهار الشفوي',
@@ -411,6 +459,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 302,
                 'example_verse_key' => '2:23',
                 'examples' => ['وَإِن كُنتُمْ فِي رَيْبٍ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا'],
+                'colored_examples' => ['وَإِن كُنتُمْ فِي رَيْبٍ مِّمَّا نَزَّلْنَا عَلَىٰ عَبْدِنَا'],
             ],
 
             // ============================
@@ -423,6 +472,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 400,
                 'example_verse_key' => '1:1',
                 'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
             [
                 'name' => 'المد المتصل',
@@ -431,14 +481,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 401,
                 'example_verse_key' => '2:2',
                 'examples' => ['ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ'],
+                'colored_examples' => ['ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ'],
             ],
             [
                 'name' => 'المد المنفصل',
-                'description' => 'إذا وقع حرف المد في آخر الكمة والساكن في أول الكلمة التالية. مقداره أربع أو خمس حركات (أو أربع ونصف).',
+                'description' => 'إذا وقع حرف المد في آخر الكلمة والساكن في أول الكلمة التالية. مقداره أربع أو خمس حركات (أو أربع ونصف).',
                 'category' => TajweedRuleDefinition::CATEGORY_MADD,
                 'order' => 402,
                 'example_verse_key' => '36:52',
                 'examples' => ['قَالُوا يَا وَيْلَنَا مَن بَعَثَنَا مِن مَّرْقَدِنَا'],
+                'colored_examples' => ['قَالُوا يَا وَيْلَنَا مَن بَعَثَنَا مِن مَّرْقَدِنَا'],
             ],
             [
                 'name' => 'مد البدل',
@@ -447,6 +499,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 403,
                 'example_verse_key' => '2:75',
                 'examples' => ['أَتُؤْمِنُونَ بِبَعْضِ الْكِتَابِ وَتَكْفُرُونَ بِبَعْضٍ'],
+                'colored_examples' => ['أَتُؤْمِنُونَ بِبَعْضِ الْكِتَابِ وَتَكْفُرُونَ بِبَعْضٍ'],
             ],
             [
                 'name' => 'المد اللازم',
@@ -455,6 +508,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 404,
                 'example_verse_key' => '2:10',
                 'examples' => ['قُلْ هَلْ نُنَبِّئُكُمْ بِالْأَخْسَرِينَ أَعْمَالًا'],
+                'colored_examples' => ['قُلْ هَلْ نُنَبِّئُكُمْ بِالْأَخْسَرِينَ أَعْمَالًا'],
             ],
             [
                 'name' => 'المد العارض للسكون',
@@ -463,14 +517,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 405,
                 'example_verse_key' => '1:4',
                 'examples' => ['مَالِكِ يَوْمِ الدِّينِ'],
+                'colored_examples' => ['مَالِكِ يَوْمِ الدِّينِ'],
             ],
             [
                 'name' => 'مد الصلة الصغرى',
                 'description' => 'المد الذي يقع بين همزة الوصل وحرف المد في بداية الكلمة. مقداره حركتان.',
                 'category' => TajweedRuleDefinition::CATEGORY_MADD,
                 'order' => 406,
-                'example_verse_key' => '2:1',
-                'examples' => ['الم (ذَٰلِكَ الْكِتَابُ)'],
+                'example_verse_key' => '12:1',
+                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ الۤمۤ'],
+                'colored_examples' => ['بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ الۤمۤ'],
             ],
             [
                 'name' => 'مد الصلة الكبرى',
@@ -479,6 +535,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 407,
                 'example_verse_key' => '2:217',
                 'examples' => ['يَسْأَلُونَكَ عَنِ الشَّهْرِ الْحَرَامِ'],
+                'colored_examples' => ['يَسْأَلُونَكَ عَنِ الشَّهْرِ الْحَرَامِ'],
             ],
 
             // ============================
@@ -487,18 +544,20 @@ class TajweedRulesSeeder extends Seeder
             [
                 'name' => 'اللام الشمسية',
                 'description' => 'اللام التي تُكتب ولا تُنطق. تسبق حروف الشمسية (ت ث د ذ ر ز س ش ص ض ط ظ ل ن). الحروف الشمسية: طِبْ ثُمَّ صِلْ رُحْمًا تَفُزْ ضِفْ ذَا نُجْحٍ شَرَفًا لَكَ (14 حرفاً).',
-                'category' => TajweedRuleDefinition::CATEGORY_MADD,
+                'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 500,
                 'example_verse_key' => '1:1',
                 'examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
             [
                 'name' => 'اللام القمرية',
                 'description' => 'اللام التي تُكتب وتُنطق. تسبق باقي الحروف (غير الشمسية).',
-                'category' => TajweedRuleDefinition::CATEGORY_MADD,
+                'category' => TajweedRuleDefinition::CATEGORY_SIFAT,
                 'order' => 501,
                 'example_verse_key' => '2:1',
                 'examples' => ['الْبَقَرَةِ'],
+                'colored_examples' => ['الْبَقَرَةِ'],
             ],
 
             // ============================
@@ -511,6 +570,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 600,
                 'example_verse_key' => '2:74',
                 'examples' => ['أَوْ يَأْتِيَهُمْ عَذَابٌ غَيْرُ مُهْتَدٍ'],
+                'colored_examples' => ['أَوْ يَأْتِيَهُمْ عَذَابٌ غَيْرُ مُهْتَدٍ'],
             ],
 
             // ============================
@@ -521,16 +581,18 @@ class TajweedRulesSeeder extends Seeder
                 'description' => 'الوقف على آخر الكلمة بحيث يكون المعنى تاماً ولا يتوقف على أحد معانٍ المتشابهات.',
                 'category' => TajweedRuleDefinition::CATEGORY_WAQF,
                 'order' => 700,
-                'example_verse_key' => '2:1',
-                'examples' => ['الم (ذَٰلِكَ الْكِتَابُ)'],
+                'example_verse_key' => '12:1',
+                'examples' => ['بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ الۤمۤ'],
+                'colored_examples' => ['بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ الۤمۤ'],
             ],
             [
                 'name' => 'الوقف الممنوع',
                 'description' => 'الوقف الذي يُمنع لفساد المعنى أو لارتباط الكلام بعضه ببعض.',
                 'category' => TajweedRuleDefinition::CATEGORY_WAQF,
                 'order' => 701,
-                'example_verse_key' => '2:2',
-                'examples' => ['ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ'],
+                'example_verse_key' => '2:27',
+                'examples' => ['الَّذِينَ يَنقُضُونَ عَهْدَ اللَّهِ مِن بَعْدِ مِيثَاقِهِ'],
+                'colored_examples' => ['الَّذِينَ يَنقُضُونَ عَهْدَ اللَّهِ مِن بَعْدِ مِيثَاقِهِ'],
             ],
             [
                 'name' => 'الوقف الجائز',
@@ -539,6 +601,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 702,
                 'example_verse_key' => '2:3',
                 'examples' => ['الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ'],
+                'colored_examples' => ['الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ'],
             ],
             [
                 'name' => 'السكت',
@@ -547,6 +610,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 703,
                 'example_verse_key' => '2:6',
                 'examples' => ['إِنَّ الَّذِينَ كَفَرُوا سَوَاءٌ عَلَيْهِمْ'],
+                'colored_examples' => ['إِنَّ الَّذِينَ كَفَرُوا سَوَاءٌ عَلَيْهِمْ'],
             ],
 
             // ============================
@@ -559,6 +623,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 800,
                 'example_verse_key' => '1:1',
                 'examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
+                'colored_examples' => ['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'],
             ],
             [
                 'name' => 'أقسام الغنة',
@@ -567,6 +632,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 801,
                 'example_verse_key' => '2:8',
                 'examples' => ['مِنَ النَّاسِ مَن يَقُولُ آمَنَّا بِاللَّهِ'],
+                'colored_examples' => ['مِنَ النَّاسِ مَن يَقُولُ آمَنَّا بِاللَّهِ'],
             ],
 
             // ============================
@@ -579,14 +645,16 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 900,
                 'example_verse_key' => '2:7',
                 'examples' => ['خَتَمَ اللَّهُ عَلَىٰ قُلُوبِهِمْ وَعَلَىٰ سَمْعِهِمْ'],
+                'colored_examples' => ['خَتَمَ اللَّهُ عَلَىٰ قُلُوبِهِمْ وَعَلَىٰ سَمْعِهِمْ'],
             ],
             [
                 'name' => 'الإدغام المتقارب',
                 'description' => 'إدغام حرف في متقاربه (متقاربان في المخرج أو في الصفة)، مثل اللام في الراء أو الراء في اللام.',
                 'category' => TajweedRuleDefinition::CATEGORY_IDGHAM,
                 'order' => 901,
-                'example_verse_key' => '2:14',
-                'examples' => ['وَإِذَا لَقُوا الَّذِينَ آمَنُوا قَالُوا آمَنَّا'],
+                'example_verse_key' => '2:47',
+                'examples' => ['يَا بَنِي إِسْرَائِيلَ'],
+                'colored_examples' => ['يَا بَنِي إِسْرَائِيلَ'],
             ],
             [
                 'name' => 'الإدغام المتجانس',
@@ -595,6 +663,7 @@ class TajweedRulesSeeder extends Seeder
                 'order' => 902,
                 'example_verse_key' => '2:142',
                 'examples' => ['سَيَقُولُ السُّفَهَاءُ مِنَ النَّاسِ'],
+                'colored_examples' => ['سَيَقُولُ السُّفَهَاءُ مِنَ النَّاسِ'],
             ],
         ];
 
@@ -602,6 +671,10 @@ class TajweedRulesSeeder extends Seeder
             TajweedRuleDefinition::create($rule);
         }
 
-        $this->command->info('✅ تم إدخال ' . count($rules) . ' قاعدة تجويد بنجاح!');
+        if ($this->command) {
+            $this->command->info('✅ تم إدخال ' . count($rules) . ' قاعدة تجويد بنجاح!');
+        } else {
+            echo "✅ تم إدخال " . count($rules) . " قاعدة تجويد بنجاح!\n";
+        }
     }
 }

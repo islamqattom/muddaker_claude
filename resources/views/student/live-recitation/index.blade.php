@@ -13,8 +13,18 @@
 
 @php
 $user = Auth::user();
-$token = $user->currentAccessToken();
-$apiToken = $token ? $token->token : null;
+// Clean up old page tokens (keep max 5)
+$tokenCount = $user->tokens()->where('name', 'like', 'live-recitation-page-%')->count();
+if ($tokenCount >= 5) {
+    $user->tokens()
+        ->where('name', 'like', 'live-recitation-page-%')
+        ->orderBy('created_at', 'asc')
+        ->limit($tokenCount - 4)
+        ->delete();
+}
+// Create a fresh Sanctum token for the page (currentAccessToken returns hashed token which is unusable)
+$tokenResult = $user->createToken('live-recitation-page-' . time());
+$apiToken = $tokenResult->plainTextToken;
 @endphp
 
 @if($apiToken)

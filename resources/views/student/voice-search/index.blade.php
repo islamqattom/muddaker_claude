@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="{{ asset('css/student/tarteel-center.css') }}?v={{ time() }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<meta name="voice-search-url" content="{{ route('api.student.tarteel.voice-search') }}">
+<meta name="voice-search-url" content="{{ config('app.url') }}/api/student/tarteel/voice-search">
 
 <div class="recitation-wrapper">
     <div class="card mb-4">

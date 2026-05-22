@@ -247,13 +247,23 @@ class TajweedEvaluatorService
      */
     public function normalizeArabic(string $text): string
     {
+        // Remove Uthmani-script invisible separators (hair space U+200A,
+        // word joiner U+2060, etc.) that split words like "صِرَٰطَ".
+        $text = preg_replace('/[\x{2000}-\x{200F}\x{2028}\x{2029}\x{205F}\x{2060}\x{FEFF}]/u', '', $text);
+
+        // Convert dagger alef (U+0670) to regular alef — in Uthmani script
+        // it represents a spoken alef (e.g. مَٰلِكِ -> مالك, صِرَٰطَ -> صراط)
+        $text = str_replace("\u{0670}", 'ا', $text);
+
         // Remove diacritics (tashkeel) - Unicode ranges for Arabic diacritics
         // \x{064B}-\x{065F}: Fatha through Tanween Fath, Damatan, Kasratan, Fatha, Damma, Kasra, Sukun, Shadda
-        // \x{0670}: Dagger alef
-        $text = preg_replace('/[\x{064B}-\x{065F}\x{0670}]/u', '', $text);
+        $text = preg_replace('/[\x{064B}-\x{065F}]/u', '', $text);
 
-        // Normalize alef variations
-        $text = preg_replace('/[إأآا]/u', 'ا', $text);
+        // Fix: U+0670 in 'رَحْمَٰنِ' does not represent a spoken alef
+        $text = str_replace('رحمان', 'رحمن', $text);
+
+        // Normalize alef variations (includes alef wasla U+0671)
+        $text = preg_replace('/[إأآٱا]/u', 'ا', $text);
 
         // Normalize teh marbuta (ة) to teh (ت)
         $text = str_replace('ة', 'ت', $text);
