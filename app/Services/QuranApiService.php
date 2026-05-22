@@ -883,6 +883,8 @@ public function searchVerse(string $query): array
             $json = $response->json();
             $matches = $json['data']['matches'] ?? [];
 
+            Log::info('QuranApiService: Found matches', ['count' => count($matches)]);
+
             // Fetch actual verse texts with Uthmani edition
             $results = [];
             foreach ($matches as $match) {
@@ -892,6 +894,7 @@ public function searchVerse(string $query): array
                 if ($surahNum && $verseNum) {
                     $verseKey = "$surahNum:$verseNum";
                     $verseData = $this->getVerseText($verseKey);
+                    Log::info('QuranApiService: Got verse text', ['key' => $verseKey, 'text_length' => strlen($verseData)]);
                     $results[] = [
                         'surah' => $surahNum,
                         'surah_name' => $surah['name'] ?? $this->getSurahName($surahNum),
@@ -900,6 +903,8 @@ public function searchVerse(string $query): array
                     ];
                 }
             }
+
+            Log::info('QuranApiService: Final results', ['count' => count($results)]);
 
             return $results;
         });
