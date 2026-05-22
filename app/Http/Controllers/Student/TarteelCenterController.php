@@ -251,6 +251,8 @@ class TarteelCenterController extends Controller
         try {
             $searchResults = $this->quranApiService->searchVerse($query);
 
+            Log::info('Voice search completed', ['query' => $query, 'results_count' => count($searchResults)]);
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -258,6 +260,7 @@ class TarteelCenterController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
+            Log::error('Voice search failed', ['query' => $query, 'error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
                 'error' => 'Search failed: ' . $e->getMessage(),

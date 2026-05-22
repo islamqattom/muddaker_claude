@@ -153,17 +153,22 @@
             });
 
             const data = await response.json();
+            console.log('Search response:', data);
 
-            if (data.success && data.data.results.length > 0) {
+            if (data.success && data.data && data.data.results && data.data.results.length > 0) {
                 renderResults(data.data.results);
                 voiceSearchStatus.innerHTML = '<span class="text-success">تم العثور على ' + data.data.results.length + ' نتيجة</span>';
-            } else {
+            } else if (data.success && data.data && data.data.results && data.data.results.length === 0) {
                 searchResults.innerHTML = '<div class="text-center text-muted py-5"><p>لم يتم العثور على نتائج</p></div>';
+                voiceSearchStatus.innerHTML = '<span class="text-muted">اضغط للبحث الصوتي</span>';
+            } else {
+                const errorMsg = data.error || 'حدث خطأ غير معروف';
+                searchResults.innerHTML = '<div class="text-center text-danger py-5"><p>' + errorMsg + '</p></div>';
                 voiceSearchStatus.innerHTML = '<span class="text-muted">اضغط للبحث الصوتي</span>';
             }
         } catch (error) {
             console.error('Search error:', error);
-            searchResults.innerHTML = '<div class="text-center text-danger py-5"><p>حدث خطأ في البحث</p></div>';
+            searchResults.innerHTML = '<div class="text-center text-danger py-5"><p>حدث خطأ في الاتصال</p></div>';
             voiceSearchStatus.innerHTML = '<span class="text-muted">اضغط للبحث الصوتي</span>';
         }
     }
