@@ -22,7 +22,7 @@
 </a>
 <a href="{{ route('student.tafseer') }}" class="nav-link {{ request()->routeIs('student.tafseer') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book"></i></div>
-    <span>التفسير والترجمة</span>
+    <span>التفسير</span>
 </a>
 <a href="{{ route('student.tarteel-challenges') }}" class="nav-link {{ request()->routeIs('student.tarteel-challenges') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-trophy"></i></div>
