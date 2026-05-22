@@ -859,21 +859,17 @@ class QuranApiService
     /**
      * Search for verses
      */
-    public function searchVerse(string $query): array
+public function searchVerse(string $query): array
     {
         $cacheKey = "quran_search_" . md5($query);
 
-        Log::info('QuranApiService: Searching for query', ['query' => $query]);
-
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
-            $url = self::BASE_URL . "/search/" . urlencode($query);
-            Log::info('QuranApiService: Making request to', ['url' => $url]);
-
-            $response = Http::timeout(10)->get($url);
-            Log::info('QuranApiService: Response status', ['status' => $response->status()]);
+            $response = Http::timeout(10)->get(self::BASE_URL . "/search", [
+                'query' => $query,
+                'size' => 50
+            ]);
 
             if ($response->status() === 404) {
-                Log::info('QuranApiService: Search returned no results', ['query' => $query]);
                 return [];
             }
 
@@ -881,15 +877,12 @@ class QuranApiService
                 Log::error('QuranApiService: Search failed', [
                     'query' => $query,
                     'status' => $response->status(),
-                    'body' => $response->body(),
                 ]);
                 throw new \Exception("Quran search failed for query: {$query}");
             }
 
             $json = $response->json();
             $matches = $json['data']['matches'] ?? [];
-
-            Log::info('QuranApiService: Found matches', ['count' => count($matches)]);
 
             // Fetch actual verse texts with Uthmani edition
             $results = [];
