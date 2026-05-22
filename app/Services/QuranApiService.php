@@ -864,8 +864,7 @@ public function searchVerse(string $query): array
         $cacheKey = "quran_search_" . md5($query);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
-            $encodedQuery = rawurlencode($query);
-            $url = self::BASE_URL . "/search/" . $encodedQuery;
+            $url = self::BASE_URL . "/search/" . urlencode($query);
             $response = Http::timeout(10)->get($url);
 
             if ($response->status() === 404) {
