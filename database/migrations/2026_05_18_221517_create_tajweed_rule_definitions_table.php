@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('tajweed_rule_definitions')) {
+            return;
+        }
+
         Schema::create('tajweed_rule_definitions', function (Blueprint $table) {
             $table->id();
             $table->string('name');

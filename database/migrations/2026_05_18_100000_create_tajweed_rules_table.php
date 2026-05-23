@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tajweed_rules', function (Blueprint $table) {
+        Schema::create('tajweed_rule_definitions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->text('description');
@@ -23,6 +23,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tajweed_rules');
+        Schema::dropIfExists('tajweed_rule_definitions');
     }
 };
