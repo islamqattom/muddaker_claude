@@ -354,6 +354,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <tr>
                             <th>#</th>
                             <th>رقم الصفحة</th>
+                            <th>الموضع</th>
                             <th>الأخطاء</th>
                             <th>الترددات</th>
                             <th>التقييم</th>
@@ -365,6 +366,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <tr>
                             <td><span style="color: var(--gold); font-weight: 700;">{{ $index + 1 }}</span></td>
                             <td class="page-score">{{ $page->page_number }}</td>
+                            <td>{{ $page->position_label ?? '—' }}</td>
                             <td>
                                 @if($page->errors > 0)
                                     <span style="color: var(--danger); font-weight: 700;">{{ $page->errors }}</span>

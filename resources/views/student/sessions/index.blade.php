@@ -264,7 +264,7 @@
                             </td>
                             <td>
                                 @if($session->type === 'mafsil')
-                                    @php $partNumbers = $session->pages->pluck('page_number')->toArray(); @endphp
+                                    @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
                                     @if(count($partNumbers) > 0)
                                         <span class="part-info">أجزاء {{ implode(', ', $partNumbers) }}</span>
                                     @elseif($session->part)

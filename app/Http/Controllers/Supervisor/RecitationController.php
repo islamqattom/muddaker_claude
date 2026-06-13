@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Supervisor;
 
 use App\Http\Controllers\Controller;
-use App\Models\{RecitationSession, RecitationPage, Student, QuranPart, QuranPage};
+use App\Models\Ayah;
+use App\Models\MafsilPosition;
+use App\Models\QuranPart;
+use App\Models\RecitationPage;
+use App\Models\RecitationSession;
+use App\Models\Student;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Services\NotificationService;
 
 class RecitationController extends Controller
 {
@@ -21,6 +26,9 @@ class RecitationController extends Controller
         'pages.*.page_number' => 'required|integer|exists:quran_pages,page_number',
         'pages.*.errors' => 'required|integer|min:0',
         'pages.*.hesitations' => 'required|integer|min:0',
+        'pages.*.mafsil_position_id' => 'nullable|exists:mafsil_positions,id',
+        'pages.*.position_range' => 'nullable|string|max:100',
+        'pages.*.page_number_in_mushaf' => 'nullable|integer|min:1',
     ];
 
     private const MAFSIL_MAX_SCORE = 100;
@@ -40,7 +48,23 @@ class RecitationController extends Controller
                 $totalErrors += $page['errors'];
             }
         }
+
         return ['errors' => $totalErrors, 'hesitations' => $totalHesitations];
+    }
+
+    /**
+     * Calculate final mafsil score as aggregate deduction from max score.
+     */
+    private function calculateMafsilFinalScore(array $pages, float $maxScore = 100): float
+    {
+        $totalDeduction = 0;
+        foreach ($pages as $page) {
+            $errorDeduction = $page['errors'] * 3;
+            $hesitationDeduction = floor($page['hesitations'] / 3) + (($page['hesitations'] % 3) * 0.33);
+            $totalDeduction += $errorDeduction + $hesitationDeduction;
+        }
+
+        return round(max(0, $maxScore - $totalDeduction), 2);
     }
 
     public function index()
@@ -82,7 +106,7 @@ class RecitationController extends Controller
 
         // Validate page number is within part range
         if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
-            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين '.$part->start_page.' و '.$part->end_page]);
         }
 
         $startPage = $request->page_number;
@@ -134,7 +158,7 @@ class RecitationController extends Controller
 
         // Validate page number is within part range
         if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
-            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين '.$part->start_page.' و '.$part->end_page]);
         }
 
         $startPage = $request->page_number;
@@ -185,7 +209,7 @@ class RecitationController extends Controller
 
         // Validate page number is within part range
         if ($request->page_number < $part->start_page || $request->page_number > $part->end_page) {
-            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين ' . $part->start_page . ' و ' . $part->end_page]);
+            return redirect()->back()->withErrors(['page_number' => 'رقم الصفحة يجب أن يكون بين '.$part->start_page.' و '.$part->end_page]);
         }
 
         $startPage = $request->page_number;
@@ -248,7 +272,7 @@ class RecitationController extends Controller
 
             // Validate selected parts count
             if (count($selectedParts) != $partsCount) {
-                return back()->withErrors(['selected_parts' => 'يجب اختيار ' . $partsCount . ' أجزاء']);
+                return back()->withErrors(['selected_parts' => 'يجب اختيار '.$partsCount.' أجزاء']);
             }
 
             // Ensure all selected parts are integers to prevent SQL injection
@@ -266,15 +290,160 @@ class RecitationController extends Controller
                 return back()->withErrors(['selected_parts' => 'الأجزاء المختارة غير صالحة']);
             }
 
+            $difficultyDistribution = $request->input('difficulty', []);
+            $validatedDistribution = $this->validateDifficultyDistribution($selectedParts, $difficultyDistribution);
+
+            if ($validatedDistribution === null) {
+                return back()->withErrors(['difficulty' => 'توزيع المواضيع غير صالح. يجب أن يكون المجموع 3 لكل جزء.']);
+            }
+
+            $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
+
+            if ($mafsilPositions === null) {
+                return back()->withErrors(['difficulty' => 'لا يوجد مواضيع كافية من المستوى المطلوب في أحد الأجزاء.']);
+            }
+
             // Parts selected - show scoring form
             $selectionMode = false; // Show scoring form
-            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode'));
+
+            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions'));
         }
 
         // No parts selected yet - show selection UI
         $parts = collect(); // Empty collection for now
+        $mafsilPositions = collect();
         $selectionMode = true; // Show part selection UI
-        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode'));
+
+        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions'));
+    }
+
+    /**
+     * Validate difficulty distribution: each selected part must have exactly 3 positions.
+     */
+    private function validateDifficultyDistribution(array $selectedParts, array $difficultyDistribution): ?array
+    {
+        $validated = [];
+
+        foreach ($selectedParts as $partNumber) {
+            $partDistribution = $difficultyDistribution[$partNumber] ?? [];
+            $easy = isset($partDistribution[1]) ? (int) $partDistribution[1] : 0;
+            $medium = isset($partDistribution[2]) ? (int) $partDistribution[2] : 0;
+            $hard = isset($partDistribution[3]) ? (int) $partDistribution[3] : 0;
+
+            if ($easy < 0 || $medium < 0 || $hard < 0) {
+                return null;
+            }
+
+            if (($easy + $medium + $hard) !== 3) {
+                return null;
+            }
+
+            $validated[$partNumber] = [
+                1 => $easy,
+                2 => $medium,
+                3 => $hard,
+            ];
+        }
+
+        return $validated;
+    }
+
+    /**
+     * Randomly select mafsil positions for each part based on difficulty distribution.
+     */
+    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): ?\Illuminate\Support\Collection
+    {
+        $allPositions = MafsilPosition::with(['startAyah.surah', 'endAyah.surah'])
+            ->whereIn('juz_number', $selectedParts)
+            ->get()
+            ->groupBy(['juz_number', 'difficulty']);
+
+        $selectedPositions = collect();
+
+        foreach ($selectedParts as $partNumber) {
+            $distribution = $validatedDistribution[$partNumber];
+            $partSelected = collect();
+
+            foreach ([1, 2, 3] as $difficulty) {
+                $needed = $distribution[$difficulty];
+                if ($needed === 0) {
+                    continue;
+                }
+
+                $available = $allPositions->get($partNumber, collect())->get($difficulty, collect());
+
+                if ($available->count() < $needed) {
+                    return null;
+                }
+
+                $partSelected = $partSelected->merge($available->shuffle()->take($needed));
+            }
+
+            if ($partSelected->isEmpty()) {
+                return null;
+            }
+
+            $selectedPositions = $selectedPositions->merge(
+                $partSelected->shuffle()->sortBy('list_order')->values()
+            );
+        }
+
+        return $selectedPositions->groupBy('juz_number');
+    }
+
+    /**
+     * Get ayahs for a mafsil position (Uthmani script).
+     */
+    public function getMafsilPositionAyahs(MafsilPosition $mafsilPosition)
+    {
+        $start = $mafsilPosition->startAyah;
+        $end = $mafsilPosition->endAyah;
+
+        if (! $start || ! $end) {
+            return response()->json(['html' => '<p class="text-muted text-center">لا توجد آيات مرتبطة بهذا الموضع</p>']);
+        }
+
+        $ayahs = Ayah::with('surah')
+            ->where('id', '>=', $start->id)
+            ->where('id', '<=', $end->id)
+            ->orderBy('id')
+            ->get();
+
+        $html = '<div class="quran-page" dir="rtl" style="font-family: Amiri, serif; font-size: 1.6rem; line-height: 2.4; text-align: justify; padding: 1rem;">';
+
+        $currentSurah = null;
+        foreach ($ayahs as $ayah) {
+            if ($currentSurah !== $ayah->surah_id) {
+                if ($currentSurah !== null) {
+                    $html .= '</div>';
+                }
+                $html .= '<div class="surah-block" style="margin-bottom: 1.5rem;">';
+                $html .= '<div class="surah-name" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 0.75rem; color: #182B48; text-align: center;">'.e($ayah->surah->name_ar).'</div>';
+                $currentSurah = $ayah->surah_id;
+            }
+
+            $html .= '<span class="ayah-text" data-ayah-id="'.$ayah->id.'">';
+            $html .= e($ayah->text).' ﴿'.$this->arabicNumeral($ayah->ayah_number).'﴾ ';
+            $html .= '</span>';
+        }
+
+        if ($currentSurah !== null) {
+            $html .= '</div>';
+        }
+
+        $html .= '</div>';
+
+        return response()->json(['html' => $html]);
+    }
+
+    /**
+     * Convert number to Arabic numeral string.
+     */
+    private function arabicNumeral(int $num): string
+    {
+        $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+        return implode('', array_map(fn ($d) => $arabic[(int) $d], str_split($num)));
     }
 
     /**
@@ -328,7 +497,7 @@ class RecitationController extends Controller
 
             $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
 
-            $session = DB::transaction(function() use ($request) {
+            $session = DB::transaction(function () use ($request) {
                 $pages = $request->input('pages');
                 $totals = $this->calculateTotals($pages, $request->type);
                 $totalErrors = $totals['errors'];
@@ -338,13 +507,13 @@ class RecitationController extends Controller
                 $finalScore = null;
                 if ($request->type === RecitationSession::TYPE_MAFSIL) {
                     $maxScore = 100;
-                    $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
+                    $finalScore = $this->calculateMafsilFinalScore($pages, $maxScore);
                 }
 
                 $failedPages = 0;
                 foreach ($pages as $page) {
                     $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
-                    if (!$colorResult['passed']) {
+                    if (! $colorResult['passed']) {
                         $failedPages++;
                     }
                 }
@@ -375,14 +544,14 @@ class RecitationController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'تم حفظ جلسة التسميع بنجاح',
-                    'session_id' => $session->id
+                    'session_id' => $session->id,
                 ]);
             }
 
             return redirect()->route('supervisor.recitation.index')
                 ->with('success', 'تم حفظ جلسة التسميع بنجاح');
         } catch (\Exception $e) {
-            \Log::error('Failed to save session: ' . $e->getMessage(), [
+            \Log::error('Failed to save session: '.$e->getMessage(), [
                 'exception_class' => get_class($e),
                 'student_id' => $request->student_id,
                 'pages' => $request->input('pages'),
@@ -391,8 +560,10 @@ class RecitationController extends Controller
                 if ($e instanceof \Illuminate\Validation\ValidationException) {
                     return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
                 }
+
                 return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
             }
+
             return back()->with('error', 'حدث خطأ أثناء الحفظ');
         }
     }
@@ -407,14 +578,14 @@ class RecitationController extends Controller
 
             $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
 
-            $session = DB::transaction(function() use ($request) {
+            $session = DB::transaction(function () use ($request) {
                 $pages = $request->input('pages');
                 $totals = $this->calculateTotals($pages, $request->type);
                 $totalErrors = $totals['errors'];
                 $totalHesitations = $totals['hesitations'];
 
                 $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
-                $finalScore = $maxScore ? RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations) : null;
+                $finalScore = $maxScore ? $this->calculateMafsilFinalScore($pages, $maxScore) : null;
 
                 return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore);
             });
@@ -423,14 +594,14 @@ class RecitationController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'تم حفظ الجلسة بنجاح (لم يكمل)',
-                    'session_id' => $session->id
+                    'session_id' => $session->id,
                 ]);
             }
 
             return redirect()->route('supervisor.recitation.index')
                 ->with('success', 'تم حفظ الجلسة بنجاح (لم يكمل)');
         } catch (\Exception $e) {
-            \Log::error('Failed to save incomplete session: ' . $e->getMessage(), [
+            \Log::error('Failed to save incomplete session: '.$e->getMessage(), [
                 'exception_class' => get_class($e),
                 'student_id' => $request->student_id,
                 'pages' => $request->input('pages'),
@@ -439,8 +610,10 @@ class RecitationController extends Controller
                 if ($e instanceof \Illuminate\Validation\ValidationException) {
                     return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
                 }
+
                 return response()->json(['success' => false, 'message' => 'حدث خطأ أثناء الحفظ'], 500);
             }
+
             return back()->with('error', 'حدث خطأ أثناء الحفظ');
         }
     }
@@ -482,6 +655,10 @@ class RecitationController extends Controller
             RecitationPage::create([
                 'session_id' => $session->id,
                 'page_number' => $pageData['page_number'],
+                'mafsil_position_id' => $pageData['mafsil_position_id'] ?? null,
+                'position' => $pageData['position'] ?? null,
+                'position_range' => $pageData['position_range'] ?? null,
+                'page_number_in_mushaf' => $pageData['page_number_in_mushaf'] ?? null,
                 'errors' => $pageData['errors'],
                 'hesitations' => $pageData['hesitations'],
                 'color_status' => $colorResult['color'],
@@ -565,9 +742,10 @@ class RecitationController extends Controller
                     'errors' => $e->errors(),
                     'ip' => $request->ip(),
                 ]);
+
                 return response()->json([
                     'errors' => $e->errors(),
-                    'message' => 'Validation failed'
+                    'message' => 'Validation failed',
                 ], 422);
             }
 
@@ -578,7 +756,7 @@ class RecitationController extends Controller
         $student = Student::where('supervisor_id', Auth::id())->findOrFail($request->student_id);
 
         try {
-            $session = DB::transaction(function() use ($request) {
+            $session = DB::transaction(function () use ($request) {
                 $pages = $request->input('pages');
                 $totals = $this->calculateTotals($pages, $request->type);
                 $totalErrors = $totals['errors'];
@@ -586,7 +764,7 @@ class RecitationController extends Controller
                 $maxScore = 100;
 
                 // Calculate score
-                $finalScore = RecitationSession::calculateMafsilScore($maxScore, $totalErrors, $totalHesitations);
+                $finalScore = $this->calculateMafsilFinalScore($pages, $maxScore);
 
                 // For failed_continued, we use 'failed' status but add note indicating continued
                 $sessionStatus = RecitationSession::STATUS_FAILED;
@@ -598,7 +776,9 @@ class RecitationController extends Controller
                     'part_id' => $request->part_id,
                     'start_page' => $pages[0]['page_number'] ?? null,
                     'end_page' => end($pages)['page_number'] ?? null,
-                    'total_pages' => count($pages),
+                    'total_pages' => $request->type === RecitationSession::TYPE_MAFSIL
+                        ? count(array_unique(array_column($pages, 'page_number')))
+                        : count($pages),
                     'total_errors' => $totalErrors,
                     'total_hesitations' => $totalHesitations,
                     'status' => $sessionStatus,
@@ -607,7 +787,7 @@ class RecitationController extends Controller
                     'final_score' => $finalScore,
                     'unmastered_pages_count' => $request->unmastered_pages_count ?? null,
                     'session_date' => $request->session_date,
-                    'notes' => ($request->notes ?? '') . ' [راسب ومكمل - أكمل بعد الرسوب]',
+                    'notes' => ($request->notes ?? '').' [راسب ومكمل - أكمل بعد الرسوب]',
                 ]);
 
                 // Save each page
@@ -622,6 +802,10 @@ class RecitationController extends Controller
                     RecitationPage::create([
                         'session_id' => $session->id,
                         'page_number' => $pageData['page_number'],
+                        'mafsil_position_id' => $pageData['mafsil_position_id'] ?? null,
+                        'position' => $pageData['position'] ?? null,
+                        'position_range' => $pageData['position_range'] ?? null,
+                        'page_number_in_mushaf' => $pageData['page_number_in_mushaf'] ?? null,
                         'errors' => $pageData['errors'],
                         'hesitations' => $pageData['hesitations'],
                         'color_status' => $colorResult['color'],
@@ -638,10 +822,11 @@ class RecitationController extends Controller
 
             return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
         } catch (\Exception $e) {
-            \Log::error('Failed to save recitation session: ' . $e->getMessage());
+            \Log::error('Failed to save recitation session: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ أثناء حفظ السجل'
+                'message' => 'حدث خطأ أثناء حفظ السجل',
             ], 500);
         }
     }
@@ -701,7 +886,7 @@ class RecitationController extends Controller
         $fromDate = $request->from_date ? Carbon::parse($request->from_date) : Carbon::now()->startOfMonth();
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
 
-        $query = RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
+        $query = RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
             ->with(['student.user', 'part', 'pages'])
             ->whereBetween('session_date', [$fromDate, $toDate]);
 
@@ -732,7 +917,7 @@ class RecitationController extends Controller
     {
         $student = $session->student;
         $parent = $student->parents()->first();
-        if (!$parent || !$parent->user) {
+        if (! $parent || ! $parent->user) {
             return;
         }
 
@@ -758,14 +943,14 @@ class RecitationController extends Controller
                 route('parent.sessions.show', $session->id)
             );
         } catch (\Exception $e) {
-            \Log::error("Failed to notify parent about session {$session->id}: " . $e->getMessage());
+            \Log::error("Failed to notify parent about session {$session->id}: ".$e->getMessage());
         }
     }
 
     protected function notifyStudentOnSession(RecitationSession $session): void
     {
         $student = $session->student;
-        if (!$student->user) {
+        if (! $student->user) {
             return;
         }
 
@@ -786,12 +971,12 @@ class RecitationController extends Controller
             $notificationService->sendToUser(
                 $student->user,
                 'recitation_session',
-                "تم تسجيل تسميع جديد",
+                'تم تسجيل تسميع جديد',
                 "تم تسجيل تلاوة بتاريخ {$session->session_date} من نوع {$typeLabel} بنتيجة {$statusText}{$scoreText}",
                 route('student.sessions.show', $session->id)
             );
         } catch (\Exception $e) {
-            \Log::error("Failed to notify student about session {$session->id}: " . $e->getMessage());
+            \Log::error("Failed to notify student about session {$session->id}: ".$e->getMessage());
         }
     }
 }

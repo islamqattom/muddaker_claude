@@ -408,7 +408,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <td>
                             <span class="pages-cell">
                                 @if($session->type === 'mafsil')
-                                    @php $partNumbers = $session->pages->pluck('page_number')->toArray(); @endphp
+                                    @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
                                     {{ count($partNumbers) > 0 ? 'أجزاء ' . implode(', ', $partNumbers) : ($session->part ? 'جزء ' . $session->part->part_number : '—') }}
                                 @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
                                     {{ $session->start_page === $session->end_page ? 'صفحة ' . $session->start_page : 'صفحات ' . $session->start_page . '-' . $session->end_page }}

@@ -17,7 +17,7 @@ class SessionController extends Controller {
     }
 
     public function show(RecitationSession $session) {
-        $session->load(['student.user', 'part', 'pages', 'supervisor']);
+        $session->load(['student.user', 'part', 'pages.mafsilPosition.startAyah.surah', 'pages.mafsilPosition.endAyah.surah', 'supervisor']);
 
         return view('supervisor.sessions.show', compact('session'));
     }

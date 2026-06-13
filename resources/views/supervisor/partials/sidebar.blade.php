@@ -39,10 +39,6 @@
     <div class="icon-wrapper"><i class="fas fa-history"></i></div>
     <span>سجل الجلسات</span>
 </a>
-<a href="{{ route('supervisor.exam-assistant.index') }}" class="nav-link {{ request()->routeIs('supervisor.exam-assistant.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-graduation-cap"></i></div>
-    <span>اختبار المواضع</span>
-</a>
 <a href="{{ route('supervisor.ijazah.index') }}" class="nav-link {{ request()->routeIs('supervisor.ijazah.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-award"></i></div>
     <span>الإجازة</span>

@@ -196,6 +196,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::post('/save-not-recitate', [Supervisor\RecitationController::class, 'saveNotRecitate'])->name('save-not-recitate');
         Route::post('/calculate-color', [Supervisor\RecitationController::class, 'calculateColor'])->name('calculate-color');
         Route::post('/get-pages', [Supervisor\RecitationController::class, 'getPages'])->name('get-pages');
+        Route::get('/mafsil-position/{mafsilPosition}/ayahs', [Supervisor\RecitationController::class, 'getMafsilPositionAyahs'])->name('mafsil-position.ayahs');
         Route::get('/history', [Supervisor\RecitationController::class, 'history'])->name('history');
         Route::delete('/{recitation}', [Supervisor\RecitationController::class, 'destroy'])->name('destroy');
     });
@@ -253,10 +254,6 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/ijazah', [Supervisor\IjazahController::class, 'index'])->name('ijazah.index');
     Route::post('/ijazah', [Supervisor\IjazahController::class, 'store'])->name('ijazah.store');
     Route::delete('/ijazah', [Supervisor\IjazahController::class, 'destroy'])->name('ijazah.destroy');
-
-    // Quran Exam Assistant
-    Route::get('/exam-assistant', [Supervisor\QuranExamAssistantController::class, 'index'])->name('exam-assistant.index');
-    Route::post('/exam-assistant/generate', [Supervisor\QuranExamAssistantController::class, 'generateQuestion'])->name('exam-assistant.generate');
 
     // Tasks (تكليفات)
     Route::get('/tasks', [Supervisor\TaskController::class, 'index'])->name('tasks.index');

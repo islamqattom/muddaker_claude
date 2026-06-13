@@ -162,7 +162,7 @@
                                 <td>
                                     @if($session->type === 'mafsil')
                                         @php
-                                            $partNumbers = $session->pages->pluck('page_number')->toArray();
+                                            $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray();
                                         @endphp
                                         @if(count($partNumbers) > 0)
                                             <span class="fw-bold">أجزاء {{ implode(', ', $partNumbers) }}</span>

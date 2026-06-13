@@ -350,6 +350,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>رقم الصفحة</th>
+                                    <th>الموضع</th>
                                     <th>الأخطاء</th>
                                     <th>الترددات</th>
                                     <th>التقييم</th>
@@ -361,6 +362,7 @@
                                 <tr>
                                     <td><span style="color: var(--gold); font-weight: 700;">{{ $index + 1 }}</span></td>
                                     <td class="fw-bold" style="color: var(--navy);">{{ $page->page_number }}</td>
+                                    <td>{{ $page->position_label ?? '—' }}</td>
                                     <td>
                                         @if($page->errors > 0)
                                             <span style="color: var(--danger); font-weight: 700;">{{ $page->errors }}</span>

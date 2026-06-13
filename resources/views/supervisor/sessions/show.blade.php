@@ -386,7 +386,10 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>رقم الصفحة</th>
+                                    <th>الجزء</th>
+                                    <th>المستوى</th>
+                                    <th>الموضع</th>
+                                    <th>الصفحة</th>
                                     <th>الأخطاء</th>
                                     <th>الترددات</th>
                                     <th>التقييم</th>
@@ -398,6 +401,34 @@
                                 <tr>
                                     <td><span style="color: var(--gold); font-weight: 700;">{{ $index + 1 }}</span></td>
                                     <td class="fw-bold" style="color: var(--navy);">{{ $page->page_number }}</td>
+                                    <td>
+                                        @if($page->mafsilPosition)
+                                            @php
+                                                $difficultyClass = match($page->mafsilPosition->difficulty) {
+                                                    1 => 'bg-success',
+                                                    3 => 'bg-danger',
+                                                    default => 'bg-warning text-dark',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $difficultyClass }}">{{ $page->mafsilPosition->difficultyLabel() }}</span>
+                                        @else
+                                            <span style="color: #ccc;">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($page->mafsilPosition)
+                                            <small class="text-muted">{{ $page->mafsilPosition->positionRangeLabel() }}</small>
+                                        @else
+                                            {{ $page->position_label ?? '—' }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($page->page_number_in_mushaf)
+                                            <span class="badge bg-info">{{ $page->page_number_in_mushaf }}</span>
+                                        @else
+                                            <span style="color: #ccc;">—</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($page->errors > 0)
                                             <span style="color: var(--danger); font-weight: 700;">{{ $page->errors }}</span>
