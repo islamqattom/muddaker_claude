@@ -506,18 +506,26 @@
                                 </td>
                                 <td>
                                     @if($session->type === 'mafsil')
-                                        @php $partNumbers = $session->pages->pluck('page_number'); @endphp
-                                        @if($partNumbers->isNotEmpty())
-                                            <span class="part-badge">أجزاء {{ $partNumbers->implode(', ') }}</span>
+                                        @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
+                                        @if(count($partNumbers) > 0)
+                                            <span class="part-badge">أجزاء {{ implode(', ', $partNumbers) }}</span>
                                         @elseif($session->part)
                                             <span class="part-badge">جزء {{ $session->part->part_number }}</span>
                                         @else
                                             <span class="text-muted">—</span>
                                         @endif
-                                    @elseif($session->part)
-                                        <span class="part-badge">الجزء {{ $session->part->part_number }}</span>
+                                    @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
+                                        @if($session->start_page === $session->end_page)
+                                            <span class="part-badge">صفحة {{ $session->start_page }}</span>
+                                        @else
+                                            <span class="part-badge">{{ $session->start_page }} - {{ $session->end_page }}</span>
+                                        @endif
                                     @else
-                                        <span class="text-muted">—</span>
+                                        @if($session->part)
+                                            <span class="part-badge">الجزء {{ $session->part->part_number }}</span>
+                                        @else
+                                            <span class="part-badge">{{ $session->start_page }} - {{ $session->end_page }}</span>
+                                        @endif
                                     @endif
                                 </td>
                                 <td>
