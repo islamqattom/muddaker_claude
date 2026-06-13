@@ -20,7 +20,7 @@ class IjazahController extends Controller
         $studentsQuery = Student::with(['user', 'supervisor']);
 
         if ($request->supervisor_id) {
-            $studentsQuery->where('supervisor_id', $request->supervisor_id);
+            $studentsQuery->where('ijazah_supervisor_id', $request->supervisor_id);
         }
 
         if ($request->search) {
@@ -28,7 +28,7 @@ class IjazahController extends Controller
         }
 
         $studentsWithIjazah = $studentsQuery->where('has_ijazah', true)->get();
-        $allStudents = Student::with(['user', 'supervisor'])->get();
+        $allStudents = Student::with(['user', 'supervisor', 'ijazahSupervisor'])->get();
 
         $ijazahRecords = Ijazah::with(['student.user', 'quranPart', 'supervisor'])
             ->when($request->supervisor_id, fn($q) => $q->where('supervisor_id', $request->supervisor_id))
@@ -90,7 +90,7 @@ class IjazahController extends Controller
 
     public function getStudentsForSupervisor(Request $request)
     {
-        $students = Student::where('supervisor_id', $request->supervisor_id)
+        $students = Student::where('ijazah_supervisor_id', $request->supervisor_id)
             ->where('has_ijazah', true)
             ->with('user')
             ->get()
@@ -120,7 +120,7 @@ class IjazahController extends Controller
             $supervisor = User::findOrFail($validated['supervisor_id']);
 
             $student->update([
-                'supervisor_id' => $validated['supervisor_id'],
+                'ijazah_supervisor_id' => $validated['supervisor_id'],
                 'has_ijazah' => true
             ]);
 
@@ -150,10 +150,17 @@ class IjazahController extends Controller
                 ->where('supervisor_id', $validated['supervisor_id'])
                 ->delete();
 
-            $student->update([
-                'supervisor_id' => null,
-                'has_ijazah' => false
-            ]);
+            $updateData = [];
+            if ($student->ijazah_supervisor_id == $validated['supervisor_id']) {
+                $updateData['ijazah_supervisor_id'] = null;
+            }
+            if (!Ijazah::where('student_id', $student->id)->exists()) {
+                $updateData['has_ijazah'] = false;
+            }
+
+            if (!empty($updateData)) {
+                $student->update($updateData);
+            }
 
             return response()->json([
                 'success' => true,

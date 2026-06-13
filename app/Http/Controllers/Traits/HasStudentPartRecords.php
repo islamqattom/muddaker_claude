@@ -25,6 +25,7 @@ trait HasStudentPartRecords
     {
         $existingRecords = StudentPartRecord::where('student_id', $student->id)->get()->keyBy('part_number');
         $sessionsByPart = $allSessions->groupBy(fn($s) => $s->part?->part_number);
+        $partSessionTypes = $this->buildPartSessionTypes($allSessions);
 
         $partsToFill = [];
         foreach (range(1, 30) as $partNumber) {
@@ -34,7 +35,7 @@ trait HasStudentPartRecords
                 continue;
             }
 
-            $calculated = $this->calculatePartRecordWithGrouped($sessionsByPart, $partNumber);
+            $calculated = $this->calculatePartRecordWithGrouped($sessionsByPart, $partNumber, $partSessionTypes);
 
             if (!$existing || $this->recordIsDirty($existing, $calculated)) {
                 $partsToFill[$partNumber] = $calculated;
@@ -60,25 +61,37 @@ trait HasStudentPartRecords
     protected function buildPartSessionTypes($allSessions): array
     {
         $partSessionTypes = [];
+        $partSessionDates = [];
 
-        // Process mafsil first so recitation (passed sard) always takes precedence
+        // Process all sessions; later sessions override earlier ones,
+        // but mafsil always takes precedence over recitation when dates are equal or later.
         foreach ($allSessions as $session) {
-            if ($session->type === RecitationSession::TYPE_MAFSIL) {
-                $partNumbers = $session->pages->pluck('page_number')->toArray();
-                foreach ($partNumbers as $partNumber) {
-                    if (!isset($partSessionTypes[$partNumber])) {
-                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
+            if ($session->type === RecitationSession::TYPE_RECITATION) {
+                $partNumber = $session->part?->part_number;
+                if ($partNumber) {
+                    $sessionDate = $session->session_date?->toDateString();
+                    $existingDate = $partSessionDates[$partNumber] ?? null;
+                    $existingType = $partSessionTypes[$partNumber] ?? null;
+
+                    // Recitation only sets if no existing mafsil at same or later date
+                    if ($existingType !== RecitationSession::TYPE_MAFSIL || $sessionDate > $existingDate) {
+                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_RECITATION;
+                        $partSessionDates[$partNumber] = $sessionDate;
                     }
                 }
             }
-        }
 
-        // Recitation always overwrites (passed sard takes priority over mafsil)
-        foreach ($allSessions as $session) {
-            if ($session->type === RecitationSession::TYPE_RECITATION) {
-                $partNum = $session->part?->part_number;
-                if ($partNum) {
-                    $partSessionTypes[$partNum] = RecitationSession::TYPE_RECITATION;
+            if ($session->type === RecitationSession::TYPE_MAFSIL) {
+                foreach ($session->pages as $page) {
+                    $partNumber = $page->page_number;
+                    $sessionDate = $session->session_date?->toDateString();
+                    $existingDate = $partSessionDates[$partNumber] ?? null;
+
+                    // Mafsil always wins if same date or later
+                    if (!$existingDate || $sessionDate >= $existingDate) {
+                        $partSessionTypes[$partNumber] = RecitationSession::TYPE_MAFSIL;
+                        $partSessionDates[$partNumber] = $sessionDate;
+                    }
                 }
             }
         }
@@ -86,7 +99,7 @@ trait HasStudentPartRecords
         return $partSessionTypes;
     }
 
-    protected function calculatePartRecordWithGrouped($sessionsByPart, int $partNumber): array
+    protected function calculatePartRecordWithGrouped($sessionsByPart, int $partNumber, array $partSessionTypes = []): array
     {
         $partSessions = $sessionsByPart->get($partNumber, collect());
         $hasPassedSessions = !$partSessions->isEmpty();
@@ -103,6 +116,11 @@ trait HasStudentPartRecords
             ];
         }
 
+        $sessionType = $partSessionTypes[$partNumber] ?? null;
+        $masteryStatus = $sessionType === RecitationSession::TYPE_MAFSIL
+            ? StudentPartRecord::MASTERY_MAFSIL
+            : StudentPartRecord::MASTERY_MASTERED;
+
         return [
             'is_completed' => true,
             'total_errors' => $partSessions->sum('total_errors'),
@@ -110,7 +128,7 @@ trait HasStudentPartRecords
             'total_score' => $partSessions->avg('final_score'),
             'last_recitation_date' => $partSessions->max('session_date'),
             'is_manual_override' => false,
-            'mastery_status' => StudentPartRecord::MASTERY_MASTERED,
+            'mastery_status' => $masteryStatus,
         ];
     }
 
@@ -147,7 +165,8 @@ trait HasStudentPartRecords
     {
         $calculated = $this->calculatePartRecordWithGrouped(
             $this->getSessionsForStudent($studentId)->groupBy(fn($s) => $s->part?->part_number),
-            $partNumber
+            $partNumber,
+            $this->buildPartSessionTypes($this->getSessionsForStudent($studentId))
         );
 
         StudentPartRecord::updateOrCreate(

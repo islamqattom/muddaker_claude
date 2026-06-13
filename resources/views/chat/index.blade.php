@@ -5,6 +5,7 @@
 @php
     $role = auth()->user()->role;
     $roleSidebar = $role === 'admin' ? 'admin.partials.sidebar' : ($role === 'supervisor' ? 'supervisor.partials.sidebar' : ($role === 'student' ? 'student.partials.sidebar' : 'parent.partials.sidebar'));
+    $currentUserId = auth()->id();
 @endphp
 
 @section('sidebar-menu')
@@ -12,111 +13,120 @@
 @endsection
 
 @section('content')
-<div class="page-header mb-4">
-    <div class="header-content">
-        <div class="header-icon" style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
-            <i class="fas fa-comments"></i>
-        </div>
-        <div class="header-text">
-            <h4>المحادثات</h4>
-            <p>تواصل مع الطلاب والمشرفين</p>
-        </div>
-    </div>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newChatModal">
-        <i class="fas fa-plus me-2"></i>
-        محادثة جديدة
-    </button>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="table-card">
-            <div class="table-header">
-                <div class="table-title">
-                    <i class="fas fa-list"></i>
-                    <span>المحادثات</span>
-                </div>
-                <div class="record-count">
-                    <i class="fas fa-comment"></i>
-                    <span>{{ $conversations->count() }} محادثة</span>
-                </div>
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="chat-header-info">
+            <div class="chat-header-icon">
+                <i class="fas fa-comments"></i>
             </div>
+            <div>
+                <h4>المحادثات</h4>
+                <p>تواصل مع الطلاب والمشرفين بسهولة</p>
+            </div>
+        </div>
+        <button class="btn btn-new-chat" data-bs-toggle="modal" data-bs-target="#newChatModal">
+            <i class="fas fa-plus"></i>
+            <span>محادثة جديدة</span>
+        </button>
+    </div>
 
-            @if($conversations->isEmpty())
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <h5>لا توجد محادثات</h5>
-                    <p>ابدأ محادثة جديدة للتواصل مع الآخرين</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newChatModal">
-                        <i class="fas fa-plus me-2"></i>
-                        بدء محادثة جديدة
-                    </button>
+    <div class="chat-card">
+        <div class="chat-toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="conversationSearch" placeholder="ابحث في المحادثات...">
+            </div>
+            <div class="chat-count">
+                <span>{{ $conversations->count() }}</span> محادثة
+            </div>
+        </div>
+
+        @if($conversations->isEmpty())
+            <div class="chat-empty">
+                <div class="chat-empty-icon">
+                    <i class="fas fa-comments"></i>
                 </div>
-            @else
-                <div class="conversations-list">
-                    @foreach($conversations as $conversation)
-                        @php
-                            $otherUser = $conversation->is_group ? null : $conversation->participants->first(fn($p) => $p->id !== auth()->id());
-                            $unreadCount = $conversation->getUnreadCountAttribute(auth()->id());
-                        @endphp
-                        <a href="{{ route('chat.show', $conversation) }}" class="conversation-item {{ $unreadCount > 0 ? 'unread' : '' }}">
-                            <div class="conversation-avatar">
-                                @if($conversation->is_group)
-                                    <i class="fas fa-users"></i>
-                                @else
-                                    <i class="fas fa-user"></i>
-                                @endif
-                            </div>
-                            <div class="conversation-info">
-                                <div class="conversation-name">
+                <h5>لا توجد محادثات بعد</h5>
+                <p>ابدأ محادثة جديدة للتواصل مع الآخرين</p>
+                <button class="btn btn-new-chat" data-bs-toggle="modal" data-bs-target="#newChatModal">
+                    <i class="fas fa-plus"></i>
+                    <span>بدء محادثة</span>
+                </button>
+            </div>
+        @else
+            <div class="conversations-list" id="conversationsList">
+                @foreach($conversations as $conversation)
+                    @php
+                        $otherUser = $conversation->is_group ? null : $conversation->participants->first(fn($p) => $p->id !== $currentUserId);
+                        $unreadCount = $conversation->getUnreadCountAttribute($currentUserId);
+                        $lastMessage = $conversation->messages->first();
+                    @endphp
+                    <a href="{{ route('chat.show', $conversation) }}" class="conversation-item {{ $unreadCount > 0 ? 'unread' : '' }}">
+                        <div class="conversation-avatar {{ $conversation->is_group ? 'group' : '' }}">
+                            @if($conversation->is_group)
+                                <i class="fas fa-users"></i>
+                            @else
+                                <i class="fas fa-user"></i>
+                            @endif
+                        </div>
+                        <div class="conversation-body">
+                            <div class="conversation-top">
+                                <div class="conversation-title">
                                     {{ $conversation->is_group ? $conversation->name : ($otherUser ? $otherUser->name : 'مستخدم') }}
-                                    @if($unreadCount > 0)
-                                        <span class="unread-badge">{{ $unreadCount }}</span>
+                                    @if($conversation->is_group)
+                                        <span class="group-badge">مجموعة</span>
                                     @endif
                                 </div>
+                                @if($unreadCount > 0)
+                                    <span class="unread-badge">{{ $unreadCount }}</span>
+                                @endif
+                            </div>
+                            <div class="conversation-bottom">
                                 <div class="conversation-preview">
-                                    @if($conversation->messages->count() > 0)
-                                        <span>{{ Str::limit($conversation->messages->first()->content, 40) }}</span>
+                                    @if($lastMessage)
+                                        <span>{{ Str::limit($lastMessage->content, 55) }}</span>
                                     @else
                                         <span class="text-muted">لا توجد رسائل بعد</span>
                                     @endif
                                 </div>
-                            </div>
-                            <div class="conversation-meta">
-                                @if($conversation->messages->count() > 0)
-                                    <span class="conversation-time">{{ $conversation->messages->first()->created_at->diffForHumans() }}</span>
-                                @endif
-                                @if($conversation->is_group)
-                                    <span class="group-badge"><i class="fas fa-users"></i></span>
+                                @if($lastMessage)
+                                    <span class="conversation-time">{{ $lastMessage->created_at->diffForHumans() }}</span>
                                 @endif
                             </div>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
-        </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @endif
     </div>
 </div>
 
 <div class="modal fade" id="newChatModal" tabindex="-1" aria-labelledby="newChatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #182B48, #2A4570); color: #fff;">
+            <div class="modal-header">
                 <h5 class="modal-title" id="newChatModalLabel">
                     <i class="fas fa-plus me-2"></i>
                     محادثة جديدة
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('chat.store') }}" method="POST">
+            <form action="{{ route('chat.store') }}" method="POST" id="newChatForm">
                 @csrf
                 @if(session('error'))
-                    <div class="alert alert-danger mx-3 mt-3">{{ session('error') }}</div>
+                    <div class="alert alert-danger mx-3 mt-3 mb-0">{{ session('error') }}</div>
+                @endif
+                @if($errors->any())
+                    <div class="alert alert-danger mx-3 mt-3 mb-0">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
                 <div class="modal-body">
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label">نوع المحادثة</label>
                         <div class="chat-type-buttons">
                             <button type="button" class="chat-type-btn active" data-type="direct">
@@ -139,16 +149,20 @@
                     <div id="directChatSection">
                         <div class="mb-3">
                             <label class="form-label">اختر المستخدم</label>
+                            <div class="search-select">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="user-search" data-target="userSelect" placeholder="ابحث عن مستخدم...">
+                            </div>
                             <select id="userSelect" class="form-select" name="user_ids[]" required>
-                                <option value="">-- اختر --</option>
+                                <option value="">-- اختر مستخدم --</option>
                                 <optgroup label="الطلاب">
-                                    @foreach(\App\Models\User::where('role', 'student')->where('is_active', true)->get() as $student)
-                                        <option value="{{ $student->id }}">{{ $student->name }}</option>
+                                    @foreach(\App\Models\User::where('role', 'student')->where('is_active', true)->orderBy('name')->get() as $student)
+                                        <option value="{{ $student->id }}" {{ $student->id == $currentUserId ? 'disabled' : '' }}>{{ $student->name }}</option>
                                     @endforeach
                                 </optgroup>
                                 <optgroup label="المشرفون">
-                                    @foreach(\App\Models\User::where('role', 'supervisor')->where('is_active', true)->get() as $supervisor)
-                                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                                    @foreach(\App\Models\User::where('role', 'supervisor')->where('is_active', true)->orderBy('name')->get() as $supervisor)
+                                        <option value="{{ $supervisor->id }}" {{ $supervisor->id == $currentUserId ? 'disabled' : '' }}>{{ $supervisor->name }}</option>
                                     @endforeach
                                 </optgroup>
                             </select>
@@ -158,26 +172,31 @@
                     <div id="groupChatSection" class="d-none">
                         <div class="mb-3">
                             <label class="form-label">اختر المشاركين (3 على الأقل)</label>
+                            <div class="search-select">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="user-search" data-target="groupUsersSelect" placeholder="ابحث عن المشاركين...">
+                            </div>
                             <select id="groupUsersSelect" class="form-select" name="user_ids[]" multiple required>
                                 <optgroup label="الطلاب">
-                                    @foreach(\App\Models\User::where('role', 'student')->where('is_active', true)->get() as $student)
-                                        <option value="{{ $student->id }}">{{ $student->name }}</option>
+                                    @foreach(\App\Models\User::where('role', 'student')->where('is_active', true)->orderBy('name')->get() as $student)
+                                        <option value="{{ $student->id }}" {{ $student->id == $currentUserId ? 'disabled' : '' }}>{{ $student->name }}</option>
                                     @endforeach
                                 </optgroup>
                                 <optgroup label="المشرفون">
-                                    @foreach(\App\Models\User::where('role', 'supervisor')->where('is_active', true)->get() as $supervisor)
-                                        <option value="{{ $supervisor->id }}">{{ $supervisor->name }}</option>
+                                    @foreach(\App\Models\User::where('role', 'supervisor')->where('is_active', true)->orderBy('name')->get() as $supervisor)
+                                        <option value="{{ $supervisor->id }}" {{ $supervisor->id == $currentUserId ? 'disabled' : '' }}>{{ $supervisor->name }}</option>
                                     @endforeach
                                 </optgroup>
                             </select>
+                            <div id="groupSelectedTags" class="selected-users"></div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>
-                        إنشاء
+                        إنشاء المحادثة
                     </button>
                 </div>
             </form>
@@ -188,6 +207,162 @@
 
 @push('styles')
 <style>
+.chat-container {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chat-header-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #182B48, #2A4570);
+    color: #d4a030;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 8px 24px rgba(24, 43, 72, 0.18);
+}
+
+.chat-header h4 {
+    margin: 0;
+    color: #182B48;
+    font-weight: 800;
+    font-size: 1.45rem;
+}
+
+.chat-header p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.92rem;
+}
+
+.btn-new-chat {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 8px 22px rgba(39, 174, 96, 0.28);
+    transition: all 0.2s ease;
+}
+
+.btn-new-chat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(39, 174, 96, 0.38);
+    color: #fff;
+}
+
+.chat-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 12px 45px rgba(24, 43, 72, 0.09);
+    overflow: hidden;
+}
+
+.chat-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid #f0f4f8;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+}
+
+.search-box i {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    border: 1px solid #e1e8ed;
+    border-radius: 14px;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    font-size: 0.92rem;
+}
+
+.search-box input:focus {
+    background: #fff;
+    border-color: #182B48;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(24, 43, 72, 0.08);
+}
+
+.chat-count {
+    color: #7f8c8d;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.chat-count span {
+    color: #182B48;
+    font-weight: 800;
+}
+
+.chat-empty {
+    text-align: center;
+    padding: 4.5rem 1.5rem;
+}
+
+.chat-empty-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0f4f8, #e1e8ed);
+    color: #182B48;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    margin: 0 auto 1.25rem;
+    box-shadow: 0 8px 24px rgba(24, 43, 72, 0.08);
+}
+
+.chat-empty h5 {
+    color: #182B48;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.chat-empty p {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+}
+
 .conversations-list {
     display: flex;
     flex-direction: column;
@@ -196,11 +371,13 @@
 .conversation-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 18px 24px;
-    border-bottom: 1px solid #f0f4f8;
+    gap: 1rem;
+    padding: 1.15rem 1.75rem;
     text-decoration: none;
-    transition: all 0.3s ease;
+    color: inherit;
+    border-bottom: 1px solid #f5f7fa;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
 .conversation-item:last-child {
@@ -208,178 +385,344 @@
 }
 
 .conversation-item:hover {
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.04) 100%);
+    background: #f8fafc;
+    transform: translateX(-4px);
 }
 
 .conversation-item.unread {
-    background: linear-gradient(135deg, rgba(212, 160, 48, 0.04) 0%, rgba(180, 128, 44, 0.06) 100%);
+    background: #fffbf2;
+}
+
+.conversation-item.unread:hover {
+    background: #fff5e0;
 }
 
 .conversation-item.unread::before {
     content: '';
     position: absolute;
     right: 0;
-    top: 0;
-    bottom: 0;
+    top: 14px;
+    bottom: 14px;
     width: 4px;
     background: linear-gradient(180deg, #d4a030, #B4802C);
+    border-radius: 4px 0 0 4px;
 }
 
 .conversation-avatar {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 14px;
+    color: #d4a030;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #d4a030;
     font-size: 20px;
     flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(24, 43, 72, 0.14);
 }
 
-.conversation-info {
+.conversation-avatar.group {
+    background: linear-gradient(135deg, #d4a030, #B4802C);
+    color: #fff;
+}
+
+.conversation-body {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
 }
 
-.conversation-name {
+.conversation-top {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #182B48;
-    margin-bottom: 4px;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
 
-.conversation-preview {
-    font-size: 13px;
-    color: #7f8c8d;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.conversation-title {
+    font-weight: 800;
+    color: #182B48;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.conversation-item.unread .conversation-title {
+    color: #000;
+}
+
+.group-badge {
+    background: rgba(24, 43, 72, 0.08);
+    color: #182B48;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
 }
 
 .unread-badge {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.conversation-meta {
+.conversation-bottom {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.conversation-preview {
+    font-size: 0.86rem;
+    color: #7f8c8d;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.conversation-item.unread .conversation-preview {
+    color: #182B48;
+    font-weight: 600;
 }
 
 .conversation-time {
-    font-size: 11px;
+    font-size: 0.75rem;
     color: #95a5a6;
+    white-space: nowrap;
 }
 
-.group-badge {
-    background: rgba(24, 43, 72, 0.1);
-    color: #182B48;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
+.modal-content {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #182B48, #2A4570);
+    padding: 1.25rem 1.75rem;
+    color: #fff;
+}
+
+.modal-title {
+    font-weight: 800;
+    font-size: 1.1rem;
 }
 
 .chat-type-buttons {
     display: flex;
-    gap: 12px;
+    gap: 0.5rem;
+    background: #f0f4f8;
+    padding: 0.35rem;
+    border-radius: 16px;
 }
 
 .chat-type-btn {
     flex: 1;
-    padding: 14px 20px;
-    background: #f0f4f8;
-    border: 2px solid transparent;
+    padding: 0.75rem;
+    border: none;
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    background: transparent;
+    color: #7f8c8d;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
 }
 
 .chat-type-btn:hover {
-    background: rgba(24, 43, 72, 0.05);
+    background: rgba(24, 43, 72, 0.04);
 }
 
 .chat-type-btn.active {
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.1), rgba(42, 69, 112, 0.1));
-    border-color: #182B48;
-    color: #182B48;
-}
-
-.user-search-container {
-    position: relative;
-}
-
-.search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
     background: #fff;
+    color: #182B48;
+    box-shadow: 0 4px 12px rgba(24, 43, 72, 0.1);
+}
+
+.form-label {
+    font-weight: 800;
+    color: #182B48;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
     border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    max-height: 250px;
-    overflow-y: auto;
-    z-index: 100;
+    border: 1px solid #e1e8ed;
+    padding: 0.75rem 1rem;
+    font-size: 0.92rem;
 }
 
-.search-result-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    cursor: pointer;
-    transition: all 0.2s;
+.form-control:focus,
+.form-select:focus {
+    border-color: #182B48;
+    box-shadow: 0 0 0 3px rgba(24, 43, 72, 0.08);
 }
 
-.search-result-item:hover {
-    background: #f0f4f8;
+.search-select {
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.search-select i {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #95a5a6;
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+.search-select input {
+    width: 100%;
+    padding: 0.55rem 2rem 0.55rem 0.75rem;
+    border: 1px solid #e1e8ed;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+}
+
+.search-select input:focus {
+    outline: none;
+    border-color: #182B48;
+    background: #fff;
+}
+
+.form-select[multiple] {
+    min-height: 170px;
+    border-radius: 12px;
+}
+
+.form-select option {
+    padding: 0.55rem 0.85rem;
+}
+
+.form-select option:checked {
+    background: #182B48;
+    color: #fff;
+}
+
+.form-select option:disabled {
+    color: #bdc3c7;
+    background: #f8fafc;
+}
+
+.form-select optgroup {
+    font-weight: 800;
+    color: #182B48;
+    background: #f8fafc;
+    padding: 0.4rem 0;
 }
 
 .selected-users {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .selected-user-tag {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.1), rgba(42, 69, 112, 0.1));
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
+    background: linear-gradient(135deg, rgba(24, 43, 72, 0.08), rgba(42, 69, 112, 0.08));
     color: #182B48;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.selected-user-tag .remove-btn {
+.selected-user-tag button {
+    border: none;
+    background: rgba(192, 57, 43, 0.12);
+    color: #c0392b;
     width: 18px;
     height: 18px;
-    background: rgba(192, 57, 43, 0.2);
-    color: #c0392b;
     border-radius: 50%;
+    font-size: 9px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    font-size: 10px;
+    transition: background 0.2s;
+}
+
+.selected-user-tag button:hover {
+    background: rgba(192, 57, 43, 0.25);
+}
+
+.modal-footer {
+    border-top: 1px solid #f0f4f8;
+    padding: 1rem 1.75rem;
+}
+
+.btn-light {
+    background: #f0f4f8;
+    border: none;
+    color: #182B48;
+    border-radius: 12px;
+    padding: 0.65rem 1.25rem;
+    font-weight: 700;
+}
+
+.btn-light:hover {
+    background: #e1e8ed;
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    border-radius: 12px;
+    padding: 0.65rem 1.5rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-footer .btn-primary:hover {
+    opacity: 0.92;
+}
+
+@media (max-width: 576px) {
+    .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .chat-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .conversation-item {
+        padding: 1rem;
+    }
+
+    .conversation-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
 }
 </style>
 @endpush
@@ -394,29 +737,106 @@ document.addEventListener('DOMContentLoaded', function() {
     const groupChatSection = document.getElementById('groupChatSection');
     const userSelect = document.getElementById('userSelect');
     const groupUsersSelect = document.getElementById('groupUsersSelect');
+    const groupSelectedTags = document.getElementById('groupSelectedTags');
+    const newChatForm = document.getElementById('newChatForm');
+    const newChatModal = document.getElementById('newChatModal');
+    const conversationSearch = document.getElementById('conversationSearch');
+    const conversationsList = document.getElementById('conversationsList');
+
+    groupUsersSelect.disabled = true;
+
+    function switchChatType(type) {
+        chatTypeBtns.forEach(b => b.classList.remove('active'));
+        document.querySelector(`.chat-type-btn[data-type="${type}"]`).classList.add('active');
+        chatTypeInput.value = type === 'group' ? 1 : 0;
+
+        if (type === 'group') {
+            groupNameSection.classList.remove('d-none');
+            directChatSection.classList.add('d-none');
+            groupChatSection.classList.remove('d-none');
+            userSelect.removeAttribute('required');
+            userSelect.disabled = true;
+            groupUsersSelect.setAttribute('required', 'required');
+            groupUsersSelect.disabled = false;
+        } else {
+            groupNameSection.classList.add('d-none');
+            directChatSection.classList.remove('d-none');
+            groupChatSection.classList.add('d-none');
+            userSelect.setAttribute('required', 'required');
+            userSelect.disabled = false;
+            groupUsersSelect.removeAttribute('required');
+            groupUsersSelect.disabled = true;
+        }
+
+        buildGroupTags();
+    }
 
     chatTypeBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            chatTypeBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-
-            const type = this.dataset.type;
-            chatTypeInput.value = type === 'group' ? 1 : 0;
-
-            if (type === 'group') {
-                groupNameSection.classList.remove('d-none');
-                directChatSection.classList.add('d-none');
-                groupChatSection.classList.remove('d-none');
-                userSelect.removeAttribute('required');
-                groupUsersSelect.setAttribute('required', 'required');
-            } else {
-                groupNameSection.classList.add('d-none');
-                directChatSection.classList.remove('d-none');
-                groupChatSection.classList.add('d-none');
-                userSelect.setAttribute('required', 'required');
-                groupUsersSelect.removeAttribute('required');
-            }
+            switchChatType(this.dataset.type);
         });
+    });
+
+    function buildGroupTags() {
+        groupSelectedTags.innerHTML = '';
+        const selected = Array.from(groupUsersSelect.selectedOptions);
+        if (selected.length === 0) return;
+
+        selected.forEach(option => {
+            const tag = document.createElement('div');
+            tag.className = 'selected-user-tag';
+            tag.innerHTML = `
+                <span>${option.text}</span>
+                <button type="button" data-value="${option.value}" aria-label="إزالة">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            tag.querySelector('button').addEventListener('click', function() {
+                const opt = groupUsersSelect.querySelector(`option[value="${this.dataset.value}"]`);
+                if (opt) {
+                    opt.selected = false;
+                    buildGroupTags();
+                }
+            });
+            groupSelectedTags.appendChild(tag);
+        });
+    }
+
+    groupUsersSelect.addEventListener('change', buildGroupTags);
+
+    document.querySelectorAll('.user-search').forEach(input => {
+        input.addEventListener('input', function() {
+            const target = document.getElementById(this.dataset.target);
+            const term = this.value.trim().toLowerCase();
+            target.querySelectorAll('optgroup').forEach(group => {
+                let visible = 0;
+                group.querySelectorAll('option').forEach(option => {
+                    const match = option.textContent.toLowerCase().includes(term);
+                    option.style.display = match ? '' : 'none';
+                    if (match) visible++;
+                });
+                group.style.display = visible > 0 ? '' : 'none';
+            });
+        });
+    });
+
+    if (conversationSearch && conversationsList) {
+        conversationSearch.addEventListener('input', function() {
+            const term = this.value.trim().toLowerCase();
+            conversationsList.querySelectorAll('.conversation-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+    }
+
+    newChatModal.addEventListener('hidden.bs.modal', function() {
+        newChatForm.reset();
+        switchChatType('direct');
+        document.querySelectorAll('.user-search').forEach(input => input.value = '');
+        document.querySelectorAll('.form-select option').forEach(option => option.style.display = '');
+        document.querySelectorAll('.form-select optgroup').forEach(group => group.style.display = '');
+        buildGroupTags();
     });
 });
 </script>

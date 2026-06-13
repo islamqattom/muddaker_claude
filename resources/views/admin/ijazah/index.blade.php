@@ -519,7 +519,7 @@ function loadStudents() {
         return;
     }
 
-    const filteredStudents = allStudents.filter(s => s.supervisor_id == supervisorId);
+    const filteredStudents = allStudents.filter(s => s.ijazah_supervisor_id == supervisorId);
 
     if (filteredStudents.length === 0) {
         studentSelect.innerHTML = '<option value="">-- لا يوجد طلاب --</option>';
@@ -608,7 +608,7 @@ function loadModalStudents() {
         return;
     }
 
-    const filteredStudents = allStudents.filter(s => !s.supervisor_id);
+    const filteredStudents = allStudents;
 
     if (filteredStudents.length === 0) {
         studentSelect.innerHTML = '<option value="">-- لا توجد طلاب --</option>';
@@ -619,7 +619,7 @@ function loadModalStudents() {
     filteredStudents.forEach(student => {
         const option = document.createElement('option');
         option.value = student.id;
-        option.textContent = student.user.name + ' (مشرف: ' + (student.supervisor?.name || 'بدون مشرف') + ')';
+        option.textContent = student.user.name + ' (مشرف: ' + (student.supervisor?.name || 'بدون مشرف') + ')' + (student.ijazah_supervisor ? ' - إجازة: ' + student.ijazah_supervisor.name : '');
         studentSelect.appendChild(option);
     });
     studentSelect.disabled = false;
@@ -686,7 +686,7 @@ function loadStudentsForRemoval() {
         return;
     }
 
-    const filteredStudents = allStudents.filter(s => s.supervisor_id == supervisorId);
+    const filteredStudents = allStudents.filter(s => s.ijazah_supervisor_id == supervisorId);
 
     if (filteredStudents.length === 0) {
         studentSelect.innerHTML = '<option value="">-- لا يوجد طلاب لهذا المشرف --</option>';

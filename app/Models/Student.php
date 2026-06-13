@@ -12,7 +12,7 @@ class Student extends Model
     use HasFactory, Auditable, HasArabicDay;
 
     protected $fillable = [
-        'user_id', 'supervisor_id', 'level_id', 'student_number',
+        'user_id', 'supervisor_id', 'ijazah_supervisor_id', 'level_id', 'student_number',
         'national_id', 'birth_date', 'phone', 'address',
         'memorized_parts', 'current_part', 'current_page',
         'enrollment_date', 'notes', 'fee_category_id',
@@ -40,6 +40,11 @@ class Student extends Model
     public function supervisor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function ijazahSupervisor()
+    {
+        return $this->belongsTo(User::class, 'ijazah_supervisor_id');
     }
 
     public function level()
