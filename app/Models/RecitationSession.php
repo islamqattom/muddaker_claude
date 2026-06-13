@@ -145,30 +145,27 @@ class RecitationSession extends Model
         // }
 
         // For all other types (new_memorization, review, unmastered, mafsil):
-        // حساب إجمالي الخطأ المكافئ: 3 ترددات = 1 خطأ دائماً
-        // - الأخضر: أقل من 1 خطأ equivalent
-        // - البرتقالي: من 1 إلى أقل من 2 خطأ equivalent
-        // - الأحمر: 2 خطأ equivalent بالضبط (2 خطأ بدون تردد، أو 6 تردد، أو 1 خطأ+3 تردد)
-        // - الأسود: 2 خطأ + 1 تردد أو أكثر، أو 3+ أخطاء
+        // نظام النقاط: كل خطأ = 3 نقاط، كل تردد = 1 نقطة
+        // - الأخضر: 0–2 نقاط
+        // - البرتقالي: 3–5 نقاط
+        // - الأحمر: 6 نقاط بالضبط
+        // - الأسود: 7 نقاط فأكثر
 
-        $totalEquivalent = $errors + floor($hesitations / 3);
+        $score = ($errors * 3) + $hesitations;
 
-        if ($totalEquivalent < 1) {
-            return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
-        } elseif ($totalEquivalent < 2) {
-            return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
-        } elseif ($totalEquivalent == 2 && $hesitations >= 1) {
-            // أسود: 2 خطأ + 1 تردد أو أكثر (يتضمن 6 تردد = 2 خطأ مكافئ)
-            return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
-        } elseif ($totalEquivalent == 2 && $hesitations == 0) {
-            // أحمر: خطأين بدون تردد
-            return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
-        } elseif ($totalEquivalent >= 3) {
-            // 3 خطأ equivalent أو أكثر
-            return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
-        } else {
+        if ($score <= 2) {
             return ['color' => 'green', 'passed' => true, 'label' => 'ممتاز'];
         }
+
+        if ($score <= 5) {
+            return ['color' => 'orange', 'passed' => true, 'label' => 'جيد'];
+        }
+
+        if ($score === 6) {
+            return ['color' => 'red', 'passed' => true, 'label' => 'ضعيف'];
+        }
+
+        return ['color' => 'black', 'passed' => false, 'label' => 'راسب'];
     }
 
     public static function calculateMafsilScore(float $maxScore, int $errors, int $hesitations): float

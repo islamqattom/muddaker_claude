@@ -130,39 +130,67 @@ class RecitationSessionTest extends TestCase
 
     public function test_calculate_page_color_returns_orange_for_good(): void
     {
-        // 1 error OR 3-5 hesitations = good (orange)
-        $result = RecitationSession::calculatePageColor(1, 0);
+        // 0 errors + 3-5 hesitations OR 1 error + 0-2 hesitations = good (orange)
+        $result = RecitationSession::calculatePageColor(0, 3);
         $this->assertEquals('orange', $result['color']);
         $this->assertTrue($result['passed']);
         $this->assertEquals('جيد', $result['label']);
 
-        $result = RecitationSession::calculatePageColor(0, 4);
+        $result = RecitationSession::calculatePageColor(0, 5);
+        $this->assertEquals('orange', $result['color']);
+        $this->assertTrue($result['passed']);
+
+        $result = RecitationSession::calculatePageColor(1, 0);
+        $this->assertEquals('orange', $result['color']);
+        $this->assertTrue($result['passed']);
+
+        $result = RecitationSession::calculatePageColor(1, 2);
         $this->assertEquals('orange', $result['color']);
         $this->assertTrue($result['passed']);
     }
 
     public function test_calculate_page_color_returns_red_for_weak(): void
     {
-        // 2 errors, 0 hesitations = weak (red)
+        // Exactly 6 points = weak (red)
         $result = RecitationSession::calculatePageColor(2, 0);
         $this->assertEquals('red', $result['color']);
         $this->assertTrue($result['passed']);
         $this->assertEquals('ضعيف', $result['label']);
+
+        $result = RecitationSession::calculatePageColor(0, 6);
+        $this->assertEquals('red', $result['color']);
+        $this->assertTrue($result['passed']);
+
+        $result = RecitationSession::calculatePageColor(1, 3);
+        $this->assertEquals('red', $result['color']);
+        $this->assertTrue($result['passed']);
     }
 
     public function test_calculate_page_color_returns_black_for_failed(): void
     {
-        // 3+ errors OR 2 errors with any hesitations OR 6+ hesitations = failed (black)
-        $result = RecitationSession::calculatePageColor(3, 0);
+        // 7+ points = failed (black)
+        $result = RecitationSession::calculatePageColor(0, 7);
         $this->assertEquals('black', $result['color']);
         $this->assertFalse($result['passed']);
         $this->assertEquals('راسب', $result['label']);
+
+        $result = RecitationSession::calculatePageColor(0, 8);
+        $this->assertEquals('black', $result['color']);
+        $this->assertFalse($result['passed']);
+
+        $result = RecitationSession::calculatePageColor(1, 4);
+        $this->assertEquals('black', $result['color']);
+        $this->assertFalse($result['passed']);
+
+        $result = RecitationSession::calculatePageColor(1, 5);
+        $this->assertEquals('black', $result['color']);
+        $this->assertFalse($result['passed']);
 
         $result = RecitationSession::calculatePageColor(2, 1);
         $this->assertEquals('black', $result['color']);
         $this->assertFalse($result['passed']);
 
-        $result = RecitationSession::calculatePageColor(0, 6);
+        $result = RecitationSession::calculatePageColor(3, 0);
         $this->assertEquals('black', $result['color']);
         $this->assertFalse($result['passed']);
     }
