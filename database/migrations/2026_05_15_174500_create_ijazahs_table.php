@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('quran_part_id')->constrained()->onDelete('cascade');
-            $table->foreignId('supervisor_id')->constrained()->onDelete('cascade');
+            $table->foreignId('supervisor_id')->constrained('users')->onDelete('cascade');
             $table->boolean('is_completed')->default(false);
             $table->date('completed_at')->nullable();
             $table->timestamps();

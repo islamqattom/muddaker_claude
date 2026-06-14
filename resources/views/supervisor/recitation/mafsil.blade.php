@@ -1163,29 +1163,38 @@
                 </div>
                 @else
                 @foreach($juzPositions as $posIndex => $mafsilPosition)
-                <div class="position-card" id="mafsil-row-{{ $partIndex }}-{{ $posIndex }}">
+                @php $isPlaceholder = empty($mafsilPosition->start_ayah_id) || empty($mafsilPosition->end_ayah_id); @endphp
+                <div class="position-card" id="mafsil-row-{{ $partIndex }}-{{ $posIndex }}" data-placeholder="{{ $isPlaceholder ? '1' : '0' }}">
                     <div class="position-card-head">
                         <span class="position-number">{{ $posIndex + 1 }}</span>
-                        <span class="position-range">{{ $mafsilPosition->positionRangeLabel() }}</span>
+                        <span class="position-range">
+                            @if($isPlaceholder)
+                                <em class="text-muted">الموضع {{ $posIndex + 1 }}</em>
+                            @else
+                                {{ $mafsilPosition->positionRangeLabel() }}
+                            @endif
+                        </span>
                         <div class="position-meta">
-                            @php
-                                $difficultyClass = match($mafsilPosition->difficulty) {
-                                    1 => 'bg-success',
-                                    3 => 'bg-danger',
-                                    default => 'bg-warning text-dark',
-                                };
-                            @endphp
-                            <span class="difficulty-badge {{ $difficultyClass }}">
-                                @if($mafsilPosition->difficulty == 1)<i class="fas fa-feather-alt"></i>
-                                @elseif($mafsilPosition->difficulty == 3)<i class="fas fa-fire"></i>
-                                @else<i class="fas fa-balance-scale"></i>@endif
-                                {{ $mafsilPosition->difficultyLabel() }}
-                            </span>
-                            <span class="page-badge"><i class="fas fa-file-alt"></i> صفحة {{ $mafsilPosition->pageNumberLabel() }}</span>
-                            <button type="button" class="btn-view-ayahs"
-                                    onclick="showPositionAyahs({{ $mafsilPosition->id }})" title="عرض الآيات بالرسم العثماني">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                            @if(!$isPlaceholder)
+                                @php
+                                    $difficultyClass = match($mafsilPosition->difficulty) {
+                                        1 => 'bg-success',
+                                        3 => 'bg-danger',
+                                        default => 'bg-warning text-dark',
+                                    };
+                                @endphp
+                                <span class="difficulty-badge {{ $difficultyClass }}">
+                                    @if($mafsilPosition->difficulty == 1)<i class="fas fa-feather-alt"></i>
+                                    @elseif($mafsilPosition->difficulty == 3)<i class="fas fa-fire"></i>
+                                    @else<i class="fas fa-balance-scale"></i>@endif
+                                    {{ $mafsilPosition->difficultyLabel() }}
+                                </span>
+                                <span class="page-badge"><i class="fas fa-file-alt"></i> صفحة {{ $mafsilPosition->pageNumberLabel() }}</span>
+                                <button type="button" class="btn-view-ayahs"
+                                        onclick="showPositionAyahs({{ $mafsilPosition->id }})" title="عرض الآيات بالرسم العثماني">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
                     <div class="position-card-body">
@@ -1228,9 +1237,15 @@
                     </div>
                     <input type="hidden" name="pages[{{ $globalIndex }}][page_number]" value="{{ $part->part_number }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][position]" value="{{ $posIndex + 1 }}">
+                    <input type="hidden" name="pages[{{ $globalIndex }}][is_placeholder]" value="{{ $isPlaceholder ? '1' : '0' }}">
+                    @if(!$isPlaceholder)
                     <input type="hidden" name="pages[{{ $globalIndex }}][mafsil_position_id]" value="{{ $mafsilPosition->id }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][position_range]" value="{{ $mafsilPosition->positionRangeLabel() }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][page_number_in_mushaf]" value="{{ $mafsilPosition->pageNumberLabel() }}">
+                    @else
+                    <input type="hidden" name="pages[{{ $globalIndex }}][position_range]" value="">
+                    <input type="hidden" name="pages[{{ $globalIndex }}][page_number_in_mushaf]" value="">
+                    @endif
                 </div>
                 @php $globalIndex++; @endphp
                 @endforeach

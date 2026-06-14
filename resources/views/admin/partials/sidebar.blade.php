@@ -20,6 +20,10 @@
     <div class="icon-wrapper"><i class="fas fa-award"></i></div>
     <span>الإجازة</span>
 </a>
+<a href="{{ route('admin.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('admin.yawm-al-himma.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
+    <span>يوم الهمة</span>
+</a>
 <a href="{{ route('admin.supervisors.index') }}" class="nav-link {{ request()->routeIs('admin.supervisors.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-user-tie"></i></div>
     <span>المشرفون</span>

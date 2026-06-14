@@ -299,10 +299,6 @@ class RecitationController extends Controller
 
             $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
 
-            if ($mafsilPositions === null) {
-                return back()->withErrors(['difficulty' => 'لا يوجد مواضيع كافية من المستوى المطلوب في أحد الأجزاء.']);
-            }
-
             // Parts selected - show scoring form
             $selectionMode = false; // Show scoring form
 
@@ -351,7 +347,7 @@ class RecitationController extends Controller
     /**
      * Randomly select mafsil positions for each part based on difficulty distribution.
      */
-    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): ?\Illuminate\Support\Collection
+    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): \Illuminate\Support\Collection
     {
         $allPositions = MafsilPosition::with(['startAyah.surah', 'endAyah.surah'])
             ->whereIn('juz_number', $selectedParts)
@@ -373,14 +369,17 @@ class RecitationController extends Controller
                 $available = $allPositions->get($partNumber, collect())->get($difficulty, collect());
 
                 if ($available->count() < $needed) {
-                    return null;
+                    $partSelected = $partSelected->merge(
+                        $this->buildPlaceholderPositions($partNumber, $needed, $difficulty, count($partSelected))
+                    );
+                    continue;
                 }
 
                 $partSelected = $partSelected->merge($available->shuffle()->take($needed));
             }
 
             if ($partSelected->isEmpty()) {
-                return null;
+                $partSelected = $this->buildPlaceholderPositions($partNumber, 3, 0, 0);
             }
 
             $selectedPositions = $selectedPositions->merge(
@@ -389,6 +388,29 @@ class RecitationController extends Controller
         }
 
         return $selectedPositions->groupBy('juz_number');
+    }
+
+    /**
+     * Build placeholder MafsilPosition rows for a part when no real positions exist.
+     */
+    private function buildPlaceholderPositions(int $partNumber, int $count, int $difficulty, int $startOrder): \Illuminate\Support\Collection
+    {
+        $placeholders = collect();
+        for ($i = 0; $i < $count; $i++) {
+            $position = new MafsilPosition();
+            $position->id = -1 * (($partNumber * 100) + $startOrder + $i + 1);
+            $position->juz_number = $partNumber;
+            $position->position_number = $startOrder + $i + 1;
+            $position->list_order = $startOrder + $i + 1;
+            $position->start_ayah_id = null;
+            $position->end_ayah_id = null;
+            $position->difficulty = $difficulty > 0 ? $difficulty : 2;
+            $position->notes = null;
+            $position->exists = false;
+            $placeholders->push($position);
+        }
+
+        return $placeholders;
     }
 
     /**

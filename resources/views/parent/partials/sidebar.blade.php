@@ -20,6 +20,10 @@
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
     <span>أجزاء الأبناء</span>
 </a>
+<a href="{{ route('parent.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('parent.yawm-al-himma.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
+    <span>يوم الهمة</span>
+</a>
 <a href="{{ route('parent.warnings.index') }}" class="nav-link {{ request()->routeIs('parent.warnings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>

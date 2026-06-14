@@ -41,6 +41,10 @@
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
     <span>أجزائي</span>
 </a>
+<a href="{{ route('student.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('student.yawm-al-himma.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
+    <span>يوم الهمة</span>
+</a>
 <a href="{{ route('student.reports.index') }}" class="nav-link {{ request()->routeIs('student.reports.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-chart-bar"></i></div>
     <span>تقاريري</span>

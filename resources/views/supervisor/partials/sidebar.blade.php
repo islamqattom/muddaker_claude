@@ -29,6 +29,10 @@
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
     <span>أجزاء الطالب</span>
 </a>
+<a href="{{ route('supervisor.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('supervisor.yawm-al-himma.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
+    <span>يوم الهمة</span>
+</a>
 
 <span class="nav-section-title">التسميع</span>
 <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.index') ? 'active' : '' }}">

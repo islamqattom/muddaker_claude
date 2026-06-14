@@ -26,6 +26,17 @@ Route::middleware('throttle:5,1')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
+// ============================
+// GUEST: Yawm Al-Himma (يوم الهمة)
+// ============================
+Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'showForm'])->name('index');
+    Route::post('/parts', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'showParts'])->name('parts');
+    Route::post('/evaluate', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'showEvaluation'])->name('evaluate');
+    Route::post('/save', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'save'])->name('save');
+    Route::get('/result/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'result'])->name('result');
+});
+
 // Push subscription routes (authenticated)
 Route::middleware('auth')->group(function () {
     Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
@@ -160,6 +171,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/ijazah/get-ijazah', [Admin\IjazahController::class, 'getIjazahForStudent'])->name('ijazah.getIjazah');
     Route::post('/ijazah/assign-student', [Admin\IjazahController::class, 'assignStudentToSupervisor'])->name('ijazah.assignStudent');
     Route::post('/ijazah/remove-student', [Admin\IjazahController::class, 'removeStudentFromIjazah'])->name('ijazah.removeStudent');
+
+    // Yawm Al-Himma (يوم الهمة)
+    Route::get('/yawm-al-himma', [Admin\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
+    Route::get('/yawm-al-himma/day/{date}', [Admin\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
+    Route::delete('/yawm-al-himma/{session}', [Admin\YawmAlHimmaController::class, 'destroy'])->name('yawm-al-himma.destroy');
 });
 
 // ============================
@@ -258,6 +274,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Tasks (تكليفات)
     Route::get('/tasks', [Supervisor\TaskController::class, 'index'])->name('tasks.index');
     Route::put('/tasks/{task}/status', [Supervisor\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+
+    // Yawm Al-Himma (يوم الهمة)
+    Route::get('/yawm-al-himma', [Supervisor\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
+    Route::get('/yawm-al-himma/{session}', [Supervisor\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
 });
 
 // ============================
@@ -292,6 +312,10 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
     // Student Parts Record (own record only)
     Route::get('/student-parts', [StudentStudentPartRecordController::class, 'show'])->name('student-parts');
+
+    // Yawm Al-Himma (يوم الهمة)
+    Route::get('/yawm-al-himma', [Student\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
+    Route::get('/yawm-al-himma/{session}', [Student\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
 
     // Quran Reader
     Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
@@ -397,6 +421,10 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     Route::get('/student-parts', [ParentStudentPartRecordController::class, 'index'])->name('student-parts.index');
     Route::get('/student-parts/{studentId}', [ParentStudentPartRecordController::class, 'show'])->name('student-parts.show');
     Route::put('/student-parts/{studentId}/{partNumber}', [ParentStudentPartRecordController::class, 'update'])->name('student-parts.update');
+
+    // Yawm Al-Himma (يوم الهمة)
+    Route::get('/yawm-al-himma', [ParentPortal\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
+    Route::get('/yawm-al-himma/{session}', [ParentPortal\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
 
     // Billing
     Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');
