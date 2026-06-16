@@ -241,8 +241,34 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 @media (max-width: 768px) {
     .page-header { flex-direction: column; align-items: flex-start; }
     .stats-row { flex-direction: column; }
-    .data-table { font-size: 12px; }
-    .data-table th, .data-table td { padding: 10px 8px; }
+
+    .data-table thead { display: none; }
+    .data-table, .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; }
+    .data-table tr {
+        background: #fff;
+        border: 1px solid #eef1f6;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 2px 6px rgba(24,43,72,0.05);
+    }
+    .data-table td {
+        text-align: right;
+        padding: 6px 0;
+        border-bottom: 1px dashed #eef1f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+    .data-table td:last-child { border-bottom: none; padding-top: 10px; justify-content: center; }
+    .data-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 12px;
+        flex-shrink: 0;
+    }
 }
 </style>
 @endpush
@@ -366,10 +392,19 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             default => ''
                         };
                     @endphp
+                    @php
+                        $modalData = $record ? [
+                            'total_errors' => $record->total_errors,
+                            'total_hesitations' => $record->total_hesitations,
+                            'total_score' => $record->total_score,
+                            'last_recitation_date' => $record->last_recitation_date ? $record->last_recitation_date->format('Y-m-d') : null,
+                            'mastery_status' => $record->mastery_status,
+                        ] : null;
+                    @endphp
                     <tr>
-                        <td><strong>{{ $part->part_number }}</strong></td>
-                        <td>{{ $part->name }}</td>
-                        <td>
+                        <td data-label="الجزء"><strong>{{ $part->part_number }}</strong></td>
+                        <td data-label="اسم الجزء">{{ $part->name }}</td>
+                        <td data-label="الحالة">
                             <span class="status-badge {{ $statusClass }}">
                                 @if($statusLabel === 'مفصل')<i class="fas fa-star"></i>
                                 @elseif($statusLabel === 'متقن')<i class="fas fa-check"></i>
@@ -381,14 +416,14 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                 <span class="override-badge">يدوي</span>
                             @endif
                         </td>
-                        <td>{{ $record ? $record->total_errors : '-' }}</td>
-                        <td>{{ $record ? $record->total_hesitations : '-' }}</td>
-                        <td class="{{ $scoreClass }}">{{ $score !== null ? number_format($score, 1) . '%' : '-' }}</td>
-                        <td>{{ $record && $record->last_recitation_date ? $record->last_recitation_date->format('Y-m-d') : '-' }}</td>
-                        <td>
+                        <td data-label="الأخطاء">{{ $record ? $record->total_errors : '-' }}</td>
+                        <td data-label="الترددات">{{ $record ? $record->total_hesitations : '-' }}</td>
+                        <td data-label="الدرجة" class="{{ $scoreClass }}">{{ $score !== null ? number_format($score, 1) . '%' : '-' }}</td>
+                        <td data-label="آخر تسميع">{{ $record && $record->last_recitation_date ? $record->last_recitation_date->format('Y-m-d') : '-' }}</td>
+                        <td data-label="الإجراءات">
                             <button class="edit-btn"
                                 data-part="{{ $part->part_number }}"
-                                data-record='@json($record)'
+                                data-record='@json($modalData)'
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal">
                                 <i class="fas fa-edit"></i>

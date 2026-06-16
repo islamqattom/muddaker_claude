@@ -342,13 +342,38 @@
         }
 
         @media (max-width: 700px) {
-            .page-row { grid-template-columns: 80px 1fr 1fr; gap: 12px; padding: 12px 14px; }
-            .scoring-input-group { max-width: none; }
-            .scoring-input-group input { min-width: 50px; font-size: 15px; padding: 8px; }
-            .counter-btn { width: 34px; height: 34px; font-size: 14px; }
+            .page-row {
+                grid-template-columns: 1fr 1fr;
+                grid-template-areas: "page page" "errors hesitations";
+                gap: 10px;
+                padding: 12px 12px;
+            }
+            .page-row > .page-number-badge { grid-area: page; justify-self: center; }
+            .page-row > .errors-col { grid-area: errors; }
+            .page-row > .hesitations-col { grid-area: hesitations; }
+            .page-row.header { display: none; }
+            .scoring-input-group { max-width: none; gap: 6px; }
+            .scoring-input-group input { min-width: 0; width: 100%; font-size: 15px; padding: 8px; }
+            .counter-btn { width: 32px; height: 32px; font-size: 14px; flex-shrink: 0; }
             .page-number-badge { font-size: 13px; padding: 6px 10px; min-width: 60px; }
             .page-hero h1 { font-size: 22px; }
             .page-card { padding: 18px; }
+
+            .mobile-legend {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                background: linear-gradient(135deg, #f8f9fc 0%, #eef1f6 100%);
+                font-weight: 700;
+                color: var(--navy);
+                font-size: 13px;
+                padding: 10px 12px;
+                border-bottom: 2px solid var(--gold-soft);
+                text-align: center;
+            }
+        }
+        @media (min-width: 701px) {
+            .mobile-legend { display: none; }
         }
     </style>
     @stack('styles')

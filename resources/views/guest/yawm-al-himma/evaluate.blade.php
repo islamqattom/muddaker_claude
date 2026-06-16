@@ -46,6 +46,11 @@
             <div><i class="fas fa-question-circle" style="color: #b36b00;"></i> الترددات</div>
         </div>
 
+        <div class="mobile-legend">
+            <div><i class="fas fa-times-circle" style="color: var(--danger);"></i> الأخطاء</div>
+            <div><i class="fas fa-question-circle" style="color: #b36b00;"></i> الترددات</div>
+        </div>
+
         @foreach($pageRange as $pageNum)
         <div class="page-row" data-part="{{ $part->part_number }}" data-page="{{ $pageNum }}">
             <div class="page-number-badge">ص {{ $pageNum }}</div>

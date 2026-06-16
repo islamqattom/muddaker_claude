@@ -1026,6 +1026,60 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,160,48,0.3); }
 .btn-outline { background: transparent; color: #7f8c8d; border: 2px solid #e9ecef; }
 .btn-outline:hover { border-color: #182B48; color: #182B48; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .islamic-fees-header { height: 56px; margin-bottom: 16px; }
+    .header-bismillah { font-size: 16px; letter-spacing: 1px; }
+    .header-decoration-left, .header-decoration-right { display: none; }
+
+    .page-header-fees {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 18px 20px;
+        gap: 14px;
+    }
+    .header-content { gap: 12px; }
+    .header-icon { width: 52px; height: 52px; font-size: 22px; border-radius: 14px; }
+    .header-text h4 { font-size: 18px; }
+    .header-text p { font-size: 12px; }
+    .header-actions { flex-wrap: wrap; gap: 8px; }
+    .btn-action-header { padding: 9px 14px; font-size: 12px; }
+
+    .stat-card-fees { padding: 18px; }
+    .stat-icon { width: 48px; height: 48px; font-size: 20px; }
+    .stat-number { font-size: 26px; }
+    .stat-label { font-size: 12px; }
+    .stat-decoration { font-size: 36px; }
+
+    .filter-form { padding: 16px; }
+    .form-select-fe { padding: 10px 12px; font-size: 13px; }
+    .btn-search-fe, .btn-reset-fe { padding: 10px; }
+
+    .actions-bar-fees {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px 16px;
+    }
+    .actions-right { flex-wrap: wrap; gap: 8px; }
+    .actions-right .btn-action-fees { flex: 1 1 calc(50% - 4px); justify-content: center; padding: 10px 12px; font-size: 12px; }
+    .actions-left { text-align: center; }
+
+    /* Keep the table layout like desktop; allow horizontal scroll inside the card */
+    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table-fees { min-width: 760px; }
+    .data-table-fees th, .data-table-fees td { padding: 10px 8px; font-size: 12px; }
+    .user-avatar { width: 32px; height: 32px; font-size: 13px; }
+    .user-name { font-size: 12px; }
+    .category-badge { font-size: 11px; padding: 4px 8px; }
+    .status-badge { font-size: 11px; padding: 5px 10px; }
+    .action-btn-fees { width: 32px; height: 32px; }
+
+    .table-header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px 18px; }
+    .table-footer { padding: 14px 16px; }
+    .table-footer .page-link { padding: 8px 12px; font-size: 12px; }
+}
 </style>
 
 @push('scripts')
