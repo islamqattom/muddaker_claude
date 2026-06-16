@@ -34,6 +34,11 @@ class RecitationPage extends Model
         return $this->belongsTo(MafsilPosition::class, 'mafsil_position_id');
     }
 
+    public function tajweedErrors()
+    {
+        return $this->hasMany(RecitationTajweedError::class, 'recitation_page_id');
+    }
+
     public function getPositionLabelAttribute(): ?string
     {
         if ($this->mafsil_position_id && $this->mafsilPosition) {

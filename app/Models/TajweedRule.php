@@ -11,7 +11,7 @@ class TajweedRule extends Model
     const CATEGORY_WAQF = 'الوقف والابتداء';
     const CATEGORY_MADD = 'المد';
     const CATEGORY_NOON_SAKIN = 'النون الساكنة والتنوين';
-    const CATEGORY_Meem_SAKIN = 'الميم الساكنة';
+    const CATEGORY_MEEM_SAKIN = 'الميم الساكنة';
     const CATEGORY_GHUNNA = 'الغنة';
     const CATEGORY_IDGHAM = 'الإدغام';
     const CATEGORY_QALQALA = 'القلقلة';

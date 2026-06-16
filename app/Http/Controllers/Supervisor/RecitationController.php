@@ -8,7 +8,9 @@ use App\Models\MafsilPosition;
 use App\Models\QuranPart;
 use App\Models\RecitationPage;
 use App\Models\RecitationSession;
+use App\Models\RecitationTajweedError;
 use App\Models\Student;
+use App\Models\TajweedRuleDefinition;
 use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,6 +31,12 @@ class RecitationController extends Controller
         'pages.*.mafsil_position_id' => 'nullable|exists:mafsil_positions,id',
         'pages.*.position_range' => 'nullable|string|max:100',
         'pages.*.page_number_in_mushaf' => 'nullable|integer|min:1',
+        'pages.*.tajweed_errors' => 'nullable|array',
+        'pages.*.tajweed_errors.*.tajweed_rule_id' => 'nullable|integer|exists:tajweed_rule_definitions,id',
+        'pages.*.tajweed_errors.*.category' => 'nullable|string|max:100',
+        'pages.*.tajweed_errors.*.note' => 'nullable|string|max:500',
+        'pages.*.tajweed_errors.*.severity' => 'nullable|integer|min:1|max:5',
+        'pages.*.tajweed_errors.*.occurrences' => 'nullable|integer|min:1',
     ];
 
     private const MAFSIL_MAX_SCORE = 100;
@@ -298,19 +306,22 @@ class RecitationController extends Controller
             }
 
             $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
+            $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
+                ->get(['id', 'name', 'category']);
 
             // Parts selected - show scoring form
             $selectionMode = false; // Show scoring form
 
-            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions'));
+            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions', 'tajweedRules'));
         }
 
         // No parts selected yet - show selection UI
         $parts = collect(); // Empty collection for now
         $mafsilPositions = collect();
+        $tajweedRules = collect();
         $selectionMode = true; // Show part selection UI
 
-        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions'));
+        return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions', 'tajweedRules'));
     }
 
     /**
@@ -674,7 +685,7 @@ class RecitationController extends Controller
                 $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
             }
 
-            RecitationPage::create([
+            $page = RecitationPage::create([
                 'session_id' => $session->id,
                 'page_number' => $pageData['page_number'],
                 'mafsil_position_id' => $pageData['mafsil_position_id'] ?? null,
@@ -687,6 +698,8 @@ class RecitationController extends Controller
                 'is_passed' => $colorResult['passed'],
                 'page_score' => $pageScore,
             ]);
+
+            $this->saveTajweedErrorsForPage($page, $pageData['tajweed_errors'] ?? []);
         }
 
         return $session;
@@ -999,6 +1012,42 @@ class RecitationController extends Controller
             );
         } catch (\Exception $e) {
             \Log::error("Failed to notify student about session {$session->id}: ".$e->getMessage());
+        }
+    }
+
+    /**
+     * Return tajweed rules grouped by category for use in scoring forms.
+     */
+    public function tajweedRules(Request $request)
+    {
+        $rules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
+            ->get(['id', 'name', 'category', 'description']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $rules,
+        ]);
+    }
+
+    /**
+     * Persist attached tajweed errors for a single recitation page.
+     */
+    private function saveTajweedErrorsForPage(RecitationPage $page, array $tajweedErrors): void
+    {
+        foreach ($tajweedErrors as $err) {
+            if (empty($err['tajweed_rule_id']) && empty($err['category']) && empty($err['note'])) {
+                continue;
+            }
+
+            RecitationTajweedError::create([
+                'recitation_page_id' => $page->id,
+                'tajweed_rule_id' => $err['tajweed_rule_id'] ?? null,
+                'category' => $err['category'] ?? null,
+                'note' => $err['note'] ?? null,
+                'severity' => isset($err['severity']) ? (int) $err['severity'] : 1,
+                'occurrences' => isset($err['occurrences']) ? (int) $err['occurrences'] : 1,
+                'source' => 'supervisor',
+            ]);
         }
     }
 }

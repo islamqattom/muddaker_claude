@@ -1282,6 +1282,77 @@
     min-width: 0;
 }
 
+.rec-session .position-card-tajweed {
+    grid-column: 1 / -1;
+    padding: 8px 12px 10px;
+    border-top: 1px dashed rgba(15, 28, 51, 0.08);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+}
+
+.rec-session .btn-tajweed-attach {
+    background: linear-gradient(135deg, var(--gold) 0%, #b8941f 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(212, 160, 48, 0.25);
+    flex-shrink: 0;
+}
+.rec-session .btn-tajweed-attach:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(212, 160, 48, 0.35); }
+.rec-session .btn-tajweed-attach:active { transform: scale(0.97); }
+
+.rec-session .tajweed-count-badge {
+    background: white;
+    color: var(--gold);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 800;
+    margin-inline-start: 4px;
+}
+
+.rec-session .tajweed-summary {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.rec-session .tajweed-summary .tajweed-chip {
+    background: rgba(212, 160, 48, 0.12);
+    color: #8a6a14;
+    border: 1px solid rgba(212, 160, 48, 0.35);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rec-session .tajweed-summary .tajweed-chip .remove-chip {
+    cursor: pointer;
+    color: #b91c1c;
+    font-weight: 800;
+    margin-inline-start: 2px;
+}
+
+.rec-session .tajweed-errors-container { display: none; }
+
 .rec-session .position-stat {
     display: flex;
     align-items: center;
@@ -2304,6 +2375,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="position-card-tajweed">
+                        <button type="button" class="btn-tajweed-attach"
+                                onclick="openTajweedModal({{ $globalIndex }}, {{ $partIndex }}, {{ $posIndex }}, '{{ addslashes($mafsilPosition->positionRangeLabel() ?? 'الموضع ' . ($posIndex + 1)) }}')">
+                            <i class="fas fa-book-quran me-1"></i>
+                            <span>أخطاء التجويد</span>
+                            <span class="tajweed-count-badge" id="tajweed-count-{{ $partIndex }}-{{ $posIndex }}" style="display:none;">0</span>
+                        </button>
+                        <div class="tajweed-summary" id="tajweed-summary-{{ $partIndex }}-{{ $posIndex }}"></div>
+                        <div class="tajweed-errors-container" id="tajweed-errors-{{ $globalIndex }}"></div>
+                    </div>
                     <input type="hidden" name="pages[{{ $globalIndex }}][page_number]" value="{{ $part->part_number }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][position]" value="{{ $posIndex + 1 }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][is_placeholder]" value="{{ $isPlaceholder ? '1' : '0' }}">
@@ -2458,6 +2539,52 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="tajweedModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
+                <div class="modal-header" style="background: linear-gradient(135deg, var(--gold) 0%, #b8941f 100%); color: white; border: none;">
+                    <h5 class="modal-title">
+                        <i class="fas fa-book-quran me-2"></i>
+                        أخطاء التجويد - <span id="tajweedModalPositionLabel"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <div class="mb-3">
+                        <label for="tajweedRuleSelect" class="form-label fw-bold">القاعدة</label>
+                        <select id="tajweedRuleSelect" class="form-select">
+                            <option value="">— اختر قاعدة —</option>
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="tajweedSeverityInput" class="form-label fw-bold">الشدة (1-5)</label>
+                            <input type="number" id="tajweedSeverityInput" class="form-control" value="1" min="1" max="5">
+                        </div>
+                        <div class="col-6">
+                            <label for="tajweedOccurrencesInput" class="form-label fw-bold">عدد التكرارات</label>
+                            <input type="number" id="tajweedOccurrencesInput" class="form-control" value="1" min="1" max="50">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="tajweedNoteInput" class="form-label fw-bold">ملاحظة (اختياري)</label>
+                        <textarea id="tajweedNoteInput" class="form-control" rows="2" maxlength="500" placeholder="مثال: لم يُظهر الغنة في النون الساكنة"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f8fafc; border-top: 1px solid #e2e8f0;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-warning text-white" id="tajweedAddBtn" onclick="addTajweedError()">
+                        <i class="fas fa-plus me-1"></i>إضافة الخطأ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const TAJWEED_RULES = @json($tajweedRules ?? []);
+    </script>
 
     @endif
 </div>
@@ -2781,6 +2908,114 @@ function submitMafsilIncomplete() {
             toastr.error(errorMsg);
         }
     });
+}
+
+// ====== Tajweed attach UI ======
+let tajweedContext = { globalIndex: null, partIndex: null, posIndex: null, positionLabel: '' };
+
+function openTajweedModal(globalIndex, partIndex, posIndex, positionLabel) {
+    tajweedContext = { globalIndex, partIndex, posIndex, positionLabel };
+    document.getElementById('tajweedModalPositionLabel').textContent = positionLabel;
+
+    const select = document.getElementById('tajweedRuleSelect');
+    select.innerHTML = '<option value="">— اختر قاعدة —</option>';
+    if (Array.isArray(window.TAJWEED_RULES)) {
+        const grouped = {};
+        window.TAJWEED_RULES.forEach(r => {
+            if (!grouped[r.category]) grouped[r.category] = [];
+            grouped[r.category].push(r);
+        });
+        Object.entries(grouped).forEach(([cat, list]) => {
+            const og = document.createElement('optgroup');
+            og.label = cat;
+            list.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = r.name;
+                opt.dataset.category = cat;
+                og.appendChild(opt);
+            });
+            select.appendChild(og);
+        });
+    }
+
+    document.getElementById('tajweedSeverityInput').value = 1;
+    document.getElementById('tajweedOccurrencesInput').value = 1;
+    document.getElementById('tajweedNoteInput').value = '';
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('tajweedModal'));
+    modal.show();
+}
+
+function addTajweedError() {
+    const ctx = tajweedContext;
+    const select = document.getElementById('tajweedRuleSelect');
+    const ruleId = select.value;
+    if (!ruleId) { toastr.warning('يرجى اختيار قاعدة'); return; }
+
+    const ruleName = select.options[select.selectedIndex].textContent;
+    const ruleCategory = select.options[select.selectedIndex].dataset.category || '';
+    const severity = Math.max(1, Math.min(5, parseInt(document.getElementById('tajweedSeverityInput').value, 10) || 1));
+    const occurrences = Math.max(1, parseInt(document.getElementById('tajweedOccurrencesInput').value, 10) || 1);
+    const note = document.getElementById('tajweedNoteInput').value.trim();
+
+    const container = document.getElementById('tajweed-errors-' + ctx.globalIndex);
+    const idx = container.children.length;
+
+    const row = document.createElement('div');
+    row.innerHTML = `
+        <input type="hidden" name="pages[${ctx.globalIndex}][tajweed_errors][${idx}][tajweed_rule_id]" value="${ruleId}">
+        <input type="hidden" name="pages[${ctx.globalIndex}][tajweed_errors][${idx}][category]" value="${ruleCategory}">
+        <input type="hidden" name="pages[${ctx.globalIndex}][tajweed_errors][${idx}][severity]" value="${severity}">
+        <input type="hidden" name="pages[${ctx.globalIndex}][tajweed_errors][${idx}][occurrences]" value="${occurrences}">
+        <input type="hidden" name="pages[${ctx.globalIndex}][tajweed_errors][${idx}][note]" value="${note.replace(/"/g, '&quot;')}">
+    `;
+    container.appendChild(row);
+
+    const summary = document.getElementById('tajweed-summary-' + ctx.partIndex + '-' + ctx.posIndex);
+    const chip = document.createElement('span');
+    chip.className = 'tajweed-chip';
+    chip.innerHTML = `<i class="fas fa-book-quran"></i> ${ruleName} ${occurrences > 1 ? `×${occurrences}` : ''} <span class="remove-chip" onclick="removeTajweedError(this, ${ctx.partIndex}, ${ctx.posIndex})" title="حذف">&times;</span>`;
+    summary.appendChild(chip);
+
+    updateTajweedCountBadge(ctx.partIndex, ctx.posIndex);
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('tajweedModal'));
+    modal.hide();
+    toastr.success('تم إضافة خطأ التجويد');
+}
+
+function removeTajweedError(el, partIndex, posIndex) {
+    const chip = el.closest('.tajweed-chip');
+    if (!chip) return;
+    const summary = chip.parentElement;
+    const index = Array.from(summary.children).indexOf(chip);
+
+    const container = chip.closest('.position-card-tajweed').querySelector('.tajweed-errors-container');
+    const rows = container.querySelectorAll(':scope > div');
+    if (rows[index]) {
+        rows[index].remove();
+        const globalIndex = container.id.replace('tajweed-errors-', '');
+        const remaining = container.querySelectorAll(':scope > div');
+        remaining.forEach((row, newIdx) => {
+            row.innerHTML = row.innerHTML.replace(/tajweed_errors\]\[\d+\]/g, 'tajweed_errors][' + newIdx + ']');
+        });
+    }
+    chip.remove();
+    updateTajweedCountBadge(partIndex, posIndex);
+}
+
+function updateTajweedCountBadge(partIndex, posIndex) {
+    const summary = document.getElementById('tajweed-summary-' + partIndex + '-' + posIndex);
+    const badge = document.getElementById('tajweed-count-' + partIndex + '-' + posIndex);
+    if (!summary || !badge) return;
+    const count = summary.querySelectorAll('.tajweed-chip').length;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
 }
 </script>
 @endpush

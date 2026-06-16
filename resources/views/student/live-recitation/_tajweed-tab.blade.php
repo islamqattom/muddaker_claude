@@ -46,10 +46,19 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>اختبر معلوماتك</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="toggleQuizHistory" type="button">
+                    <i class="fas fa-history me-1"></i>سجل الاختبارات
+                </button>
             </div>
             <div class="card-body text-center" id="tajweedQuizSection">
+                <div id="quizCategoryFilter" class="mb-3 text-end" style="display: none;">
+                    <label for="quizCategorySelect" class="form-label small text-muted mb-1">تصفية حسب الفئة</label>
+                    <select id="quizCategorySelect" class="form-select form-select-sm">
+                        <option value="">جميع الفئات</option>
+                    </select>
+                </div>
                 <div id="quizPlaceholder">
                     <i class="fas fa-question-circle fa-4x mb-3 text-success opacity-25"></i>
                     <h5>اختبر معلوماتك في التجويد</h5>
@@ -75,6 +84,24 @@
                     </div>
                 </div>
                 <div id="quizResults" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="card mt-4" id="quizHistoryCard" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>سجل الاختبارات</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="closeQuizHistory" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div id="quizHistoryList" class="list-group list-group-flush" style="max-height: 50vh; overflow-y: auto;">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden">جارٍ التحميل...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

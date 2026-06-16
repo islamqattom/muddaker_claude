@@ -213,6 +213,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::post('/calculate-color', [Supervisor\RecitationController::class, 'calculateColor'])->name('calculate-color');
         Route::post('/get-pages', [Supervisor\RecitationController::class, 'getPages'])->name('get-pages');
         Route::get('/mafsil-position/{mafsilPosition}/ayahs', [Supervisor\RecitationController::class, 'getMafsilPositionAyahs'])->name('mafsil-position.ayahs');
+        Route::get('/tajweed-rules', [Supervisor\RecitationController::class, 'tajweedRules'])->name('tajweed-rules');
         Route::get('/history', [Supervisor\RecitationController::class, 'history'])->name('history');
         Route::delete('/{recitation}', [Supervisor\RecitationController::class, 'destroy'])->name('destroy');
     });

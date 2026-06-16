@@ -8,6 +8,7 @@ use App\Http\Controllers\Student\ProgressController;
 use App\Http\Controllers\Student\AchievementController;
 use App\Http\Controllers\Student\LiveRecitationController;
 use App\Http\Controllers\Student\TarteelCenterController;
+use App\Http\Controllers\Student\TajweedTestController;
 use App\Http\Controllers\Api\ExamController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -76,6 +77,10 @@ Route::middleware(['auth:sanctum', 'role:student'])->prefix('student/tarteel')->
     Route::get('/memorization-stats', [TarteelCenterController::class, 'getMemorizationStats'])->name('api.student.tarteel.memorization-stats');
     Route::get('/tajweed-rules', [TarteelCenterController::class, 'getTajweedRules'])->name('api.student.tarteel.tajweed-rules');
     Route::get('/tajweed-example/{id}', [TarteelCenterController::class, 'getTajweedExample'])->name('api.student.tarteel.tajweed-example');
+    Route::post('/tajweed-quiz/start', [TajweedTestController::class, 'start'])->name('api.student.tarteel.tajweed-quiz.start');
+    Route::post('/tajweed-quiz/{attemptId}/submit', [TajweedTestController::class, 'submit'])->name('api.student.tarteel.tajweed-quiz.submit');
+    Route::get('/tajweed-quiz/history', [TajweedTestController::class, 'history'])->name('api.student.tarteel.tajweed-quiz.history');
+    Route::get('/tajweed-quiz/{attemptId}', [TajweedTestController::class, 'show'])->name('api.student.tarteel.tajweed-quiz.show');
     Route::post('/voice-search', [TarteelCenterController::class, 'voiceSearch'])->name('api.student.tarteel.voice-search');
     Route::get('/tafseer', [TarteelCenterController::class, 'getTafseer'])->name('api.student.tarteel.tafseer');
     Route::get('/challenges', [TarteelCenterController::class, 'getChallenges'])->name('api.student.tarteel.challenges');

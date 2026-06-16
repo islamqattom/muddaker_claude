@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\LiveRecitationError;
 use App\Models\LiveRecitationSession;
+use App\Models\RecitationTajweedError;
 use App\Models\Student;
+use App\Models\TajweedRuleDefinition;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -259,12 +261,62 @@ class LiveRecitationService
             'occurred_at' => Carbon::now(),
         ]);
 
+        $this->persistDetectedTajweedRule($sessionId, $errorData);
+
         $session = LiveRecitationSession::find($sessionId);
         if ($session) {
             $session->increment('total_errors');
         }
 
         return $error;
+    }
+
+    /**
+     * If the recorded error looks like a tajweed violation, attach a matching
+     * TajweedRuleDefinition row to the corresponding RecitationPage (if any).
+     */
+    protected function persistDetectedTajweedRule(int $liveSessionId, array $errorData): void
+    {
+        try {
+            $expected = (string) ($errorData['expected_text'] ?? '');
+            $detected = (string) ($errorData['detected_text'] ?? '');
+            if ($expected === '' || $detected === '' || $expected === $detected) {
+                return;
+            }
+
+            $category = $this->tajweedEvaluator->detectRuleCategory($expected, $detected);
+            if ($category === null) {
+                return;
+            }
+
+            $session = LiveRecitationSession::find($liveSessionId);
+            if (!$session || !$session->recitation_page_id) {
+                return;
+            }
+
+            $rule = TajweedRuleDefinition::where('category', $category)
+                ->orderBy('order')
+                ->first();
+
+            if (!$rule) {
+                return;
+            }
+
+            RecitationTajweedError::create([
+                'recitation_page_id' => $session->recitation_page_id,
+                'tajweed_rule_id' => $rule->id,
+                'category' => $category,
+                'note' => 'تم الكشف تلقائياً من التلاوة الحية',
+                'severity' => 1,
+                'occurrences' => 1,
+                'source' => 'live_recognition',
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('Failed to persist detected tajweed rule', [
+                'live_session_id' => $liveSessionId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

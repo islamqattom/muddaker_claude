@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\PronunciationAttempt;
+use App\Models\TajweedRuleDefinition;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -434,6 +435,35 @@ class TajweedEvaluatorService
                 return 'ممدود -elongation';
             }
             return 'نقصان في الحروف';
+        }
+
+        return null;
+    }
+
+    /**
+     * Detect category of the violated tajweed rule (Arabic label, matches TajweedRuleDefinition::category).
+     *
+     * Returns the category constant (e.g. "المد", "الغنة", "القلقلة", "النون الساكنة والتنوين")
+     * or null if no rule could be detected.
+     */
+    public function detectRuleCategory(string $expected, string $detected): ?string
+    {
+        $ruleText = $this->detectTajweedRule($expected, $detected);
+        if ($ruleText === null) {
+            return null;
+        }
+
+        if (str_contains($ruleText, 'ممدود')) {
+            return TajweedRuleDefinition::CATEGORY_MADD;
+        }
+        if (str_contains($ruleText, 'غنة')) {
+            return TajweedRuleDefinition::CATEGORY_GHUNNA;
+        }
+        if (str_contains($ruleText, 'قلقلة')) {
+            return TajweedRuleDefinition::CATEGORY_QALQALA;
+        }
+        if (str_contains($ruleText, 'النون')) {
+            return TajweedRuleDefinition::CATEGORY_NOON_SAKIN;
         }
 
         return null;

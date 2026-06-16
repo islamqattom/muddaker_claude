@@ -132,9 +132,14 @@ class TarteelCenterController extends Controller
     {
         $rules = TajweedRuleDefinition::orderBy('category')->orderBy('order')->get();
 
+        $categories = $rules->pluck('category')->filter()->unique()->values();
+
         return response()->json([
             'success' => true,
-            'data' => $rules,
+            'data' => [
+                'rules' => $rules,
+                'categories' => $categories,
+            ],
         ]);
     }
 
@@ -460,6 +465,6 @@ class TarteelCenterController extends Controller
 
     public function challengesPage()
     {
-        return view('student.live-recitation.tarteel-challenges');
+        return redirect()->route('student.challenges.index');
     }
 }

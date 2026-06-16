@@ -3,12 +3,16 @@
 
     const TajweedTab = {
         currentRule: null,
+        quizAttemptId: null,
         quizQuestions: [],
         currentQuizIndex: 0,
-        quizScore: 0,
+        quizSelectedAnswers: [],
+        questionStartedAt: null,
+        categories: [],
 
         init: function() {
             this.loadTajweedRules();
+            this.loadCategories();
             this.initQuizControls();
         },
 
@@ -16,7 +20,7 @@
             return document.querySelector('meta[name=api-token]')?.content || '';
         },
 
-        getFetchOptions: function() {
+        getFetchOptions: function(method, body) {
             const apiToken = this.getApiToken();
             const headers = {
                 'Accept': 'application/json',
@@ -25,21 +29,39 @@
             if (apiToken) {
                 headers['Authorization'] = 'Bearer ' + apiToken;
             }
-            return {
-                headers: headers,
-                credentials: 'include',
-            };
+            const opts = { method: method || 'GET', headers: headers, credentials: 'include' };
+            if (body) {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            return opts;
+        },
+
+        apiRequest: function(url, method, body) {
+            return fetch(url, this.getFetchOptions(method, body)).then(res => res.json());
+        },
+
+        loadCategories: function() {
+            this.apiRequest('/api/student/tarteel/tajweed-rules').then(data => {
+                if (data && data.success && data.data && data.data.categories) {
+                    this.categories = data.data.categories;
+                    const select = document.getElementById('quizCategorySelect');
+                    if (select) {
+                        select.innerHTML = '<option value="">جميع الفئات</option>' +
+                            this.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+                    }
+                }
+            }).catch(() => {});
         },
 
         loadTajweedRules: function() {
             const container = document.getElementById('tajweedRulesList');
             if (!container) return;
 
-            fetch('/api/student/tarteel/tajweed-rules', this.getFetchOptions())
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data && data.data.length > 0) {
-                    this.renderTajweedRules(data.data);
+            this.apiRequest('/api/student/tarteel/tajweed-rules').then(data => {
+                const rules = data && data.data ? (Array.isArray(data.data) ? data.data : (data.data.rules || [])) : [];
+                if (data && data.success && rules.length > 0) {
+                    this.renderTajweedRules(rules);
                 } else {
                     container.innerHTML = `
                         <div class="text-center py-4 px-3">
@@ -48,8 +70,7 @@
                         </div>
                     `;
                 }
-            })
-            .catch(err => {
+            }).catch(err => {
                 console.error('Error loading tajweed rules:', err);
                 container.innerHTML = `
                     <div class="text-center py-4 px-3">
@@ -113,85 +134,39 @@
 
             detailCard.style.display = 'block';
 
-            fetch(`/api/student/tarteel/tajweed-example/${ruleId}`, this.getFetchOptions())
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
+            this.apiRequest(`/api/student/tarteel/tajweed-example/${ruleId}`).then(data => {
+                if (data && data.success) {
                     this.renderRuleDetail(data.data);
-                } else {
-                    this.showToast('فشل في تحميل تفاصيل القاعدة', 'error');
                 }
-            })
-            .catch(err => {
-                console.error('Error loading rule detail:', err);
-                this.showToast('خطأ في الاتصال', 'error');
-            });
+            }).catch(err => console.error('Error loading rule detail:', err));
         },
 
         renderRuleDetail: function(data) {
-            this.currentRule = data.rule;
+            const rule = data.rule || {};
+            const example = data.example_verse || {};
 
-            const titleEl = document.getElementById('ruleDetailTitle');
-            const categoryEl = document.getElementById('ruleDetailCategory');
-            const typeEl = document.getElementById('ruleDetailType');
-            const descEl = document.getElementById('ruleDetailDescription');
-
-            if (titleEl) titleEl.innerHTML = `<i class="fas fa-info-circle me-2"></i>${data.rule.name}`;
-            if (categoryEl) categoryEl.textContent = data.rule.category;
-            if (typeEl) typeEl.textContent = data.rule.order ? `#${data.rule.order}` : '';
-            if (descEl) descEl.textContent = data.rule.description || 'لا يوجد وصف تفصيلي لهذه القاعدة';
+            document.getElementById('ruleDetailTitle').innerHTML =
+                `<i class="fas fa-info-circle me-2"></i>${rule.name || ''}`;
+            document.getElementById('ruleDetailCategory').textContent = rule.category || '';
+            document.getElementById('ruleDetailDescription').textContent = rule.description || '';
 
             const exampleSection = document.getElementById('tajweedExampleSection');
-            const verseEl = document.getElementById('ruleDetailVerse');
-            const verseRefEl = document.getElementById('ruleDetailVerseRef');
-
-            if (data.example_verse && data.example_verse.text) {
-                if (verseEl) {
-                    if (data.rule.colored_examples && data.rule.colored_examples[0]) {
-                        verseEl.innerHTML = `<span class="tajweed-example-text">${data.rule.colored_examples[0]}</span>`;
-                    } else {
-                        verseEl.textContent = data.example_verse.text;
-                    }
-                }
-                if (verseRefEl) {
-                    const surahName = window.SURAH_INFO?.[data.example_verse.surah]?.name || `سورة ${data.example_verse.surah}`;
-                    verseRefEl.textContent = `${surahName} - الآية ${data.example_verse.verse_number}`;
-                }
-                if (exampleSection) exampleSection.style.display = 'block';
+            if (example && example.text) {
+                exampleSection.style.display = 'block';
+                document.getElementById('ruleDetailVerse').textContent = example.text;
+                document.getElementById('ruleDetailVerseRef').textContent =
+                    `${example.surah && example.surah.name ? example.surah.name : ''} - آية ${example.verse_number || ''}`;
             } else {
-                if (exampleSection) exampleSection.style.display = 'none';
+                exampleSection.style.display = 'none';
             }
 
             const examplesSection = document.getElementById('ruleExamplesSection');
-            const examplesList = document.getElementById('ruleExamplesList');
-
-            if (data.rule.examples && examplesList) {
-                try {
-                    let examples = typeof data.rule.examples === 'string'
-                        ? JSON.parse(data.rule.examples)
-                        : data.rule.examples;
-
-                    let coloredExamples = [];
-                    if (data.rule.colored_examples) {
-                        coloredExamples = typeof data.rule.colored_examples === 'string'
-                            ? JSON.parse(data.rule.colored_examples)
-                            : data.rule.colored_examples;
-                    }
-
-                    if (Array.isArray(examples) && examples.length > 0) {
-                        examplesList.innerHTML = examples.map((ex, idx) => {
-                            const colored = coloredExamples[idx] || ex;
-                            return `<li class="list-group-item"><span class="tajweed-example-text">${colored}</span></li>`;
-                        }).join('');
-                        if (examplesSection) examplesSection.style.display = 'block';
-                    } else {
-                        if (examplesSection) examplesSection.style.display = 'none';
-                    }
-                } catch (e) {
-                    if (examplesSection) examplesSection.style.display = 'none';
-                }
+            if (Array.isArray(rule.examples) && rule.examples.length > 0) {
+                examplesSection.style.display = 'block';
+                document.getElementById('ruleExamplesList').innerHTML =
+                    rule.examples.map(ex => `<li class="list-group-item">${ex}</li>`).join('');
             } else {
-                if (examplesSection) examplesSection.style.display = 'none';
+                examplesSection.style.display = 'none';
             }
         },
 
@@ -199,90 +174,55 @@
             const startBtn = document.getElementById('startTajweedQuiz');
             const nextBtn = document.getElementById('nextQuizQuestion');
             const finishBtn = document.getElementById('finishQuiz');
+            const historyBtn = document.getElementById('toggleQuizHistory');
+            const closeHistoryBtn = document.getElementById('closeQuizHistory');
+            const filterContainer = document.getElementById('quizCategoryFilter');
 
-            if (startBtn) {
-                startBtn.addEventListener('click', () => this.startQuiz());
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => this.nextQuizQuestion());
-            }
-            if (finishBtn) {
-                finishBtn.addEventListener('click', () => this.finishQuiz());
-            }
+            if (filterContainer) filterContainer.style.display = 'block';
+
+            if (startBtn) startBtn.addEventListener('click', () => this.startQuiz());
+            if (nextBtn) nextBtn.addEventListener('click', () => this.recordAnswerAndNext());
+            if (finishBtn) finishBtn.addEventListener('click', () => this.submitAndFinish());
+            if (historyBtn) historyBtn.addEventListener('click', () => this.showHistory());
+            if (closeHistoryBtn) closeHistoryBtn.addEventListener('click', () => this.hideHistory());
         },
 
         startQuiz: function() {
+            const categorySelect = document.getElementById('quizCategorySelect');
+            const category = categorySelect ? categorySelect.value : '';
+
             const placeholder = document.getElementById('quizPlaceholder');
             const content = document.getElementById('quizContent');
-
             if (placeholder) placeholder.style.display = 'none';
             if (content) content.style.display = 'block';
 
-            fetch('/api/student/tarteel/tajweed-rules', this.getFetchOptions())
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data && data.data.length > 0) {
-                    this.quizQuestions = this.generateQuizQuestions(data.data);
+            this.apiRequest('/api/student/tarteel/tajweed-quiz/start', 'POST', {
+                category: category || null,
+            }).then(data => {
+                if (data && data.success && data.data && data.data.questions) {
+                    this.quizAttemptId = data.data.attempt_id;
+                    this.quizQuestions = data.data.questions;
                     this.currentQuizIndex = 0;
-                    this.quizScore = 0;
+                    this.quizSelectedAnswers = new Array(this.quizQuestions.length).fill(null);
                     this.displayQuizQuestion();
                 } else {
-                    this.showToast('لا توجد قواعد للاختبار', 'error');
+                    this.showToast((data && data.error) || 'فشل في بدء الاختبار', 'error');
                     this.resetQuiz();
                 }
-            })
-            .catch(err => {
+            }).catch(err => {
                 console.error('Error starting quiz:', err);
                 this.showToast('فشل في بدء الاختبار', 'error');
                 this.resetQuiz();
             });
         },
 
-        generateQuizQuestions: function(rules) {
-            const questions = [];
-            const shuffled = [...rules].sort(() => Math.random() - 0.5);
-            const selected = shuffled.slice(0, Math.min(5, shuffled.length));
-
-            selected.forEach(rule => {
-                const options = this.generateOptions(rule, rules);
-                questions.push({
-                    question: `ما هي قاعدة "${rule.name}"؟`,
-                    correct: rule.description || rule.category,
-                    options: options,
-                });
-            });
-
-            return questions;
-        },
-
-        generateOptions: function(correctRule, allRules) {
-            const options = [correctRule.description || correctRule.category];
-            const otherDescriptions = allRules
-                .filter(r => r.id !== correctRule.id)
-                .map(r => r.description || r.category)
-                .filter(d => d && d !== options[0]);
-
-            while (options.length < 4 && otherDescriptions.length > 0) {
-                const idx = Math.floor(Math.random() * otherDescriptions.length);
-                const option = otherDescriptions.splice(idx, 1)[0];
-                if (!options.includes(option)) {
-                    options.push(option);
-                }
-            }
-
-            while (options.length < 4) {
-                options.push('إجابة أخرى');
-            }
-
-            return options.sort(() => Math.random() - 0.5);
-        },
-
         displayQuizQuestion: function() {
             if (this.currentQuizIndex >= this.quizQuestions.length) {
-                this.finishQuiz();
+                this.submitAndFinish();
                 return;
             }
 
+            this.questionStartedAt = Date.now();
             const question = this.quizQuestions[this.currentQuizIndex];
             const questionNumEl = document.getElementById('quizQuestionNum');
             const questionTextEl = document.getElementById('quizQuestionText');
@@ -313,36 +253,27 @@
         },
 
         selectAnswer: function(index) {
+            this.quizSelectedAnswers[this.currentQuizIndex] = index;
+
             const question = this.quizQuestions[this.currentQuizIndex];
-            const selectedOption = question.options[index];
-            const isCorrect = selectedOption === question.correct;
-
-            if (isCorrect) this.quizScore++;
-
             const feedbackEl = document.getElementById('quizFeedback');
             const feedbackText = document.getElementById('quizFeedbackText');
             const nextBtn = document.getElementById('nextQuizQuestion');
             const finishBtn = document.getElementById('finishQuiz');
 
             if (feedbackEl && feedbackText) {
-                if (isCorrect) {
-                    feedbackEl.className = 'alert alert-success';
-                    feedbackText.innerHTML = '<i class="fas fa-check-circle me-2"></i>إجابة صحيحة!';
-                } else {
-                    feedbackEl.className = 'alert alert-danger';
-                    feedbackText.innerHTML = `<i class="fas fa-times-circle me-2"></i>إجابة خاطئة! الإجابة الصحيحة: ${question.correct}`;
-                }
+                feedbackEl.className = 'alert alert-info';
+                feedbackText.innerHTML = '<i class="fas fa-check me-2"></i>تم اختيار الإجابة';
                 feedbackEl.style.display = 'block';
             }
 
             const optionBtns = document.querySelectorAll('#quizOptions .list-group-item');
             optionBtns.forEach((opt, idx) => {
                 opt.style.pointerEvents = 'none';
+                opt.classList.add('list-group-item-secondary');
                 if (idx === index) {
-                    opt.classList.add(isCorrect ? 'list-group-item-success' : 'list-group-item-danger');
-                }
-                if (question.options[idx] === question.correct) {
-                    opt.classList.add('list-group-item-success');
+                    opt.classList.remove('list-group-item-secondary');
+                    opt.classList.add('list-group-item-primary');
                 }
             });
 
@@ -353,51 +284,162 @@
             }
         },
 
-        nextQuizQuestion: function() {
+        recordAnswerAndNext: function() {
             this.currentQuizIndex++;
             this.displayQuizQuestion();
         },
 
-        finishQuiz: function() {
-            const percentage = this.quizQuestions.length > 0
-                ? Math.round((this.quizScore / this.quizQuestions.length) * 100)
-                : 0;
+        submitAndFinish: function() {
+            if (!this.quizAttemptId) {
+                this.resetQuiz();
+                return;
+            }
+
+            const answers = this.quizQuestions.map((q, idx) => {
+                const timeTaken = this.questionStartedAt
+                    ? Math.round((Date.now() - this.questionStartedAt) / 1000)
+                    : 0;
+                return {
+                    rule_id: q.rule_id,
+                    selected_index: this.quizSelectedAnswers[idx] !== null ? this.quizSelectedAnswers[idx] : 0,
+                    time_taken_seconds: timeTaken,
+                };
+            });
+
+            this.apiRequest(`/api/student/tarteel/tajweed-quiz/${this.quizAttemptId}/submit`, 'POST', {
+                answers: answers,
+            }).then(data => {
+                if (data && data.success && data.data) {
+                    this.renderResults(data.data);
+                } else {
+                    this.showToast((data && data.error) || 'فشل في حفظ النتيجة', 'error');
+                }
+            }).catch(err => {
+                console.error('Error submitting quiz:', err);
+                this.showToast('فشل في حفظ النتيجة', 'error');
+            });
+        },
+
+        renderResults: function(result) {
+            const score = result.score_percentage || 0;
+            const correct = result.correct_answers || 0;
+            const total = result.total_questions || 0;
 
             let message = '';
             let icon = '';
-
-            if (percentage >= 80) {
-                message = `ممتاز! أحسنت!`;
+            if (score >= 80) {
+                message = 'ممتاز! أحسنت!';
                 icon = 'fa-trophy text-warning';
-            } else if (percentage >= 60) {
-                message = `جيد جداً!`;
+            } else if (score >= 60) {
+                message = 'جيد جداً!';
                 icon = 'fa-star text-success';
-            } else if (percentage >= 40) {
-                message = `يمكنك التحسن أكثر`;
+            } else if (score >= 40) {
+                message = 'يمكنك التحسن أكثر';
                 icon = 'fa-thumbs-up text-info';
             } else {
-                message = ` تحتاج لمزيد من المراجعة`;
+                message = 'تحتاج لمزيد من المراجعة';
                 icon = 'fa-book text-secondary';
             }
 
+            const answersList = (result.answers || []).map(a => {
+                const statusIcon = a.is_correct
+                    ? '<i class="fas fa-check-circle text-success"></i>'
+                    : '<i class="fas fa-times-circle text-danger"></i>';
+                return `
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="text-end flex-grow-1">
+                            <div class="fw-bold">${a.rule_name || ''}</div>
+                            <small class="text-muted">${a.question_text || ''}</small>
+                            ${a.student_answer ? `<div class="small mt-1">إجابتك: <span class="${a.is_correct ? 'text-success' : 'text-danger'}">${a.student_answer}</span></div>` : ''}
+                            ${!a.is_correct ? `<div class="small text-success">الصواب: ${a.correct_answer}</div>` : ''}
+                        </div>
+                        <span class="ms-2">${statusIcon}</span>
+                    </li>
+                `;
+            }).join('');
+
             const resultsEl = document.getElementById('quizResults');
             const contentEl = document.getElementById('quizContent');
-
             if (contentEl) contentEl.style.display = 'none';
             if (resultsEl) {
                 resultsEl.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas ${icon} fa-4x mb-4"></i>
+                    <div class="py-4">
+                        <i class="fas ${icon} fa-4x mb-3"></i>
                         <h4 class="mb-2">${message}</h4>
-                        <h2 class="text-success mb-3">${percentage}%</h2>
-                        <p class="text-muted mb-4">أجبت على ${this.quizScore} من ${this.quizQuestions.length} بشكل صحيح</p>
-                        <button class="btn btn-outline-success" onclick="TajweedTab.resetQuiz()">
-                            <i class="fas fa-redo me-2"></i>إعادة الاختبار
-                        </button>
+                        <h2 class="text-success mb-2">${score}%</h2>
+                        <p class="text-muted mb-3">أجبت على ${correct} من ${total} بشكل صحيح</p>
+                        <div class="d-flex justify-content-center gap-2 mb-3">
+                            <button class="btn btn-outline-success" onclick="TajweedTab.resetQuiz()">
+                                <i class="fas fa-redo me-2"></i>إعادة الاختبار
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="TajweedTab.showHistory()">
+                                <i class="fas fa-history me-2"></i>عرض السجل
+                            </button>
+                        </div>
+                        <div class="text-end mt-4">
+                            <h6 class="mb-2">تفاصيل الإجابات</h6>
+                            <ul class="list-group text-end">${answersList}</ul>
+                        </div>
                     </div>
                 `;
                 resultsEl.style.display = 'block';
             }
+        },
+
+        showHistory: function() {
+            const card = document.getElementById('quizHistoryCard');
+            if (card) card.style.display = 'block';
+            this.loadHistory();
+        },
+
+        hideHistory: function() {
+            const card = document.getElementById('quizHistoryCard');
+            if (card) card.style.display = 'none';
+        },
+
+        loadHistory: function() {
+            const container = document.getElementById('quizHistoryList');
+            if (!container) return;
+
+            this.apiRequest('/api/student/tarteel/tajweed-quiz/history').then(data => {
+                if (data && data.success) {
+                    const list = data.data || [];
+                    if (list.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center py-4 px-3">
+                                <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">لا توجد اختبارات سابقة</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = list.map(a => {
+                        const scoreClass = a.score_percentage >= 80 ? 'success' :
+                            a.score_percentage >= 60 ? 'info' :
+                            a.score_percentage >= 40 ? 'warning' : 'danger';
+                        const date = a.finished_at ? new Date(a.finished_at).toLocaleString('ar-EG') : '';
+                        return `
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="text-end">
+                                    <div class="fw-bold">${a.correct_answers} / ${a.total_questions}</div>
+                                    <small class="text-muted">${date}</small>
+                                    ${a.category_filter ? `<div class="small text-muted">${a.category_filter}</div>` : ''}
+                                </div>
+                                <span class="badge bg-${scoreClass} fs-6">${a.score_percentage}%</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }).catch(err => {
+                console.error('Error loading quiz history:', err);
+                container.innerHTML = `
+                    <div class="text-center py-4 px-3">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                        <p class="text-danger mb-0">فشل في تحميل السجل</p>
+                    </div>
+                `;
+            });
         },
 
         resetQuiz: function() {
@@ -409,9 +451,10 @@
             if (content) content.style.display = 'none';
             if (placeholder) placeholder.style.display = 'block';
 
+            this.quizAttemptId = null;
             this.quizQuestions = [];
             this.currentQuizIndex = 0;
-            this.quizScore = 0;
+            this.quizSelectedAnswers = [];
         },
 
         showToast: function(message, type) {
