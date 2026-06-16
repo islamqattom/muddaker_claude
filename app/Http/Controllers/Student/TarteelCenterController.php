@@ -279,7 +279,7 @@ class TarteelCenterController extends Controller
         $validator = Validator::make($request->all(), [
             'surah' => 'required|integer|min:1|max:114',
             'verse' => 'required|integer|min:1',
-            'interpretation' => 'nullable|string|in:ar.muyassar,ar.jalalayn,ar.qurtubi,ar.sadi,ar.waseet,ar.baghawi',
+            'interpretation' => 'nullable|string|in:ar.muyassar,ar.jalalayn,ar.qurtubi,ar.sadi,ar.waseet,ar.baghawi,ar.zilal',
         ]);
 
         if ($validator->fails()) {

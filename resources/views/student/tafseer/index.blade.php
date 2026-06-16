@@ -194,6 +194,7 @@
                     <option value="ar.sadi">تفسير السعدي</option>
                     <option value="ar.waseet">التفسير الوسيط</option>
                     <option value="ar.baghawi">تفسير البغوي</option>
+                    <option value="ar.zilal">في ظلال القرآن - سيد قطب</option>
                 </select>
             </div>
             <div class="col-md-3">
