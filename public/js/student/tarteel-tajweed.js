@@ -38,7 +38,26 @@
         },
 
         apiRequest: function(url, method, body) {
-            return fetch(url, this.getFetchOptions(method, body)).then(res => res.json());
+            return fetch(url, this.getFetchOptions(method, body)).then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => {
+                        const error = new Error('HTTP ' + res.status + ': ' + (text || res.statusText));
+                        error.status = res.status;
+                        error.body = text;
+                        throw error;
+                    });
+                }
+                return res.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        const error = new Error('Invalid JSON response: ' + (text || '').substring(0, 200));
+                        error.status = res.status;
+                        error.body = text;
+                        throw error;
+                    }
+                });
+            });
         },
 
         loadCategories: function() {
@@ -211,7 +230,7 @@
                 }
             }).catch(err => {
                 console.error('Error starting quiz:', err);
-                this.showToast('فشل في بدء الاختبار', 'error');
+                this.showToast('فشل في بدء الاختبار: ' + (err.message || 'خطأ غير معروف'), 'error');
                 this.resetQuiz();
             });
         },
