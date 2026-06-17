@@ -300,14 +300,10 @@ class QuranApiService
     public function getTafseer(string $verseKey, string $interpretation = 'ibn_kathir'): array
     {
         $edition = $this->mapInterpretationToEdition($interpretation);
-
-        if (str_starts_with($edition, 'quran-com:')) {
-            return $this->getQuranComTafseer($verseKey, (int) substr($edition, 10));
-        }
-
         $cacheKey = "tafseer_{$verseKey}_{$edition}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $edition) {
+            // Use ayah endpoint with tafsir edition
             $response = Http::timeout(10)->get(self::BASE_URL . "/ayah/" . $verseKey . "/" . $edition);
 
             if ($response->status() === 404 || $response->failed()) {
@@ -326,40 +322,6 @@ class QuranApiService
         });
     }
 
-    private function getQuranComTafseer(string $verseKey, int $resourceId): array
-    {
-        $cacheKey = "qurancom_tafseer_{$resourceId}_{$verseKey}";
-
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($verseKey, $resourceId) {
-            $url = "https://api.quran.com/api/v4/tafsirs/{$resourceId}/by_ayah/{$verseKey}";
-            $response = Http::timeout(10)->get($url);
-
-            if ($response->failed()) {
-                Log::warning("Quran.com tafsir failed for {$verseKey}", [
-                    'resource_id' => $resourceId,
-                    'status' => $response->status(),
-                ]);
-                return [
-                    'source' => 'التفسير',
-                    'text' => ['التفسير غير متاح حالياً'],
-                ];
-            }
-
-            $data = $response->json()['tafsir'] ?? [];
-            $name = $data['resource_name'] ?? 'التفسير';
-            $text = $data['text'] ?? '';
-
-            $text = strip_tags($text);
-            $text = preg_replace('/\s+/u', ' ', $text);
-            $text = trim($text);
-
-            return [
-                'source' => $name,
-                'text' => [$text],
-            ];
-        });
-    }
-
     private function mapInterpretationToEdition(string $interpretation): string
     {
         return match ($interpretation) {
@@ -369,7 +331,6 @@ class QuranApiService
             'ar.sadi' => 'ar.sadi',
             'ar.waseet' => 'ar.waseet',
             'ar.baghawi' => 'ar.baghawi',
-            'ar.zilal' => 'quran-com:157',
             default => 'ar.jalalayn',
         };
     }
