@@ -43,6 +43,9 @@ class ImportMafsilPositions extends Command
         'الأول' => 1,
     ];
 
+    private static array $lastSurahIndexByJuz = [];
+    private static array $wholeSurahCounterByJuz = [];
+
     public function handle(): int
     {
         $file = base_path($this->option('file'));
@@ -87,8 +90,23 @@ class ImportMafsilPositions extends Command
             }
 
             $listOrder++;
-            $endAyahNumber = $this->clampEndAyahToJuz($currentJuz, $parsed['end']);
-            $resolved = $this->resolveAyahs($currentJuz, $parsed['start'], $endAyahNumber);
+            $endAyahNumber = $parsed['end'] ?? null;
+            if ($parsed['surah_number'] !== null) {
+                $resolved = $this->resolveBySurahNumber(
+                    $currentJuz,
+                    $parsed['surah_number'],
+                    $parsed['surah_end'] ?? $parsed['surah_number']
+                );
+            } elseif ($parsed['whole_surah']) {
+                $resolved = $this->resolveWholeSurah($currentJuz);
+            } else {
+                if ($endAyahNumber === null) {
+                    $endAyahNumber = $this->getLastAyahNumberInJuz($currentJuz);
+                } else {
+                    $endAyahNumber = $this->clampEndAyahToJuz($currentJuz, $endAyahNumber);
+                }
+                $resolved = $this->resolveAyahs($currentJuz, $parsed['start'], $endAyahNumber);
+            }
 
             if ($resolved === null) {
                 $failed[] = [
@@ -138,23 +156,59 @@ class ImportMafsilPositions extends Command
 
     private function parsePositionLine(string $line): ?array
     {
-        $pattern = '/الموضع\s+([\d\s]+)\s*من\s*(?:آية\s+)?(?:رقم\s+)?([\d\s]+)\s*إلى\s*(?:آية\s+)?([\d\s]+)\s*(?:\(([^)]*)\))?/u';
+        $pattern = '/الموضع\s+([\d\s]+)\s*من\s*(?:آية\s+)?(?:رقم\s+)?([\d\s]+)\s*إلى\s*(?:آية\s+)?([\d\s]*)\s*(?:\(([^)]*)\))?/u';
 
-        if (! preg_match($pattern, $line, $matches)) {
-            return null;
+        if (preg_match($pattern, $line, $matches)) {
+            $position = (int) $this->toWestern($matches[1]);
+            $start = (int) $this->toWestern($matches[2]);
+            $endRaw = trim($this->toWestern($matches[3]));
+            $end = ($endRaw === '') ? null : (int) $endRaw;
+            $difficultyText = trim($matches[4] ?? '');
+
+            return [
+                'position' => $position,
+                'start' => $start,
+                'end' => $end,
+                'difficulty' => $this->parseDifficulty($difficultyText),
+                'whole_surah' => false,
+                'surah_number' => null,
+            ];
         }
 
-        $position = (int) $this->toWestern($matches[1]);
-        $start = (int) $this->toWestern($matches[2]);
-        $end = (int) $this->toWestern($matches[3]);
-        $difficultyText = trim($matches[4] ?? '');
+        $surahHintPattern = '/الموضع\s+([\d\s]+)\s*\[سورة\s*[:=]?\s*(\d+)(?:\s*-\s*(\d+))?\]\s*(?:\(([^)]*)\))?/u';
+        if (preg_match($surahHintPattern, $line, $matches)) {
+            $position = (int) $this->toWestern($matches[1]);
+            $surahStart = (int) $matches[2];
+            $surahEnd = isset($matches[3]) && $matches[3] !== '' ? (int) $matches[3] : $surahStart;
+            $difficultyText = trim($matches[4] ?? '');
 
-        return [
-            'position' => $position,
-            'start' => $start,
-            'end' => $end,
-            'difficulty' => $this->parseDifficulty($difficultyText),
-        ];
+            return [
+                'position' => $position,
+                'start' => 1,
+                'end' => null,
+                'difficulty' => $this->parseDifficulty($difficultyText),
+                'whole_surah' => false,
+                'surah_number' => $surahStart,
+                'surah_end' => $surahEnd,
+            ];
+        }
+
+        $wholeSurahPattern = '/الموضع\s+([\d\s]+)\s*(?:\(([^)]*)\))?/u';
+        if (preg_match($wholeSurahPattern, $line, $matches)) {
+            $position = (int) $this->toWestern($matches[1]);
+            $difficultyText = trim($matches[2] ?? '');
+
+            return [
+                'position' => $position,
+                'start' => 1,
+                'end' => null,
+                'difficulty' => $this->parseDifficulty($difficultyText),
+                'whole_surah' => true,
+                'surah_number' => null,
+            ];
+        }
+
+        return null;
     }
 
     private function parseDifficulty(string $text): int
@@ -210,8 +264,7 @@ class ImportMafsilPositions extends Command
             ];
         }
 
-        static $lastSurahIndexByJuz = [];
-        $startIndex = $lastSurahIndexByJuz[$juzNumber] ?? 0;
+        $startIndex = self::$lastSurahIndexByJuz[$juzNumber] ?? 0;
 
         $startSurahIndex = $this->findSurahForAyah($surahs, $startAyahNumber, $startIndex);
         if ($startSurahIndex === null) {
@@ -256,7 +309,7 @@ class ImportMafsilPositions extends Command
             $note = 'Range appears invalid: end ayah precedes start ayah';
         }
 
-        $lastSurahIndexByJuz[$juzNumber] = $endSurahIndex;
+        self::$lastSurahIndexByJuz[$juzNumber] = $endSurahIndex;
 
         return [
             'start_ayah_id' => $startAyah->id,
@@ -267,10 +320,7 @@ class ImportMafsilPositions extends Command
 
     private function clampEndAyahToJuz(int $juzNumber, int $endAyahNumber): int
     {
-        $lastAyah = Ayah::query()
-            ->where('juz_number', $juzNumber)
-            ->orderByDesc('id')
-            ->first();
+        $lastAyah = $this->getLastAyahInJuz($juzNumber);
 
         if ($lastAyah === null) {
             return $endAyahNumber;
@@ -283,6 +333,138 @@ class ImportMafsilPositions extends Command
         }
 
         return $endAyahNumber;
+    }
+
+    private function getLastAyahInJuz(int $juzNumber): ?Ayah
+    {
+        return Ayah::query()
+            ->where('juz_number', $juzNumber)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function getLastAyahNumberInJuz(int $juzNumber): int
+    {
+        $last = $this->getLastAyahInJuz($juzNumber);
+        return $last?->ayah_number ?? 999;
+    }
+
+    private function resolveBySurahNumber(int $juzNumber, int $surahNumber, int $surahEndNumber = null): ?array
+    {
+        $surahEndNumber = $surahEndNumber ?? $surahNumber;
+
+        $startAyahs = Ayah::query()
+            ->with('surah')
+            ->whereHas('surah', function ($q) use ($surahNumber) {
+                $q->where('surah_number', $surahNumber);
+            })
+            ->where('juz_number', $juzNumber)
+            ->orderBy('ayah_number')
+            ->get();
+
+        $endAyahs = Ayah::query()
+            ->with('surah')
+            ->whereHas('surah', function ($q) use ($surahEndNumber) {
+                $q->where('surah_number', $surahEndNumber);
+            })
+            ->where('juz_number', $juzNumber)
+            ->orderByDesc('ayah_number')
+            ->get();
+
+        if ($startAyahs->isEmpty() || $endAyahs->isEmpty()) {
+            return null;
+        }
+
+        $firstAyah = $startAyahs->first();
+        $lastAyah = $endAyahs->first();
+
+        $endSurahIndex = $this->getSurahIndexInJuz($juzNumber, $lastAyah->surah_id);
+        if ($endSurahIndex !== null) {
+            self::$lastSurahIndexByJuz[$juzNumber] = $endSurahIndex;
+        }
+
+        $note = null;
+        if ($lastAyah->id < $firstAyah->id) {
+            $note = 'Range appears invalid: end ayah precedes start ayah';
+        }
+
+        return [
+            'start_ayah_id' => $firstAyah->id,
+            'end_ayah_id' => $lastAyah->id,
+            'note' => $note,
+        ];
+    }
+
+    private function getSurahIndexInJuz(int $juzNumber, int $surahId): ?int
+    {
+        $surahs = Ayah::query()
+            ->where('juz_number', $juzNumber)
+            ->orderBy('id')
+            ->get()
+            ->groupBy('surah_id')
+            ->sortKeys()
+            ->keys()
+            ->values()
+            ->all();
+
+        $index = array_search($surahId, $surahs, true);
+        return $index === false ? null : (int) $index;
+    }
+
+    private function resolveWholeSurah(int $juzNumber): ?array
+    {
+        $ayahsBySurah = Ayah::query()
+            ->with('surah')
+            ->where('juz_number', $juzNumber)
+            ->orderBy('id')
+            ->get()
+            ->groupBy('surah_id')
+            ->sortKeys()
+            ->values();
+
+        if ($ayahsBySurah->isEmpty()) {
+            return null;
+        }
+
+        $surahs = [];
+        foreach ($ayahsBySurah as $group) {
+            $ayahNumbers = $group->pluck('ayah_number')->all();
+            $surahs[] = [
+                'surah_id' => $group->first()->surah_id,
+                'min' => min($ayahNumbers),
+                'max' => max($ayahNumbers),
+            ];
+        }
+
+        $counter = self::$wholeSurahCounterByJuz[$juzNumber] ?? null;
+        if ($counter === null) {
+            $counter = (self::$lastSurahIndexByJuz[$juzNumber] ?? -1) + 1;
+        }
+        if ($counter >= count($surahs)) {
+            $counter = count($surahs) - 1;
+        }
+        $surah = $surahs[$counter];
+        self::$wholeSurahCounterByJuz[$juzNumber] = $counter + 1;
+        self::$lastSurahIndexByJuz[$juzNumber] = $counter;
+
+        $firstAyah = Ayah::query()
+            ->where('surah_id', $surah['surah_id'])
+            ->where('ayah_number', $surah['min'])
+            ->first();
+        $lastAyah = Ayah::query()
+            ->where('surah_id', $surah['surah_id'])
+            ->where('ayah_number', $surah['max'])
+            ->first();
+
+        if ($firstAyah === null || $lastAyah === null) {
+            return null;
+        }
+
+        return [
+            'start_ayah_id' => $firstAyah->id,
+            'end_ayah_id' => $lastAyah->id,
+            'note' => null,
+        ];
     }
 
     private function findSurahForAyah(array $surahs, int $ayahNumber, int $fromIndex): ?int
