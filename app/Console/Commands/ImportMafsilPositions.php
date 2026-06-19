@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ImportMafsilPositions extends Command
 {
-    protected $signature = 'mafsil:import-positions {--file=database/data/mafsil_positions.txt : Path to the positions text file}';
+    protected $signature = 'mafsil:import-positions {--file=database/data/mafsil_positions.txt : Path to the positions text file} {--fresh : Delete all existing positions before importing (destructive; will null FK references)}';
     protected $description = 'Import Mafsil positions from a text file into mafsil_positions table';
 
     private const ARABIC_DIGITS = [
@@ -26,10 +26,25 @@ class ImportMafsilPositions extends Command
     ];
 
     private const JUZ_ORDINALS = [
-        'الثاني عشر' => 12,
-        'الثالث عشر' => 13,
-        'الرابع عشر' => 14,
+        'الثلاثون' => 30,
+        'التاسع والعشرون' => 29,
+        'الثامن والعشرون' => 28,
+        'السابع والعشرون' => 27,
+        'السادس والعشرون' => 26,
+        'الخامس والعشرون' => 25,
+        'الرابع والعشرون' => 24,
+        'الثالث والعشرون' => 23,
+        'الثاني والعشرون' => 22,
+        'الحادي والعشرون' => 21,
+        'العشرون' => 20,
+        'التاسع عشر' => 19,
+        'الثامن عشر' => 18,
+        'السابع عشر' => 17,
+        'السادس عشر' => 16,
         'الخامس عشر' => 15,
+        'الرابع عشر' => 14,
+        'الثالث عشر' => 13,
+        'الثاني عشر' => 12,
         'الحادي عشر' => 11,
         'العاشر' => 10,
         'التاسع' => 9,
@@ -58,11 +73,24 @@ class ImportMafsilPositions extends Command
         $content = file_get_contents($file);
         $lines = preg_split('/\r\n|\r|\n/', $content);
 
-        MafsilPosition::query()->delete();
+        $fresh = (bool) $this->option('fresh');
+        $nullifiedCount = 0;
+
+        if ($fresh) {
+            $nullifiedCount = \Illuminate\Support\Facades\DB::table('recitation_pages')
+                ->whereNotNull('mafsil_position_id')
+                ->update(['mafsil_position_id' => null]);
+            if ($nullifiedCount > 0) {
+                $this->warn("Nulled {$nullifiedCount} recitation_pages.mafsil_position_id references before delete.");
+            }
+            MafsilPosition::query()->delete();
+        }
 
         $currentJuz = null;
-        $listOrder = 0;
+        $listOrderByJuz = [];
         $inserted = 0;
+        $updated = 0;
+        $skipped = 0;
         $failed = [];
 
         foreach ($lines as $line) {
@@ -89,7 +117,9 @@ class ImportMafsilPositions extends Command
                 continue;
             }
 
-            $listOrder++;
+            $listOrderByJuz[$currentJuz] = ($listOrderByJuz[$currentJuz] ?? 0) + 1;
+            $listOrder = $listOrderByJuz[$currentJuz];
+
             $endAyahNumber = $parsed['end'] ?? null;
             if ($parsed['surah_number'] !== null) {
                 $resolved = $this->resolveBySurahNumber(
@@ -118,7 +148,12 @@ class ImportMafsilPositions extends Command
                 continue;
             }
 
-            MafsilPosition::create([
+            $existing = MafsilPosition::query()
+                ->where('juz_number', $currentJuz)
+                ->where('list_order', $listOrder)
+                ->first();
+
+            $payload = [
                 'juz_number' => $currentJuz,
                 'position_number' => $parsed['position'],
                 'list_order' => $listOrder,
@@ -126,13 +161,43 @@ class ImportMafsilPositions extends Command
                 'end_ayah_id' => $resolved['end_ayah_id'],
                 'difficulty' => $parsed['difficulty'],
                 'notes' => $resolved['note'] ?? null,
-            ]);
+            ];
 
-            $inserted++;
+            if ($existing) {
+                $existing->fill($payload)->save();
+                $updated++;
+            } else {
+                MafsilPosition::create($payload);
+                $inserted++;
+            }
+        }
+
+        // Delete any rows with list_order beyond what was imported for each Juz
+        // (cleans up duplicates from previous runs). References in
+        // recitation_pages are nullified first.
+        $staleDeleted = 0;
+        $nullifiedForCleanup = 0;
+        foreach ($listOrderByJuz as $juzNum => $maxOrder) {
+            $staleIds = MafsilPosition::query()
+                ->where('juz_number', $juzNum)
+                ->where('list_order', '>', $maxOrder)
+                ->pluck('id')
+                ->all();
+            if (empty($staleIds)) {
+                continue;
+            }
+
+            $nullifiedForCleanup += \Illuminate\Support\Facades\DB::table('recitation_pages')
+                ->whereIn('mafsil_position_id', $staleIds)
+                ->update(['mafsil_position_id' => null]);
+
+            $staleDeleted += MafsilPosition::query()
+                ->whereIn('id', $staleIds)
+                ->delete();
         }
 
         $this->newLine();
-        $this->info("Inserted {$inserted} positions.");
+        $this->info("Inserted {$inserted}, updated {$updated}, deleted {$staleDeleted} stale positions (nulled {$nullifiedForCleanup} page refs).");
 
         if (! empty($failed)) {
             $this->warn('Failed to import ' . count($failed) . ' positions:');
@@ -144,10 +209,11 @@ class ImportMafsilPositions extends Command
         return self::SUCCESS;
     }
 
-    private function parseJuzHeader(string $line): ?int
+private function parseJuzHeader(string $line): ?int
     {
+        $rest = trim(substr($line, strlen('الجزء')));
         foreach (self::JUZ_ORDINALS as $ordinal => $number) {
-            if (str_contains($line, 'الجزء ' . $ordinal)) {
+            if ($rest === $ordinal || str_starts_with($rest, $ordinal . ' ') || str_starts_with($rest, $ordinal . '-')) {
                 return $number;
             }
         }
