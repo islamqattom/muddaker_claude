@@ -48,6 +48,7 @@ class YawmAlHimmaController extends Controller
 
         // Multi-line chart data: each student gets a cumulative line over parts in this day.
         $rawSessions = (clone $query)->get(['student_name', 'parts', 'pages_data']);
+        $rawAll = (clone $query)->get(['student_name', 'parts', 'pages_data', 'total_errors', 'total_hesitations']);
 
         $sessions = $query->paginate(50)->withQueryString();
         $day = \Carbon\Carbon::parse($date);
@@ -109,37 +110,73 @@ class YawmAlHimmaController extends Controller
         ];
 
         // Precision chart: most precise recitation = more parts with fewer mistakes.
-        // Positive scoring formula per part:
+        // Positive scoring formula per part (calculated from pages_data, not session averages):
         //   Base points per part = 10
-        //   Quality bonus per part = max(0, 10 − errors_per_part) × 1
-        //   Fluency bonus per part = max(0, 10 − hesitations_per_part) × 0.33
+        //   Quality bonus per part = max(0, 10 − errors_in_part) × 1
+        //   Fluency bonus per part = max(0, 10 − hesitations_in_part) × 0.33
         //   Final score = sum over all parts
-        // To compute per-part errors/hesitations, we spread session totals evenly across parts.
-        $rawAll = (clone $query)->get(['student_name', 'parts', 'total_errors', 'total_hesitations']);
         $studentPrecision = [];
         foreach ($rawAll as $s) {
             $parts = is_array($s->parts) ? $s->parts : [];
-            $partsCount = count($parts);
-            if ($partsCount === 0) {
+            if (empty($parts)) {
                 continue;
             }
 
-            $errorsPerPart = $s->total_errors / $partsCount;
-            $hesitationsPerPart = $s->total_hesitations / $partsCount;
+            $pagesData = is_array($s->pages_data) ? $s->pages_data : [];
+            $partStats = [];
+            foreach ($parts as $partNumber) {
+                $partNumber = (int) $partNumber;
+                $partStats[$partNumber] = ['errors' => 0, 'hesitations' => 0, 'pages' => 0];
+            }
+            foreach ($pagesData as $page) {
+                $pn = (int) ($page['part'] ?? 0);
+                if (!isset($partStats[$pn])) {
+                    continue;
+                }
+                $partStats[$pn]['errors'] += (int) ($page['errors'] ?? 0);
+                $partStats[$pn]['hesitations'] += (int) ($page['hesitations'] ?? 0);
+                $partStats[$pn]['pages'] += 1;
+            }
 
-            $partsPoints = $partsCount * 10;
-            $qualityBonus = $partsCount * (max(0, 10 - $errorsPerPart) * 1);
-            $fluencyBonus = $partsCount * (max(0, 10 - $hesitationsPerPart) * 0.33);
+            $partsCount = 0;
+            $partsPoints = 0;
+            $qualityBonus = 0;
+            $fluencyBonus = 0;
+            $unaccountedErrors = 0;
+            $unaccountedHesitations = 0;
+            foreach ($partStats as $pn => $st) {
+                if ($st['pages'] === 0) {
+                    $unaccountedErrors += (int) ($s->total_errors ?? 0);
+                    $unaccountedHesitations += (int) ($s->total_hesitations ?? 0);
+                    continue;
+                }
+                $partsCount++;
+                $partsPoints += 10;
+                $qualityBonus += max(0, 10 - $st['errors']) * 1;
+                $fluencyBonus += max(0, 10 - $st['hesitations']) * 0.33;
+            }
+            if ($partsCount === 0) {
+                $partsCount = count($parts);
+                $partsPoints = $partsCount * 10;
+                $unaccountedErrors = (int) ($s->total_errors ?? 0);
+                $unaccountedHesitations = (int) ($s->total_hesitations ?? 0);
+            }
             $score = $partsPoints + $qualityBonus + $fluencyBonus;
+            $totalErrors = (int) ($s->total_errors ?? 0);
+            $totalHesitations = (int) ($s->total_hesitations ?? 0);
+            $remainingPartsErrors = max(0, $totalErrors - $unaccountedErrors);
+            $remainingPartsHesitations = max(0, $totalHesitations - $unaccountedHesitations);
 
             $studentPrecision[$s->student_name] = [
-                'parts' => ($studentPrecision[$s->student_name]['parts'] ?? 0) + $partsCount,
-                'errors' => ($studentPrecision[$s->student_name]['errors'] ?? 0) + $s->total_errors,
-                'hesitations' => ($studentPrecision[$s->student_name]['hesitations'] ?? 0) + $s->total_hesitations,
+                'parts' => ($studentPrecision[$s->student_name]['parts'] ?? 0) + count($parts),
+                'errors' => ($studentPrecision[$s->student_name]['errors'] ?? 0) + $totalErrors,
+                'hesitations' => ($studentPrecision[$s->student_name]['hesitations'] ?? 0) + $totalHesitations,
                 'parts_points' => ($studentPrecision[$s->student_name]['parts_points'] ?? 0) + $partsPoints,
                 'quality_bonus' => ($studentPrecision[$s->student_name]['quality_bonus'] ?? 0) + $qualityBonus,
                 'fluency_bonus' => ($studentPrecision[$s->student_name]['fluency_bonus'] ?? 0) + $fluencyBonus,
                 'score' => ($studentPrecision[$s->student_name]['score'] ?? 0) + $score,
+                'remaining_errors' => ($studentPrecision[$s->student_name]['remaining_errors'] ?? 0) + $remainingPartsErrors,
+                'remaining_hesitations' => ($studentPrecision[$s->student_name]['remaining_hesitations'] ?? 0) + $remainingPartsHesitations,
             ];
         }
         $precisionList = collect($studentPrecision)
