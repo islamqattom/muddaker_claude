@@ -195,6 +195,32 @@ class YawmAlHimmaController extends Controller
             ->sortByDesc('score')
             ->values();
 
+        $precisionByName = [];
+        foreach ($precisionList as $row) {
+            $precisionByName[$row['name']] = $row;
+        }
+
+        $leaderboard = collect($studentParts)
+            ->map(function ($partsMap, $studentName) use ($precisionByName) {
+                $precision = $precisionByName[$studentName] ?? null;
+                $parts = count($partsMap);
+                $score = $precision['score'] ?? ($parts * 10);
+                return [
+                    'name' => $studentName,
+                    'parts' => $parts,
+                    'score' => round($score, 2),
+                    'errors' => $precision['errors'] ?? 0,
+                    'hesitations' => $precision['hesitations'] ?? 0,
+                ];
+            })
+            ->sortByDesc('score')
+            ->values();
+
+        $barChart = [
+            'labels' => $leaderboard->pluck('name')->values(),
+            'data' => $leaderboard->pluck('score')->values(),
+        ];
+
         $precisionChart = [
             'labels' => $precisionList->pluck('name')->values(),
             'data' => $precisionList->pluck('score')->values(),

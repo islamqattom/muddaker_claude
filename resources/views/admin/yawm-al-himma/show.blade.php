@@ -482,7 +482,7 @@
         </div>
 
         <div class="leaderboard-card">
-            <div class="leaderboard-title"><i class="fas fa-medal"></i> لوحة المتصدرين - أكثر الطلاب سردًا للأجزاء</div>
+            <div class="leaderboard-title"><i class="fas fa-medal"></i> لوحة المتصدرين - أكثر الطلاب إتقانًا</div>
             @if($leaderboard->isEmpty())
                 <div class="text-muted text-center py-3">لا توجد بيانات متاحة</div>
             @else
@@ -499,7 +499,7 @@
                         <li class="leaderboard-item">
                             <span class="rank {{ $rankClass }}">{{ $idx + 1 }}</span>
                             <span class="student-name">{{ $row['name'] }}</span>
-                            <span class="parts-count">{{ $row['parts'] }} جزء</span>
+                            <span class="parts-count">{{ $row['score'] }} نقطة ({{ $row['parts'] }} جزء)</span>
                         </li>
                     @endforeach
                 </ul>
