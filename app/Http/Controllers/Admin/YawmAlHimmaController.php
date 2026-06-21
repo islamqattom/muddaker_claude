@@ -112,8 +112,8 @@ class YawmAlHimmaController extends Controller
         // Precision chart: most precise recitation = more parts with fewer mistakes.
         // Positive scoring formula per part (calculated from pages_data, not session averages):
         //   Base points per part = 10
-        //   Quality bonus per part = max(0, 10 − errors_in_part) × 1
-        //   Fluency bonus per part = max(0, 10 − hesitations_in_part) × 0.33
+        //   Quality bonus per part = max(0, 10 − errors_in_part) × 1  (each error −1, starting from 10)
+        //   Fluency bonus per part = max(0, 10 − hesitations_in_part) × 0.5  (each hesitation −0.5, starting from 10)
         //   Final score = sum over all parts
         $studentPrecision = [];
         foreach ($rawAll as $s) {
@@ -153,7 +153,7 @@ class YawmAlHimmaController extends Controller
                 $partsCount++;
                 $partsPoints += 10;
                 $qualityBonus += max(0, 10 - $st['errors']) * 1;
-                $fluencyBonus += max(0, 10 - $st['hesitations']) * 0.33;
+                $fluencyBonus += max(0, 10 - $st['hesitations']) * 0.5;
             }
             if ($partsCount === 0) {
                 $partsCount = count($parts);
