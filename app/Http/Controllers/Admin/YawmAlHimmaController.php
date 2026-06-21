@@ -40,17 +40,17 @@ class YawmAlHimmaController extends Controller
             $query->where('student_name', 'like', '%' . $request->student_name . '%');
         }
 
-        $sessions = $query->paginate(50)->withQueryString();
-        $day = \Carbon\Carbon::parse($date);
-
         $dayStats = [
-            'sessions_count' => $sessions->total(),
+            'sessions_count' => (clone $query)->count(),
             'total_errors' => (clone $query)->sum('total_errors'),
             'total_hesitations' => (clone $query)->sum('total_hesitations'),
         ];
 
         // Multi-line chart data: each student gets a cumulative line over parts in this day.
         $rawSessions = (clone $query)->get(['student_name', 'parts', 'pages_data']);
+
+        $sessions = $query->paginate(50)->withQueryString();
+        $day = \Carbon\Carbon::parse($date);
         $studentParts = [];
         $allPartNumbers = collect();
         foreach ($rawSessions as $s) {
