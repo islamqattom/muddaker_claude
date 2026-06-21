@@ -129,7 +129,7 @@ class YawmAlHimmaController extends Controller
                 $partStats[$partNumber] = ['errors' => 0, 'hesitations' => 0, 'pages' => 0];
             }
             foreach ($pagesData as $page) {
-                $pn = (int) ($page['part'] ?? 0);
+                $pn = (int) ($page['part'] ?? $page['part_number'] ?? 0);
                 if (!isset($partStats[$pn])) {
                     continue;
                 }
