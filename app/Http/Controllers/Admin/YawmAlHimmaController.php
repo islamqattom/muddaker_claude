@@ -207,7 +207,14 @@ class YawmAlHimmaController extends Controller
             if ($students->count() < 2) {
                 continue;
             }
-            $sorted = $students->sortByDesc('score')->values();
+            $sorted = $students
+                ->sortByDesc('score')
+                ->sortBy(function ($student) use ($partsCount) {
+                    $avgErrors = $partsCount > 0 ? $student['errors'] / $partsCount : 0;
+                    $avgHesitations = $partsCount > 0 ? $student['hesitations'] / $partsCount : 0;
+                    return $avgErrors + $avgHesitations;
+                })
+                ->values();
             $groupedPrecisionCharts[$partsCount] = [
                 'labels' => $sorted->pluck('name')->values(),
                 'data' => $sorted->pluck('score')->values(),
