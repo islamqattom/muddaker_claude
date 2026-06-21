@@ -218,7 +218,7 @@ class YawmAlHimmaController extends Controller
 
         $barChart = [
             'labels' => $leaderboard->pluck('name')->values(),
-            'data' => $leaderboard->pluck('score')->values(),
+            'data' => $leaderboard->pluck('parts')->values(),
         ];
 
         $precisionChart = [
