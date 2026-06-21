@@ -869,10 +869,10 @@
                     borderRadius: 8,
                     barPercentage: 0.6,
                     backgroundColor: function(context) {
-                        return 'rgba(39, 174, 96, 0.85)';
+                        return barBackground(context, 0.85);
                     },
                     hoverBackgroundColor: function(context) {
-                        return 'rgba(39, 174, 96, 1)';
+                        return barBackground(context, 1);
                     },
                 }],
             },
