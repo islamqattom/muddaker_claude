@@ -132,10 +132,12 @@ class ImportMafsilPositions extends Command
             } else {
                 if ($endAyahNumber === null) {
                     $endAyahNumber = $this->getLastAyahNumberInJuz($currentJuz);
-                } else {
-                    $endAyahNumber = $this->clampEndAyahToJuz($currentJuz, $endAyahNumber);
                 }
                 $resolved = $this->resolveAyahs($currentJuz, $parsed['start'], $endAyahNumber);
+                if ($resolved === null && $parsed['end'] !== null) {
+                    $endAyahNumber = $this->clampEndAyahToJuz($currentJuz, $endAyahNumber);
+                    $resolved = $this->resolveAyahs($currentJuz, $parsed['start'], $endAyahNumber);
+                }
             }
 
             if ($resolved === null) {

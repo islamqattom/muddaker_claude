@@ -40,7 +40,6 @@ class MeetingMinuteController extends Controller
     {
         $supervisors = User::whereIn('role', ['admin', 'supervisor'])->get();
 
-        $lastMeeting = MeetingMinute::orderBy('meeting_date', 'desc')->first();
         $tasksFromAllMeetings = MeetingTask::whereIn('status', ['pending', 'in_progress'])
             ->whereHas('meetingMinute', function($query) {
                 $query->where('meeting_date', '<', now()->toDateString());
@@ -49,20 +48,6 @@ class MeetingMinuteController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(30)
             ->get();
-
-        $changedTasks = collect();
-        if ($lastMeeting) {
-            $changedTasks = MeetingTask::where('meeting_minute_id', '!=', $lastMeeting->id)
-                ->whereHas('meetingMinute', function($query) {
-                    $query->where('meeting_date', '<', now()->toDateString());
-                })
-                ->whereIn('status', ['completed', 'cancelled'])
-                ->where('updated_at', '>=', $lastMeeting->created_at)
-                ->with(['assignee', 'meetingMinute'])
-                ->orderBy('updated_at', 'desc')
-                ->limit(20)
-                ->get();
-        }
 
         $recentAttendance = Attendance::where('date', '>=', now()->subDays(3))
             ->with('student.user')
@@ -96,7 +81,7 @@ class MeetingMinuteController extends Controller
             return $supervisor;
         });
 
-        return view('admin.meeting-minutes.create', compact('supervisors', 'recentAttendance', 'tasksFromAllMeetings', 'lastMeeting', 'changedTasks', 'supervisorStudents'));
+        return view('admin.meeting-minutes.create', compact('supervisors', 'recentAttendance', 'tasksFromAllMeetings', 'supervisorStudents'));
     }
 
     public function store(Request $request)

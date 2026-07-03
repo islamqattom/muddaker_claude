@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
 use App\Models\Ayah;
 use App\Models\MafsilPosition;
+use App\Models\MafsilPositionUsage;
 use App\Models\QuranPart;
 use App\Models\RecitationPage;
 use App\Models\RecitationSession;
@@ -306,6 +307,7 @@ class RecitationController extends Controller
             }
 
             $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
+            $this->recordMafsilPositionUsage($mafsilPositions);
             $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
                 ->get(['id', 'name', 'category']);
 
@@ -357,6 +359,9 @@ class RecitationController extends Controller
 
     /**
      * Randomly select mafsil positions for each part based on difficulty distribution.
+     * A position is excluded if it was already selected in the current usage cycle
+     * for its part and difficulty. When all positions of a difficulty have been used,
+     * the cycle resets so coverage starts over.
      */
     private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): \Illuminate\Support\Collection
     {
@@ -386,7 +391,24 @@ class RecitationController extends Controller
                     continue;
                 }
 
-                $partSelected = $partSelected->merge($available->shuffle()->take($needed));
+                $usedIds = MafsilPositionUsage::where('juz_number', $partNumber)
+                    ->where('difficulty', $difficulty)
+                    ->pluck('mafsil_position_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->all();
+
+                $unused = $available->whereNotIn('id', $usedIds);
+
+                // If not enough unused positions remain, the cycle is complete: reset it.
+                if ($unused->count() < $needed) {
+                    MafsilPositionUsage::where('juz_number', $partNumber)
+                        ->where('difficulty', $difficulty)
+                        ->delete();
+
+                    $unused = $available;
+                }
+
+                $partSelected = $partSelected->merge($unused->shuffle()->take($needed));
             }
 
             if ($partSelected->isEmpty()) {
@@ -399,6 +421,33 @@ class RecitationController extends Controller
         }
 
         return $selectedPositions->groupBy('juz_number');
+    }
+
+    /**
+     * Record that the selected real mafsil positions have been used in the current cycle.
+     */
+    private function recordMafsilPositionUsage(\Illuminate\Support\Collection $mafsilPositions): void
+    {
+        $records = [];
+
+        foreach ($mafsilPositions as $partNumber => $positions) {
+            foreach ($positions as $position) {
+                if ($position->id > 0 && $position->start_ayah_id) {
+                    $records[] = [
+                        'juz_number' => $partNumber,
+                        'difficulty' => $position->difficulty,
+                        'mafsil_position_id' => $position->id,
+                        'supervisor_id' => Auth::id(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+        }
+
+        if (! empty($records)) {
+            MafsilPositionUsage::insert($records);
+        }
     }
 
     /**

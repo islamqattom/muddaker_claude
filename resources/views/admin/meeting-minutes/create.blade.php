@@ -513,44 +513,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
             </button>
         </div>
 
-        @if(isset($changedTasks) && $changedTasks->count() > 0)
-        <div class="divider"></div>
-        <div class="form-section">
-            <div class="section-title">
-                <i class="fas fa-sync-alt" style="color: var(--warning);"></i>
-                <span>التكليفات المتغيرة</span>
-                <span class="section-badge">{{ $changedTasks->count() }}</span>
-            </div>
-            <div class="row g-3">
-                @foreach($changedTasks as $task)
-                <div class="col-md-6">
-                    <div class="task-card">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->title }}</span>
-                                <span class="text-muted small d-block">
-                                    {{ $task->assignee->name ?? '-' }}
-                                    @if($task->meetingMinute)
-                                        <span class="mx-2">•</span>
-                                        {{ $task->meetingMinute->meeting_date->format('Y/m/d') }}
-                                    @endif
-                                </span>
-                            </div>
-                            <span class="status-badge-sm badge-{{ $task->status_color }}">{{ $task->status_label }}</span>
-                        </div>
-                        <select name="task_status[{{ $task->id }}]" class="form-select form-select-sm" onchange="updateTaskStatusColor(this)">
-                            <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
-                            <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
-                            <option value="completed" {{ $task->status == 'completed' ? 'selected' : '' }}>مكتمل</option>
-                            <option value="cancelled" {{ $task->status == 'cancelled' ? 'selected' : '' }}>ملغي</option>
-                        </select>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-
         @if(isset($tasksFromAllMeetings) && $tasksFromAllMeetings->count() > 0)
         <div class="divider"></div>
         <div class="form-section">
