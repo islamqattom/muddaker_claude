@@ -2076,6 +2076,380 @@
     </style>
 
     @stack('styles')
+
+    <!-- Mobile fixes for recitation pages -->
+    <style>
+    @media (max-width: 768px) {
+        .rec-session .page-hero {
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        .rec-session .hero-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .rec-session .student-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rec-session .student-avatar {
+            width: 48px;
+            height: 48px;
+            font-size: 18px;
+        }
+
+        .rec-session .student-name {
+            font-size: 18px;
+        }
+
+        .rec-session .hero-meta {
+            justify-content: center;
+        }
+
+        .rec-session .page-card-header {
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .rec-session .page-title {
+            justify-content: center;
+        }
+
+        .rec-session .page-card-body {
+            padding: 14px;
+        }
+
+        .rec-session .page-card-body .row.g-4 {
+            row-gap: 1.25rem !important;
+        }
+
+        .rec-session .page-card-body .col-4 {
+            flex: 0 0 100%;
+            width: 100%;
+            text-align: center;
+        }
+
+        .rec-session .counter-input {
+            width: 80px;
+            height: 48px;
+            font-size: 18px;
+        }
+
+        .rec-session .input-btn {
+            width: 42px;
+            height: 42px;
+            font-size: 16px;
+        }
+
+        .rec-session .result-indicator {
+            width: 44px;
+            height: 44px;
+            font-size: 16px;
+        }
+
+        .rec-session .summary-card .row .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .rec-session .summary-stat {
+            padding: 12px;
+        }
+
+        .rec-session .summary-stat .stat-value {
+            font-size: 20px;
+        }
+
+        .rec-session .notes-textarea {
+            font-size: 16px;
+        }
+
+        .rec-session .info-alert {
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between > a,
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between > div {
+            width: 100%;
+        }
+
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between > div {
+            flex-direction: column;
+            gap: 10px !important;
+        }
+
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between .save-btn,
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between .btn-outline-secondary,
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between .btn-stop,
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between .btn-secondary,
+        .rec-session form .d-flex.flex-wrap.gap-3.justify-content-between .btn-cancel {
+            width: 100%;
+            padding: 14px;
+            font-size: 14px;
+        }
+
+        .rec-session .quran-verse {
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+
+        .recitation-index .hero-section {
+            padding: 16px;
+        }
+
+        .recitation-index .hero-content {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recitation-index .hero-content > .hero-icon {
+            position: static;
+            margin: 0 auto;
+        }
+
+        .recitation-index .hero-content > div:not(.hero-icon) {
+            text-align: center;
+        }
+
+        .recitation-index .session-type-card {
+            min-height: 100px;
+            padding: 12px 8px;
+        }
+
+        .recitation-index .session-type-card .type-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .recitation-index .session-type-card .type-label {
+            font-size: 13px;
+        }
+
+        .recitation-index .session-type-card .type-desc {
+            display: none;
+        }
+
+        .recitation-index .form-card .card-body {
+            padding: 14px;
+        }
+
+        .recitation-index .student-stats {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .recitation-index .student-stat {
+            flex: 1 1 60px;
+        }
+
+        .recitation-index .student-stat .stat-value {
+            font-size: 16px;
+        }
+
+        .recitation-index .start-btn {
+            width: 100%;
+            padding: 14px;
+        }
+
+        .recitation-index .color-item {
+            padding: 10px 12px;
+        }
+
+        .recitation-index .color-dot {
+            width: 32px;
+            height: 32px;
+        }
+
+        .recitation-index .color-item .fw-bold {
+            font-size: 12px;
+        }
+
+        .recitation-index .session-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .recitation-index .sessions-list .card-header {
+            padding: 12px 16px;
+        }
+
+        .recitation-index .form-select,
+        .recitation-index .form-control {
+            font-size: 16px;
+        }
+
+        .rec-session .selection-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px;
+        }
+
+        .rec-session .search-box {
+            min-width: 100%;
+        }
+
+        .rec-session .action-bar-sticky {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rec-session .action-bar-sticky .btn {
+            width: 100%;
+        }
+
+        .rec-session .score-dashboard-body {
+            padding: 14px;
+        }
+
+        .rec-session .distribution-grid {
+            gap: 12px;
+        }
+
+        .rec-session .distribution-grid .form-label {
+            font-size: 12px;
+        }
+
+        .rec-session .position-card {
+            gap: 0;
+        }
+
+        .rec-session .position-card-head {
+            border-bottom: 1px solid #f1f5f9;
+            border-inline-end: none;
+            padding: 10px 12px;
+        }
+
+        .rec-session .position-card-body {
+            grid-template-columns: 1fr;
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .rec-session .scoring-input-group input {
+            width: 48px;
+            height: 44px;
+            font-size: 16px;
+        }
+
+        .rec-session .scoring-input-group button {
+            width: 40px;
+            height: 40px;
+        }
+
+        .rec-session .ayahs-content .amiri-text {
+            font-size: 18px;
+            line-height: 2;
+        }
+
+        .rec-session .modal-body {
+            padding: 16px;
+        }
+
+        .rec-session .stat-pill {
+            padding: 8px 12px;
+        }
+
+        .rec-session .stat-pill .stat-text .val {
+            font-size: 14px;
+        }
+
+        .rec-session .session-hero .student-avatar {
+            width: 52px;
+            height: 52px;
+            font-size: 20px;
+        }
+
+        .rec-session .session-hero .student-name {
+            font-size: 18px;
+        }
+
+        .session-history .page-hero {
+            padding: 18px;
+        }
+
+        .session-history .hero-icon {
+            width: 48px;
+            height: 48px;
+            font-size: 22px;
+        }
+
+        .session-history .hero-title {
+            font-size: 18px;
+        }
+
+        .session-history .filter-body {
+            padding: 14px;
+        }
+
+        .session-history .stats-bar {
+            padding: 12px;
+            gap: 10px;
+        }
+
+        .session-history .action-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 15px;
+        }
+
+        .session-history .sessions-table {
+            font-size: 12px;
+        }
+
+        .session-history .sessions-table thead th,
+        .session-history .sessions-table tbody td {
+            padding: 10px 6px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .rec-session .page-card-body .col-4 {
+            padding: 0 8px;
+        }
+
+        .rec-session .summary-card .row .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .rec-session .summary-stat {
+            padding: 10px;
+        }
+
+        .rec-session .summary-stat .stat-label {
+            font-size: 10px;
+        }
+
+        .recitation-index .session-type-card {
+            min-height: 90px;
+        }
+
+        .recitation-index .session-type-card .type-label {
+            font-size: 12px;
+        }
+
+        .rec-session .scoring-input-group input {
+            width: 44px;
+        }
+    }
+    </style>
 </head>
 <body>
 
