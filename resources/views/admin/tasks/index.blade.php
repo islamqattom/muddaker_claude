@@ -352,6 +352,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <option value="">جميع الحالات</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
                     <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
+                    <option value="partially_done" {{ request('status') == 'partially_done' ? 'selected' : '' }}>منجزة جزئياً</option>
                     <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>مكتمل</option>
                     <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>ملغي</option>
                 </select>
@@ -467,6 +468,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                 <select name="status" class="status-select" onchange="this.form.submit()">
                                     <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
                                     <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
+                                    <option value="partially_done" {{ $task->status === 'partially_done' ? 'selected' : '' }}>منجزة جزئياً</option>
                                     <option value="completed" {{ $task->status === 'completed' ? 'selected' : '' }}>مكتمل</option>
                                     <option value="cancelled" {{ $task->status === 'cancelled' ? 'selected' : '' }}>ملغي</option>
                                 </select>

@@ -46,7 +46,7 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $session->student->user->name }}</td>
                 <td>{{ $session->supervisor->name ?? '-' }}</td>
-                <td>{{ $session->part->name ?? '-' }}</td>
+                <td>{{ $session->parts_label }}</td>
                 <td>{{ $session->from_page }} - {{ $session->to_page }}</td>
                 <td>{{ $session->session_date?->format('d/m/Y') }}</td>
                 <td class="{{ $session->status === 'passed' ? 'status-passed' : ($session->status === 'failed' ? 'status-failed' : '') }}">

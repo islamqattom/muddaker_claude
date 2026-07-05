@@ -80,6 +80,43 @@ class RecitationSession extends Model
         return $this->hasMany(RecitationPage::class, 'session_id');
     }
 
+    public function getTestedPartNumbersAttribute()
+    {
+        if ($this->type === self::TYPE_MAFSIL) {
+            $pages = $this->relationLoaded('pages') ? $this->pages : $this->pages()->get();
+
+            return $pages->pluck('page_number')
+                ->filter(fn ($number) => is_numeric($number) && (int) $number >= 1 && (int) $number <= 30)
+                ->map(fn ($number) => (int) $number)
+                ->unique()
+                ->sort()
+                ->values();
+        }
+
+        if ($this->part) {
+            return collect([(int) $this->part->part_number]);
+        }
+
+        return collect();
+    }
+
+    public function getPartsLabelAttribute(): string
+    {
+        $partNumbers = $this->tested_part_numbers;
+
+        if ($partNumbers->isNotEmpty()) {
+            return $partNumbers
+                ->map(fn ($number) => 'الجزء ' . $number)
+                ->join('، ');
+        }
+
+        if ($this->type === self::TYPE_MAFSIL && $this->mafsil_type) {
+            return 'مفصل (' . $this->mafsil_type . ')';
+        }
+
+        return '-';
+    }
+
     public function getTypeLabelAttribute(): string
     {
         return match($this->type) {

@@ -53,6 +53,10 @@
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>
 </a>
+<a href="{{ route('student.tasks.calendar') }}" class="nav-link {{ request()->routeIs('student.tasks.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
+    <span>تقويم مهامي</span>
+</a>
 <a href="{{ route('student.azkar') }}" class="nav-link {{ request()->routeIs('student.azkar*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
     <span>أذكار المسلم</span>

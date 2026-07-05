@@ -22,6 +22,15 @@ class NotificationTest extends TestCase
         $this->assertContains('type', $fillable);
         $this->assertContains('link', $fillable);
         $this->assertContains('is_read', $fillable);
+        $this->assertContains('message_id', $fillable);
+    }
+
+    public function test_notification_belongs_to_message(): void
+    {
+        $message = \App\Models\Message::factory()->create();
+        $notification = Notification::factory()->create(['message_id' => $message->id]);
+
+        $this->assertEquals($message->id, $notification->message->id);
     }
 
     public function test_notification_has_correct_casts(): void

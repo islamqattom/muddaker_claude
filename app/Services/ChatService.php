@@ -4,11 +4,16 @@ namespace App\Services;
 
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\Notification;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ChatService
 {
+    public function __construct(
+        private readonly NotificationService $notificationService,
+    ) {}
+
     public function sendMessage(Conversation $conversation, User $sender, string $content): Message
     {
         $message = Message::create([
@@ -19,7 +24,36 @@ class ChatService
 
         $conversation->update(['updated_at' => now()]);
 
+        $this->notifyRecipients($conversation, $sender, $message);
+
         return $message;
+    }
+
+    private function notifyRecipients(Conversation $conversation, User $sender, Message $message): void
+    {
+        $recipientIds = $conversation->participants()
+            ->where('user_id', '!=', $sender->id)
+            ->pluck('users.id')
+            ->toArray();
+
+        if (empty($recipientIds)) {
+            return;
+        }
+
+        $title = $conversation->is_group
+            ? "رسالة جديدة في {$conversation->name}"
+            : "رسالة جديدة من {$sender->name}";
+
+        $link = route('chat.show', $conversation);
+
+        $this->notificationService->sendToUsers(
+            $recipientIds,
+            'message',
+            $title,
+            Str::limit($message->content, 100),
+            $link,
+            $message->id
+        );
     }
 
     public function getUnreadCount(int $userId): int
@@ -42,6 +76,14 @@ class ChatService
             ->where('user_id', '!=', $userId)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+
+        Notification::where('user_id', $userId)
+            ->whereIn(
+                'message_id',
+                Message::where('conversation_id', $conversation->id)->pluck('id')
+            )
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
     }
 
     public function createGroupConversation(array $userIds, string $name, User $creator): Conversation

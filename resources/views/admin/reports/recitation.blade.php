@@ -349,7 +349,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                 </div>
                             </td>
                             <td style="font-weight: 600; color: var(--primary);">{{ $session->supervisor->name ?? '-' }}</td>
-                            <td style="font-weight: 600;">{{ $session->part->name ?? '-' }}</td>
+                            <td style="font-weight: 600;">{{ $session->parts_label }}</td>
                             <td>{{ $session->start_page ?? '-' }} - {{ $session->end_page ?? '-' }}</td>
                             <td style="font-weight: 600;">{{ $session->session_date?->format('Y/m/d') }}</td>
                             <td>

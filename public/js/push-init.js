@@ -93,6 +93,35 @@
         return outputArray;
     }
 
+    async function autoSubscribe() {
+        if (!swRegistration) {
+            try {
+                swRegistration = await navigator.serviceWorker.ready;
+            } catch (e) {
+                return;
+            }
+        }
+
+        if (Notification.permission === 'granted') {
+            await subscribeToPush(swRegistration);
+            const btn = document.querySelector('.notification-permission-btn');
+            if (btn) btn.style.display = 'none';
+        } else if (Notification.permission === 'default') {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const success = await subscribeToPush(swRegistration);
+                    if (success) {
+                        const btn = document.querySelector('.notification-permission-btn');
+                        if (btn) btn.style.display = 'none';
+                    }
+                }
+            } catch (e) {
+                console.log('Notification permission request failed:', e);
+            }
+        }
+    }
+
     function init() {
         if (!('serviceWorker' in navigator)) {
             console.log('Service Worker not supported');
@@ -103,10 +132,7 @@
             .then(function (registration) {
                 console.log('SW registered:', registration.scope);
                 swRegistration = registration;
-
-                if (typeof onServiceWorkerReady === 'function') {
-                    onServiceWorkerReady(registration);
-                }
+                autoSubscribe();
             })
             .catch(function (error) {
                 console.log('SW registration failed:', error);
@@ -148,13 +174,6 @@
             return;
         }
         await unsubscribeFromPush(swRegistration);
-    };
-
-    window.onServiceWorkerReady = function(registration) {
-        const btn = document.querySelector('.notification-permission-btn');
-        if (btn && Notification.permission === 'default') {
-            btn.style.display = 'flex';
-        }
     };
 
     if (document.readyState === 'loading') {

@@ -146,7 +146,7 @@ class ReportController extends Controller
 
         $i = 1;
         foreach ($sessions as $session) {
-            $part = $session->part ? 'الجزء ' . $session->part->part_number : ($session->mafsil_type ? 'مفصل (' . $session->mafsil_type . ')' : '-');
+            $part = $session->parts_label;
             $score = $session->final_score !== null ? number_format($session->final_score, 1) . '%' : '-';
             $statusColor = $session->status === 'passed' ? '#28a745' : '#dc3545';
 
@@ -466,7 +466,7 @@ class ReportController extends Controller
                 </tr>';
 
             foreach ($sessions as $session) {
-                $part = $session->part ? 'الجزء ' . $session->part->part_number : ($session->mafsil_type ? 'مفصل' : '-');
+                $part = $session->parts_label;
                 $score = $session->final_score !== null ? number_format($session->final_score, 1) . '%' : '-';
                 $statusColor = $session->status === 'passed' ? '#28a745' : '#dc3545';
 

@@ -183,13 +183,7 @@
                             <tr>
                                 <td><span class="type-pill">{{ $session->type_label }}</span></td>
                                 <td>
-                                    @if($session->part)
-                                        <span class="part-label">الجزء {{ $session->part->part_number }}</span>
-                                    @elseif($session->mafsil_type)
-                                        <span class="mafsil-label">مفصل ({{ $session->mafsil_type }})</span>
-                                    @else
-                                        -
-                                    @endif
+                                    <span class="part-label">{{ $session->parts_label }}</span>
                                 </td>
                                 <td class="text-center">
                                     @if($session->total_pages)

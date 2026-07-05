@@ -57,6 +57,10 @@
     <div class="icon-wrapper"><i class="fas fa-tasks"></i></div>
     <span>تكليفاتي</span>
 </a>
+<a href="{{ route('supervisor.tasks.calendar') }}" class="nav-link {{ request()->routeIs('supervisor.tasks.calendar') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
+    <span>تقويم المهام</span>
+</a>
 <a href="{{ route('supervisor.warnings.index') }}" class="nav-link {{ request()->routeIs('supervisor.warnings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>

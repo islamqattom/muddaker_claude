@@ -142,15 +142,7 @@
                     @foreach($sessions as $session)
                     <tr>
                         <td>{{ $session->type_label }}</td>
-                        <td>
-                            @if($session->part)
-                                الجزء {{ $session->part->part_number }}
-                            @elseif($session->mafsil_type)
-                                مفصل ({{ $session->mafsil_type }})
-                            @else
-                                -
-                            @endif
-                        </td>
+                        <td>{{ $session->parts_label }}</td>
                         <td>{{ $session->total_pages ?? '-' }}</td>
                         <td>{{ $session->total_errors ?? 0 }}</td>
                         <td>{{ $session->total_hesitations ?? 0 }}</td>

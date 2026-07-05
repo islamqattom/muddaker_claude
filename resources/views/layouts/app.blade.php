@@ -39,6 +39,16 @@
 
         * { box-sizing: border-box; }
 
+        /* Fix Arabic text character separation -
+           letter-spacing breaks Arabic ligatures, causing characters to appear split */
+        body, input, textarea, select, optgroup,
+        .form-control, .form-select, .form-label,
+        p, span, div, h1, h2, h3, h4, h5, h6,
+        td, th, label, a, li, button {
+            letter-spacing: 0 !important;
+            word-spacing: 0 !important;
+        }
+
         body {
             font-family: 'Tajawal', sans-serif;
             background: #f0f4f8;
@@ -2605,6 +2615,8 @@
                                             <i class="fas fa-quran"></i>
                                         @elseif(str_contains($notif->type, 'billing'))
                                             <i class="fas fa-file-invoice-dollar"></i>
+                                        @elseif($notif->type === 'message')
+                                            <i class="fas fa-comment"></i>
                                         @else
                                             <i class="fas fa-bell"></i>
                                         @endif
@@ -2879,28 +2891,68 @@
     <!-- PWA Push + Service Worker -->
     <script src="/js/push-init.js"></script>
 
-    @if(config('broadcasting.default') === 'pusher')
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Fetch initial unread count
-        fetch('/chat/unread/count')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.getElementById('chatBadge');
-                if (badge && data.unread > 0) {
-                    badge.textContent = data.unread;
-                    badge.style.display = 'flex';
-                }
-            });
+        function updateBadges() {
+            fetch('/chat/unread/count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('chatBadge');
+                    if (!badge) return;
+                    if (window.location.pathname === '/chat') {
+                        badge.textContent = '0';
+                        badge.style.display = 'none';
+                    } else if (data.unread > 0) {
+                        badge.textContent = data.unread;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.textContent = '0';
+                        badge.style.display = 'none';
+                    }
+                });
 
-        // Pusher for real-time chat notifications
+            fetch('/notifications/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    const notifBell = document.getElementById('notifBell');
+                    let badge = document.getElementById('notifBadge');
+                    if (data.count > 0) {
+                        if (!badge && notifBell) {
+                            badge = document.createElement('span');
+                            badge.className = 'notification-badge';
+                            badge.id = 'notifBadge';
+                            notifBell.appendChild(badge);
+                        }
+                        if (badge) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'flex';
+                        }
+                    } else if (badge) {
+                        badge.style.display = 'none';
+                    }
+                    const dropdownBadge = document.querySelector('.badge-count');
+                    if (data.count > 0) {
+                        if (dropdownBadge) {
+                            dropdownBadge.textContent = data.count;
+                        }
+                    } else if (dropdownBadge) {
+                        dropdownBadge.remove();
+                    }
+                });
+        }
+
+        updateBadges();
+
+        setInterval(updateBadges, 3000);
+
+        @if(config('broadcasting.default') === 'pusher')
         const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}', {
             cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}'
         });
 
         const channel = pusher.subscribe('chat.{{ auth()->id() }}');
         channel.bind('new-message', function(data) {
+            if (window.location.pathname === '/chat') return;
             const badge = document.getElementById('chatBadge');
             if (badge) {
                 let count = parseInt(badge.textContent) || 0;
@@ -2908,18 +2960,9 @@
                 badge.style.display = 'flex';
             }
         });
-
-        // Clear badge when visiting chat index
-        if (window.location.pathname === '/chat') {
-            const badge = document.getElementById('chatBadge');
-            if (badge) {
-                badge.textContent = '0';
-                badge.style.display = 'none';
-            }
-        }
+        @endif
     });
     </script>
-    @endif
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {

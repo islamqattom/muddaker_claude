@@ -60,9 +60,13 @@
     <div class="icon-wrapper"><i class="fas fa-calendar-minus"></i></div>
     <span>محاضر الاجتماعات</span>
 </a>
-<a href="{{ route('admin.tasks.index') }}" class="nav-link {{ request()->routeIs('admin.tasks.*') ? 'active' : '' }}">
+<a href="{{ route('admin.tasks.index') }}" class="nav-link {{ request()->routeIs('admin.tasks.index') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-tasks"></i></div>
     <span>إدارة التكليفات</span>
+</a>
+<a href="{{ route('admin.tasks.calendar') }}" class="nav-link {{ request()->routeIs('admin.tasks.calendar') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
+    <span>تقويم المهام</span>
 </a>
 <span class="nav-section-title">التقارير والإنذارات</span>
 <a href="{{ route('admin.sessions.index') }}" class="nav-link {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">

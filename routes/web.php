@@ -23,6 +23,7 @@ Route::get('/', function () {
 Route::middleware('throttle:5,1')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::get('/logout', [LoginController::class, 'logout']);
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
@@ -135,6 +136,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Tasks
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [Admin\TaskController::class, 'index'])->name('index');
+        Route::get('/calendar', [Admin\TaskController::class, 'calendar'])->name('calendar');
         Route::post('/', [Admin\TaskController::class, 'store'])->name('store');
         Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
         Route::put('/{task}/title', [Admin\TaskController::class, 'updateTitle'])->name('updateTitle');
@@ -274,6 +276,8 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
 
     // Tasks (تكليفات)
     Route::get('/tasks', [Supervisor\TaskController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/calendar', [Supervisor\TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::post('/tasks', [Supervisor\TaskController::class, 'store'])->name('tasks.store');
     Route::put('/tasks/{task}/status', [Supervisor\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 
     // Yawm Al-Himma (يوم الهمة)
@@ -349,6 +353,12 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
 
     // Smart Review Scheduler (SM-2)
     Route::get('/reviews', [Student\ReviewController::class, 'index'])->name('reviews.index');
+
+    // Tasks Calendar (مهام الطالب)
+    Route::get('/tasks/calendar', [Student\TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::post('/tasks', [Student\TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}/status', [Student\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    Route::delete('/tasks/{task}', [Student\TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::get('/reviews/session', [Student\ReviewController::class, 'session'])->name('reviews.session');
     Route::post('/reviews/{reviewItem}/submit', [Student\ReviewController::class, 'submitReview'])->name('reviews.submit');
     Route::post('/reviews/add', [Student\ReviewController::class, 'addToReviews'])->name('reviews.add');

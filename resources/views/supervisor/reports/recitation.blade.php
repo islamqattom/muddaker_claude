@@ -495,15 +495,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if($session->part)
-                                        <span class="part-badge">الجزء {{ $session->part->part_number }}</span>
-                                    @elseif($session->mafsil_type)
-                                        <span class="part-badge" style="background: linear-gradient(135deg, rgba(220,38,38,0.1), rgba(239,68,68,0.15)); color: #dc2626;">
-                                            مفصل ({{ $session->mafsil_type }})
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
+                                    <span class="part-badge">{{ $session->parts_label }}</span>
                                 </td>
                                 <td>
                                     @if($session->total_pages)

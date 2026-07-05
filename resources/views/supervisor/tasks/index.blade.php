@@ -330,6 +330,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <i class="fas fa-clock"></i>
                     @elseif($task->status === 'in_progress')
                         <i class="fas fa-spinner"></i>
+                    @elseif($task->status === 'partially_done')
+                        <i class="fas fa-adjust"></i>
                     @elseif($task->status === 'completed')
                         <i class="fas fa-check"></i>
                     @else
@@ -365,6 +367,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <select name="status" class="status-select" onchange="this.form.submit()">
                         <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
                         <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
+                        <option value="partially_done" {{ $task->status === 'partially_done' ? 'selected' : '' }}>منجزة جزئياً</option>
                         <option value="completed" {{ $task->status === 'completed' ? 'selected' : '' }}>مكتمل</option>
                         <option value="cancelled" {{ $task->status === 'cancelled' ? 'selected' : '' }}>ملغي</option>
                     </select>

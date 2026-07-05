@@ -494,10 +494,12 @@ function updateSardColor(index) {
         colorClass = 'color-orange'; label = 'جيد'; icon = 'fa-minus';
     } else if ((totalEquivalent === 2 && hesitations === 0) || (hesitations === 6 && totalEquivalent === 2) || (hesitations === 3 && totalEquivalent === 2)) {
         colorClass = 'color-red'; label = 'ضعيف'; icon = 'fa-times';
+    } else if (totalEquivalent === 2 && hesitations >= 1) {
+        colorClass = 'color-black'; label = 'راسب'; icon = 'fa-ban';
     } else if (totalEquivalent >= 3) {
         colorClass = 'color-black'; label = 'راسب'; icon = 'fa-ban';
     } else {
-        colorClass = 'color-gray'; label = '—'; icon = 'fa-hourglass-half';
+        colorClass = 'color-green'; label = 'ممتاز'; icon = 'fa-check';
     }
 
     const indicator = document.getElementById('color-indicator-' + index);

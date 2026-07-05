@@ -41,7 +41,7 @@ class ReportController extends Controller {
                 break;
         }
 
-        $query = RecitationSession::with(['student.user','supervisor','part']);
+        $query = RecitationSession::with(['student.user','supervisor','part','pages']);
 
         // Filter by supervisor
         if ($request->supervisor_id) {
@@ -65,7 +65,7 @@ class ReportController extends Controller {
         $students = Student::with('user')->get();
         if ($request->export === 'pdf') {
             // Get all sessions for PDF (not paginated) - apply same filters
-            $pdfQuery = RecitationSession::with(['student.user','supervisor','part']);
+            $pdfQuery = RecitationSession::with(['student.user','supervisor','part','pages']);
 
             // Apply same filters as main query
             if ($request->supervisor_id) {
@@ -171,7 +171,7 @@ class ReportController extends Controller {
 
         $i = 1;
         foreach ($sessions as $session) {
-            $partName = $session->part ? ($session->part->part_number ? 'الجزء ' . $session->part->part_number : $session->part->name) : '-';
+            $partName = $session->parts_label;
             $pages = ($session->start_page && $session->end_page) ? ($session->start_page . ' - ' . $session->end_page) : '-';
 
             // Handle all possible status values

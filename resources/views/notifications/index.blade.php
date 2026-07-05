@@ -89,6 +89,7 @@
                     @elseif($notification->type === 'attendance') attendance
                     @elseif($notification->type === 'milestone') milestone
                     @elseif($notification->type === 'meeting_task') milestone
+                    @elseif($notification->type === 'message') message
                     @endif">
                     @if($notification->type === 'warning_draft')
                         <i class="fas fa-edit"></i>
@@ -102,6 +103,8 @@
                         <i class="fas fa-trophy"></i>
                     @elseif($notification->type === 'meeting_task')
                         <i class="fas fa-tasks"></i>
+                    @elseif($notification->type === 'message')
+                        <i class="fas fa-comment"></i>
                     @else
                         <i class="fas fa-bell"></i>
                     @endif
@@ -231,6 +234,11 @@
 .notif-icon-wrapper.meeting_task {
     background: linear-gradient(135deg, rgba(142, 68, 173, 0.15), rgba(125, 60, 152, 0.2));
     color: #8e44ad;
+}
+
+.notif-icon-wrapper.message {
+    background: linear-gradient(135deg, rgba(41, 128, 185, 0.15), rgba(52, 152, 219, 0.2));
+    color: #2980b9;
 }
 
 .notif-item-modern:hover .notif-icon-wrapper {

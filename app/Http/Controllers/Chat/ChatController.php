@@ -7,11 +7,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+    public function __construct(
+        private readonly ChatService $chatService,
+    ) {}
     public function index()
     {
         $user = Auth::user();
@@ -38,9 +42,7 @@ class ChatController extends Controller
             $query->orderBy('created_at', 'asc')->limit(100);
         }]);
 
-        $conversation->participants()
-            ->where('user_id', $user->id)
-            ->update(['last_read_at' => now()]);
+        $this->chatService->markConversationAsRead($conversation, $user->id);
 
         return view('chat.show', compact('conversation'));
     }
@@ -97,13 +99,7 @@ class ChatController extends Controller
             abort(403);
         }
 
-        $message = Message::create([
-            'conversation_id' => $conversation->id,
-            'user_id' => $user->id,
-            'content' => $request->content,
-        ]);
-
-        $conversation->update(['updated_at' => now()]);
+        $message = $this->chatService->sendMessage($conversation, $user, $request->content);
 
         event(new NewMessage($message));
 
@@ -125,14 +121,7 @@ class ChatController extends Controller
             abort(403);
         }
 
-        $conversation->participants()
-            ->where('user_id', $user->id)
-            ->update(['last_read_at' => now()]);
-
-        Message::where('conversation_id', $conversation->id)
-            ->where('user_id', '!=', $user->id)
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
+        $this->chatService->markConversationAsRead($conversation, $user->id);
 
         return response()->json(['success' => true]);
     }

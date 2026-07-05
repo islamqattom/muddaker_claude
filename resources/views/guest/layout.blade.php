@@ -28,6 +28,16 @@
             margin: 0;
         }
 
+        /* Fix Arabic text character separation -
+           letter-spacing breaks Arabic ligatures, causing characters to appear split */
+        body, input, textarea, select, optgroup,
+        .form-control, .form-select, .form-label,
+        p, span, div, h1, h2, h3, h4, h5, h6,
+        td, th, label, a, li, button {
+            letter-spacing: 0 !important;
+            word-spacing: 0 !important;
+        }
+
         .page-hero {
             background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
             color: white;
