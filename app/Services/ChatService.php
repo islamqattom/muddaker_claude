@@ -40,19 +40,28 @@ class ChatService
             return;
         }
 
+        // For 1:1 chats show the sender's name in the title; for groups show
+        // the group name. Body is always the message preview so the user
+        // can read the gist without opening the app.
         $title = $conversation->is_group
-            ? "رسالة جديدة في {$conversation->name}"
-            : "رسالة جديدة من {$sender->name}";
+            ? "{$sender->name} في {$conversation->name}"
+            : "{$sender->name} أرسل لك رسالة";
 
+        $preview = Str::limit($message->content, 120);
         $link = route('chat.show', $conversation);
 
         $this->notificationService->sendToUsers(
             $recipientIds,
             'message',
             $title,
-            Str::limit($message->content, 100),
+            $preview,
             $link,
-            $message->id
+            $message->id,
+            $sender,
+            [
+                'message_preview' => $preview,
+                'conversation_id' => $conversation->id,
+            ]
         );
     }
 

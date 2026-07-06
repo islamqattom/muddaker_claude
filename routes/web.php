@@ -13,6 +13,7 @@ use App\Http\Controllers\ParentPortal\StudentPartRecordController as ParentStude
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 // Root redirect to login
 Route::get('/', function () {
@@ -38,16 +39,22 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::get('/result/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'result'])->name('result');
 });
 
-// Push subscription routes (authenticated)
-Route::middleware('auth')->group(function () {
-    Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
-    Route::delete('/push/unsubscribe', [PushController::class, 'unsubscribe'])->name('push.unsubscribe');
+    // Push subscription routes (authenticated)
+    Route::middleware('auth')->group(function () {
+        Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
+        Route::delete('/push/unsubscribe', [PushController::class, 'unsubscribe'])->name('push.unsubscribe');
+        Route::get('/push/status', [PushController::class, 'status'])->name('push.status');
 
     // Notification routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::get('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+
+    // Notification preferences (settings page, test, update)
+    Route::get('/notifications/settings', [NotificationPreferenceController::class, 'index'])->name('notifications.settings');
+    Route::put('/notifications/settings', [NotificationPreferenceController::class, 'update'])->name('notifications.preferences.update');
+    Route::post('/notifications/test', [NotificationPreferenceController::class, 'test'])->name('notifications.test');
 
     // Chat routes
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');

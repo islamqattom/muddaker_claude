@@ -13,6 +13,9 @@
     <meta name="vapid-public-key" content="{{ config('web-push.vapid.public_key', '') }}">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+    <meta name="user-id" content="{{ auth()->id() }}">
+    @endauth
     <title>@yield('title', 'نظام تسميع القرآن الكريم') - مشروع مدكر القرآني</title>
 
     <!-- Bootstrap RTL -->
@@ -2572,7 +2575,7 @@
                 </a>
 
                 <!-- Enable Notifications Button -->
-                <button class="notification-permission-btn" onclick="requestNotificationPermission()" style="display: none;">
+                <button class="notification-permission-btn" id="headerEnableNotifBtn" onclick="PushNotifications.enable().then(updateHeaderNotifBtn)" style="display: none;">
                     <i class="fas fa-bell"></i>
                     <span>تفعيل الإشعارات</span>
                 </button>
@@ -2644,6 +2647,10 @@
                             <a href="{{ route('notifications.index') }}" class="notif-footer-link">
                                 <i class="fas fa-list"></i>
                                 عرض جميع الإشعارات
+                            </a>
+                            <a href="{{ route('notifications.settings') }}" class="notif-footer-link">
+                                <i class="fas fa-cog"></i>
+                                إعدادات الإشعارات
                             </a>
                         </div>
                     </div>
@@ -2944,6 +2951,32 @@
         updateBadges();
 
         setInterval(updateBadges, 3000);
+
+        // Show/hide the "Enable Notifications" button based on the current
+        // browser permission state. Hide it once the user has granted
+        // permission (or if the browser doesn't support it at all).
+        function updateHeaderNotifBtn() {
+            const btn = document.getElementById('headerEnableNotifBtn');
+            if (!btn || !window.PushNotifications) return;
+            const status = window.PushNotifications.getStatus();
+            if (status.state === 'granted' || status.state === 'unsupported') {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = '';
+            }
+        }
+        updateHeaderNotifBtn();
+
+        // iOS Safari browser (not PWA) — show a small banner telling the
+        // user to add the app to the home screen for notifications to work.
+        if (window.PushNotifications && window.PushNotifications.isIOSBrowser && window.PushNotifications.isIOSBrowser()) {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#182B48;color:#fff;padding:10px 16px;text-align:center;z-index:99999;font-size:13px;font-family:Tajawal,sans-serif;';
+            banner.innerHTML = '<i class="fas fa-info-circle"></i> ' +
+                'للحصول على الإشعارات على iPhone، أضف الموقع إلى الشاشة الرئيسية: ' +
+                '<strong>مشاركة</strong> ← <strong>إضافة إلى الشاشة الرئيسية</strong>.';
+            document.body.appendChild(banner);
+        }
 
         @if(config('broadcasting.default') === 'pusher')
         const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}', {

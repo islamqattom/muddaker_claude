@@ -89,8 +89,41 @@ class User extends Authenticatable
         return $this->notifications()->where('is_read', false)->count();
     }
 
-    public function pushSubscription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function pushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(PushSubscription::class);
+        return $this->hasMany(PushSubscription::class);
+    }
+
+    public function activePushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->pushSubscriptions()->where('is_active', true);
+    }
+
+    public function notificationPreferences(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
+
+    /**
+     * Returns true if the user has at least one active, non-expired push
+     * subscription — i.e. push notifications are actually deliverable.
+     */
+    public function hasActivePush(): bool
+    {
+        return $this->activePushSubscriptions()
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->exists();
+    }
+
+    /**
+     * Returns true if the user has explicitly disabled push for a given
+     * notification type. Defaults to "enabled" when no preference row exists.
+     */
+    public function isPushEnabledFor(string $type): bool
+    {
+        $pref = $this->notificationPreferences()->where('type', $type)->first();
+        return $pref ? (bool) $pref->push_enabled : true;
     }
 }
