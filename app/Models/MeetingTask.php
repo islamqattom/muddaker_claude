@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Carbon\Carbon;
 
 class MeetingTask extends Model
@@ -38,6 +39,11 @@ class MeetingTask extends Model
         return $this->belongsTo(MeetingMinute::class);
     }
 
+    public function assignee(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
     public function assigneeUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assignee_id');
@@ -46,14 +52,6 @@ class MeetingTask extends Model
     public function assigneeStudent(): BelongsTo
     {
         return $this->belongsTo(Student::class, 'assignee_id');
-    }
-
-    public function getAssigneeAttribute()
-    {
-        if ($this->assignee_type === 'student') {
-            return $this->assigneeStudent;
-        }
-        return $this->assigneeUser;
     }
 
     public function assigner(): BelongsTo

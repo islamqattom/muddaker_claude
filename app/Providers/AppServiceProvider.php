@@ -6,7 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Student;
 use App\Services\NotificationService;
 use App\Listeners\AuthenticationListener;
 use Illuminate\Auth\Events\Login;
@@ -48,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Use Bootstrap 5 pagination
         Paginator::useBootstrapFive();
+
+        Relation::morphMap([
+            'user' => User::class,
+            'student' => Student::class,
+        ]);
 
         // Register authentication audit listeners
         Event::listen(Login::class, [AuthenticationListener::class, 'handleLogin']);
