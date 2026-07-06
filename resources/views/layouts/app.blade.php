@@ -1467,8 +1467,8 @@
             display: none;
         }
 
-        /* Mobile */
-        @media (max-width: 768px) {
+        /* Mobile / Tablet (matches Bootstrap lg breakpoint) */
+        @media (max-width: 991.98px) {
             .sidebar {
                 transform: translateX(100%);
                 width: var(--sidebar-width) !important;
@@ -1613,7 +1613,7 @@
         }
 
         /* Mobile close button for sidebar */
-        @media (max-width: 768px) {
+        @media (max-width: 991.98px) {
             .sidebar-close-btn {
                 display: flex;
             }
@@ -1636,8 +1636,8 @@
         }
         .sidebar-close-btn:hover { background: rgba(255,255,255,0.25); transform: rotate(90deg); }
 
-        /* Tablet and above - sidebar toggle */
-        @media (min-width: 769px) {
+        /* Tablet and above - hide mobile menu button (matches Bootstrap lg) */
+        @media (min-width: 992px) {
             #mobileMenuBtn { display: none; }
         }
 
@@ -2848,7 +2848,7 @@
         // Restore sidebar state on page load (desktop only)
         document.addEventListener('DOMContentLoaded', function() {
             // Only apply desktop collapse state on larger screens
-            if (window.innerWidth >= 769) {
+            if (window.innerWidth >= 992) {
                 const sidebar = document.getElementById('sidebar');
                 const mainContent = document.querySelector('.main-content');
                 const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
@@ -2866,8 +2866,8 @@
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.querySelector('.main-content');
 
-            if (window.innerWidth < 769) {
-                // Mobile: remove collapse classes, ensure proper state
+            if (window.innerWidth < 992) {
+                // Mobile/tablet: remove collapse classes, ensure proper state
                 sidebar.classList.remove('collapsed');
                 mainContent.classList.remove('sidebar-collapsed');
             }
