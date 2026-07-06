@@ -1,6 +1,10 @@
 /node_modules
 /public/hot
 /public/storage
+/storage/app/public/chat-attachments/
+/storage/framework/testing/
+/storage/framework/testing-*/
+/storage/framework/cache/data/
 /storage/*.key
 /vendor
 .env

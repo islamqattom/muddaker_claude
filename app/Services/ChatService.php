@@ -4,29 +4,115 @@ namespace App\Services;
 
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\MessageAttachment;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ChatService
 {
+    public const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024;
+
+    public const ALLOWED_MIME_PREFIXES = [
+        'image/',
+        'video/',
+        'audio/',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+        'application/zip',
+        'application/x-rar-compressed',
+        'application/x-7z-compressed',
+        'application/x-tar',
+        'application/gzip',
+        'application/json',
+        'application/xml',
+        'text/',
+    ];
+
     public function __construct(
         private readonly NotificationService $notificationService,
     ) {}
 
-    public function sendMessage(Conversation $conversation, User $sender, string $content): Message
+    /**
+     * Send a chat message. Either text (content), one or more attachments,
+     * or both. Files are stored on the public disk under
+     * `chat-attachments/{conversation}/{message}`.
+     *
+     * @param UploadedFile[] $attachments
+     */
+    public function sendMessage(Conversation $conversation, User $sender, ?string $content, array $attachments = []): Message
     {
-        $message = Message::create([
-            'conversation_id' => $conversation->id,
-            'user_id' => $sender->id,
-            'content' => $content,
-        ]);
+        $content = trim((string) $content);
+        if ($content === '' && empty($attachments)) {
+            throw new \InvalidArgumentException('لا يمكن إرسال رسالة فارغة بدون مرفقات.');
+        }
 
-        $conversation->update(['updated_at' => now()]);
+        $message = DB::transaction(function () use ($conversation, $sender, $content, $attachments) {
+            $message = Message::create([
+                'conversation_id' => $conversation->id,
+                'user_id' => $sender->id,
+                'content' => $content !== '' ? $content : null,
+            ]);
+
+            foreach ($attachments as $file) {
+                $this->storeAttachment($message, $file);
+            }
+
+            $conversation->update(['updated_at' => now()]);
+
+            return $message;
+        });
+
+        $message->load('attachments');
 
         $this->notifyRecipients($conversation, $sender, $message);
 
         return $message;
+    }
+
+    private function storeAttachment(Message $message, UploadedFile $file): MessageAttachment
+    {
+        $mime = (string) ($file->getMimeType() ?: $file->getClientMimeType() ?: 'application/octet-stream');
+        $size = (int) $file->getSize();
+
+        if ($size > self::MAX_ATTACHMENT_BYTES) {
+            throw new \InvalidArgumentException(
+                'حجم المرفق يتجاوز الحد الأقصى (' . self::MAX_ATTACHMENT_BYTES . ' بايت).'
+            );
+        }
+
+        $isAllowed = false;
+        foreach (self::ALLOWED_MIME_PREFIXES as $prefix) {
+            if (Str::startsWith($mime, $prefix)) {
+                $isAllowed = true;
+                break;
+            }
+        }
+        if (!$isAllowed) {
+            throw new \InvalidArgumentException("نوع الملف غير مسموح: {$mime}");
+        }
+
+        $dir = "chat-attachments/{$message->conversation_id}/{$message->id}";
+        $stored = $file->store($dir, 'public');
+
+        $attachment = new MessageAttachment([
+            'message_id' => $message->id,
+            'disk' => 'public',
+            'path' => $stored,
+            'original_name' => $file->getClientOriginalName() ?: basename($stored),
+            'mime_type' => $mime,
+            'size' => $size,
+        ]);
+        $attachment->category = $attachment->detectCategory();
+        $attachment->save();
+
+        return $attachment;
     }
 
     private function notifyRecipients(Conversation $conversation, User $sender, Message $message): void
@@ -40,29 +126,40 @@ class ChatService
             return;
         }
 
-        // For 1:1 chats show the sender's name in the title; for groups show
-        // the group name. Body is always the message preview so the user
-        // can read the gist without opening the app.
         $title = $conversation->is_group
             ? "{$sender->name} في {$conversation->name}"
             : "{$sender->name} أرسل لك رسالة";
 
-        $preview = Str::limit($message->content, 120);
+        $body = $this->buildPreview($message);
         $link = route('chat.show', $conversation);
 
         $this->notificationService->sendToUsers(
             $recipientIds,
             'message',
             $title,
-            $preview,
+            $body,
             $link,
             $message->id,
             $sender,
             [
-                'message_preview' => $preview,
+                'message_preview' => $body,
                 'conversation_id' => $conversation->id,
+                'has_attachments' => $message->attachments->isNotEmpty(),
+                'attachment_count' => $message->attachments->count(),
             ]
         );
+    }
+
+    private function buildPreview(Message $message): string
+    {
+        $parts = [];
+        if (!empty($message->content)) {
+            $parts[] = Str::limit($message->content, 80);
+        }
+        foreach ($message->attachments as $att) {
+            $parts[] = '📎 ' . $att->original_name;
+        }
+        return $parts ? implode(' • ', $parts) : 'مرفق';
     }
 
     public function getUnreadCount(int $userId): int
@@ -134,5 +231,15 @@ class ChatService
 
         $conversation->participants()->detach($user->id);
         $conversation->update(['updated_at' => now()]);
+    }
+
+    public function deleteAttachment(MessageAttachment $attachment, User $user): bool
+    {
+        if ($attachment->message?->user_id !== $user->id) {
+            throw new \Exception('لا يمكن حذف مرفق لرسالة لم ترسلها.');
+        }
+        Storage::disk($attachment->disk)->delete($attachment->path);
+        $attachment->delete();
+        return true;
     }
 }

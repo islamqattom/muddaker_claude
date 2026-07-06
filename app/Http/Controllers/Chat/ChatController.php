@@ -6,10 +6,12 @@ use App\Events\NewMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\MessageAttachment;
 use App\Models\User;
 use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -38,9 +40,16 @@ class ChatController extends Controller
             abort(403);
         }
 
-        $conversation->load(['participants', 'messages' => function ($query) {
-            $query->orderBy('created_at', 'asc')->limit(100);
-        }]);
+        $messages = Message::where('conversation_id', $conversation->id)
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->reverse()
+            ->values();
+
+        $conversation->setRelation('messages', $messages);
+        $conversation->load('participants');
 
         $this->chatService->markConversationAsRead($conversation, $user->id);
 
@@ -90,7 +99,9 @@ class ChatController extends Controller
     public function sendMessage(Request $request, Conversation $conversation)
     {
         $request->validate([
-            'content' => 'required|string|max:5000',
+            'content' => 'nullable|string|max:5000',
+            'attachments' => 'nullable|array|max:10',
+            'attachments.*' => 'file|max:25600',
         ]);
 
         $user = Auth::user();
@@ -99,18 +110,53 @@ class ChatController extends Controller
             abort(403);
         }
 
-        $message = $this->chatService->sendMessage($conversation, $user, $request->content);
+        $content = (string) $request->input('content', '');
+        $files = $request->file('attachments') ?? [];
+
+        try {
+            $message = $this->chatService->sendMessage($conversation, $user, $content, $files);
+        } catch (\InvalidArgumentException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
+            }
+            return back()->with('error', $e->getMessage());
+        }
 
         event(new NewMessage($message));
 
-        if (request()->expectsJson()) {
+        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => $message->load('user'),
+                'message' => $message->load(['user', 'attachments']),
             ]);
         }
 
         return back();
+    }
+
+    public function download(MessageAttachment $attachment)
+    {
+        $user = Auth::user();
+
+        $conversationId = $attachment->message?->conversation_id;
+        if (!$conversationId) {
+            abort(404);
+        }
+
+        $isParticipant = Conversation::where('id', $conversationId)
+            ->whereHas('participants', fn ($q) => $q->where('user_id', $user->id))
+            ->exists();
+
+        if (!$isParticipant) {
+            abort(403);
+        }
+
+        $disk = Storage::disk($attachment->disk);
+        if (!$disk->exists($attachment->path)) {
+            abort(404, 'الملف غير موجود على التخزين.');
+        }
+
+        return $disk->download($attachment->path, $attachment->original_name);
     }
 
     public function markAsRead(Conversation $conversation)

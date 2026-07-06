@@ -30,8 +30,18 @@ class Message extends Model
         return $this->hasMany(Notification::class, 'message_id');
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(MessageAttachment::class);
+    }
+
     public function scopeUnread($query)
     {
         return $query->whereNull('read_at');
+    }
+
+    public function hasAttachments(): bool
+    {
+        return $this->attachments()->exists();
     }
 }

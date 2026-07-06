@@ -66,6 +66,7 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::post('/chat/{conversation}/participants', [ChatController::class, 'addParticipant'])->name('chat.addParticipant');
     Route::delete('/chat/{conversation}/participants/{user}', [ChatController::class, 'removeParticipant'])->name('chat.removeParticipant');
     Route::get('/chat/unread/count', [ChatController::class, 'unreadCount'])->name('chat.unreadCount');
+    Route::get('/chat/attachments/{attachment}/download', [ChatController::class, 'download'])->name('chat.attachment.download');
 });
 
 // ============================
