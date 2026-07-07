@@ -9,8 +9,8 @@ use App\Models\MeetingTask;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
-use App\Notifications\NewMeetingTaskAssigned;
 use App\Services\AiParsingService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class MeetingMinuteController extends Controller
@@ -151,14 +151,13 @@ class MeetingMinuteController extends Controller
                         $link = $assignee->isSupervisor()
                             ? route('supervisor.tasks.index')
                             : route('admin.tasks.index');
-                        \App\Models\Notification::create([
-                            'user_id' => $assignee->id,
-                            'title' => 'تكليف جديد',
-                            'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
-                            'type' => 'meeting_task',
-                            'link' => $link,
-                            'is_read' => false,
-                        ]);
+                        app(NotificationService::class)->sendToUser(
+                            $assignee,
+                            'meeting_task',
+                            'تكليف جديد',
+                            'تم إسناد تكليف جديد: ' . $assignment['task'],
+                            $link
+                        );
                     }
                 }
             }
@@ -316,14 +315,13 @@ class MeetingMinuteController extends Controller
                         $link = $assignee->isSupervisor()
                             ? route('supervisor.tasks.index')
                             : route('admin.tasks.index');
-                        \App\Models\Notification::create([
-                            'user_id' => $assignee->id,
-                            'title' => 'تكليف جديد',
-                            'message' => 'تم إسناد تكليف جديد: ' . $assignment['task'],
-                            'type' => 'meeting_task',
-                            'link' => $link,
-                            'is_read' => false,
-                        ]);
+                        app(NotificationService::class)->sendToUser(
+                            $assignee,
+                            'meeting_task',
+                            'تكليف جديد',
+                            'تم إسناد تكليف جديد: ' . $assignment['task'],
+                            $link
+                        );
                     }
                 }
             }
@@ -427,14 +425,13 @@ class MeetingMinuteController extends Controller
                 $link = $assignee->isSupervisor()
                     ? route('supervisor.tasks.index')
                     : route('admin.tasks.index');
-                \App\Models\Notification::create([
-                    'user_id' => $assignee->id,
-                    'title' => 'تكليف جديد من الذكاء الاصطناعي',
-                    'message' => 'تم إسناد تكليف تلقائياً: ' . $aiTask['title'],
-                    'type' => 'meeting_task',
-                    'link' => $link,
-                    'is_read' => false,
-                ]);
+                app(NotificationService::class)->sendToUser(
+                    $assignee,
+                    'meeting_task',
+                    'تكليف جديد من الذكاء الاصطناعي',
+                    'تم إسناد تكليف تلقائياً: ' . $aiTask['title'],
+                    $link
+                );
             }
         }
     }

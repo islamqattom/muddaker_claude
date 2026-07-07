@@ -1402,26 +1402,59 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('content', content);
         pendingFiles.forEach(f => formData.append('attachments[]', f));
 
+        // Refresh CSRF token from meta tag in case it rotated
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content
+            || document.querySelector('input[name="_token"]')?.value
+            || '{{ csrf_token() }}';
+
         fetch(`/chat/${conversationId}/message`, {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-CSRF-TOKEN': csrf,
+                'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
             },
             body: formData
         })
-        .then(r => r.json())
+        .then(async r => {
+            const text = await r.text();
+            let data;
+            try { data = text ? JSON.parse(text) : {}; }
+            catch (parseErr) {
+                console.error('Non-JSON response:', r.status, text.slice(0, 500));
+                throw new Error(`استجابة غير متوقعة من الخادم (HTTP ${r.status})`);
+            }
+            if (!r.ok) {
+                const msg = data.error
+                    || (data.errors ? Object.values(data.errors).flat().join('\n') : null)
+                    || data.message
+                    || `خطأ في الخادم (HTTP ${r.status})`;
+                throw new Error(msg);
+            }
+            return data;
+        })
         .then(data => {
             if (data.success) {
                 chatInput.value = '';
                 pendingFiles = [];
                 rebuildAttachmentPreview();
-                addMessageToChat(data.message);
-            } else if (data.error) {
-                alert(data.error);
+                // Render the sent message in the chat. If client-side
+                // rendering throws (e.g. a future regression in
+                // addMessageToChat), we must NOT show "send failed" —
+                // the message is already saved on the server.
+                try {
+                    addMessageToChat(data.message);
+                } catch (renderErr) {
+                    console.error('Render error (message was sent):', renderErr);
+                }
+            } else {
+                alert(data.error || 'استجابة غير معروفة من الخادم');
             }
         })
-        .catch(() => alert('حدث خطأ أثناء إرسال الرسالة'))
+        .catch(err => {
+            console.error('Send error:', err);
+            alert(err.message || 'حدث خطأ أثناء إرسال الرسالة');
+        })
         .finally(() => {
             sendBtn.disabled = false;
             sendBtn.innerHTML = originalIcon;
@@ -1474,14 +1507,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function initMediaPlayersFor(scope) {
-        findAll(scope, '.media-player').forEach(root => {
-            try { window.__mediaPlayers = window.__mediaPlayers || []; window.__mediaPlayers.push(new MediaPlayer(root)); } catch (e) { console.error(e); }
+        if (!scope) return;
+        const MediaPlayerCtor = window.MediaPlayer;
+        if (!MediaPlayerCtor) return;
+        Array.from(scope.querySelectorAll('.media-player')).forEach(root => {
+            try {
+                window.__mediaPlayers = window.__mediaPlayers || [];
+                window.__mediaPlayers.push(new MediaPlayerCtor(root));
+            } catch (e) { console.error('MediaPlayer init failed:', e); }
         });
     }
 
     function initLightboxFor(scope) {
+        if (!scope) return;
         const galleries = window.__lightboxGalleries = window.__lightboxGalleries || {};
-        findAll(scope, '[data-lightbox]').forEach(a => {
+        Array.from(scope.querySelectorAll('[data-lightbox]')).forEach(a => {
             const key = a.dataset.lightbox;
             (galleries[key] = galleries[key] || []).push({
                 src: a.getAttribute('href'),

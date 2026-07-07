@@ -32,6 +32,8 @@ class NewMessage implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+        $this->message->loadMissing('attachments');
+
         return [
             'id' => $this->message->id,
             'conversation_id' => $this->message->conversation_id,
@@ -43,6 +45,21 @@ class NewMessage implements ShouldBroadcast
                 'name' => $this->message->user->name,
                 'avatar' => $this->message->user->avatar_url,
             ],
+            'attachments' => $this->message->attachments->map(fn ($a) => [
+                'id' => $a->id,
+                'message_id' => $a->message_id,
+                'original_name' => $a->original_name,
+                'mime_type' => $a->mime_type,
+                'size' => $a->size,
+                'category' => $a->category,
+                'url' => $a->url,
+                'download_url' => $a->download_url,
+                'human_size' => $a->human_size,
+                'is_image' => $a->is_image,
+                'is_video' => $a->is_video,
+                'is_audio' => $a->is_audio,
+                'icon' => $a->icon,
+            ])->values()->all(),
         ];
     }
 }

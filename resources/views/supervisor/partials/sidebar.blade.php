@@ -73,3 +73,8 @@
     <div class="icon-wrapper"><i class="fas fa-edit"></i></div>
     <span>مسودات الإنذارات</span>
 </a>
+
+<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
+    <span>إعدادات الإشعارات</span>
+</a>

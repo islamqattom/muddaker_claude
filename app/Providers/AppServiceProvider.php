@@ -23,16 +23,26 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(NotificationService::class, function ($app) {
             $webPush = null;
-            try {
-                $webPush = new WebPush([
-                    'VAPID' => [
-                        'publicKey' => config('web-push.vapid.public_key'),
-                        'privateKey' => config('web-push.vapid.private_key'),
-                        'subject' => config('web-push.vapid.subject'),
-                    ],
-                ]);
-            } catch (\Exception $e) {
-                // WebPush not configured — skip
+            $publicKey  = (string) config('web-push.vapid.public_key');
+            $privateKey = (string) config('web-push.vapid.private_key');
+            $subject    = (string) config('web-push.vapid.subject');
+
+            if ($publicKey === '' || $privateKey === '') {
+                \Illuminate\Support\Facades\Log::warning(
+                    'WebPush is not configured. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY in .env to enable push notifications.'
+                );
+            } else {
+                try {
+                    $webPush = new WebPush([
+                        'VAPID' => [
+                            'publicKey'  => $publicKey,
+                            'privateKey' => $privateKey,
+                            'subject'    => $subject,
+                        ],
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Failed to initialise WebPush: ' . $e->getMessage());
+                }
             }
 
             return new NotificationService($webPush);

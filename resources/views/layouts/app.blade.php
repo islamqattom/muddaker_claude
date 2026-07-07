@@ -2575,10 +2575,15 @@
                 </a>
 
                 <!-- Enable Notifications Button -->
-                <button class="notification-permission-btn" id="headerEnableNotifBtn" onclick="PushNotifications.enable().then(updateHeaderNotifBtn)" style="display: none;">
+                <button class="notification-permission-btn" id="headerEnableNotifBtn" style="display: none;">
                     <i class="fas fa-bell"></i>
                     <span>تفعيل الإشعارات</span>
                 </button>
+
+                <!-- Notification settings (always visible) -->
+                <a href="{{ route('notifications.settings') }}" class="notification-bell" id="notifSettingsLink" title="إعدادات الإشعارات">
+                    <i class="fas fa-cog"></i>
+                </a>
 
                 <!-- Notifications -->
                 <div class="dropdown">
@@ -2964,6 +2969,16 @@
             } else {
                 btn.style.display = '';
             }
+        }
+        // Wire up the button (single delegated handler instead of inline
+        // onclick so we don't depend on global scope).
+        const headerNotifBtn = document.getElementById('headerEnableNotifBtn');
+        if (headerNotifBtn) {
+            headerNotifBtn.addEventListener('click', function () {
+                // Send the user to the settings page so they can also see
+                // the diagnostic info + per-type preferences.
+                window.location.href = "{{ route('notifications.settings') }}";
+            });
         }
         updateHeaderNotifBtn();
 

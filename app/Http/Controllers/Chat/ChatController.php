@@ -102,6 +102,11 @@ class ChatController extends Controller
             'content' => 'nullable|string|max:5000',
             'attachments' => 'nullable|array|max:10',
             'attachments.*' => 'file|max:25600',
+        ], [
+            'content.max' => 'الرسالة طويلة جداً (الحد الأقصى 5000 حرف).',
+            'attachments.max' => 'لا يمكن إرفاق أكثر من 10 ملفات.',
+            'attachments.*.file' => 'الملف المرفق غير صالح.',
+            'attachments.*.max' => 'حجم الملف يتجاوز الحد المسموح (25 ميجابايت).',
         ]);
 
         $user = Auth::user();
@@ -113,25 +118,36 @@ class ChatController extends Controller
         $content = (string) $request->input('content', '');
         $files = $request->file('attachments') ?? [];
 
+        if (trim($content) === '' && empty($files)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'لا يمكن إرسال رسالة فارغة. اكتب نصاً أو أرفق ملفاً.',
+            ], 422);
+        }
+
         try {
             $message = $this->chatService->sendMessage($conversation, $user, $content, $files);
         } catch (\InvalidArgumentException $e) {
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
-            }
-            return back()->with('error', $e->getMessage());
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Chat sendMessage failed', [
+                'user_id' => $user->id,
+                'conversation_id' => $conversation->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => 'حدث خطأ في الخادم أثناء إرسال الرسالة: ' . $e->getMessage(),
+            ], 500);
         }
 
         event(new NewMessage($message));
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message->load(['user', 'attachments']),
-            ]);
-        }
-
-        return back();
+        return response()->json([
+            'success' => true,
+            'message' => $message->load(['user', 'attachments']),
+        ]);
     }
 
     public function download(MessageAttachment $attachment)

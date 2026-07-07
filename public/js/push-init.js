@@ -170,27 +170,53 @@
      * Show the browser's permission prompt and, if granted, register a
      * push subscription. Returns a Promise resolving to the permission
      * state ('granted' | 'denied' | 'default' | 'unsupported').
+     *
+     * IMPORTANT: The browser permission prompt must be requested in direct
+     * response to a user gesture (click). We call Notification.requestPermission()
+     * FIRST, before any service worker checks, so the prompt always shows
+     * for the user. Service worker / subscription work happens after.
      */
     async function enable() {
         try {
+            // iOS Safari (not installed as PWA) — can't show prompt.
             if (isIOSBrowser() && !isIOSPWA()) {
-                throw new Error('IOS_NOT_PWA');
+                return 'ios-not-pwa';
             }
-            await ensureRegistration();
+
+            // Basic API support check.
+            if (typeof Notification === 'undefined') {
+                return 'unsupported';
+            }
+
+            // Already denied? Don't even ask — the browser will refuse
+            // silently, and the user has to fix this in browser settings.
+            if (Notification.permission === 'denied') {
+                return 'denied';
+            }
 
             // This is the only call that actually shows the browser prompt.
+            // We must call it as the first async operation after the user
+            // gesture (the click handler) so the browser considers it
+            // user-initiated and shows the prompt.
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
-                return permission;
+                return permission; // 'default' or 'denied'
             }
 
-            await subscribeToPush();
-            return 'granted';
+            // Permission granted — now wire up the push subscription.
+            try {
+                await subscribeToPush();
+                return 'granted';
+            } catch (swErr) {
+                // Permission was granted but the SW / push subscription
+                // failed. The user still gets the OS-level notification
+                // permission; we just can't deliver pushes until the
+                // service worker is sorted out.
+                console.warn('[Push] Permission granted but subscription failed:', swErr);
+                return 'granted-no-sw';
+            }
         } catch (e) {
-            console.warn('[Push] enable failed:', e.message);
-            if (e.message === 'IOS_NOT_PWA') return 'ios-not-pwa';
-            if (e.message === 'UNSUPPORTED') return 'unsupported';
-            if (e.message === 'NO_VAPID') return 'no-vapid';
+            console.warn('[Push] enable failed:', e);
             return 'error';
         }
     }
@@ -267,6 +293,7 @@
         }
     }
 
+    // Expose the API globally.
     // Expose the API globally.
     window.PushNotifications = {
         enable,

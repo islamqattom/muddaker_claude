@@ -71,3 +71,7 @@
     <div class="icon-wrapper"><i class="fas fa-user-cog"></i></div>
     <span>ملفي الشخصي</span>
 </a>
+<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
+    <span>إعدادات الإشعارات</span>
+</a>

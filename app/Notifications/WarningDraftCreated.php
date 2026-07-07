@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Channels\WebPushChannel;
 use App\Models\WarningDraft;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +18,7 @@ class WarningDraftCreated extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', WebPushChannel::class];
     }
 
     public function toArray(object $notifiable): array
@@ -36,6 +37,28 @@ class WarningDraftCreated extends Notification
             'student_id' => $this->draft->student_id,
             'message' => "تنبيه جديد: تم إنشاء مسودة إنذار لـ {$studentName} بناءً على قاعدة \"{$ruleName}\"",
             'link' => $link,
+        ];
+    }
+
+    public function toWebPush(object $notifiable): array
+    {
+        $studentName = $this->draft->student?->name ?? 'الطالب';
+        $ruleName = $this->draft->warningRule?->name ?? 'قاعدة الإنذار';
+        $link = match (true) {
+            $notifiable->isAdmin() => route('admin.warning-drafts.index'),
+            $notifiable->isSupervisor() => route('supervisor.warning-drafts.index'),
+            default => route('notifications.index'),
+        };
+
+        return [
+            'title' => 'مسودة إنذار جديدة',
+            'body'  => "تم إنشاء مسودة إنذار لـ {$studentName} بناءً على قاعدة \"{$ruleName}\"",
+            'link'  => $link,
+            'type'  => 'warning_draft',
+            'extra' => [
+                'warning_draft_id' => $this->draft->id,
+                'student_id'       => $this->draft->student_id,
+            ],
         ];
     }
 }

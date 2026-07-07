@@ -52,6 +52,10 @@
                     <i class="fas fa-bell"></i>
                     <span>تفعيل</span>
                 </button>
+                <button type="button" class="btn" id="resetPermissionBtn" style="background: #fff; color: #c0392b; border: 1px solid #c0392b; padding: 10px 20px; border-radius: 10px;" title="إذا تم رفض الإذن سابقاً، استخدم هذا لإعادة ضبط إذن هذا الموقع في المتصفح">
+                    <i class="fas fa-undo"></i>
+                    <span>إعادة ضبط إذن المتصفح</span>
+                </button>
                 <button type="button" class="btn" id="disablePushBtn" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: #fff; border: none; padding: 10px 20px; border-radius: 10px;">
                     <i class="fas fa-bell-slash"></i>
                     <span>تعطيل</span>
@@ -63,6 +67,10 @@
             </div>
         </div>
         <div id="pushStatusAlert" class="mt-3" style="display: none;"></div>
+        <div id="pushDiagnostics" class="mt-3" style="font-size: 12px; color: #7f8c8d; display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span id="pushDiagnosticsText"></span>
+        </div>
     </div>
 </div>
 
@@ -187,12 +195,39 @@
         setTimeout(() => window.location.reload(), 800);
     }
 
+    // Show a small diagnostic line about browser state so the user can
+    // tell why the prompt isn't appearing (e.g. previously denied, no SW).
+    function showDiagnostics() {
+        const el = document.getElementById('pushDiagnostics');
+        const txt = document.getElementById('pushDiagnosticsText');
+        if (!el || !txt) return;
+        const perm = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+        const hasSW = 'serviceWorker' in navigator;
+        const hasPM = 'PushManager' in window;
+        const isSecure = window.isSecureContext;
+        const vapid = document.querySelector('meta[name="vapid-public-key"]');
+        const vapidLen = vapid ? (vapid.content || '').length : 0;
+        const swCtrl = (hasSW && navigator.serviceWorker.controller) ? 'نعم' : 'لا';
+        const txt2 = [];
+        txt2.push('إذن المتصفح: ' + perm);
+        txt2.push('Service Worker: ' + (hasSW ? 'مدعوم' : 'غير مدعوم') + ' (controller=' + swCtrl + ')');
+        txt2.push('Push API: ' + (hasPM ? 'مدعومة' : 'غير مدعومة'));
+        txt2.push('VAPID key: ' + (vapidLen > 0 ? vapidLen + ' حرف' : 'فارغ ✗'));
+        txt2.push('اتصال آمن: ' + (isSecure ? 'نعم' : 'لا (HTTPS أو localhost مطلوبان)'));
+        txt.textContent = txt2.join(' | ');
+        el.style.display = 'block';
+    }
+    setTimeout(showDiagnostics, 1200);
+
     // ============= Enable / Disable =============
 
     $('#enablePushBtn')?.addEventListener('click', async function() {
         const result = await PushNotifications.enable();
         if (result === 'granted') {
             showAlert('تم تفعيل الإشعارات بنجاح ✅', 'success');
+            refreshStatusBar();
+        } else if (result === 'granted-no-sw') {
+            showAlert('تم منح إذن الإشعارات، لكن تعذّر تسجيل الاشتراك في الخلفية. أعد تحميل الصفحة وحاول مرة أخرى.', 'warning');
             refreshStatusBar();
         } else if (result === 'denied') {
             showAlert('تم رفض إذن الإشعارات. يمكنك تفعيلها من إعدادات المتصفح.', 'warning');
@@ -214,6 +249,25 @@
         } else {
             showAlert('فشل تعطيل الإشعارات.', 'error');
         }
+    });
+
+    $('#resetPermissionBtn')?.addEventListener('click', function() {
+        const isHttps = window.location.protocol === 'https:';
+        const isLocal = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+        const url = window.location.origin;
+        const el = $('#pushStatusAlert');
+        el.className = 'alert alert-info mt-3';
+        el.style.borderRadius = '10px';
+        el.textContent =
+            'لإعادة ضبط إذن الإشعارات:\n\n' +
+            '• Chrome / Edge / Opera: اضغط على أيقونة القفل (🔒) بجانب العنوان → "إعدادات الموقع" → أعد ضبط "الإشعارات".\n' +
+            '• Firefox: اضغط على أيقونة الدرع (🛡) → "اتصال آمن" → "مزيد من المعلومات" → التبويب "الأذونات" → أعد ضبط "إرسال الإشعارات".\n' +
+            '• Safari: Safari → "تفضيلات" → "مواقع الإنترنت" → "الإشعارات" → ابحث عن ' + url + '.\n\n' +
+            'بعدها أعد تحميل الصفحة واضغط "تفعيل" مرة أخرى.\n\n' +
+            'الاتصال الحالي: ' + (isHttps || isLocal ? 'آمن ✓' : 'غير آمن ✗ (الإشعارات لا تعمل خارج HTTPS أو localhost)');
+        el.style.display = 'block';
+        clearTimeout(window.__resetAlertTimeout);
+        window.__resetAlertTimeout = setTimeout(() => { el.style.display = 'none'; }, 20000);
     });
 
     // ============= Test =============

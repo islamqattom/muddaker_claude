@@ -39,3 +39,9 @@
     <div class="icon-wrapper"><i class="fas fa-money-bill"></i></div>
     <span>الرسوم الشهرية</span>
 </a>
+
+<span class="nav-section-title">الإعدادات</span>
+<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
+    <span>إعدادات الإشعارات</span>
+</a>
