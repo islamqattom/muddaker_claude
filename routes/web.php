@@ -13,7 +13,6 @@ use App\Http\Controllers\ParentPortal\StudentPartRecordController as ParentStude
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\NotificationPreferenceController;
 
 // Root redirect to login
 Route::get('/', function () {
@@ -50,11 +49,6 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::get('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
-
-    // Notification preferences (settings page, test, update)
-    Route::get('/notifications/settings', [NotificationPreferenceController::class, 'index'])->name('notifications.settings');
-    Route::put('/notifications/settings', [NotificationPreferenceController::class, 'update'])->name('notifications.preferences.update');
-    Route::post('/notifications/test', [NotificationPreferenceController::class, 'test'])->name('notifications.test');
 
     // Chat routes
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
@@ -187,6 +181,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/yawm-al-himma', [Admin\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
     Route::get('/yawm-al-himma/day/{date}', [Admin\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
     Route::delete('/yawm-al-himma/{session}', [Admin\YawmAlHimmaController::class, 'destroy'])->name('yawm-al-himma.destroy');
+
+    // Iman Program (البرنامج الإيماني)
+    Route::prefix('iman-program')->name('iman-program.')->group(function () {
+        Route::get('/', [Admin\ImanProgramController::class, 'index'])->name('index');
+        Route::get('/create', [Admin\ImanProgramController::class, 'create'])->name('create');
+        Route::post('/', [Admin\ImanProgramController::class, 'store'])->name('store');
+        Route::get('/{program}/edit', [Admin\ImanProgramController::class, 'edit'])->name('edit');
+        Route::put('/{program}', [Admin\ImanProgramController::class, 'update'])->name('update');
+        Route::delete('/{program}', [Admin\ImanProgramController::class, 'destroy'])->name('destroy');
+        Route::post('/{program}/toggle-entry', [Admin\ImanProgramController::class, 'toggleEntry'])->name('toggle-entry');
+        Route::post('/{program}/bulk-save', [Admin\ImanProgramController::class, 'bulkSave'])->name('bulk-save');
+    });
 });
 
 // ============================
@@ -293,6 +299,20 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [Supervisor\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
     Route::get('/yawm-al-himma/{session}', [Supervisor\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
+
+    // Iman Program (البرنامج الإيماني)
+    Route::prefix('iman-program')->name('iman-program.')->group(function () {
+        Route::get('/', [Supervisor\ImanProgramController::class, 'index'])->name('index');
+        Route::get('/create', [Supervisor\ImanProgramController::class, 'create'])->name('create');
+        Route::post('/', [Supervisor\ImanProgramController::class, 'store'])->name('store');
+        Route::get('/{program}/edit', [Supervisor\ImanProgramController::class, 'edit'])->name('edit');
+        Route::put('/{program}', [Supervisor\ImanProgramController::class, 'update'])->name('update');
+        Route::delete('/{program}', [Supervisor\ImanProgramController::class, 'destroy'])->name('destroy');
+        Route::post('/{program}/toggle-entry', [Supervisor\ImanProgramController::class, 'toggleEntry'])->name('toggle-entry');
+        Route::post('/{program}/bulk-save', [Supervisor\ImanProgramController::class, 'bulkSave'])->name('bulk-save');
+        Route::get('/{program}/manage-criteria', [Supervisor\ImanProgramController::class, 'manageStudentCriteria'])->name('manage-criteria');
+        Route::put('/{program}/manage-criteria', [Supervisor\ImanProgramController::class, 'updateStudentCriteria'])->name('update-criteria');
+    });
 });
 
 // ============================
@@ -331,6 +351,18 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [Student\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
     Route::get('/yawm-al-himma/{session}', [Student\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
+
+    // Iman Program (البرنامج الإيماني)
+    Route::prefix('iman-program')->name('iman-program.')->group(function () {
+        Route::get('/', [Student\ImanProgramController::class, 'index'])->name('index');
+        Route::get('/create', [Student\ImanProgramController::class, 'create'])->name('create');
+        Route::post('/', [Student\ImanProgramController::class, 'store'])->name('store');
+        Route::get('/{program}/edit', [Student\ImanProgramController::class, 'edit'])->name('edit');
+        Route::put('/{program}', [Student\ImanProgramController::class, 'update'])->name('update');
+        Route::delete('/{program}', [Student\ImanProgramController::class, 'destroy'])->name('destroy');
+        Route::post('/{program}/toggle-entry', [Student\ImanProgramController::class, 'toggleEntry'])->name('toggle-entry');
+        Route::post('/{program}/bulk-save', [Student\ImanProgramController::class, 'bulkSave'])->name('bulk-save');
+    });
 
     // Quran Reader
     Route::get('/quran/page/{page}', [Student\QuranReaderController::class, 'page'])->name('quran.page');
@@ -447,6 +479,12 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [ParentPortal\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
     Route::get('/yawm-al-himma/{session}', [ParentPortal\YawmAlHimmaController::class, 'show'])->name('yawm-al-himma.show');
+
+    // Iman Program (البرنامج الإيماني) - read only
+    Route::prefix('iman-program')->name('iman-program.')->group(function () {
+        Route::get('/', [ParentPortal\ImanProgramController::class, 'index'])->name('index');
+        Route::get('/{program}', [ParentPortal\ImanProgramController::class, 'show'])->name('show');
+    });
 
     // Billing
     Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');
