@@ -131,6 +131,15 @@
     color: #182B48;
 }
 .time-hint { font-size: 12px; color: #7f8c8d; margin-top: 4px; }
+.assignee-self-info {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 12px;
+    background: rgba(212, 160, 48, 0.1);
+    border: 1px dashed rgba(212, 160, 48, 0.4);
+    color: #182B48; font-size: 14px; font-weight: 500;
+}
+.assignee-self-info i { color: #d4a030; font-size: 16px; }
+.assignee-self-info strong { color: #182B48; font-weight: 700; }
 
 /* ============== RESPONSIVE STYLES ============== */
 
@@ -660,11 +669,11 @@
                     <div class="mb-3">
                         <label class="form-label">إسناد إلى</label>
                         <div class="assignee-type-tabs">
-                            <div class="assignee-type-tab active" data-type="student">
+                            <div class="assignee-type-tab{{ $role === 'supervisor' ? '' : ' active' }}" data-type="student">
                                 <i class="fas fa-user-graduate"></i> طالب
                             </div>
                             @if($role === 'supervisor')
-                            <div class="assignee-type-tab" data-type="user">
+                            <div class="assignee-type-tab active" data-type="user">
                                 <i class="fas fa-user"></i> نفسي
                             </div>
                             @else
@@ -673,10 +682,15 @@
                             </div>
                             @endif
                         </div>
-                        <select name="assignee_id" class="form-select" id="taskAssigneeSelect" required>
+                        <select name="assignee_id" class="form-select" id="taskAssigneeSelect"{{ $role === 'supervisor' ? ' disabled style="display:none;"' : ' required' }}>
                             <option value="">-- اختر المستلم --</option>
                         </select>
-                        <input type="hidden" name="assignee_type" id="assigneeTypeInput" value="student">
+                        <input type="hidden" name="assignee_id" id="assigneeIdSelfInput" value="{{ auth()->id() }}"{{ $role === 'supervisor' ? '' : ' disabled' }}>
+                        <div class="assignee-self-info" id="assigneeSelfInfo" style="display: {{ $role === 'supervisor' ? 'flex' : 'none' }};">
+                            <i class="fas fa-user-check"></i>
+                            <span>سيتم إسناد المهمة إلى <strong>{{ auth()->user()->name }}</strong></span>
+                        </div>
+                        <input type="hidden" name="assignee_type" id="assigneeTypeInput" value="{{ $role === 'supervisor' ? 'user' : 'student' }}">
                     </div>
 
                     <div class="row">
@@ -965,7 +979,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 
-    populateAssignees('student');
+    var initialActiveTab = document.querySelector('.assignee-type-tab.active');
+    if (initialActiveTab) {
+        handleAssigneeTabSwitch(initialActiveTab.getAttribute('data-type'));
+    } else {
+        populateAssignees('student');
+    }
 
     document.querySelectorAll('.assignee-type-tab').forEach(function(tab) {
         tab.addEventListener('click', function() {
@@ -973,9 +992,29 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             var type = this.getAttribute('data-type');
             document.getElementById('assigneeTypeInput').value = type;
-            populateAssignees(type);
+            handleAssigneeTabSwitch(type);
         });
     });
+
+    function handleAssigneeTabSwitch(type) {
+        var select = document.getElementById('taskAssigneeSelect');
+        var selfInput = document.getElementById('assigneeIdSelfInput');
+        var selfInfo = document.getElementById('assigneeSelfInfo');
+
+        if (type === 'user' && currentRole === 'supervisor') {
+            select.style.display = 'none';
+            select.disabled = true;
+            select.value = '';
+            if (selfInput) selfInput.disabled = false;
+            if (selfInfo) selfInfo.style.display = 'flex';
+        } else {
+            select.style.display = '';
+            select.disabled = false;
+            if (selfInput) selfInput.disabled = true;
+            if (selfInfo) selfInfo.style.display = 'none';
+            populateAssignees(type);
+        }
+    }
 
     function populateAssignees(type) {
         var select = document.getElementById('taskAssigneeSelect');
@@ -1019,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('repeatEndDate').value = '';
         var activeTab = document.querySelector('.assignee-type-tab.active');
         if (activeTab) {
-            populateAssignees(activeTab.getAttribute('data-type'));
+            handleAssigneeTabSwitch(activeTab.getAttribute('data-type'));
         }
         new bootstrap.Modal(document.getElementById('createTaskModal')).show();
     };
