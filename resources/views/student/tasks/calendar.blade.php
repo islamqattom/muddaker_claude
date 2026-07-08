@@ -607,17 +607,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-calendar-plus"></i>
-                    إضافة مهمة شخصية
+                    <i class="fas fa-calendar-plus" id="createTaskModalIcon"></i>
+                    <span id="createTaskModalTitle">إضافة مهمة شخصية</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="createTaskForm" method="POST" action="{{ route('student.tasks.store') }}">
                 @csrf
+                <input type="hidden" name="_method" id="createTaskMethodInput" value="POST" disabled>
+                <input type="hidden" id="editingTaskId" value="">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">عنوان المهمة <span class="text-danger">*</span></label>
-                        <input type="text" name="title" class="form-control" placeholder="مثال: مراجعة جزء عم" required maxlength="500">
+                        <input type="text" name="title" id="taskTitleInput" class="form-control" placeholder="مثال: مراجعة جزء عم" required maxlength="500">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">الوصف (اختياري)</label>
@@ -664,8 +666,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: #fff;">
-                        <i class="fas fa-save"></i> حفظ المهمة
+                    <button type="submit" class="btn" id="createTaskSubmitBtn" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: #fff;">
+                        <i class="fas fa-save"></i> <span id="createTaskSubmitText">حفظ المهمة</span>
                     </button>
                 </div>
             </form>
@@ -746,6 +748,9 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
             </div>
         </div>
@@ -874,6 +879,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.style.fontWeight = isCurrent ? '700' : '500';
             });
 
+            var editBtn = document.getElementById('editTaskBtn');
+            if (editBtn) {
+                editBtn.setAttribute('data-task-id', task.id);
+                editBtn.setAttribute('data-task-props', JSON.stringify(props));
+            }
+
             new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
         },
         eventDidMount: function(info) {
@@ -911,6 +922,16 @@ document.addEventListener('DOMContentLoaded', function() {
     calendar.render();
 
     window.openCreateTaskModal = function() {
+        var form = document.getElementById('createTaskForm');
+        form.removeAttribute('data-mode');
+        document.getElementById('createTaskMethodInput').value = 'POST';
+        document.getElementById('createTaskMethodInput').disabled = true;
+        document.getElementById('editingTaskId').value = '';
+        form.action = '/student/tasks';
+
+        document.getElementById('taskTitleInput').value = '';
+        var descField = form.querySelector('textarea[name="description"]');
+        if (descField) descField.value = '';
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskDueTime').value = '';
         document.getElementById('taskEndTime').value = '';
@@ -918,6 +939,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('repeatRangeRow').style.display = 'none';
         document.getElementById('repeatStartDate').value = '';
         document.getElementById('repeatEndDate').value = '';
+
+        document.getElementById('createTaskModalTitle').textContent = 'إضافة مهمة شخصية';
+        document.getElementById('createTaskModalIcon').className = 'fas fa-calendar-plus';
+        document.getElementById('createTaskSubmitText').textContent = 'حفظ المهمة';
+
         new bootstrap.Modal(document.getElementById('createTaskModal')).show();
     };
 
@@ -943,6 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
         createForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             var formData = new FormData(createForm);
+            var isEdit = createForm.getAttribute('data-mode') === 'edit';
             try {
                 var response = await fetch(createForm.action, {
                     method: 'POST',
@@ -958,12 +985,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     var data = {};
                     try { data = await response.json(); } catch (err) {}
-                    alert(data.message || 'حدث خطأ أثناء إضافة المهمة');
+                    alert(data.message || (isEdit ? 'حدث خطأ أثناء تحديث المهمة' : 'حدث خطأ أثناء إضافة المهمة'));
                 }
             } catch (err) {
                 alert('حدث خطأ في الاتصال: ' + err.message);
             }
         });
+    }
+
+    var editBtn = document.getElementById('editTaskBtn');
+    if (editBtn) {
+        editBtn.addEventListener('click', function() {
+            var taskId = this.getAttribute('data-task-id');
+            var propsStr = this.getAttribute('data-task-props');
+            if (!taskId || !propsStr) return;
+            var props = JSON.parse(propsStr);
+
+            var detailModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailModal'));
+            if (detailModal) detailModal.hide();
+
+            openEditTaskModal(taskId, props);
+        });
+    }
+
+    function openEditTaskModal(taskId, props) {
+        var form = document.getElementById('createTaskForm');
+        var methodInput = document.getElementById('createTaskMethodInput');
+        var editingIdInput = document.getElementById('editingTaskId');
+        var modalTitle = document.getElementById('createTaskModalTitle');
+        var modalIcon = document.getElementById('createTaskModalIcon');
+        var submitText = document.getElementById('createTaskSubmitText');
+
+        form.setAttribute('data-mode', 'edit');
+        methodInput.value = 'PUT';
+        methodInput.disabled = false;
+        editingIdInput.value = taskId;
+        form.action = '/student/tasks/' + taskId;
+
+        document.getElementById('taskTitleInput').value = props.title || '';
+        var descField = form.querySelector('textarea[name="description"]');
+        if (descField) descField.value = props.description || '';
+        document.getElementById('taskDueDate').value = props.dueDate || '';
+        document.getElementById('taskDueTime').value = props.dueTime || '';
+        document.getElementById('taskEndTime').value = props.endTime || '';
+
+        modalTitle.textContent = 'تعديل المهمة';
+        modalIcon.className = 'fas fa-edit';
+        submitText.textContent = 'حفظ التعديلات';
+
+        var repeatCheckbox = document.getElementById('repeatTask');
+        var repeatRangeRow = document.getElementById('repeatRangeRow');
+        if (repeatCheckbox) repeatCheckbox.checked = false;
+        if (repeatRangeRow) repeatRangeRow.style.display = 'none';
+        document.getElementById('repeatStartDate').value = '';
+        document.getElementById('repeatEndDate').value = '';
+
+        new bootstrap.Modal(document.getElementById('createTaskModal')).show();
     }
 
     document.querySelectorAll('.status-actions .btn').forEach(function(btn) {

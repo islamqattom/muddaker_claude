@@ -227,6 +227,81 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'تم تحديث حالة التكليف بنجاح');
     }
 
+    public function update(Request $request, MeetingTask $task)
+    {
+        $supervisorId = auth()->id();
+        $supervisedStudentIds = Student::where('supervisor_id', $supervisorId)->pluck('id')->toArray();
+
+        $isAuthorized = false;
+        if ($task->assignee_type === 'user' && $task->assignee_id === $supervisorId) {
+            $isAuthorized = true;
+        } elseif ($task->assignee_type === 'student' && in_array($task->assignee_id, $supervisedStudentIds, true)) {
+            $isAuthorized = true;
+        } elseif ($task->assigned_by === $supervisorId) {
+            $isAuthorized = true;
+        }
+
+        if (!$isAuthorized) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:500',
+            'description' => 'nullable|string',
+            'assignee_id' => 'nullable|integer',
+            'assignee_type' => 'nullable|in:user,student',
+            'due_date' => 'required|date',
+            'due_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i|after_or_equal:due_time',
+        ]);
+
+        $assigneeType = $validated['assignee_type'] ?? $task->assignee_type;
+        $assigneeId = $validated['assignee_id'] ?? $task->assignee_id;
+
+        if ($assigneeType === 'student' && $assigneeId) {
+            $student = Student::find($assigneeId);
+            if (!$student || $student->supervisor_id !== $supervisorId) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'لا تملك صلاحية تعديل مهام لهذا الطالب'], 403);
+                }
+                abort(403, 'لا تملك صلاحية تعديل مهام لهذا الطالب');
+            }
+        } elseif ($assigneeType === 'user' && $assigneeId && $assigneeId != $supervisorId) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'لا يمكن تعديل مهام لمستخدمين آخرين'], 403);
+            }
+            abort(403, 'لا يمكن تعديل مهام لمستخدمين آخرين');
+        } else {
+            $assigneeId = $supervisorId;
+            $assigneeType = 'user';
+        }
+
+        $endTime = null;
+        if (!empty($validated['due_time']) && !empty($validated['end_time'])) {
+            $endTime = $validated['end_time'];
+        }
+
+        $task->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'assignee_id' => $assigneeId,
+            'assignee_type' => $assigneeType,
+            'due_date' => $validated['due_date'],
+            'due_time' => $validated['due_time'] ?? null,
+            'end_time' => $endTime,
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث المهمة بنجاح',
+                'task' => $this->formatTaskForCalendar($task->fresh()),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'تم تحديث المهمة بنجاح');
+    }
+
     private function formatTaskForCalendar(MeetingTask $task): array
     {
         $statusClass = $task->status;
@@ -254,14 +329,16 @@ class TaskController extends Controller
             'allDay' => !$hasTime,
             'color' => $task->effective_color,
             'extendedProps' => [
+                'title' => $task->title,
+                'description' => $task->description,
                 'status' => $task->status,
                 'statusLabel' => $task->status_label,
                 'statusClass' => $statusClass,
-                'description' => $task->description,
+                'assigneeId' => $task->assignee_id,
                 'assigneeName' => $task->assignee_name,
                 'assignerName' => $task->assigner?->name ?? '-',
                 'createdDate' => $task->created_at->format('Y/m/d'),
-                'dueDate' => $task->due_date ? $task->due_date->format('Y/m/d') : null,
+                'dueDate' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
                 'dueTime' => $hasTime ? $task->due_time->format('H:i') : null,
                 'endTime' => $hasEndTime ? $task->end_time->format('H:i') : null,
                 'isOverdue' => $task->is_overdue,

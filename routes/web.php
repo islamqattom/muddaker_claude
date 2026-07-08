@@ -146,6 +146,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/', [Admin\TaskController::class, 'index'])->name('index');
         Route::get('/calendar', [Admin\TaskController::class, 'calendar'])->name('calendar');
         Route::post('/', [Admin\TaskController::class, 'store'])->name('store');
+        Route::put('/{task}', [Admin\TaskController::class, 'update'])->name('update');
         Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
         Route::put('/{task}/title', [Admin\TaskController::class, 'updateTitle'])->name('updateTitle');
     });
@@ -286,6 +287,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/tasks', [Supervisor\TaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/calendar', [Supervisor\TaskController::class, 'calendar'])->name('tasks.calendar');
     Route::post('/tasks', [Supervisor\TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [Supervisor\TaskController::class, 'update'])->name('tasks.update');
     Route::put('/tasks/{task}/status', [Supervisor\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 
     // Yawm Al-Himma (يوم الهمة)
@@ -365,6 +367,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     // Tasks Calendar (مهام الطالب)
     Route::get('/tasks/calendar', [Student\TaskController::class, 'calendar'])->name('tasks.calendar');
     Route::post('/tasks', [Student\TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [Student\TaskController::class, 'update'])->name('tasks.update');
     Route::put('/tasks/{task}/status', [Student\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
     Route::delete('/tasks/{task}', [Student\TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::get('/reviews/session', [Student\ReviewController::class, 'session'])->name('reviews.session');
