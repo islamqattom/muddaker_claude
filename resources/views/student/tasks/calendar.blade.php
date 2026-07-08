@@ -880,6 +880,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (info.view.type === 'listWeek') {
                 customizeListEvent(info);
             }
+            var color = info.event.extendedProps.color || info.event.backgroundColor || info.event.color;
+            if (color) {
+                info.el.style.background = 'linear-gradient(135deg, ' + color + ' 0%, ' + shadeColor(color, -15) + ' 100%)';
+                info.el.style.borderColor = shadeColor(color, -20);
+                info.el.style.color = '#fff';
+            }
             var tip = info.event.extendedProps.description || info.event.title;
             if (info.event.extendedProps.dueTime) {
                 var timeRange = '⏰ ' + formatTime12Str(info.event.extendedProps.dueTime);
@@ -1050,7 +1056,9 @@ function customizeListEvent(info) {
         'cancelled': '#95a5a6',
         'overdue': '#c0392b'
     };
-    el.style.setProperty('--event-color', colorMap[status] || '#27ae60');
+    var eventColor = props.color || event.backgroundColor || event.color || colorMap[status] || '#27ae60';
+    el.style.setProperty('--event-color', eventColor);
+    el.style.borderLeftColor = eventColor;
 
     var timeEl = el.querySelector('.fc-list-event-time');
     if (timeEl && event.start) {
@@ -1134,6 +1142,20 @@ function formatTime12Str(timeStr) {
     var h12 = h % 12;
     if (h12 === 0) h12 = 12;
     return h12 + ':' + m + ' ' + period;
+}
+
+function shadeColor(hex, percent) {
+    if (!hex) return hex;
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(function(c) { return c + c; }).join('');
+    var num = parseInt(h, 16);
+    var r = (num >> 16) + Math.round(255 * (percent / 100));
+    var g = ((num >> 8) & 0x00FF) + Math.round(255 * (percent / 100));
+    var b = (num & 0x0000FF) + Math.round(255 * (percent / 100));
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 </script>
 @endpush

@@ -144,6 +144,7 @@ class MeetingMinuteController extends Controller
                         'assigned_by' => auth()->id(),
                         'title' => $assignment['task'],
                         'status' => 'pending',
+                        'color' => MeetingTask::generateUniqueColor(),
                     ]);
 
                     $assignee = User::find($assignment['supervisor_id']);
@@ -308,6 +309,7 @@ class MeetingMinuteController extends Controller
                         'assigned_by' => auth()->id(),
                         'title' => $assignment['task'],
                         'status' => 'pending',
+                        'color' => MeetingTask::generateUniqueColor(),
                     ]);
 
                     $assignee = User::find($assignment['supervisor_id']);
@@ -418,6 +420,7 @@ class MeetingMinuteController extends Controller
                 'title' => $aiTask['title'],
                 'description' => $aiTask['description'] ?? null,
                 'status' => 'pending',
+                'color' => MeetingTask::generateUniqueColor(),
             ]);
 
             $assignee = User::find($assigneeId);

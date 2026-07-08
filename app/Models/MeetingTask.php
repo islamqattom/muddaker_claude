@@ -24,8 +24,40 @@ class MeetingTask extends Model
         'end_time',
         'status',
         'notes',
+        'color',
         'completed_at',
     ];
+
+    public const STATUS_COLOR_MAP = [
+        'pending' => null,
+        'in_progress' => '#3498db',
+        'partially_done' => '#8e44ad',
+        'completed' => '#27ae60',
+        'cancelled' => '#7f8c8d',
+        'overdue' => '#c0392b',
+    ];
+
+    public const TASK_PALETTE = [
+        '#16a085', '#d35400', '#2980b9', '#8e44ad', '#c0392b',
+        '#27ae60', '#f39c12', '#2c3e50', '#e74c3c', '#1abc9c',
+        '#9b59b6', '#d68910', '#2874a6', '#1e8449', '#a93226',
+        '#6c3483', '#0e6655', '#b7950b', '#922b21', '#1a5276',
+    ];
+
+    public static function generateUniqueColor(): string
+    {
+        $usedColors = self::whereNotNull('color')->pluck('color')->all();
+        $available = array_diff(self::TASK_PALETTE, $usedColors);
+        if (!empty($available)) {
+            return $available[array_rand($available)];
+        }
+        return self::TASK_PALETTE[array_rand(self::TASK_PALETTE)];
+    }
+
+    public static function colorForStatus(string $status): ?string
+    {
+        return self::STATUS_COLOR_MAP[$status] ?? null;
+    }
 
     protected $casts = [
         'due_date' => 'date',
@@ -69,6 +101,18 @@ class MeetingTask extends Model
             'cancelled' => 'danger',
             default => 'secondary'
         };
+    }
+
+    public function getEffectiveColorAttribute(): string
+    {
+        if ($this->is_overdue) {
+            return self::STATUS_COLOR_MAP['overdue'];
+        }
+        $statusColor = self::colorForStatus($this->status);
+        if ($statusColor !== null) {
+            return $statusColor;
+        }
+        return $this->color ?: '#d4a030';
     }
 
     public function getStatusLabelAttribute(): string

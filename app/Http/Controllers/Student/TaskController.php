@@ -78,6 +78,7 @@ class TaskController extends Controller
                 'due_time' => $validated['due_time'] ?? null,
                 'end_time' => $endTime,
                 'status' => 'pending',
+                'color' => MeetingTask::generateUniqueColor(),
             ]);
             $createdTasks[] = $task;
         }
@@ -138,9 +139,19 @@ class TaskController extends Controller
             'status' => 'required|in:pending,in_progress,partially_done,completed,cancelled',
         ]);
 
-        $task->update(['status' => $validated['status']]);
+        $newStatus = $validated['status'];
+        $statusColor = MeetingTask::colorForStatus($newStatus);
+        $updateData = ['status' => $newStatus];
 
-        if ($validated['status'] === 'completed') {
+        if ($newStatus === 'pending') {
+            $updateData['color'] = MeetingTask::generateUniqueColor();
+        } elseif ($statusColor !== null) {
+            $updateData['color'] = $statusColor;
+        }
+
+        $task->update($updateData);
+
+        if ($newStatus === 'completed') {
             $task->update(['completed_at' => now()]);
         } else {
             $task->update(['completed_at' => null]);
@@ -205,6 +216,7 @@ class TaskController extends Controller
             'start' => $start,
             'end' => $end,
             'allDay' => !$hasTime,
+            'color' => $task->effective_color,
             'extendedProps' => [
                 'status' => $task->status,
                 'statusLabel' => $task->status_label,
@@ -220,6 +232,7 @@ class TaskController extends Controller
                 'isOverdue' => $task->is_overdue,
                 'isOwnTask' => true,
                 'assigneeType' => $task->assignee_type,
+                'color' => $task->effective_color,
             ]
         ];
     }
