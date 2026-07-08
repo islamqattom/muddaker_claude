@@ -75,6 +75,16 @@
 }
 .task-modal .modal-title { color: #fff; font-weight: 700; }
 .task-modal .btn-close-white { filter: brightness(0) invert(1); }
+.task-modal .modal-content { max-height: 90vh; }
+.task-modal .modal-body {
+    max-height: calc(90vh - 140px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.task-modal .modal-body::-webkit-scrollbar { width: 8px; }
+.task-modal .modal-body::-webkit-scrollbar-track { background: #f1f3f5; border-radius: 4px; }
+.task-modal .modal-body::-webkit-scrollbar-thumb { background: #c4cdd5; border-radius: 4px; }
+.task-modal .modal-body::-webkit-scrollbar-thumb:hover { background: #182B48; }
 .form-control, .form-select {
     border-radius: 12px; border: 2px solid #e9ecef;
     padding: 12px 16px; transition: all 0.3s ease;
