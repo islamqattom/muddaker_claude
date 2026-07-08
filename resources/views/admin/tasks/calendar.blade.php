@@ -836,8 +836,8 @@ document.addEventListener('DOMContentLoaded', function() {
         dayMaxEvents: true,
         weekends: true,
         nowIndicator: true,
-        slotMinTime: '06:00:00',
-        slotMaxTime: '23:00:00',
+        slotMinTime: '00:00:00',
+        slotMaxTime: '24:00:00',
         events: @json($tasksJson),
         eventContent: function(arg) {
             var timeStr = '';
