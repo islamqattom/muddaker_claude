@@ -1,0 +1,9 @@
+{
+    "The end time field must be a date after or equal to due time.": "يجب أن يكون وقت النهاية مساوياً أو بعد وقت البدء",
+    "The repeat end date field must be a date after or equal to repeat start date.": "يجب أن يكون تاريخ نهاية التكرار مساوياً أو بعد تاريخ بداية التكرار",
+    "The title field is required.": "حقل العنوان مطلوب",
+    "The due date field is required.": "حقل تاريخ الاستحقاق مطلوب",
+    "The due time field must match the format H:i.": "يجب أن يطابق وقت البدء الصيغة H:i",
+    "The end time field must match the format H:i.": "يجب أن يطابق وقت النهاية الصيغة H:i",
+    "The due date field must be a valid date.": "يجب أن يكون تاريخ الاستحقاق تاريخاً صحيحاً"
+}

@@ -835,6 +835,7 @@ const supervisorsData = @json($supervisors->map(fn($s) => ['id' => $s->id, 'name
 const currentRole = @json($role);
 const currentUserId = @json(auth()->id());
 const updateStatusBaseUrl = currentRole === 'admin' ? '/admin/tasks' : '/supervisor/tasks';
+const allEvents = @json($tasksJson);
 
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
@@ -857,7 +858,32 @@ document.addEventListener('DOMContentLoaded', function() {
         nowIndicator: true,
         slotMinTime: '00:00:00',
         slotMaxTime: '24:00:00',
-        events: @json($tasksJson),
+        events: function(fetchInfo, successCallback, failureCallback) {
+            try {
+                if (fetchInfo.view.type === 'dayGridMonth') {
+                    var counts = {};
+                    allEvents.forEach(function(ev) {
+                        var props = ev.extendedProps || {};
+                        var key = (ev.title || '') + '|' + (props.assigneeId || '') + '|' + (props.assigneeType || '') + '|' + (props.color || '');
+                        counts[key] = (counts[key] || 0) + 1;
+                    });
+                    var unique = [];
+                    allEvents.forEach(function(ev) {
+                        var props = ev.extendedProps || {};
+                        var key = (ev.title || '') + '|' + (props.assigneeId || '') + '|' + (props.assigneeType || '') + '|' + (props.color || '');
+                        if (counts[key] === 1) {
+                            unique.push(ev);
+                        }
+                    });
+                    successCallback(unique);
+                } else {
+                    successCallback(allEvents);
+                }
+            } catch (err) {
+                console.error('Calendar events error:', err);
+                successCallback(allEvents);
+            }
+        },
         eventContent: function(arg) {
             var timeStr = '';
             if (arg.event.start && !arg.event.allDay) {
@@ -870,7 +896,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
-            return { html: '<div class="fc-event-title">' + timeStr + escapeHtml(arg.event.title) + '</div>' };
+            var countBadge = '';
+            var occ = arg.event.extendedProps && arg.event.extendedProps.occurrenceCount;
+            if (occ && occ > 1) {
+                countBadge = '<span style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:4px;">×' + occ + '</span>';
+            }
+            return { html: '<div class="fc-event-title">' + countBadge + timeStr + escapeHtml(arg.event.title) + '</div>' };
         },
         eventDidMount: function(info) {
             if (info.view.type === 'listWeek') {

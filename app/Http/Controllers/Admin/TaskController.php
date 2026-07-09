@@ -241,6 +241,7 @@ class TaskController extends Controller
 
         $createdTasks = [];
         $notifiedAlready = false;
+        $sharedColor = MeetingTask::generateUniqueColor();
 
         foreach ($dates as $date) {
             $taskData = [
@@ -253,7 +254,7 @@ class TaskController extends Controller
                 'due_time' => $validated['due_time'] ?? null,
                 'end_time' => $endTime,
                 'status' => 'pending',
-                'color' => MeetingTask::generateUniqueColor(),
+                'color' => $sharedColor,
             ];
 
             if ($meetingMinuteId) {

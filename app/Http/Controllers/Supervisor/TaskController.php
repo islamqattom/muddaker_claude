@@ -124,6 +124,7 @@ class TaskController extends Controller
         }
 
         $createdTasks = [];
+        $sharedColor = MeetingTask::generateUniqueColor();
         foreach ($dates as $date) {
             $task = MeetingTask::create([
                 'title' => $validated['title'],
@@ -135,7 +136,7 @@ class TaskController extends Controller
                 'due_time' => $validated['due_time'] ?? null,
                 'end_time' => $endTime,
                 'status' => 'pending',
-                'color' => MeetingTask::generateUniqueColor(),
+                'color' => $sharedColor,
             ]);
             $createdTasks[] = $task;
         }
