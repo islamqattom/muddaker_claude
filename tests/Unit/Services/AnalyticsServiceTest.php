@@ -61,7 +61,6 @@ class AnalyticsServiceTest extends TestCase
         $this->assertInstanceOf(\App\DTO\SupervisorPerformanceData::class, $result);
         $this->assertArrayHasKey('studentsCount', (array) $result);
         $this->assertArrayHasKey('evaluationsThisMonth', (array) $result);
-        $this->assertArrayHasKey('pendingWarningDrafts', (array) $result);
     }
 
     public function test_get_all_supervisors_performance_returns_array(): void

@@ -6,7 +6,6 @@ use App\Models\Student;
 use App\Models\User;
 use App\Models\RecitationSession;
 use App\Models\RecitationPage;
-use App\Models\WarningDraft;
 use App\DTO\StudentProgressData;
 use App\DTO\SupervisorPerformanceData;
 use Carbon\Carbon;
@@ -120,28 +119,6 @@ class AnalyticsService
         $evaluationsThisMonth = $sessionsThisMonth->count();
         $avgScoreThisMonth = $sessionsThisMonth->avg('final_score') ?? 0.0;
 
-        $pendingWarningDrafts = WarningDraft::where('supervisor_id', $supervisorId)
-            ->whereNull('reviewed_at')
-            ->count();
-
-        $resolvedDrafts = WarningDraft::where('supervisor_id', $supervisorId)
-            ->whereNotNull('reviewed_at')
-            ->where('created_at', '>=', $monthStart->copy()->subMonths(3)->toDateString())
-            ->get();
-
-        $avgResponseTimeDays = null;
-        if ($resolvedDrafts->count() > 0) {
-            $totalDays = 0;
-            $count = 0;
-            foreach ($resolvedDrafts as $draft) {
-                if ($draft->reviewed_at) {
-                    $totalDays += Carbon::parse($draft->reviewed_at)->diffInDays(Carbon::parse($draft->created_at));
-                    $count++;
-                }
-            }
-            $avgResponseTimeDays = $count > 0 ? round($totalDays / $count, 1) : null;
-        }
-
         $monthlyTrend = [];
         for ($i = 5; $i >= 0; $i--) {
             $mStart = $now->copy()->subMonths($i)->startOfMonth();
@@ -157,8 +134,6 @@ class AnalyticsService
             'studentsCount' => $studentsCount,
             'evaluationsThisMonth' => $evaluationsThisMonth,
             'avgScoreThisMonth' => round($avgScoreThisMonth, 1),
-            'pendingWarningDrafts' => $pendingWarningDrafts,
-            'avgResponseTimeDays' => $avgResponseTimeDays,
             'monthlyTrend' => $monthlyTrend,
         ]);
     }

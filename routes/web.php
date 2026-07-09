@@ -250,12 +250,6 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::get('/warnings/recitations/{student}', [Supervisor\WarningController::class, 'getRecitations'])->name('warnings.recitations');
     Route::get('/warnings/student-stats/{student}', [Supervisor\WarningController::class, 'getStudentStats'])->name('warnings.studentStats');
 
-    // Warning Drafts
-    Route::get('warning-drafts', [Supervisor\WarningDraftController::class, 'index'])->name('warning-drafts.index');
-    Route::get('warning-drafts/{id}', [Supervisor\WarningDraftController::class, 'show'])->name('warning-drafts.show');
-    Route::post('warning-drafts/{id}/approve', [Supervisor\WarningDraftController::class, 'approve'])->name('warning-drafts.approve');
-    Route::post('warning-drafts/{id}/dismiss', [Supervisor\WarningDraftController::class, 'dismiss'])->name('warning-drafts.dismiss');
-
     // Students (view only)
     Route::get('/students', [Supervisor\StudentController::class, 'index'])->name('students.index');
     Route::get('/students/create', [Supervisor\StudentController::class, 'create'])->name('students.create');

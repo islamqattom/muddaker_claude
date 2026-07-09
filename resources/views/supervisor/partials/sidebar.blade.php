@@ -3,6 +3,16 @@
     <div class="icon-wrapper"><i class="fas fa-home"></i></div>
     <span>لوحة التحكم</span>
 </a>
+
+<span class="nav-section-title">المهام والأنشطة</span>
+<a href="{{ route('supervisor.iman-program.index') }}" class="nav-link {{ request()->routeIs('supervisor.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
+<a href="{{ route('supervisor.tasks.calendar') }}" class="nav-link {{ request()->routeIs('supervisor.tasks.calendar') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
+    <span>تقويم المهام</span>
+</a>
 <a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
     <span>المحادثات</span>
@@ -24,18 +34,6 @@
 <a href="{{ route('supervisor.attendance.history') }}" class="nav-link {{ request()->routeIs('supervisor.attendance.history') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-history"></i></div>
     <span>سجل الحضور</span>
-</a>
-<a href="{{ route('supervisor.student-parts.index') }}" class="nav-link {{ request()->routeIs('supervisor.student-parts.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
-    <span>أجزاء الطالب</span>
-</a>
-<a href="{{ route('supervisor.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('supervisor.yawm-al-himma.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
-    <span>يوم الهمة</span>
-</a>
-<a href="{{ route('supervisor.iman-program.index') }}" class="nav-link {{ request()->routeIs('supervisor.iman-program.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
-    <span>البرنامج الإيماني</span>
 </a>
 
 <span class="nav-section-title">التسميع</span>
@@ -61,10 +59,6 @@
     <div class="icon-wrapper"><i class="fas fa-tasks"></i></div>
     <span>تكليفاتي</span>
 </a>
-<a href="{{ route('supervisor.tasks.calendar') }}" class="nav-link {{ request()->routeIs('supervisor.tasks.calendar') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
-    <span>تقويم المهام</span>
-</a>
 <a href="{{ route('supervisor.warnings.index') }}" class="nav-link {{ request()->routeIs('supervisor.warnings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>
@@ -73,8 +67,11 @@
         <span class="badge">{{ $warnCount }}</span>
     @endif
 </a>
-<a href="{{ route('supervisor.warning-drafts.index') }}" class="nav-link {{ request()->routeIs('supervisor.warning-drafts.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-edit"></i></div>
-    <span>مسودات الإنذارات</span>
+<a href="{{ route('supervisor.student-parts.index') }}" class="nav-link {{ request()->routeIs('supervisor.student-parts.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
+    <span>أجزاء الطالب</span>
 </a>
-
+<a href="{{ route('supervisor.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('supervisor.yawm-al-himma.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
+    <span>يوم الهمة</span>
+</a>

@@ -10,12 +10,6 @@
             <h6>{{ $supervisor['name'] }}</h6>
             <span class="role-badge">مشرف</span>
         </div>
-        @if($perf->pendingWarningDrafts > 0)
-            <div class="pending-badge">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ $perf->pendingWarningDrafts }}
-            </div>
-        @endif
     </div>
 
     <div class="supervisor-stats">
@@ -30,10 +24,6 @@
         <div class="stat-item">
             <div class="stat-value">{{ $perf->avgScoreThisMonth > 0 ? $perf->avgScoreThisMonth . '%' : '-' }}</div>
             <div class="stat-label">المتوسط</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">{{ $perf->avgResponseTimeDays !== null ? $perf->avgResponseTimeDays . 'd' : '-' }}</div>
-            <div class="stat-label">الاستجابة</div>
         </div>
     </div>
 
@@ -96,19 +86,6 @@
     border-radius: 6px;
     font-size: 11px;
     font-weight: 600;
-}
-
-.pending-badge {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: #fff;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
 }
 
 .supervisor-stats {
