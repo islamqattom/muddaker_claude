@@ -3,11 +3,8 @@
     <div class="icon-wrapper"><i class="fas fa-home"></i></div>
     <span>لوحتي الشخصية</span>
 </a>
-<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
-    <span>المحادثات</span>
-</a>
 <span class="nav-section-title">القرآن الكريم</span>
+{{--
 <a href="{{ route('student.quran.page', 1) }}" class="nav-link {{ request()->routeIs('student.quran.page') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
     <span>قراءة القرآن</span>
@@ -16,6 +13,7 @@
     <div class="icon-wrapper"><i class="fas fa-microphone-alt"></i></div>
     <span>تسميع القرآن</span>
 </a>
+--}}
 <a href="{{ route('student.voice-search') }}" class="nav-link {{ request()->routeIs('student.voice-search') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>
     <span>البحث الصوتي</span>
@@ -24,9 +22,30 @@
     <div class="icon-wrapper"><i class="fas fa-book"></i></div>
     <span>التفسير</span>
 </a>
+{{--
 <a href="{{ route('student.tarteel-challenges') }}" class="nav-link {{ request()->routeIs('student.tarteel-challenges') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-trophy"></i></div>
     <span>التحديات</span>
+</a>
+--}}
+<span class="nav-section-title">المهام والأنشطة</span>
+<a href="{{ route('student.iman-program.index') }}" class="nav-link {{ request()->routeIs('student.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
+<a href="{{ route('student.tasks.calendar') }}" class="nav-link {{ request()->routeIs('student.tasks.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
+    <span>تقويم مهامي</span>
+</a>
+{{--
+<a href="{{ route('student.azkar') }}" class="nav-link {{ request()->routeIs('student.azkar*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
+    <span>أذكار المسلم</span>
+</a>
+--}}
+<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+    <span>المحادثات</span>
 </a>
 <span class="nav-section-title">المتابعة</span>
 <a href="{{ route('student.sessions.index') }}" class="nav-link {{ request()->routeIs('student.sessions.*') ? 'active' : '' }}">
@@ -52,18 +71,6 @@
 <a href="{{ route('student.warnings.index') }}" class="nav-link {{ request()->routeIs('student.warnings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>
-</a>
-<a href="{{ route('student.tasks.calendar') }}" class="nav-link {{ request()->routeIs('student.tasks.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
-    <span>تقويم مهامي</span>
-</a>
-<a href="{{ route('student.azkar') }}" class="nav-link {{ request()->routeIs('student.azkar*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
-    <span>أذكار المسلم</span>
-</a>
-<a href="{{ route('student.iman-program.index') }}" class="nav-link {{ request()->routeIs('student.iman-program.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
-    <span>البرنامج الإيماني</span>
 </a>
 <span class="nav-section-title">المساعدة</span>
 <a href="{{ route('student.memorization') }}" class="nav-link {{ request()->routeIs('student.memorization') ? 'active' : '' }}">
