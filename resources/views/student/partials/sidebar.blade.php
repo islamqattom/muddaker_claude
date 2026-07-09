@@ -61,6 +61,10 @@
     <div class="icon-wrapper"><i class="fas fa-quran"></i></div>
     <span>أذكار المسلم</span>
 </a>
+<a href="{{ route('student.iman-program.index') }}" class="nav-link {{ request()->routeIs('student.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
 <span class="nav-section-title">المساعدة</span>
 <a href="{{ route('student.memorization') }}" class="nav-link {{ request()->routeIs('student.memorization') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
@@ -70,8 +74,4 @@
 <a href="{{ route('student.profile.index') }}" class="nav-link {{ request()->routeIs('student.profile.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-user-cog"></i></div>
     <span>ملفي الشخصي</span>
-</a>
-<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
-    <span>إعدادات الإشعارات</span>
 </a>

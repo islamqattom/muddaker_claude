@@ -703,25 +703,132 @@
     opacity: 0.92;
 }
 
+@media (max-width: 768px) {
+    .chat-container {
+        max-width: 100%;
+    }
+
+    .chat-header {
+        gap: 0.75rem;
+    }
+
+    .chat-header-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+        border-radius: 14px;
+    }
+
+    .chat-header h4 {
+        font-size: 1.15rem;
+    }
+
+    .chat-header p {
+        font-size: 0.82rem;
+    }
+
+    .btn-new-chat {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+
+    .chat-toolbar {
+        padding: 0.9rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .search-box {
+        min-width: 0;
+    }
+
+    .conversation-item {
+        padding: 0.9rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .conversation-avatar {
+        width: 46px;
+        height: 46px;
+        font-size: 18px;
+    }
+
+    .conversation-title {
+        font-size: 0.92rem;
+    }
+
+    .conversation-preview {
+        font-size: 0.8rem;
+    }
+
+    .conversation-time {
+        font-size: 0.7rem;
+    }
+
+    .unread-badge {
+        font-size: 0.65rem;
+        min-width: 20px;
+        height: 20px;
+    }
+
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-footer {
+        padding: 0.85rem 1.25rem;
+    }
+}
+
 @media (max-width: 576px) {
     .chat-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 0.85rem;
+    }
+
+    .chat-header-info {
+        gap: 0.75rem;
+    }
+
+    .btn-new-chat {
+        width: 100%;
+        justify-content: center;
     }
 
     .chat-toolbar {
         flex-direction: column;
         align-items: stretch;
+        padding: 0.85rem 1rem;
     }
 
-    .conversation-item {
-        padding: 1rem;
+    .chat-count {
+        text-align: center;
     }
 
-    .conversation-avatar {
-        width: 48px;
-        height: 48px;
-        font-size: 18px;
+    .chat-empty {
+        padding: 3rem 1rem;
+    }
+
+    .chat-empty-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+
+    .chat-empty h5 {
+        font-size: 1.1rem;
+    }
+
+    .chat-type-buttons {
+        padding: 0.25rem;
+        border-radius: 12px;
+    }
+
+    .chat-type-btn {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+        border-radius: 10px;
     }
 }
 </style>

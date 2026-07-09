@@ -92,6 +92,11 @@ class Student extends Model
         return $this->hasOne(MemorizationGoal::class);
     }
 
+    public function imanPrograms()
+    {
+        return $this->morphMany(ImanProgram::class, 'owner');
+    }
+
     public function dailyProgress()
     {
         return $this->hasMany(DailyProgress::class);

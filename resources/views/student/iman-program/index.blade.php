@@ -187,6 +187,10 @@ if (! function_exists('thisDayName')) {
 }
 .iman-page .bulk-save-bar .bulk-info { color: #6b7a90; font-size: 13px; }
 
+.iman-page .save-table-btn:hover { opacity: 0.85; }
+.iman-page .save-table-btn:active { transform: scale(0.95); }
+.iman-page .save-table-btn.is-saving { opacity: 0.6; pointer-events: none; }
+
 .iman-page .empty-state {
     text-align: center; padding: 60px 20px; color: #6b7a90;
 }
@@ -333,7 +337,7 @@ if (! function_exists('thisDayName')) {
                                 <th class="criterion-head">المعيار</th>
                                 @foreach($weekDates as $date)
                                     <th class="day-head {{ $date->toDateString() === $today ? 'today' : '' }}">
-                                        <span class="day-label">{{ $thisDayName($date) }}</span>
+                                        <span class="day-label">{{ thisDayName($date) }}</span>
                                         <span class="day-date">{{ $date->format('m-d') }}</span>
                                     </th>
                                 @endforeach
@@ -381,6 +385,13 @@ if (! function_exists('thisDayName')) {
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="bulk-save-bar">
+                    <div class="bulk-info">احفظ التغييرات يدوياً للتأكد من تسجيل جميع القيم.</div>
+                    <button type="button" class="save-table-btn"
+                            style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;border:none;padding:8px 20px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:14px;transition:all 0.2s ease;">
+                        <i class="fas fa-save"></i> حفظ التغييرات
+                    </button>
                 </div>
             @endif
         </div>
@@ -465,6 +476,28 @@ document.querySelectorAll('.number-cell').forEach(function (input) {
             })
             .catch(() => {});
         }, 400);
+    });
+});
+
+document.querySelectorAll('.save-table-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.save-table-btn').forEach(function (b) { b.classList.add('is-saving'); });
+        const inputs = document.querySelectorAll('.number-cell');
+        const requests = [];
+        inputs.forEach(function (input) {
+            clearTimeout(input._saveTimer);
+            const td = input.closest('td');
+            const data = { criterion_id: td.dataset.criterion, date: td.dataset.date, value: parseInt(input.value || 0, 10) };
+            requests.push(
+                fetch(input.dataset.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: JSON.stringify(data),
+                    keepalive: true,
+                }).catch(() => {})
+            );
+        });
+        Promise.all(requests).finally(function () { location.reload(); });
     });
 });
 </script>

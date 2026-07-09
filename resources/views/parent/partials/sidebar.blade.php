@@ -24,6 +24,10 @@
     <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
     <span>يوم الهمة</span>
 </a>
+<a href="{{ route('parent.iman-program.index') }}" class="nav-link {{ request()->routeIs('parent.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
 <a href="{{ route('parent.warnings.index') }}" class="nav-link {{ request()->routeIs('parent.warnings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-exclamation-triangle"></i></div>
     <span>الإنذارات</span>
@@ -38,10 +42,4 @@
 <a href="{{ route('parent.billing') }}" class="nav-link {{ request()->routeIs('parent.billing') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-money-bill"></i></div>
     <span>الرسوم الشهرية</span>
-</a>
-
-<span class="nav-section-title">الإعدادات</span>
-<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
-    <span>إعدادات الإشعارات</span>
 </a>

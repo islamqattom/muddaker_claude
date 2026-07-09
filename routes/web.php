@@ -305,6 +305,9 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/', [Supervisor\ImanProgramController::class, 'index'])->name('index');
         Route::get('/create', [Supervisor\ImanProgramController::class, 'create'])->name('create');
         Route::post('/', [Supervisor\ImanProgramController::class, 'store'])->name('store');
+        Route::get('/reports', [Supervisor\ImanProgramController::class, 'report'])->name('reports');
+        Route::get('/reports/students', [Supervisor\ImanProgramController::class, 'report'])->defaults('type', 'students')->name('reports.students');
+        Route::get('/reports/self', [Supervisor\ImanProgramController::class, 'report'])->defaults('type', 'self')->name('reports.self');
         Route::get('/{program}/edit', [Supervisor\ImanProgramController::class, 'edit'])->name('edit');
         Route::put('/{program}', [Supervisor\ImanProgramController::class, 'update'])->name('update');
         Route::delete('/{program}', [Supervisor\ImanProgramController::class, 'destroy'])->name('destroy');

@@ -1,42 +1,39 @@
-# Arabic Language Instructions
+# English Language Instructions
 
-## القاعدة الأساسية - Core Rule
+## Core Rule
 
-You MUST respond in Arabic (اللغة العربية) unless the user explicitly asks for English.
+You MUST respond in English unless the user explicitly asks for another language.
 
-Use formal Arabic (الفصحى) suitable for technical discussions.
+Code, file paths, commands, and tool outputs stay as-is. Explanations should be in clear, concise English.
 
-Code, file paths, commands, and tool outputs stay in English. Only explanations should be in Arabic.
+## Style
 
-## الأسلوب - Style
+- Use simple and clear English
+- Keep responses short and direct (1-3 sentences for simple questions)
+- Avoid unnecessary introductions and conclusions
 
-- استخدم الفصحى البسيطة والواضحة
-- اجعل الردود مختصرة ومباشرة (1-3 جمل للأسئلة البسيطة)
-- تجنب المقدمات والخواتم غير الضرورية
+## Formatting
 
-## التنسيق - Formatting
+- Keep variable, function, and file names in their original form
+- Use standard ASCII punctuation in English text
 
-- استخدم الفاصلة العربية (،) بدلاً من الفاصلة الإنجليزية (،) في النص العربي
-- استخدم علامة الاستفهام العربية (؟) في الأسئلة العربية
-- أسماء المتغيرات والدوال والملفات تبقى بالإنجليزية
-
-## مراجع الكود - Code References
+## Code References
 
 When referencing specific functions or code, use the pattern `file_path:line_number`:
-- مثال: `app/Http/Controllers/Admin/TaskController.php:70`
+- Example: `app/Http/Controllers/Admin/TaskController.php:70`
 
-## المصطلحات المختلطة - Mixed Terminology
+## Technical Terminology
 
-When explaining technical concepts, use Arabic alongside English in parentheses:
-- "متغير (variable)"
-- "دالة (function)"
-- "كلاس (class)"
-- "قاعدة بيانات (database)"
-- "توجيه (route)"
-- "وسيط (middleware)"
+When explaining technical concepts, English terms are preferred. Only add translations when they aid clarity:
+- "variable"
+- "function"
+- "class"
+- "database"
+- "route"
+- "middleware"
 
-## النبرة - Tone
+## Tone
 
-- كن مباشراً ومحدداً
-- لا تكرر ما يفهمه المستخدم
-- ركز على حل المشكلة المطلوبة
+- Be direct and specific
+- Don't repeat what the user already understands
+- Focus on solving the requested problem

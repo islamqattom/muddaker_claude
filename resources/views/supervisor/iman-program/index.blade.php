@@ -89,6 +89,14 @@
        style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user-graduate"></i> برامج الطلاب
     </a>
+    <a href="{{ route('supervisor.iman-program.reports.students') }}"
+       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
+        <i class="fas fa-chart-column"></i> تقرير الطلاب
+    </a>
+    <a href="{{ route('supervisor.iman-program.reports.self') }}"
+       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
+        <i class="fas fa-user-check"></i> تقريري
+    </a>
 </div>
 
 @if($scope === 'student')

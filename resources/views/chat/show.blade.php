@@ -246,6 +246,7 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - 180px);
+    height: calc(100dvh - 180px);
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -301,6 +302,10 @@
     font-size: 16px;
     font-weight: 700;
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 .chat-header-status {
@@ -311,11 +316,13 @@
 .chat-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     background: #f0f4f8;
+    min-height: 0;
 }
 
 .message {
@@ -363,6 +370,7 @@
     flex-direction: column;
     gap: 8px;
     margin-bottom: 8px;
+    max-width: 100%;
 }
 
 .message.received .message-attachments { max-width: 320px; }
@@ -937,8 +945,9 @@
     border: none;
     background: transparent;
     padding: 12px 16px;
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
+    min-width: 0;
 }
 
 .send-btn {
@@ -987,12 +996,208 @@
 }
 
 @media (max-width: 768px) {
+    .page-content:has(> .chat-container) {
+        padding: 0;
+    }
+
     .chat-container {
-        height: calc(100vh - 120px);
+        height: calc(100vh - 55px);
+        height: calc(100dvh - 55px);
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .chat-header {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .back-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        flex-shrink: 0;
+    }
+
+    .chat-header-info {
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .chat-header-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    .chat-header-name {
+        font-size: 15px;
+        max-width: 50vw;
+    }
+
+    .chat-header-status {
+        font-size: 11px;
+    }
+
+    .chat-actions .btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chat-messages {
+        padding: 14px 12px;
+        gap: 10px;
     }
 
     .message {
-        max-width: 85%;
+        max-width: 88%;
+    }
+
+    .message-content {
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    .message-text {
+        font-size: 14px;
+    }
+
+    .message-attachments {
+        max-width: 100%;
+    }
+
+    .msg-attachment-image img,
+    .msg-attachment-video video {
+        max-width: 240px;
+        max-height: 240px;
+    }
+
+    .msg-attachment-video {
+        max-width: 260px;
+    }
+
+    .msg-attachment-file {
+        max-width: 260px;
+        min-width: 180px;
+    }
+
+    .msg-attachment-audio {
+        min-width: 0;
+        max-width: 280px;
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .msg-attachment-audio audio {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .media-audio-bars {
+        width: 60px;
+    }
+
+    .media-audio-name {
+        font-size: 11px;
+    }
+
+    .chat-input-container {
+        padding: 10px 12px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .chat-input-wrapper {
+        padding: 4px;
+        border-radius: 22px;
+    }
+
+    .attach-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+
+    .send-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .empty-chat {
+        padding: 40px 16px;
+    }
+
+    .empty-chat .empty-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+        margin-bottom: 14px;
+    }
+
+    .empty-chat h5 {
+        font-size: 16px;
+    }
+
+    .lightbox-modal {
+        padding: 12px;
+    }
+
+    .lightbox-close {
+        top: 12px;
+        left: 12px;
+        width: 42px;
+        height: 42px;
+    }
+
+    .lightbox-prev { right: 12px; }
+    .lightbox-next { left: 12px; }
+    .lightbox-nav { width: 42px; height: 42px; }
+
+    .lightbox-caption {
+        font-size: 12px;
+        padding: 6px 12px;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 576px) {
+    .chat-container {
+        height: calc(100dvh - 55px);
+    }
+
+    .chat-messages {
+        padding: 10px 10px;
+    }
+
+    .message {
+        max-width: 92%;
+    }
+
+    .message-content {
+        padding: 9px 12px;
+    }
+
+    .msg-attachment-image img,
+    .msg-attachment-video video {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .msg-attachment-file {
+        min-width: 0;
+    }
+
+    .msg-attachment-file .msg-attachment-meta {
+        min-width: 0;
+    }
+
+    .chat-header-name {
+        max-width: 40vw;
     }
 }
 </style>

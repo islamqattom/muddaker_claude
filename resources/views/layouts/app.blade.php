@@ -2463,6 +2463,425 @@
         }
     }
     </style>
+
+    <!-- ===== Global mobile view (Student-page style) ===== -->
+    <style>
+    /* --- Page header: stack vertically on mobile --- */
+    @media (max-width: 768px) {
+        .page-header,
+        .page-header-modern {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+        }
+
+        .page-header .header-content,
+        .page-header-modern .header-content {
+            gap: 12px;
+        }
+
+        .page-header .header-icon,
+        .page-header-modern .header-icon {
+            width: 52px;
+            height: 52px;
+            font-size: 22px;
+            border-radius: 14px;
+        }
+
+        .page-header .header-text h4,
+        .page-header-modern .header-text h4 {
+            font-size: 18px;
+        }
+
+        .page-header .header-text p,
+        .page-header-modern .header-text p {
+            font-size: 12px;
+        }
+
+        .page-header .header-stats,
+        .page-header-modern .header-stats {
+            align-self: flex-start;
+        }
+
+        .page-header .stat-pill,
+        .page-header-modern .stat-pill {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+    }
+
+    /* --- Filter card: single column on mobile --- */
+    @media (max-width: 768px) {
+        .filter-card {
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+        }
+
+        .filter-actions {
+            grid-column: 1 / -1;
+            flex-wrap: wrap;
+        }
+
+        .filter-actions .btn {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        .filter-actions .btn i {
+            margin: 0 !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .filter-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    /* --- Form controls: 16px font prevents iOS auto-zoom --- */
+    @media (max-width: 768px) {
+        .form-control,
+        .form-select,
+        .form-label,
+        textarea {
+            font-size: 16px;
+        }
+
+        .form-control,
+        .form-select {
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+    }
+
+    /* --- Table card: better mobile padding --- */
+    @media (max-width: 768px) {
+        .table-card {
+            border-radius: 14px;
+        }
+
+        .table-header {
+            padding: 14px 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .table-title {
+            font-size: 14px;
+            gap: 10px;
+        }
+
+        .table-title i {
+            width: 34px;
+            height: 34px;
+            font-size: 14px;
+        }
+
+        .table-footer {
+            padding: 14px 16px;
+        }
+
+        .record-count {
+            font-size: 12px;
+        }
+
+        /* Make table cards scroll horizontally without breaking layout */
+        .table-responsive {
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modern-table {
+            font-size: 13px;
+        }
+
+        .modern-table th,
+        .modern-table td {
+            padding: 12px 14px;
+            white-space: nowrap;
+        }
+
+        .modern-table th {
+            font-size: 10px;
+        }
+
+        .user-avatar-table {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-size: 13px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+    }
+
+    /* --- Card-based data grid (used by Students page) --- */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .cards-grid {
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .data-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+        border: 1px solid #f0f4f8;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .data-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(24,43,72,0.1);
+    }
+
+    .data-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.04));
+        border-bottom: 1px solid #f0f4f8;
+    }
+
+    .data-card-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #182B48, #2A4570);
+        color: #d4a030;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .data-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .data-card-title {
+        color: #182B48;
+        font-weight: 700;
+        font-size: 14px;
+        margin: 0 0 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .data-card-subtitle {
+        color: #7f8c8d;
+        font-size: 11px;
+    }
+
+    .data-card-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    .data-card-body {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .data-card-footer {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        background: #fafbfc;
+        border-top: 1px solid #f0f4f8;
+    }
+
+    .data-card-footer .btn {
+        flex: 1;
+        font-size: 12px;
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .data-card {
+            border-radius: 14px;
+        }
+
+        .data-card-header {
+            padding: 12px 14px;
+            gap: 10px;
+        }
+
+        .data-card-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+
+        .data-card-body {
+            padding: 12px 14px;
+        }
+
+        .data-card-footer {
+            padding: 10px 14px;
+        }
+    }
+
+    /* --- Empty state: cleaner & centered on mobile --- */
+    @media (max-width: 768px) {
+        .empty-state {
+            padding: 36px 18px;
+        }
+
+        .empty-state .empty-icon {
+            width: 72px;
+            height: 72px;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h5 {
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+    }
+
+    /* --- Pagination: compact on mobile --- */
+    @media (max-width: 768px) {
+        .pagination-wrapper {
+            margin-top: 18px;
+        }
+
+        .pagination-wrapper .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-wrapper .page-link {
+            padding: 7px 11px;
+            font-size: 13px;
+            border-radius: 7px;
+        }
+
+        .pagination-wrapper .page-item:not(.active):not(.disabled):nth-child(n+5):nth-last-child(n+3) {
+            display: none;
+        }
+    }
+
+    /* --- Stat cards: tighter on mobile --- */
+    @media (max-width: 768px) {
+        .stat-card {
+            padding: 14px 16px;
+            border-radius: 14px;
+        }
+
+        .stat-card .number {
+            font-size: 1.4rem;
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .stat-card .icon {
+            font-size: 1.6rem;
+        }
+    }
+
+    /* --- Breadcrumb: hide on small screens --- */
+    @media (max-width: 576px) {
+        .breadcrumb {
+            font-size: 12px;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    /* --- Modals: full-screen on small phones --- */
+    @media (max-width: 576px) {
+        .modal-dialog {
+            margin: 0;
+            min-height: 100vh;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            border-radius: 16px 16px 0 0;
+            max-height: 92vh;
+        }
+
+        .modal-header,
+        .modal-footer {
+            padding: 14px 16px;
+        }
+
+        .modal-body {
+            padding: 16px;
+            max-height: calc(92vh - 130px);
+            overflow-y: auto;
+        }
+    }
+
+    /* --- Page content padding --- */
+    @media (max-width: 768px) {
+        main.page-content {
+            padding: 14px;
+        }
+    }
+
+    /* --- Generic h1-h4 sizing for mobile --- */
+    @media (max-width: 768px) {
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1.3rem; }
+        h3 { font-size: 1.2rem; }
+        h4 { font-size: 1.1rem; }
+        h5 { font-size: 1rem; }
+        h6 { font-size: 0.9rem; }
+    }
+
+    /* --- Prevent iOS rubber-band scroll on chat container --- */
+    .chat-container { overscroll-behavior: contain; }
+
+    /* --- Smooth scrolling & touch behavior --- */
+    html { -webkit-text-size-adjust: 100%; }
+    body { -webkit-tap-highlight-color: rgba(212, 160, 48, 0.15); }
+    </style>
 </head>
 <body>
 
@@ -2580,11 +2999,6 @@
                     <span>تفعيل الإشعارات</span>
                 </button>
 
-                <!-- Notification settings (always visible) -->
-                <a href="{{ route('notifications.settings') }}" class="notification-bell" id="notifSettingsLink" title="إعدادات الإشعارات">
-                    <i class="fas fa-cog"></i>
-                </a>
-
                 <!-- Notifications -->
                 <div class="dropdown">
                     <div class="notification-bell" data-bs-toggle="dropdown" id="notifBell">
@@ -2652,10 +3066,6 @@
                             <a href="{{ route('notifications.index') }}" class="notif-footer-link">
                                 <i class="fas fa-list"></i>
                                 عرض جميع الإشعارات
-                            </a>
-                            <a href="{{ route('notifications.settings') }}" class="notif-footer-link">
-                                <i class="fas fa-cog"></i>
-                                إعدادات الإشعارات
                             </a>
                         </div>
                     </div>
@@ -2975,9 +3385,7 @@
         const headerNotifBtn = document.getElementById('headerEnableNotifBtn');
         if (headerNotifBtn) {
             headerNotifBtn.addEventListener('click', function () {
-                // Send the user to the settings page so they can also see
-                // the diagnostic info + per-type preferences.
-                window.location.href = "{{ route('notifications.settings') }}";
+                window.location.href = "{{ route('notifications.index') }}";
             });
         }
         updateHeaderNotifBtn();

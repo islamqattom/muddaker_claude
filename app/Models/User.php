@@ -46,6 +46,16 @@ class User extends Authenticatable
         return $this->hasMany(Student::class, 'supervisor_id');
     }
 
+    public function imanPrograms()
+    {
+        return $this->morphMany(ImanProgram::class, 'owner');
+    }
+
+    public function createdImanPrograms()
+    {
+        return $this->hasMany(ImanProgram::class, 'created_by');
+    }
+
     public function supervisedExams(): HasMany
     {
         return $this->hasMany(Exam::class, 'supervisor_id');

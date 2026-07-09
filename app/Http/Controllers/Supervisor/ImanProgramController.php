@@ -104,6 +104,159 @@ class ImanProgramController extends Controller
         ]);
     }
 
+    public function report(Request $request)
+    {
+        $supervisorId = auth()->id();
+        $routeName = optional($request->route())->getName();
+        $type = match (true) {
+            $routeName === 'supervisor.iman-program.reports.self' => 'self',
+            $routeName === 'supervisor.iman-program.reports.students' => 'students',
+            default => $request->get('type', 'students'),
+        };
+        if (! in_array($type, ['students', 'self'], true)) {
+            $type = 'students';
+        }
+
+        $weekStart = $this->resolveWeekStart($request);
+        $weekEnd = $weekStart->copy()->addDays(6);
+
+        if ($type === 'self') {
+            $owner = User::find($supervisorId);
+            $programs = ImanProgram::with(['criteria', 'creator'])
+                ->where('owner_id', $owner->getKey())
+                ->where('owner_type', $owner->getMorphClass())
+                ->orderByDesc('is_active')
+                ->orderByDesc('id')
+                ->get();
+
+            $rows = $this->buildReportRows($programs, $weekStart, $weekEnd);
+
+            return view('supervisor.iman-program.report', [
+                'type' => 'self',
+                'title' => 'تقرير برنامجي الإيماني',
+                'subtitle' => 'ملخص التزامك بمعايير برنامجك الإيماني خلال الأسبوع المحدد',
+                'rows' => $rows,
+                'totals' => $this->summarizeRows($rows),
+                'weekStart' => $weekStart,
+                'weekEnd' => $weekEnd,
+                'studentLabel' => null,
+            ]);
+        }
+
+        $students = Student::with('user')
+            ->where('supervisor_id', $supervisorId)
+            ->orderBy('id')
+            ->get();
+
+        $studentMorph = (new Student)->getMorphClass();
+        $programs = ImanProgram::with(['criteria', 'creator', 'owner'])
+            ->whereIn('owner_id', $students->pluck('id'))
+            ->where('owner_type', $studentMorph)
+            ->orderByDesc('is_active')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy('owner_id');
+
+        $rows = [];
+        foreach ($students as $student) {
+            $studentPrograms = $programs->get($student->id, collect());
+            $rows[] = [
+                'student' => $student,
+                'programs' => $studentPrograms,
+                'report' => $this->buildReportRows($studentPrograms, $weekStart, $weekEnd),
+            ];
+        }
+
+        $allRows = collect($rows)->pluck('report')->flatten(1);
+        $totals = $this->summarizeRows($allRows);
+
+        return view('supervisor.iman-program.report', [
+            'type' => 'students',
+            'title' => 'تقرير الطلاب',
+            'subtitle' => 'ملخص التزام الطلاب بمعايير البرامج الإيمانية خلال الأسبوع المحدد',
+            'rows' => $rows,
+            'totals' => $totals,
+            'weekStart' => $weekStart,
+            'weekEnd' => $weekEnd,
+            'studentLabel' => fn ($student) => $student->user->name ?? '—',
+        ]);
+    }
+
+    protected function buildReportRows($programs, Carbon $weekStart, Carbon $weekEnd): array
+    {
+        $weekDates = [];
+        for ($i = 0; $i < 7; $i++) {
+            $weekDates[] = $weekStart->copy()->addDays($i);
+        }
+
+        if ($programs->isEmpty()) {
+            return [];
+        }
+
+        $entries = ImanDailyEntry::whereIn('iman_program_id', $programs->pluck('id'))
+            ->whereBetween('entry_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+            ->get()
+            ->groupBy(fn ($e) => $e->iman_program_id . '|' . $e->iman_criterion_id . '|' . $e->entry_date->toDateString());
+
+        $rows = [];
+        foreach ($programs as $program) {
+            $programTotal = 0;
+            $programDone = 0;
+            $criteriaRows = [];
+
+            foreach ($program->criteria as $criterion) {
+                $criterionTotal = 7;
+                $criterionDone = 0;
+                $criterionValues = [];
+                foreach ($weekDates as $date) {
+                    $key = $program->id . '|' . $criterion->id . '|' . $date->toDateString();
+                    $entry = $entries->get($key)?->first();
+                    if ($this->isEntryDone($criterion, $entry)) {
+                        $criterionDone++;
+                    }
+                    $criterionValues[] = [
+                        'date' => $date,
+                        'entry' => $entry,
+                    ];
+                }
+                $programTotal += $criterionTotal;
+                $programDone += $criterionDone;
+                $criteriaRows[] = [
+                    'criterion' => $criterion,
+                    'total' => $criterionTotal,
+                    'done' => $criterionDone,
+                    'percent' => $criterionTotal > 0 ? round(($criterionDone / $criterionTotal) * 100) : 0,
+                    'values' => $criterionValues,
+                ];
+            }
+
+            $rows[] = [
+                'program' => $program,
+                'criteria' => $criteriaRows,
+                'total' => $programTotal,
+                'done' => $programDone,
+                'percent' => $programTotal > 0 ? round(($programDone / $programTotal) * 100) : 0,
+            ];
+        }
+
+        return $rows;
+    }
+
+    protected function summarizeRows(iterable $rows): array
+    {
+        $total = 0;
+        $done = 0;
+        foreach ($rows as $row) {
+            $total += $row['total'] ?? 0;
+            $done += $row['done'] ?? 0;
+        }
+        return [
+            'total' => $total,
+            'done' => $done,
+            'percent' => $total > 0 ? round(($done / $total) * 100) : 0,
+        ];
+    }
+
     public function create(Request $request)
     {
         $owner = $this->resolveOwner($request);

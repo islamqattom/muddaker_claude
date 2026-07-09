@@ -24,6 +24,10 @@
     <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
     <span>يوم الهمة</span>
 </a>
+<a href="{{ route('admin.iman-program.index') }}" class="nav-link {{ request()->routeIs('admin.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
 <a href="{{ route('admin.supervisors.index') }}" class="nav-link {{ request()->routeIs('admin.supervisors.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-user-tie"></i></div>
     <span>المشرفون</span>
@@ -40,10 +44,6 @@
 <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-cog"></i></div>
     <span>إعدادات النظام</span>
-</a>
-<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
-    <span>إعدادات الإشعارات</span>
 </a>
 <span class="nav-section-title">سجل التدقيق</span>
 <a href="{{ route('admin.audit-logs.index') }}" class="nav-link {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">

@@ -33,6 +33,10 @@
     <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
     <span>يوم الهمة</span>
 </a>
+<a href="{{ route('supervisor.iman-program.index') }}" class="nav-link {{ request()->routeIs('supervisor.iman-program.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-star-and-crescent"></i></div>
+    <span>البرنامج الإيماني</span>
+</a>
 
 <span class="nav-section-title">التسميع</span>
 <a href="{{ route('supervisor.recitation.index') }}" class="nav-link {{ request()->routeIs('supervisor.recitation.index') ? 'active' : '' }}">
@@ -74,7 +78,3 @@
     <span>مسودات الإنذارات</span>
 </a>
 
-<a href="{{ route('notifications.settings') }}" class="nav-link {{ request()->routeIs('notifications.settings') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-bell"></i></div>
-    <span>إعدادات الإشعارات</span>
-</a>
