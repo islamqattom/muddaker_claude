@@ -15,17 +15,18 @@ class TaskController extends Controller
         $supervisorId = auth()->id();
         $supervisedStudentIds = Student::where('supervisor_id', $supervisorId)->pluck('id')->toArray();
 
-        $tasks = MeetingTask::where(function ($q) use ($supervisorId, $supervisedStudentIds) {
-            $q->where(function ($sub) use ($supervisorId) {
-                $sub->where('assignee_type', 'user')->where('assignee_id', $supervisorId);
-            });
-            if (!empty($supervisedStudentIds)) {
-                $q->orWhere(function ($sub) use ($supervisedStudentIds) {
-                    $sub->where('assignee_type', 'student')
-                        ->whereIn('assignee_id', $supervisedStudentIds);
+        $tasks = MeetingTask::whereNotNull('meeting_minute_id')
+            ->where(function ($q) use ($supervisorId, $supervisedStudentIds) {
+                $q->where(function ($sub) use ($supervisorId) {
+                    $sub->where('assignee_type', 'user')->where('assignee_id', $supervisorId);
                 });
-            }
-        })
+                if (!empty($supervisedStudentIds)) {
+                    $q->orWhere(function ($sub) use ($supervisedStudentIds) {
+                        $sub->where('assignee_type', 'student')
+                            ->whereIn('assignee_id', $supervisedStudentIds);
+                    });
+                }
+            })
             ->with(['meetingMinute', 'assigner'])
             ->when(request('status'), function ($query) {
                 $query->where('status', request('status'));

@@ -248,7 +248,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         </div>
         <div class="header-text">
             <h4>تكليفاتي</h4>
-            <p>متابعة التكليفات المكلّفة إليك</p>
+            <p>التكليفات الصادرة من محاضر الاجتماعات</p>
         </div>
     </div>
 </div>
