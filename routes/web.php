@@ -143,6 +143,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::put('/{task}', [Admin\TaskController::class, 'update'])->name('update');
         Route::put('/{task}/status', [Admin\TaskController::class, 'updateStatus'])->name('updateStatus');
         Route::put('/{task}/title', [Admin\TaskController::class, 'updateTitle'])->name('updateTitle');
+        Route::delete('/{task}', [Admin\TaskController::class, 'destroy'])->name('destroy');
     });
 
     // Audit Logs
@@ -289,6 +290,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::post('/tasks', [Supervisor\TaskController::class, 'store'])->name('tasks.store');
     Route::put('/tasks/{task}', [Supervisor\TaskController::class, 'update'])->name('tasks.update');
     Route::put('/tasks/{task}/status', [Supervisor\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    Route::delete('/tasks/{task}', [Supervisor\TaskController::class, 'destroy'])->name('tasks.destroy');
 
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [Supervisor\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');

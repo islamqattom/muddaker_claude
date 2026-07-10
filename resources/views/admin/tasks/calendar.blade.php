@@ -979,6 +979,13 @@
                 <button type="button" class="btn btn-info" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <form id="deleteTaskForm" method="POST" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" id="deleteTaskBtn" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                        <i class="fas fa-trash"></i> حذف
+                    </button>
+                </form>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
             </div>
         </div>
@@ -1061,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (occ && occ > 1) {
                 countBadge = '<span style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:4px;">×' + occ + '</span>';
             }
-            return { html: '<div class="fc-event-title">' + countBadge + timeStr + escapeHtml(arg.event.title) + '</div>' };
+            return { html: '<div class="fc-event-title">' + countBadge + timeStr + ' ' + escapeHtml(arg.event.title) + '</div>' };
         },
         eventDidMount: function(info) {
             if (info.view.type === 'listWeek') {
@@ -1179,6 +1186,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (editBtn) {
                 editBtn.setAttribute('data-task-id', task.id);
                 editBtn.setAttribute('data-task-props', JSON.stringify(props));
+            }
+
+            var deleteForm = document.getElementById('deleteTaskForm');
+            if (deleteForm) {
+                deleteForm.action = updateStatusBaseUrl + '/' + task.id;
             }
 
             new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
@@ -1357,6 +1369,46 @@ document.addEventListener('DOMContentLoaded', function() {
             if (detailModal) detailModal.hide();
 
             openEditTaskModal(taskId, props);
+        });
+    }
+
+    var deleteBtn = document.getElementById('deleteTaskBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            if (!confirm('هل أنت متأكد من حذف هذه المهمة؟ لا يمكن التراجع.')) return;
+            var form = document.getElementById('deleteTaskForm');
+            if (!form || !form.action) return;
+            var url = form.action;
+            var tokenInput = form.querySelector('input[name="_token"]');
+            var token = tokenInput ? tokenInput.value : '';
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'X-HTTP-Method-Override': 'DELETE',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                },
+                body: '_method=DELETE&_token=' + encodeURIComponent(token)
+            }).then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) { return { ok: r.ok, body: j }; }); })
+              .then(function(res) {
+                  if (res.ok && (res.body.success === undefined || res.body.success)) {
+                      var detailModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailModal'));
+                      if (detailModal) detailModal.hide();
+                      window.location.reload();
+                  } else {
+                      alert(res.body.message || 'فشل حذف المهمة');
+                      deleteBtn.disabled = false;
+                      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                  }
+              })
+              .catch(function() {
+                  alert('حدث خطأ في الاتصال');
+                  deleteBtn.disabled = false;
+                  deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+              });
         });
     }
 

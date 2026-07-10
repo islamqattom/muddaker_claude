@@ -314,6 +314,36 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'تم تحديث المهمة بنجاح');
     }
 
+    public function destroy(Request $request, MeetingTask $task)
+    {
+        $supervisorId = auth()->id();
+        $supervisedStudentIds = Student::where('supervisor_id', $supervisorId)->pluck('id')->toArray();
+
+        $isAuthorized = false;
+        if ($task->assignee_type === 'user' && $task->assignee_id === $supervisorId) {
+            $isAuthorized = true;
+        } elseif ($task->assignee_type === 'student' && in_array($task->assignee_id, $supervisedStudentIds, true)) {
+            $isAuthorized = true;
+        } elseif ($task->assigned_by === $supervisorId) {
+            $isAuthorized = true;
+        }
+
+        if (! $isAuthorized) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'لا تملك صلاحية حذف هذه المهمة'], 403);
+            }
+            abort(403, 'لا تملك صلاحية حذف هذه المهمة');
+        }
+
+        $task->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'تم حذف المهمة بنجاح']);
+        }
+
+        return redirect()->back()->with('success', 'تم حذف المهمة بنجاح');
+    }
+
     private function formatTaskForCalendar(MeetingTask $task): array
     {
         $statusClass = $task->status;
