@@ -25,6 +25,8 @@ class ImanProgramController extends Controller
         if ($scope === 'student' && $studentFilter) {
             $student = Student::with('user')->find($studentFilter);
             $owner = $student;
+        } elseif ($scope === 'student') {
+            $owner = null;
         } else {
             $scope = 'self';
             $owner = User::find(auth()->id());

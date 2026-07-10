@@ -100,6 +100,111 @@
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border-radius: 12px;
 }
+
+/* ============== CALENDAR TABS ============== */
+.calendar-tabs {
+    display: flex;
+    gap: 8px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(24,43,72,0.05);
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.calendar-tab {
+    flex: 1;
+    min-width: 160px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    color: #5a6c7d;
+    background: transparent;
+    transition: all 0.25s ease;
+    border: 2px solid transparent;
+}
+.calendar-tab i { font-size: 15px; color: #d4a030; }
+.calendar-tab:hover {
+    background: rgba(212, 160, 48, 0.08);
+    color: #182B48;
+}
+.calendar-tab.active {
+    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
+    color: #fff;
+    border-color: rgba(212, 160, 48, 0.4);
+    box-shadow: 0 6px 18px rgba(24,43,72,0.18);
+}
+.calendar-tab.active i { color: #d4a030; }
+
+.student-picker-bar {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 12px rgba(24,43,72,0.05);
+    margin-bottom: 16px;
+}
+.student-picker-form {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.picker-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #182B48;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+}
+.picker-label i { color: #d4a030; }
+.picker-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 260px;
+}
+.picker-select {
+    flex: 1;
+    max-width: 420px;
+}
+.picker-clear {
+    background: #f0f4f8;
+    color: #182B48;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.picker-clear:hover { background: #e9ecef; color: #182B48; }
+.selected-student-chip {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #e9ecef;
+    color: #5a6c7d;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.selected-student-chip i { color: #d4a030; }
+.selected-student-chip strong { color: #182B48; font-weight: 700; }
+
+@media (max-width: 768px) {
+    .calendar-tab { font-size: 13px; padding: 10px 14px; min-width: 0; }
+    .student-picker-form { flex-direction: column; align-items: stretch; }
+    .picker-controls { width: 100%; }
+    .picker-select { max-width: 100%; }
+}
 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #5a6c7d; }
 .legend-color { width: 20px; height: 20px; border-radius: 6px; }
 .legend-pending { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
@@ -616,6 +721,61 @@
         </button>
     </div>
 
+    @php
+        $calendarTab = request('view') === 'student' ? 'student' : ($studentFilter ? 'student' : 'all');
+        $studentTabParams = ['view' => 'student'];
+        if ($studentFilter) {
+            $studentTabParams['student_id'] = $studentFilter;
+        } elseif ($students->count() > 0) {
+            $studentTabParams['student_id'] = $students->first()->id;
+        }
+    @endphp
+    <div class="calendar-tabs">
+        <a href="{{ route($role . '.tasks.calendar') }}"
+           class="calendar-tab {{ $calendarTab === 'all' ? 'active' : '' }}">
+            <i class="fas fa-list"></i>
+            <span>جميع المهام</span>
+        </a>
+        <a href="{{ route($role . '.tasks.calendar', $studentTabParams) }}"
+           class="calendar-tab {{ $calendarTab === 'student' ? 'active' : '' }}">
+            <i class="fas fa-user-graduate"></i>
+            <span>تقويم طالب</span>
+        </a>
+    </div>
+
+    @if($calendarTab === 'student')
+        <div class="student-picker-bar">
+            <form method="GET" action="{{ route($role . '.tasks.calendar') }}" class="student-picker-form">
+                <input type="hidden" name="student_id" value="">
+                <label class="picker-label">
+                    <i class="fas fa-user-graduate"></i>
+                    اختر طالب لعرض تقويمه:
+                </label>
+                <div class="picker-controls">
+                    <select name="student_id" class="form-select picker-select" onchange="this.form.submit()">
+                        <option value="">— اختر طالباً —</option>
+                        @foreach($students as $s)
+                            <option value="{{ $s->id }}" {{ (int)$studentFilter === (int)$s->id ? 'selected' : '' }}>
+                                {{ $s->user->name ?? $s->name }}{{ $s->student_number ? ' (' . $s->student_number . ')' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($selectedStudent)
+                        <a href="{{ route($role . '.tasks.calendar') }}" class="btn btn-light picker-clear">
+                            <i class="fas fa-times"></i> إلغاء
+                        </a>
+                    @endif
+                </div>
+            </form>
+            @if($selectedStudent)
+                <div class="selected-student-chip">
+                    <i class="fas fa-user"></i>
+                    <span>يتم عرض تقويم الطالب: <strong>{{ $selectedStudent->user->name ?? $selectedStudent->name }}</strong></span>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="legend-container">
         <div class="legend-item">
             <div class="legend-color legend-pending"></div>
@@ -1119,9 +1279,21 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('createTaskModalIcon').className = 'fas fa-calendar-plus';
         document.getElementById('createTaskSubmitText').textContent = 'حفظ المهمة';
 
-        var activeTab = document.querySelector('.assignee-type-tab.active');
-        if (activeTab) {
-            handleAssigneeTabSwitch(activeTab.getAttribute('data-type'));
+        var preselectedStudentId = @json($studentFilter ? (int)$studentFilter : null);
+        if (preselectedStudentId && currentRole === 'admin') {
+            var studentTab = document.querySelector('.assignee-type-tab[data-type="student"]');
+            if (studentTab) {
+                handleAssigneeTabSwitch('student');
+            }
+            setTimeout(function() {
+                var sel = document.getElementById('taskAssigneeSelect');
+                if (sel) sel.value = String(preselectedStudentId);
+            }, 50);
+        } else {
+            var activeTab = document.querySelector('.assignee-type-tab.active');
+            if (activeTab) {
+                handleAssigneeTabSwitch(activeTab.getAttribute('data-type'));
+            }
         }
         new bootstrap.Modal(document.getElementById('createTaskModal')).show();
     };

@@ -165,6 +165,16 @@ class TaskController extends Controller
             });
         }
 
+        $studentFilter = $request->get('student_id');
+        $selectedStudent = null;
+        if ($studentFilter) {
+            $selectedStudent = Student::with('user')->find($studentFilter);
+            if ($selectedStudent) {
+                $query->where('assignee_type', 'student')
+                    ->where('assignee_id', $selectedStudent->id);
+            }
+        }
+
         $tasks = $query->orderBy('created_at', 'desc')->get();
 
         $tasksJson = $tasks->map(function ($task) {
@@ -183,7 +193,7 @@ class TaskController extends Controller
             $students = Student::with('user')->get();
         }
 
-        return view('admin.tasks.calendar', compact('tasksJson', 'supervisors', 'students'));
+        return view('admin.tasks.calendar', compact('tasksJson', 'supervisors', 'students', 'studentFilter', 'selectedStudent'));
     }
 
     public function store(Request $request)

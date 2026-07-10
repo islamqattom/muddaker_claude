@@ -37,7 +37,7 @@ class TaskController extends Controller
         return view('supervisor.tasks.index', compact('tasks'));
     }
 
-    public function calendar()
+    public function calendar(Request $request)
     {
         $supervisorId = auth()->id();
         $supervisedStudentIds = Student::where('supervisor_id', $supervisorId)->pluck('id')->toArray();
@@ -55,6 +55,16 @@ class TaskController extends Controller
         })
             ->with(['meetingMinute', 'assigner']);
 
+        $studentFilter = $request->get('student_id');
+        $selectedStudent = null;
+        if ($studentFilter && in_array((int)$studentFilter, $supervisedStudentIds, true)) {
+            $selectedStudent = Student::with('user')->find($studentFilter);
+            if ($selectedStudent) {
+                $query->where('assignee_type', 'student')
+                    ->where('assignee_id', $selectedStudent->id);
+            }
+        }
+
         $tasks = $query->orderBy('created_at', 'desc')->get();
 
         $tasksJson = $tasks->map(function ($task) {
@@ -69,7 +79,7 @@ class TaskController extends Controller
             ->where('id', '!=', $supervisorId)
             ->get();
 
-        return view('admin.tasks.calendar', compact('tasksJson', 'students', 'supervisors'));
+        return view('admin.tasks.calendar', compact('tasksJson', 'students', 'supervisors', 'studentFilter', 'selectedStudent'));
     }
 
     public function store(Request $request)
