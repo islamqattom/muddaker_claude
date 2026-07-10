@@ -149,4 +149,27 @@ class ImanProgramController extends Controller
         }
         return (int) $entry->value >= (int) ($criterion->target_value ?? 0) && (int) $criterion->target_value > 0;
     }
+
+    public function studentReport(Request $request, Student $student, \App\Services\StudentImanReportService $reports)
+    {
+        $parent = auth()->user()->parentProfile;
+        if (! $parent) {
+            abort(403, 'لا يوجد ملف ولي أمر مرتبط بهذا الحساب');
+        }
+
+        $studentIds = $parent->students()->pluck('students.id');
+        abort_unless($studentIds->contains($student->id), 403, 'هذا الطالب ليس من أبنائك.');
+
+        $data = $reports->build($student, $request);
+
+        return view('parent.iman-program.student-report', [
+            'data' => $data,
+            'student' => $student,
+            'formAction' => route('parent.iman-program.student-report', $student->id),
+            'compareAction' => route('parent.iman-program.student-report', $student->id),
+            'criteriaAction' => route('parent.iman-program.student-report', $student->id),
+            'backUrl' => route('parent.iman-program.index', ['student_id' => $student->id]),
+            'headerTitle' => 'تقرير ابنك: ' . ($student->user->name ?? ''),
+        ]);
+    }
 }

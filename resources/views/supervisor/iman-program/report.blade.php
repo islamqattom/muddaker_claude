@@ -194,16 +194,35 @@
 
 <div class="week-picker">
     <form method="GET" action="{{ route('supervisor.iman-program.reports', ['type' => $type]) }}" class="row g-3 align-items-end">
-        <div class="col-md-9">
-            <label class="form-label">الأسبوع</label>
-            <input type="date" name="week" class="form-control" value="{{ $weekStart->toDateString() }}">
-        </div>
-        <div class="col-md-3">
+        @if($type === 'students')
+            <div class="col-md-6">
+                <label class="form-label">اختر طالباً لعرض تقريره الكامل</label>
+                <select name="student_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">— جميع الطلاب —</option>
+                    @foreach($students as $s)
+                        <option value="{{ $s->id }}" {{ ($selectedStudent && $selectedStudent->id === $s->id) ? 'selected' : '' }}>
+                            {{ $s->user->name }} {{ $s->student_number ? '(' . $s->student_number . ')' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">الأسبوع</label>
+                <input type="date" name="week" class="form-control" value="{{ $weekStart->toDateString() }}">
+            </div>
+        @else
+            <div class="col-md-9">
+                <label class="form-label">الأسبوع</label>
+                <input type="date" name="week" class="form-control" value="{{ $weekStart->toDateString() }}">
+            </div>
+        @endif
+        <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> عرض</button>
         </div>
     </form>
 </div>
 
+@if(!$selectedStudent)
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
     <div class="summary-card">
         <div class="summary-icon" style="background:linear-gradient(135deg,#182B48,#2A4570);"><i class="fas fa-bullseye"></i></div>
@@ -227,124 +246,201 @@
         </div>
     </div>
 </div>
+@endif
 
-@if($type === 'students')
-    @forelse($rows as $row)
+@if($type === 'students' && !$selectedStudent)
+    @php
+        $chartLabels = [];
+        $chartDone = [];
+        $chartTotal = [];
+        $chartPct = [];
+        foreach ($rows as $row) {
+            $reportCollection = collect($row['report']);
+            $studentDone = $reportCollection->sum(fn ($r) => $r['done'] ?? 0);
+            $studentTotal = $reportCollection->sum(fn ($r) => $r['total'] ?? 0);
+            $chartLabels[] = $row['student']->user->name ?? '—';
+            $chartDone[] = $studentDone;
+            $chartTotal[] = $studentTotal;
+            $chartPct[] = $studentTotal > 0 ? round(($studentDone / $studentTotal) * 100) : 0;
+        }
+    @endphp
+    @if(count($chartLabels) > 0)
         <div class="report-card">
             <div class="report-card-header">
-                <div>
-                    <h3>
-                        <i class="fas fa-user-graduate" style="color:#d4a030;margin-left:8px;"></i>
-                        {{ $studentLabel ? $studentLabel($row['student']) : ($row['student']->user->name ?? '—') }}
-                    </h3>
-                    <small style="color:#6b7a90;">
-                        {{ $row['programs']->count() }} برنامج
-                        @php $reportCollection = collect($row['report']); @endphp
-                        @if($row['programs']->count() > 0 && $reportCollection->isNotEmpty())
-                            • {{ $reportCollection->sum(fn($r) => $r['done']) }} / {{ $reportCollection->sum(fn($r) => $r['total']) }} منجز
-                        @endif
-                    </small>
-                </div>
-                <div class="progress" style="min-width:200px;">
-                    <div class="progress-bar-wrap">
-                        @php
-                            $progTotal = $reportCollection->sum(fn($r) => $r['total']);
-                            $progDone = $reportCollection->sum(fn($r) => $r['done']);
-                            $progPct = $progTotal > 0 ? round(($progDone / $progTotal) * 100) : 0;
-                        @endphp
-                        <div class="progress-bar-fill {{ $progressClass($progPct) }}" style="width: {{ $progPct }}%;"></div>
-                    </div>
-                    <div class="progress-text">{{ $progPct }}%</div>
-                </div>
+                <h3>
+                    <i class="fas fa-chart-column" style="color:#d4a030;margin-left:8px;"></i>
+                    نسبة إنجاز الطلاب هذا الأسبوع
+                </h3>
+                <small style="color:#6b7a90;">{{ $weekStart->format('Y/m/d') }} - {{ $weekEnd->format('Y/m/d') }}</small>
             </div>
-            <div class="report-card-body">
-                @if($reportCollection->isEmpty())
-                    <div style="padding:24px 22px;text-align:center;color:#6b7a90;">
-                        <i class="fas fa-info-circle"></i> لا توجد برامج إيمانية لهذا الطالب.
+            <div style="padding:18px 22px;position:relative;height:320px;">
+                <canvas id="studentsCompletionChart"></canvas>
+            </div>
+        </div>
+    @endif
+@elseif($type === 'self')
+    @php
+        $chartLabels = [];
+        $chartPct = [];
+        $chartDone = [];
+        $chartTotal = [];
+        foreach ($rows as $programRow) {
+            $criteriaCollection = collect($programRow['criteria'] ?? []);
+            $progDone = $criteriaCollection->sum(fn ($c) => $c['done'] ?? 0);
+            $progTotal = $criteriaCollection->sum(fn ($c) => $c['total'] ?? 0);
+            $chartLabels[] = $programRow['program']->name ?? '—';
+            $chartDone[] = $progDone;
+            $chartTotal[] = $progTotal;
+            $chartPct[] = $progTotal > 0 ? round(($progDone / $progTotal) * 100) : 0;
+        }
+    @endphp
+    @if(count($chartLabels) > 0)
+        <div class="report-card">
+            <div class="report-card-header">
+                <h3>
+                    <i class="fas fa-chart-column" style="color:#d4a030;margin-left:8px;"></i>
+                    نسبة إنجاز برامجي هذا الأسبوع
+                </h3>
+                <small style="color:#6b7a90;">{{ $weekStart->format('Y/m/d') }} - {{ $weekEnd->format('Y/m/d') }}</small>
+            </div>
+            <div style="padding:18px 22px;position:relative;height:320px;">
+                <canvas id="studentsCompletionChart"></canvas>
+            </div>
+        </div>
+    @endif
+@endif
+
+@if($type === 'students')
+    @if($selectedStudent && $reportData)
+        @include('partials.iman-program.student-report-body', [
+            'data' => $reportData,
+            'formAction' => route('supervisor.iman-program.reports.students', ['student_id' => $selectedStudent->id]),
+            'compareAction' => route('supervisor.iman-program.reports.students', ['student_id' => $selectedStudent->id]),
+            'criteriaAction' => route('supervisor.iman-program.reports.students', ['student_id' => $selectedStudent->id]),
+            'backUrl' => route('supervisor.iman-program.reports.students'),
+            'headerTitle' => 'تقرير الطالب: ' . ($selectedStudent->user->name ?? ''),
+        ])
+    @else
+        @forelse($rows as $row)
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div>
+                        <h3>
+                            <i class="fas fa-user-graduate" style="color:#d4a030;margin-left:8px;"></i>
+                            <a href="{{ route('supervisor.iman-program.reports.students', ['student_id' => $row['student']->id]) }}"
+                               style="color:#182B48;text-decoration:none;">
+                                {{ $studentLabel ? $studentLabel($row['student']) : ($row['student']->user->name ?? '—') }}
+                            </a>
+                        </h3>
+                        <small style="color:#6b7a90;">
+                            {{ $row['programs']->count() }} برنامج
+                            @php $reportCollection = collect($row['report']); @endphp
+                            @if($row['programs']->count() > 0 && $reportCollection->isNotEmpty())
+                                • {{ $reportCollection->sum(fn($r) => $r['done']) }} / {{ $reportCollection->sum(fn($r) => $r['total']) }} منجز
+                            @endif
+                        </small>
                     </div>
-                @else
-                    @foreach($reportCollection as $programRow)
-                        <div style="padding:18px 22px;border-bottom:1px solid #eef1f6;">
-                            <h4 style="margin:0 0 6px;font-size:16px;color:#182B48;">
-                                <i class="fas fa-seedling" style="color:#27ae60;margin-left:6px;"></i>
-                                {{ $programRow['program']->name }}
-                            </h4>
-                            <small style="color:#6b7a90;">
-                                {{ $programRow['program']->is_active ? 'نشط' : 'متوقف' }}
-                                @php $criteriaCollection = collect($programRow['criteria']); @endphp
-                                • {{ $criteriaCollection->count() }} معيار
-                            </small>
-                            <div class="table-responsive" style="margin-top:12px;">
-                                <table class="report-table">
-                                    <thead>
-                                        <tr>
-                                            <th>المعيار</th>
-                                            @foreach(($criteriaCollection->first()['values'] ?? []) as $val)
-                                                <th class="day-cell">
-                                                    <span class="day-name">{{ $dayNames[$val['date']->dayOfWeek] ?? '' }}</span>
-                                                    <span class="day-num">{{ $val['date']->format('m-d') }}</span>
-                                                </th>
-                                            @endforeach
-                                            <th style="width:160px;">الإنجاز</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($criteriaCollection as $criterion)
-                                            <tr>
-                                                <td>
-                                                    <div class="criterion-name">{{ $criterion['criterion']->name }}</div>
-                                                    <div class="criterion-meta">
-                                                        @if($criterion['criterion']->type === 'check')
-                                                            <i class="fas fa-check-square"></i> علامة (تم/لم يتم)
-                                                        @else
-                                                            <i class="fas fa-hashtag"></i> رقم — الهدف: {{ $criterion['criterion']->target_value ?? 0 }}
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                @foreach($criterion['values'] as $val)
-                                                    @php
-                                                        $entry = $val['entry'];
-                                                        $isDone = false;
-                                                        $display = '—';
-                                                        if ($entry) {
-                                                            if ($criterion['criterion']->type === 'check') {
-                                                                $isDone = (bool) $entry->is_checked;
-                                                                $display = $isDone ? '✓' : '✗';
-                                                            } else {
-                                                                $isDone = (int) $entry->value >= (int) ($criterion['criterion']->target_value ?? 0) && (int) $criterion['criterion']->target_value > 0;
-                                                                $display = (int) $entry->value;
-                                                            }
-                                                        }
-                                                    @endphp
-                                                    <td class="day-cell">
-                                                        <span class="value {{ $isDone ? 'done' : '' }}">{{ $display }}</span>
-                                                    </td>
-                                                @endforeach
-                                                <td>
-                                                    <div class="progress">
-                                                        <div class="progress-bar-wrap">
-                                                            <div class="progress-bar-fill {{ $progressClass($criterion['percent']) }}" style="width: {{ $criterion['percent'] }}%;"></div>
-                                                        </div>
-                                                        <div class="progress-text">{{ $criterion['percent'] }}%</div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div class="progress" style="min-width:200px;">
+                        <div class="progress-bar-wrap">
+                            @php
+                                $progTotal = $reportCollection->sum(fn($r) => $r['total']);
+                                $progDone = $reportCollection->sum(fn($r) => $r['done']);
+                                $progPct = $progTotal > 0 ? round(($progDone / $progTotal) * 100) : 0;
+                            @endphp
+                            <div class="progress-bar-fill {{ $progressClass($progPct) }}" style="width: {{ $progPct }}%;"></div>
                         </div>
-                    @endforeach
-                @endif
+                        <div class="progress-text">{{ $progPct }}%</div>
+                    </div>
+                </div>
+                <div class="report-card-body">
+                    @if($reportCollection->isEmpty())
+                        <div style="padding:24px 22px;text-align:center;color:#6b7a90;">
+                            <i class="fas fa-info-circle"></i> لا توجد برامج إيمانية لهذا الطالب.
+                        </div>
+                    @else
+                        @foreach($reportCollection as $programRow)
+                            <div style="padding:18px 22px;border-bottom:1px solid #eef1f6;">
+                                <h4 style="margin:0 0 6px;font-size:16px;color:#182B48;">
+                                    <i class="fas fa-seedling" style="color:#27ae60;margin-left:6px;"></i>
+                                    {{ $programRow['program']->name }}
+                                </h4>
+                                <small style="color:#6b7a90;">
+                                    {{ $programRow['program']->is_active ? 'نشط' : 'متوقف' }}
+                                    @php $criteriaCollection = collect($programRow['criteria']); @endphp
+                                    • {{ $criteriaCollection->count() }} معيار
+                                </small>
+                                <div class="table-responsive" style="margin-top:12px;">
+                                    <table class="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>المعيار</th>
+                                                @foreach(($criteriaCollection->first()['values'] ?? []) as $val)
+                                                    <th class="day-cell">
+                                                        <span class="day-name">{{ $dayNames[$val['date']->dayOfWeek] ?? '' }}</span>
+                                                        <span class="day-num">{{ $val['date']->format('m-d') }}</span>
+                                                    </th>
+                                                @endforeach
+                                                <th style="width:160px;">الإنجاز</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($criteriaCollection as $criterion)
+                                                <tr>
+                                                    <td>
+                                                        <div class="criterion-name">{{ $criterion['criterion']->name }}</div>
+                                                        <div class="criterion-meta">
+                                                            @if($criterion['criterion']->type === 'check')
+                                                                <i class="fas fa-check-square"></i> علامة (تم/لم يتم)
+                                                            @else
+                                                                <i class="fas fa-hashtag"></i> رقم — الهدف: {{ $criterion['criterion']->target_value ?? 0 }}
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    @foreach($criterion['values'] as $val)
+                                                        @php
+                                                            $entry = $val['entry'];
+                                                            $isDone = false;
+                                                            $display = '—';
+                                                            if ($entry) {
+                                                                if ($criterion['criterion']->type === 'check') {
+                                                                    $isDone = (bool) $entry->is_checked;
+                                                                    $display = $isDone ? '✓' : '✗';
+                                                        } else {
+                                                            $isDone = (int) $entry->value >= (int) ($criterion['criterion']->target_value ?? 0) && (int) $criterion['criterion']->target_value > 0;
+                                                            $display = (int) $entry->value;
+                                                        }
+                                                            }
+                                                        @endphp
+                                                        <td class="day-cell">
+                                                            <span class="value {{ $isDone ? 'done' : '' }}">{{ $display }}</span>
+                                                        </td>
+                                                    @endforeach
+                                                    <td>
+                                                        <div class="progress">
+                                                            <div class="progress-bar-wrap">
+                                                                <div class="progress-bar-fill {{ $progressClass($criterion['percent']) }}" style="width: {{ $criterion['percent'] }}%;"></div>
+                                                            </div>
+                                                            <div class="progress-text">{{ $criterion['percent'] }}%</div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
             </div>
-        </div>
-    @empty
-        <div class="empty-state">
-            <i class="fas fa-user-graduate"></i>
-            <h5>لا يوجد طلاب</h5>
-            <p>لا يوجد طلاب مرتبطون بحسابك حالياً.</p>
-        </div>
-    @endforelse
+        @empty
+            <div class="empty-state">
+                <i class="fas fa-user-graduate"></i>
+                <h5>لا يوجد طلاب</h5>
+                <p>لا يوجد طلاب مرتبطون بحسابك حالياً.</p>
+            </div>
+        @endforelse
+    @endif
 @else
     @forelse($rows as $programRow)
         <div class="report-card">
@@ -442,3 +538,74 @@
     @endforelse
 @endif
 @endsection
+
+@if(count($chartLabels ?? []) > 0)
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const canvas = document.getElementById('studentsCompletionChart');
+    if (!canvas) return;
+
+    const labels = @json($chartLabels);
+    const pct = @json($chartPct);
+    const done = @json($chartDone);
+    const total = @json($chartTotal);
+
+    const colors = pct.map(v => v >= 70 ? 'rgba(39,174,96,0.85)' : (v >= 40 ? 'rgba(243,156,18,0.85)' : 'rgba(192,57,43,0.85)'));
+    const borderColors = pct.map(v => v >= 70 ? '#27ae60' : (v >= 40 ? '#f39c12' : '#c0392b'));
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'نسبة الإنجاز %',
+                data: pct,
+                backgroundColor: colors,
+                borderColor: borderColors,
+                borderWidth: 2,
+                borderRadius: 8,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(24,43,72,0.95)',
+                    titleColor: '#d4a030',
+                    bodyColor: '#fff',
+                    borderColor: '#d4a030',
+                    borderWidth: 1,
+                    rtl: true,
+                    padding: 10,
+                    callbacks: {
+                        afterLabel: function (ctx) {
+                            const i = ctx.dataIndex;
+                            return ' منجز: ' + done[i] + ' / ' + total[i];
+                        }
+                    }
+                },
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(24,43,72,0.04)' },
+                    ticks: { color: '#6b7a90', font: { size: 11, weight: '600' } },
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    position: 'right',
+                    title: { display: true, text: 'نسبة الإنجاز %', color: '#6b7a90', font: { size: 12 } },
+                    grid: { color: 'rgba(24,43,72,0.05)' },
+                    ticks: { color: '#6b7a90', callback: v => v + '%' },
+                },
+            },
+        },
+    });
+})();
+</script>
+@endpush
+@endif

@@ -43,6 +43,14 @@
         <h1 style="margin:0;font-size:22px;font-weight:700;">البرنامج الإيماني</h1>
         <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">متابعة التزام ابنك على مدار الأسبوع</p>
     </div>
+    @if($student)
+        <div style="margin-right:auto;">
+            <a href="{{ route('parent.iman-program.student-report', $student->id) }}"
+               style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                <i class="fas fa-chart-pie"></i> تقرير ابنك
+            </a>
+        </div>
+    @endif
 </div>
 
 <div style="background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">

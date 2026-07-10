@@ -27,6 +27,8 @@ class ImanProgramController extends Controller
             $owner = $student;
         } elseif ($scope === 'student') {
             $owner = null;
+        } elseif ($scope === 'reports') {
+            $owner = null;
         } else {
             $scope = 'self';
             $owner = User::find(auth()->id());
@@ -68,6 +70,88 @@ class ImanProgramController extends Controller
             'students_with_programs' => ImanProgram::where('owner_type', (new Student)->getMorphClass())->distinct('owner_id')->count('owner_id'),
         ];
 
+        $studentReports = [];
+        $aggregateDailyPoints = [];
+        if ($scope === 'reports') {
+            $studentMorph = (new Student)->getMorphClass();
+            $weekStart = Carbon::today()->subDays(6);
+            $weekEnd = Carbon::today();
+            $studentReports = Student::with(['user', 'supervisor'])
+                ->whereHas('imanPrograms')
+                ->get()
+                ->map(function ($s) use ($studentMorph, $weekStart, $weekEnd) {
+                    $programs = ImanProgram::with('criteria')
+                        ->where('owner_id', $s->id)
+                        ->where('owner_type', $studentMorph)
+                        ->get();
+
+                    $programIds = $programs->pluck('id');
+                    $criteriaCount = $programs->sum(fn ($p) => $p->criteria->count());
+                    $entriesCount = ImanDailyEntry::whereIn('iman_program_id', $programIds)->count();
+                    $weeklyEntriesCount = ImanDailyEntry::whereIn('iman_program_id', $programIds)
+                        ->whereBetween('entry_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+                        ->count();
+                    $lastEntry = ImanDailyEntry::whereIn('iman_program_id', $programIds)
+                        ->orderByDesc('entry_date')
+                        ->first();
+
+                    $completion = 0;
+                    if ($criteriaCount > 0) {
+                        $weeklyCompleted = ImanDailyEntry::whereIn('iman_program_id', $programIds)
+                            ->whereBetween('entry_date', [$weekStart->toDateString(), $weekEnd->toDateString()])
+                            ->where(function ($q) {
+                                $q->where('is_checked', true)->orWhere('value', '>', 0);
+                            })
+                            ->count();
+                        $totalPossible = $criteriaCount * 7;
+                        $completion = $totalPossible > 0 ? min(100, round(($weeklyCompleted / $totalPossible) * 100)) : 0;
+                    }
+
+                    return (object) [
+                        'student' => $s,
+                        'programs_count' => $programs->count(),
+                        'criteria_count' => $criteriaCount,
+                        'entries_count' => $entriesCount,
+                        'weekly_entries_count' => $weeklyEntriesCount,
+                        'last_entry_date' => $lastEntry?->entry_date,
+                        'completion' => $completion,
+                    ];
+                })
+                ->sortByDesc('weekly_entries_count')
+                ->values();
+
+            $allProgramIds = ImanProgram::where('owner_type', $studentMorph)->pluck('id');
+            if ($allProgramIds->isNotEmpty()) {
+                $start = Carbon::today()->subDays(29);
+                $end = Carbon::today();
+                $rows = ImanDailyEntry::whereIn('iman_program_id', $allProgramIds)
+                    ->whereBetween('entry_date', [$start->toDateString(), $end->toDateString()])
+                    ->get(['entry_date', 'is_checked', 'value']);
+
+                $bucket = [];
+                foreach ($rows as $r) {
+                    $d = $r->entry_date->toDateString();
+                    if (! isset($bucket[$d])) {
+                        $bucket[$d] = 0;
+                    }
+                    if ($r->is_checked || (int) ($r->value ?? 0) > 0) {
+                        $bucket[$d]++;
+                    }
+                }
+
+                $cursor = $start->copy();
+                while ($cursor->lte($end)) {
+                    $key = $cursor->toDateString();
+                    $aggregateDailyPoints[] = [
+                        'date' => $key,
+                        'label' => $cursor->format('m/d'),
+                        'points' => $bucket[$key] ?? 0,
+                    ];
+                    $cursor->addDay();
+                }
+            }
+        }
+
         return view('admin.iman-program.index', [
             'students' => $students,
             'student' => $student,
@@ -79,6 +163,8 @@ class ImanProgramController extends Controller
             'weekStart' => $weekStart,
             'weekEnd' => $weekEnd,
             'stats' => $stats,
+            'studentReports' => $studentReports,
+            'aggregateDailyPoints' => $aggregateDailyPoints,
         ]);
     }
 
@@ -241,6 +327,13 @@ class ImanProgramController extends Controller
         }
 
         return redirect()->back()->with('success', 'تم حفظ الإدخالات بنجاح');
+    }
+
+    public function studentReport(Request $request, Student $student, \App\Services\StudentImanReportService $reports)
+    {
+        $data = $reports->build($student, $request);
+        $data['routePrefix'] = 'admin.iman-program.student-report';
+        return view('admin.iman-program.student-report', $data);
     }
 
     protected function resolveOwner(Request $request)

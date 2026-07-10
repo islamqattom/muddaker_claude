@@ -315,4 +315,24 @@ class ImanProgramController extends Controller
         }
         return (int) $entry->value >= (int) ($criterion->target_value ?? 0) && (int) $criterion->target_value > 0;
     }
+
+    public function myReport(Request $request, \App\Services\StudentImanReportService $reports)
+    {
+        $student = auth()->user()->student;
+        if (! $student) {
+            abort(403, 'لا يوجد ملف طالب مرتبط بهذا الحساب');
+        }
+
+        $data = $reports->build($student, $request);
+
+        return view('student.iman-program.my-report', [
+            'data' => $data,
+            'student' => $student,
+            'formAction' => route('student.iman-program.my-report'),
+            'compareAction' => route('student.iman-program.my-report'),
+            'criteriaAction' => route('student.iman-program.my-report'),
+            'backUrl' => route('student.iman-program.index'),
+            'headerTitle' => 'تقاريري الإيمانية',
+        ]);
+    }
 }

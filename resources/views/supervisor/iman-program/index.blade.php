@@ -71,7 +71,13 @@
         <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'اختر طالباً لإضافة/متابعة برنامجه الإيماني' }}</p>
     </div>
     @if($scope === 'self' || $student)
-        <div style="margin-right:auto;">
+        <div style="margin-right:auto;display:flex;gap:10px;flex-wrap:wrap;">
+            @if($scope === 'student' && $student)
+                <a href="{{ route('supervisor.iman-program.student-report', $student->id) }}"
+                   style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                    <i class="fas fa-chart-pie"></i> تقرير الطالب
+                </a>
+            @endif
             <a href="{{ $scope === 'self' ? route('supervisor.iman-program.create', ['scope' => 'self']) : route('supervisor.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
                style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                 <i class="fas fa-plus-circle"></i> برنامج جديد

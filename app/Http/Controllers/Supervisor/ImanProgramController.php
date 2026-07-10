@@ -104,7 +104,7 @@ class ImanProgramController extends Controller
         ]);
     }
 
-    public function report(Request $request)
+    public function report(Request $request, \App\Services\StudentImanReportService $reports)
     {
         $supervisorId = auth()->id();
         $routeName = optional($request->route())->getName();
@@ -140,6 +140,9 @@ class ImanProgramController extends Controller
                 'weekStart' => $weekStart,
                 'weekEnd' => $weekEnd,
                 'studentLabel' => null,
+                'students' => collect(),
+                'selectedStudent' => null,
+                'reportData' => null,
             ]);
         }
 
@@ -147,6 +150,16 @@ class ImanProgramController extends Controller
             ->where('supervisor_id', $supervisorId)
             ->orderBy('id')
             ->get();
+
+        $selectedStudentId = $request->get('student_id');
+        $selectedStudent = null;
+        $reportData = null;
+        $formAction = route('supervisor.iman-program.reports.students');
+
+        if ($selectedStudentId && $students->contains('id', (int) $selectedStudentId)) {
+            $selectedStudent = $students->firstWhere('id', (int) $selectedStudentId);
+            $reportData = $reports->build($selectedStudent, $request);
+        }
 
         $studentMorph = (new Student)->getMorphClass();
         $programs = ImanProgram::with(['criteria', 'creator', 'owner'])
@@ -179,6 +192,10 @@ class ImanProgramController extends Controller
             'weekStart' => $weekStart,
             'weekEnd' => $weekEnd,
             'studentLabel' => fn ($student) => $student->user->name ?? '—',
+            'students' => $students,
+            'selectedStudent' => $selectedStudent,
+            'reportData' => $reportData,
+            'formAction' => $formAction,
         ]);
     }
 
@@ -601,5 +618,23 @@ class ImanProgramController extends Controller
             return (bool) $entry->is_checked;
         }
         return (int) $entry->value >= (int) ($criterion->target_value ?? 0) && (int) $criterion->target_value > 0;
+    }
+
+    public function studentReport(Request $request, Student $student, \App\Services\StudentImanReportService $reports)
+    {
+        $supervisorId = auth()->id();
+        abort_unless($student->supervisor_id === $supervisorId, 403, 'هذا الطالب ليس من طلابك.');
+
+        $data = $reports->build($student, $request);
+
+        return view('supervisor.iman-program.student-report', [
+            'data' => $data,
+            'student' => $student,
+            'formAction' => route('supervisor.iman-program.student-report', $student->id),
+            'compareAction' => route('supervisor.iman-program.student-report', $student->id),
+            'criteriaAction' => route('supervisor.iman-program.student-report', $student->id),
+            'backUrl' => route('supervisor.iman-program.index', ['scope' => 'student', 'student_id' => $student->id]),
+            'headerTitle' => 'تقرير الطالب: ' . ($student->user->name ?? ''),
+        ]);
     }
 }

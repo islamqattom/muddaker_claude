@@ -82,6 +82,10 @@
        style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user-graduate"></i> برامج الطلاب
     </a>
+    <a href="{{ route('admin.iman-program.index', ['scope' => 'reports']) }}"
+       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'reports' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+        <i class="fas fa-chart-pie"></i> تقارير الطلاب
+    </a>
 </div>
 
 @if($scope === 'student')
@@ -152,6 +156,92 @@
         <i class="fas fa-user-graduate" style="font-size:50px;opacity:0.3;"></i>
         <h5 style="color:#182B48;margin-top:14px;">اختر طالباً لعرض/إنشاء برنامجه الإيماني</h5>
     </div>
+@elseif($scope === 'reports')
+    @if($studentReports->isEmpty())
+        <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
+            <i class="fas fa-chart-pie" style="font-size:50px;opacity:0.3;"></i>
+            <h5 style="color:#182B48;margin-top:14px;">لا يوجد طلاب لديهم برامج إيمانية بعد</h5>
+        </div>
+    @else
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+                <h5 style="color:#182B48;font-weight:700;margin:0;display:flex;align-items:center;gap:10px;">
+                    <i class="fas fa-chart-area" style="color:#d4a030;"></i> إجمالي نقاط الطلاب خلال آخر 30 يوم
+                </h5>
+                <div id="listChartToggle" style="display:inline-flex;background:#f0f4f8;border-radius:10px;padding:4px;gap:4px;">
+                    <button type="button" data-range="week"
+                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
+                        أسبوعي
+                    </button>
+                    <button type="button" data-range="month"
+                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:transparent;color:#182B48;">
+                        شهري
+                    </button>
+                </div>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="aggregateAreaChart"></canvas>
+            </div>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
+                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px;border-top-right-radius:10px;">الطالب</th>
+                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px;">المشرف</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">البرامج</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">المعايير</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">الإدخالات</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">آخر إدخال</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">نسبة الإنجاز</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;border-top-left-radius:10px;">إجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($studentReports as $report)
+                        <tr style="border-bottom:1px solid #f0f4f8;transition:background 0.2s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='#fff'">
+                            <td style="padding:14px 16px;">
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">
+                                        {{ mb_substr($report->student->user->name ?? '؟', 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:700;color:#182B48;font-size:14px;">{{ $report->student->user->name ?? '—' }}</div>
+                                        @if($report->student->student_number)
+                                            <div style="font-size:11px;color:#6b7a90;">#{{ $report->student->student_number }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding:14px 16px;color:#2c3e50;font-size:13px;">{{ $report->student->supervisor->name ?? '—' }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->programs_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->criteria_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->entries_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-size:12px;color:#6b7a90;">{{ $report->last_entry_date ? \Carbon\Carbon::parse($report->last_entry_date)->format('Y/m/d') : 'لا يوجد' }}</td>
+                            <td style="padding:14px 16px;text-align:center;">
+                                @php
+                                    $c = $report->completion;
+                                    $color = $c >= 70 ? '#27ae60' : ($c >= 40 ? '#f39c12' : '#c0392b');
+                                @endphp
+                                <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+                                    <div style="flex:1;max-width:100px;height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+                                        <div style="height:100%;background:{{ $color }};width:{{ $c }}%;"></div>
+                                    </div>
+                                    <span style="font-weight:700;color:{{ $color }};font-size:13px;min-width:40px;">{{ $c }}%</span>
+                                </div>
+                            </td>
+                            <td style="padding:14px 16px;text-align:center;">
+                                <a href="{{ route('admin.iman-program.student-report', $report->student->id) }}"
+                                   style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none;">
+                                    <i class="fas fa-chart-line"></i> عرض التقرير
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 @else
     @forelse($programs as $program)
         <x-iman-program-card
@@ -207,5 +297,102 @@ document.querySelectorAll('.number-cell').forEach(function (input) {
         }, 400);
     });
 });
+@if($scope === 'reports' && $studentReports->isNotEmpty() && count($aggregateDailyPoints) > 1)
+(function () {
+    const allData = @json($aggregateDailyPoints);
+    const weekData = allData.slice(-7);
+    const monthData = allData;
+
+    const ctx = document.getElementById('aggregateAreaChart');
+    if (!ctx) return;
+
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, 'rgba(39, 174, 96, 0.45)');
+    gradient.addColorStop(1, 'rgba(39, 174, 96, 0.02)');
+
+    const gradientLine = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+    gradientLine.addColorStop(0, 'rgba(39, 174, 96, 1)');
+    gradientLine.addColorStop(1, 'rgba(33, 154, 82, 1)');
+
+    let chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: monthData.map(d => d.label),
+            datasets: [{
+                label: 'إجمالي النقاط اليومية',
+                data: monthData.map(d => d.points),
+                borderColor: gradientLine,
+                backgroundColor: gradient,
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: monthData.length > 20 ? 2 : 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#27ae60',
+                pointBorderWidth: 2,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(24, 43, 72, 0.95)',
+                    titleColor: '#27ae60',
+                    bodyColor: '#fff',
+                    borderColor: '#27ae60',
+                    borderWidth: 1,
+                    rtl: true,
+                    padding: 10,
+                    callbacks: {
+                        title: function (items) {
+                            return monthData[items[0].dataIndex].date;
+                        },
+                        label: function (context) {
+                            return ' النقاط: ' + context.parsed.y;
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(24,43,72,0.04)' },
+                    ticks: { color: '#6b7a90', font: { size: 10 } },
+                },
+                y: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: { color: 'rgba(24,43,72,0.05)' },
+                    ticks: { color: '#6b7a90', precision: 0 },
+                },
+            },
+        },
+    });
+
+    function switchRange(range) {
+        const data = range === 'week' ? weekData : monthData;
+        chart.data.labels = data.map(d => d.label);
+        chart.data.datasets[0].data = data.map(d => d.points);
+        chart.data.datasets[0].pointRadius = data.length > 20 ? 2 : 4;
+        chart.update();
+    }
+
+    document.querySelectorAll('#listChartToggle button').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const range = this.dataset.range;
+            document.querySelectorAll('#listChartToggle button').forEach(b => {
+                b.style.background = 'transparent';
+                b.style.color = '#182B48';
+            });
+            this.style.background = 'linear-gradient(135deg,#182B48,#2A4570)';
+            this.style.color = '#fff';
+            switchRange(range);
+        });
+    });
+})();
+@endif
 </script>
 @endpush

@@ -188,6 +188,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::delete('/{program}', [Admin\ImanProgramController::class, 'destroy'])->name('destroy');
         Route::post('/{program}/toggle-entry', [Admin\ImanProgramController::class, 'toggleEntry'])->name('toggle-entry');
         Route::post('/{program}/bulk-save', [Admin\ImanProgramController::class, 'bulkSave'])->name('bulk-save');
+        Route::get('/student-report/{student}', [Admin\ImanProgramController::class, 'studentReport'])->name('student-report');
     });
 });
 
@@ -299,6 +300,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/reports', [Supervisor\ImanProgramController::class, 'report'])->name('reports');
         Route::get('/reports/students', [Supervisor\ImanProgramController::class, 'report'])->defaults('type', 'students')->name('reports.students');
         Route::get('/reports/self', [Supervisor\ImanProgramController::class, 'report'])->defaults('type', 'self')->name('reports.self');
+        Route::get('/student-report/{student}', [Supervisor\ImanProgramController::class, 'studentReport'])->name('student-report');
         Route::get('/{program}/edit', [Supervisor\ImanProgramController::class, 'edit'])->name('edit');
         Route::put('/{program}', [Supervisor\ImanProgramController::class, 'update'])->name('update');
         Route::delete('/{program}', [Supervisor\ImanProgramController::class, 'destroy'])->name('destroy');
@@ -351,6 +353,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
         Route::get('/', [Student\ImanProgramController::class, 'index'])->name('index');
         Route::get('/create', [Student\ImanProgramController::class, 'create'])->name('create');
         Route::post('/', [Student\ImanProgramController::class, 'store'])->name('store');
+        Route::get('/my-report', [Student\ImanProgramController::class, 'myReport'])->name('my-report');
         Route::get('/{program}/edit', [Student\ImanProgramController::class, 'edit'])->name('edit');
         Route::put('/{program}', [Student\ImanProgramController::class, 'update'])->name('update');
         Route::delete('/{program}', [Student\ImanProgramController::class, 'destroy'])->name('destroy');
@@ -477,6 +480,7 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     // Iman Program (البرنامج الإيماني) - read only
     Route::prefix('iman-program')->name('iman-program.')->group(function () {
         Route::get('/', [ParentPortal\ImanProgramController::class, 'index'])->name('index');
+        Route::get('/student-report/{student}', [ParentPortal\ImanProgramController::class, 'studentReport'])->name('student-report');
         Route::get('/{program}', [ParentPortal\ImanProgramController::class, 'show'])->name('show');
     });
 

@@ -221,6 +221,9 @@ if (! function_exists('thisDayName')) {
                 <p class="hero-sub">حدد معاييرك اليومية وتابع التزامك على مدار الأسبوع</p>
             </div>
             <div class="hero-actions">
+                <a href="{{ route('student.iman-program.my-report') }}" class="btn-ghost">
+                    <i class="fas fa-chart-pie"></i> تقاريري
+                </a>
                 <a href="{{ route('student.iman-program.create') }}" class="btn-gold">
                     <i class="fas fa-plus-circle"></i> برنامج جديد
                 </a>
