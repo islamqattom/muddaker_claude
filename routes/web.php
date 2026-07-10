@@ -96,11 +96,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/warnings/attendance/{student}', [Admin\WarningController::class, 'getAttendance'])->name('warnings.attendance');
     Route::get('/warnings/recitations/{student}', [Admin\WarningController::class, 'getRecitations'])->name('warnings.recitations');
 
-    // Warning Rules
-    Route::resource('warning-rules', Admin\WarningRuleController::class);
-    Route::post('warning-rules/{id}/toggle', [Admin\WarningRuleController::class, 'toggle'])->name('warning-rules.toggle');
-    Route::post('warning-rules/test', [Admin\WarningRuleController::class, 'test'])->name('warning-rules.test');
-
     // Settings
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');

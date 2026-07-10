@@ -19,7 +19,6 @@ class AuditLog extends Model
         'App\Models\Attendance',
         'App\Models\RecitationSession',
         'App\Models\Warning',
-        'App\Models\WarningRule',
     ];
 
     public const AUDIT_ACTIONS = [
