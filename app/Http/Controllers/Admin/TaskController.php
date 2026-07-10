@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\MeetingMinute;
 use App\Models\MeetingTask;
 use App\Models\Student;
 use App\Notifications\NewMeetingTaskAssigned;
@@ -272,7 +271,7 @@ class TaskController extends Controller
             return $this->errorResponse($request, 'الحد الأقصى للتكرار 60 يوماً');
         }
 
-        $meetingMinuteId = $validated['meeting_minute_id'] ?? MeetingMinute::latest('id')->value('id');
+        $meetingMinuteId = $validated['meeting_minute_id'] ?? null;
 
         $createdTasks = [];
         $notifiedAlready = false;
@@ -299,7 +298,7 @@ class TaskController extends Controller
             $task = MeetingTask::create($taskData);
             $createdTasks[] = $task;
 
-            if ($assigneeId && !$notifiedAlready) {
+            if ($assigneeId && !$notifiedAlready && $meetingMinuteId) {
                 $this->notifyAssignee($task, $assigneeType, $assigneeId, $validated['title']);
                 $notifiedAlready = true;
             }

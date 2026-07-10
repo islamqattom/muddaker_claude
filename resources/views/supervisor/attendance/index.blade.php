@@ -91,11 +91,13 @@
                 {{ $students->count() }} طالب
             </span>
             <div class="bulk-actions">
-                <button type="button" class="btn btn-sm btn-outline-success" onclick="markAll('present')">
-                    <i class="fas fa-check me-1"></i>تحديد الكل حاضر
+                <button type="button" class="btn btn-sm btn-outline-success" onclick="markAll('present')" title="تحديد الكل حاضر">
+                    <i class="fas fa-check"></i>
+                    <span class="btn-text-mobile">تحديد الكل حاضر</span>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="markAll('absent')">
-                    <i class="fas fa-times me-1"></i>تحديد الكل غائب
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="markAll('absent')" title="تحديد الكل غائب">
+                    <i class="fas fa-times"></i>
+                    <span class="btn-text-mobile">تحديد الكل غائب</span>
                 </button>
             </div>
         </div>
@@ -156,7 +158,7 @@
                                            id="present-{{ $student->id }}" value="present"
                                            {{ $currentStatus === 'present' ? 'checked' : '' }}
                                            onchange="handleStatusChange({{ $student->id }}, 'present')">
-                                    <label class="status-btn success" for="present-{{ $student->id }}">
+                                    <label class="status-btn success" for="present-{{ $student->id }}" title="حاضر">
                                         <i class="fas fa-check"></i>
                                     </label>
 
@@ -164,7 +166,7 @@
                                            id="late-{{ $student->id }}" value="late"
                                            {{ $currentStatus === 'late' ? 'checked' : '' }}
                                            onchange="handleStatusChange({{ $student->id }}, 'late')">
-                                    <label class="status-btn warning" for="late-{{ $student->id }}">
+                                    <label class="status-btn warning" for="late-{{ $student->id }}" title="متأخر">
                                         <i class="fas fa-clock"></i>
                                     </label>
 
@@ -172,7 +174,7 @@
                                            id="absent-{{ $student->id }}" value="absent"
                                            {{ $currentStatus === 'absent' ? 'checked' : '' }}
                                            onchange="handleStatusChange({{ $student->id }}, 'absent')">
-                                    <label class="status-btn danger" for="absent-{{ $student->id }}">
+                                    <label class="status-btn danger" for="absent-{{ $student->id }}" title="غائب">
                                         <i class="fas fa-times"></i>
                                     </label>
 
@@ -180,15 +182,9 @@
                                            id="excused-{{ $student->id }}" value="excused"
                                            {{ $currentStatus === 'excused' ? 'checked' : '' }}
                                            onchange="handleStatusChange({{ $student->id }}, 'excused')">
-                                    <label class="status-btn info" for="excused-{{ $student->id }}">
+                                    <label class="status-btn info" for="excused-{{ $student->id }}" title="بعذر">
                                         <i class="fas fa-file-alt"></i>
                                     </label>
-                                </div>
-                                <div class="status-labels">
-                                    <span class="status-label {{ $currentStatus === 'present' ? 'active' : '' }}" data-for="present-{{ $student->id }}">حاضر</span>
-                                    <span class="status-label {{ $currentStatus === 'late' ? 'active' : '' }}" data-for="late-{{ $student->id }}">متأخر</span>
-                                    <span class="status-label {{ $currentStatus === 'absent' ? 'active' : '' }}" data-for="absent-{{ $student->id }}">غائب</span>
-                                    <span class="status-label {{ $currentStatus === 'excused' ? 'active' : '' }}" data-for="excused-{{ $student->id }}">بعذر</span>
                                 </div>
                             </td>
                             <td>
@@ -232,9 +228,14 @@
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
-@media (max-width: 768px) { .page-header { flex-direction: column; align-items: flex-start; } }
+@media (max-width: 768px) {
+    .page-header { flex-direction: column; align-items: stretch; gap: 14px; }
+    .page-header .header-actions { width: 100%; }
+    .page-header .header-actions .btn { width: 100%; justify-content: center; }
+}
 
 .header-content { display: flex; align-items: center; gap: 20px; }
 
@@ -249,6 +250,7 @@
     font-size: 28px;
     color: #d4a030;
     box-shadow: 0 8px 25px rgba(24,43,72,0.25);
+    flex-shrink: 0;
 }
 
 .header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
@@ -257,33 +259,33 @@
 .header-actions { display: flex; gap: 10px; }
 
 .stats-row {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
 }
 
 .stat-item {
-    flex: 1;
-    min-width: 120px;
     background: #fff;
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
+    min-width: 0;
 }
 
 .stat-item-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     color: #fff;
+    flex-shrink: 0;
 }
 
 .stat-item.success .stat-item-icon { background: linear-gradient(135deg, #27ae60, #2ecc71); }
@@ -292,9 +294,9 @@
 .stat-item.info .stat-item-icon { background: linear-gradient(135deg, #3498db, #2980b9); }
 .stat-item.secondary .stat-item-icon { background: linear-gradient(135deg, #7f8c8d, #95a5a6); }
 
-.stat-item-content { flex: 1; }
-.stat-number { font-size: 28px; font-weight: 800; color: #182B48; line-height: 1; }
-.stat-label { font-size: 12px; color: #7f8c8d; margin-top: 4px; }
+.stat-item-content { flex: 1; min-width: 0; }
+.stat-number { font-size: 24px; font-weight: 800; color: #182B48; line-height: 1; }
+.stat-label { font-size: 11px; color: #7f8c8d; margin-top: 4px; }
 
 .date-filter-card {
     background: #fff;
@@ -306,7 +308,7 @@
     border: 1px solid #f0f4f8;
 }
 
-.date-filter-form { margin: 0; }
+.date-filter-form { margin: 0; width: 100%; }
 
 .date-filter-input { position: relative; display: flex; align-items: center; }
 
@@ -314,6 +316,7 @@
     position: absolute;
     right: 14px;
     color: #d4a030;
+    pointer-events: none;
 }
 
 .date-filter-input input {
@@ -322,6 +325,8 @@
     border-radius: 8px;
     font-size: 14px;
     color: #182B48;
+    width: 100%;
+    max-width: 240px;
 }
 
 .table-card {
@@ -339,6 +344,8 @@
     padding: 20px 25px;
     border-bottom: 1px solid #f0f4f8;
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .table-title {
@@ -360,14 +367,16 @@
     justify-content: center;
     color: #d4a030;
     font-size: 16px;
+    flex-shrink: 0;
 }
 
-.table-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+.table-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 .record-count { color: #7f8c8d; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 .record-count i { color: #d4a030; }
 
-.bulk-actions { display: flex; gap: 8px; }
+.bulk-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bulk-actions .btn { white-space: nowrap; }
 
 .modern-table { width: 100%; border-collapse: collapse; }
 .modern-table thead { background: #f8f9fa; }
@@ -396,7 +405,7 @@
 
 .row-num { color: #bdc3c7; font-weight: 600; font-size: 13px; }
 
-.user-info-cell { display: flex; align-items: center; gap: 14px; }
+.user-info-cell { display: flex; align-items: center; gap: 14px; min-width: 0; }
 
 .user-avatar-table {
     width: 42px;
@@ -409,9 +418,10 @@
     color: #fff;
     font-weight: 700;
     font-size: 16px;
+    flex-shrink: 0;
 }
 
-.user-details { display: flex; flex-direction: column; }
+.user-details { display: flex; flex-direction: column; min-width: 0; }
 .user-name { color: #182B48; font-weight: 600; font-size: 14px; }
 .user-username { color: #7f8c8d; font-size: 12px; }
 
@@ -422,6 +432,7 @@
     border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .no-data { color: #bdc3c7; }
@@ -439,6 +450,7 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
+    flex-shrink: 0;
 }
 
 .status-btn:hover { transform: scale(1.1); }
@@ -455,17 +467,6 @@
 .status-btn.info { background: rgba(52,152,219,0.15); color: #3498db; border-color: rgba(52,152,219,0.3); }
 .status-btn.info:hover, input:checked + .status-btn.info { background: #3498db; color: #fff; }
 
-.status-labels { display: flex; gap: 8px; margin-top: 8px; }
-
-.status-label {
-    font-size: 10px;
-    color: #bdc3c7;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.status-label.active { color: #182B48; }
-
 .arrival-time { max-width: 120px; }
 
 .table-footer {
@@ -475,7 +476,8 @@
     justify-content: center;
 }
 
-.footer-actions { display: flex; gap: 15px; }
+.footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
+.footer-actions .btn { flex: 1; min-width: 160px; justify-content: center; }
 
 .empty-state { text-align: center; padding: 60px 20px; }
 
@@ -494,6 +496,66 @@
 
 .empty-state h5 { color: #182B48; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
 .empty-state p { color: #7f8c8d; margin-bottom: 25px; }
+
+/* ===========================
+   MOBILE RESPONSIVE
+   =========================== */
+@media (max-width: 768px) {
+    .header-icon { width: 52px; height: 52px; font-size: 22px; border-radius: 14px; }
+    .header-text h4 { font-size: 18px; }
+    .header-text p { font-size: 12px; }
+    .header-content { gap: 12px; }
+
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-item { padding: 12px; gap: 10px; }
+    .stat-item-icon { width: 38px; height: 38px; font-size: 16px; border-radius: 10px; }
+    .stat-number { font-size: 20px; }
+    .stat-label { font-size: 10px; }
+
+    .date-filter-card { padding: 12px 14px; }
+    .date-filter-input input { font-size: 14px; padding: 8px 12px 8px 36px; }
+
+    .table-header { padding: 14px 16px; flex-direction: column; align-items: stretch; }
+    .table-title { font-size: 14px; }
+    .table-title i { width: 34px; height: 34px; font-size: 14px; }
+    .table-actions { width: 100%; justify-content: space-between; gap: 8px; }
+    .record-count { font-size: 12px; }
+    .bulk-actions { width: 100%; flex-wrap: wrap; gap: 6px; }
+    .bulk-actions .btn { flex: 1; min-width: 0; padding: 6px 10px; font-size: 12px; }
+    .bulk-actions .btn i { margin: 0 !important; }
+    .bulk-actions .btn-text-mobile { display: none; }
+
+    .modern-table th { padding: 10px 12px; font-size: 10px; }
+    .modern-table td { padding: 10px 12px; font-size: 13px; }
+    .row-num { font-size: 12px; min-width: 24px; }
+    .user-avatar-table { width: 36px; height: 36px; font-size: 14px; }
+    .user-info-cell { gap: 10px; }
+    .user-name { font-size: 13px; }
+    .user-username { font-size: 11px; }
+    .level-badge { padding: 4px 10px; font-size: 11px; }
+    .no-data { font-size: 12px; }
+
+    .attendance-status-group { gap: 4px; }
+    .status-btn { width: 32px; height: 32px; font-size: 12px; border-radius: 8px; }
+
+    .arrival-time { max-width: 100%; width: 100%; }
+
+    .table-footer { padding: 14px 16px; }
+    .footer-actions { flex-direction: column; gap: 10px; }
+    .footer-actions .btn { width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-item { padding: 10px; }
+    .stat-item-icon { width: 34px; height: 34px; font-size: 14px; }
+    .stat-number { font-size: 18px; }
+    .stat-label { font-size: 9px; }
+
+    .modern-table th, .modern-table td { padding: 8px 10px; }
+    .status-btn { width: 28px; height: 28px; font-size: 11px; }
+    .attendance-status-group { gap: 3px; }
+}
 </style>
 
 @endsection
@@ -502,6 +564,7 @@
 <script>
 function handleStatusChange(studentId, status) {
     const arrivalInput = document.getElementById('arrival-' + studentId);
+    if (!arrivalInput) return;
     if (status === 'late') {
         arrivalInput.style.display = '';
         arrivalInput.required = true;
@@ -509,18 +572,13 @@ function handleStatusChange(studentId, status) {
         arrivalInput.style.display = 'none';
         arrivalInput.required = false;
     }
-
-    document.querySelectorAll(`.status-label[data-for^="${studentId}"]`).forEach(label => {
-        label.classList.remove('active');
-    });
-    const activeLabel = document.querySelector(`.status-label[data-for="${status}-${studentId}"]`);
-    if (activeLabel) activeLabel.classList.add('active');
 }
 
 function markAll(status) {
     document.querySelectorAll(`input[type="radio"][value="${status}"]`).forEach(radio => {
         radio.checked = true;
-        const studentId = radio.id.split('-')[1];
+        const parts = radio.id.split('-');
+        const studentId = parts[parts.length - 1];
         handleStatusChange(studentId, status);
     });
 }
