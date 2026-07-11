@@ -14,7 +14,10 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        $query = MeetingTask::with(['meetingMinute', 'assignee', 'assigner']);
+        $query = MeetingTask::with(['meetingMinute', 'assignee', 'assigner'])
+            ->whereHas('assigner', function ($q) {
+                $q->where('role', 'admin');
+            });
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
