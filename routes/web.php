@@ -45,7 +45,7 @@ Route::prefix('public/recitation')->name('public.recitation.')->group(function (
     Route::get('/mafsil', [\App\Http\Controllers\Guest\MafsilController::class, 'index'])->name('mafsil');
     Route::post('/mafsil', [\App\Http\Controllers\Guest\MafsilController::class, 'index'])->name('mafsil.post');
     Route::post('/mafsil/save', [\App\Http\Controllers\Guest\MafsilController::class, 'saveSession'])->name('mafsil.save');
-    Route::get('/mafsil/result/{session}', [\App\Http\Controllers\Guest\MafsilController::class, 'result'])->name('mafsil.result');
+    Route::get('/mafsil/result/{sessionId}', [\App\Http\Controllers\Guest\MafsilController::class, 'result'])->name('mafsil.result');
     Route::get('/mafsil-position/{mafsilPosition}/ayahs', [\App\Http\Controllers\Guest\MafsilController::class, 'getMafsilPositionAyahs'])->name('mafsil-position.ayahs');
     Route::get('/tajweed-rules', [\App\Http\Controllers\Guest\MafsilController::class, 'tajweedRules'])->name('tajweed-rules');
 });

@@ -395,8 +395,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         </td>
                         <td>
                             <div class="participant-cell">
-                                <span class="participant-name">{{ $session->student->user->name }}</span>
-                                <span class="participant-role">الطالب</span>
+                                <span class="participant-name">{{ $session->student_name ?? ($session->student->user->name ?? 'غير معروف') }}</span>
+                                <span class="participant-role">{{ $session->student ? 'الطالب' : 'زائر' }}</span>
                             </div>
                         </td>
                         <td>

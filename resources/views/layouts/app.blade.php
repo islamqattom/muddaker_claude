@@ -731,7 +731,7 @@
 
         .page-title {
             flex: 1;
-            font-size: 32px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--primary);
             margin: 0;

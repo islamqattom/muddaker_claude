@@ -421,8 +421,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <div class="student-avatar">
                         <i class="fas fa-user"></i>
                     </div>
-                    <div class="student-name">{{ $session->student->user->name }}</div>
-                    <div class="student-number">{{ $session->student->student_number }}</div>
+                    <div class="student-name">{{ $session->student_name ?? ($session->student->user->name ?? 'غير معروف') }}</div>
+                    <div class="student-number">{{ $session->student->student_number ?? '—' }}</div>
                 </div>
 
                 @if($session->supervisor)

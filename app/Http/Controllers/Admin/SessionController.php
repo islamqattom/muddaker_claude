@@ -83,10 +83,29 @@ class SessionController extends Controller {
             'mafsil_type' => 'nullable|integer|min:1|max:30',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
+            'source' => 'nullable|in:all,public,supervised',
         ]);
 
-        $query = RecitationSession::with(['student.user', 'pages', 'supervisor'])
+        $source = $request->input('source', 'all');
+
+        $baseQuery = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
             ->where('type', RecitationSession::TYPE_MAFSIL);
+
+        if ($source === 'public') {
+            $baseQuery->whereNull('supervisor_id');
+        } elseif ($source === 'supervised') {
+            $baseQuery->whereNotNull('supervisor_id');
+        }
+
+        $query = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->with(['student.user', 'pages', 'supervisor'])
+            ->where('type', RecitationSession::TYPE_MAFSIL);
+
+        if ($source === 'public') {
+            $query->whereNull('supervisor_id');
+        } elseif ($source === 'supervised') {
+            $query->whereNotNull('supervisor_id');
+        }
 
         if ($request->filled('student_name')) {
             $query->where('student_name', 'like', '%' . $request->student_name . '%');
@@ -115,18 +134,23 @@ class SessionController extends Controller {
         $sessions = $query->latest('session_date')->latest('id')->paginate(20)->withQueryString();
 
         $stats = [
-            'total' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->count(),
-            'passed' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->where('status', 'passed')->count(),
-            'failed' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->where('status', 'failed')->count(),
+            'total' => (clone $baseQuery)->count(),
+            'passed' => (clone $baseQuery)->where('status', 'passed')->count(),
+            'failed' => (clone $baseQuery)->where('status', 'failed')->count(),
+            'public_count' => RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')->where('type', RecitationSession::TYPE_MAFSIL)->whereNull('supervisor_id')->count(),
+            'supervised_count' => RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')->where('type', RecitationSession::TYPE_MAFSIL)->whereNotNull('supervisor_id')->count(),
         ];
 
-        return view('admin.mafsil-history.index', compact('sessions', 'stats'));
+        return view('admin.mafsil-history.index', compact('sessions', 'stats', 'source'));
     }
 
     public function mafsilShow(RecitationSession $session) {
-        abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);
+        $session->unsetRelation('student')->unsetRelation('supervisor')->unsetRelation('pages');
+        $session = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->with(['student.user', 'pages', 'supervisor'])
+            ->findOrFail($session->id);
 
-        $session->load(['student.user', 'pages', 'supervisor']);
+        abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);
 
         return view('admin.mafsil-history.show', compact('session'));
     }

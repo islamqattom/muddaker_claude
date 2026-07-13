@@ -250,6 +250,61 @@
         padding: 16px 22px;
         border-top: 1px solid #f0f3f7;
     }
+
+    .source-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 20px;
+        background: white;
+        padding: 6px;
+        border-radius: 14px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(24,43,72,0.05);
+        flex-wrap: wrap;
+    }
+    .source-tab {
+        flex: 1;
+        min-width: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #6c7a89;
+        text-decoration: none;
+        transition: all 0.2s;
+        background: transparent;
+    }
+    .source-tab:hover {
+        background: #f8fafc;
+        color: var(--primary);
+    }
+    .source-tab.active {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(24,43,72,0.25);
+    }
+    .source-tab .tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        background: rgba(24,43,72,0.1);
+        color: var(--primary);
+    }
+    .source-tab.active .tab-count {
+        background: var(--gold);
+        color: var(--primary);
+    }
+    .source-tab i { font-size: 14px; }
 </style>
 
 <div class="page-header">
@@ -260,6 +315,27 @@
             <p>عرض جميع جلسات اختبار الأجزاء المسجلة</p>
         </div>
     </div>
+</div>
+
+<div class="source-tabs">
+    <a href="{{ route('admin.mafsil-history.index', array_merge(request()->except('source', 'page'), ['source' => 'all'])) }}"
+       class="source-tab {{ ($source ?? 'all') === 'all' ? 'active' : '' }}">
+        <i class="fas fa-layer-group"></i>
+        <span>جميع الجلسات</span>
+        <span class="tab-count">{{ number_format($stats['public_count'] + $stats['supervised_count']) }}</span>
+    </a>
+    <a href="{{ route('admin.mafsil-history.index', array_merge(request()->except('source', 'page'), ['source' => 'supervised'])) }}"
+       class="source-tab {{ ($source ?? 'all') === 'supervised' ? 'active' : '' }}">
+        <i class="fas fa-user-tie"></i>
+        <span>جلسات المشرفين</span>
+        <span class="tab-count">{{ number_format($stats['supervised_count']) }}</span>
+    </a>
+    <a href="{{ route('admin.mafsil-history.index', array_merge(request()->except('source', 'page'), ['source' => 'public'])) }}"
+       class="source-tab {{ ($source ?? 'all') === 'public' ? 'active' : '' }}">
+        <i class="fas fa-globe"></i>
+        <span>جلسات الزوار (الصفحة العامة)</span>
+        <span class="tab-count">{{ number_format($stats['public_count']) }}</span>
+    </a>
 </div>
 
 <div class="stat-grid">
@@ -293,6 +369,7 @@
     </div>
     <div class="filter-body">
         <form method="GET" action="{{ route('admin.mafsil-history.index') }}">
+            <input type="hidden" name="source" value="{{ $source ?? 'all' }}">
             <div class="row g-3">
                 <div class="col-md-3">
                     <label>اسم الطالب</label>
@@ -328,7 +405,7 @@
                     <button type="submit" class="btn-action view" style="padding: 9px 20px;">
                         <i class="fas fa-search"></i> بحث
                     </button>
-                    <a href="{{ route('admin.mafsil-history.index') }}" class="btn-reset">
+                    <a href="{{ route('admin.mafsil-history.index', ['source' => $source ?? 'all']) }}" class="btn-reset">
                         <i class="fas fa-eraser"></i> مسح
                     </a>
                 </div>

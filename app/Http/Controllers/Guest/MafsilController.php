@@ -414,7 +414,7 @@ class MafsilController extends Controller
                 ]);
             }
 
-            return redirect()->route('public.recitation.mafsil.result', ['session' => $session->id])
+            return redirect()->route('public.recitation.mafsil.result', ['sessionId' => $session->id])
                 ->with('success', 'تم حفظ جلسة المفصل بنجاح');
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->expectsJson()) {
@@ -432,9 +432,11 @@ class MafsilController extends Controller
         }
     }
 
-    public function result(RecitationSession $session)
+    public function result(int $sessionId)
     {
-        $session->load(['student.user', 'pages']);
+        $session = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->with(['student.user', 'pages'])
+            ->findOrFail($sessionId);
 
         return view('guest.mafsil-result', [
             'session' => $session,

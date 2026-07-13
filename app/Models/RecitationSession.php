@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use App\Traits\Auditable;
 use App\Traits\HasArabicDay;
 
@@ -33,6 +35,16 @@ class RecitationSession extends Model
         self::TYPE_MAFSIL,
         self::TYPE_NOT_RECITE,
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope('exclude_visitor_mafsil', function (Builder $builder) {
+            $builder->where(function ($q) {
+                $q->where('type', '!=', self::TYPE_MAFSIL)
+                  ->orWhereNotNull('supervisor_id');
+            });
+        });
+    }
 
     protected $fillable = [
         'student_id', 'student_name', 'mahd_name', 'supervisor_id', 'type', 'part_id',
