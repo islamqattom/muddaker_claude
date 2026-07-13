@@ -328,6 +328,19 @@
     .legend-item { font-size: 10px; gap: 5px; }
     .legend-color { width: 14px; height: 14px; }
 
+    .calendar-page, .calendar-container, #calendar, .fc, .fc-view-harness, .fc-view-harness-active { min-height: 0 !important; height: auto !important; }
+    .fc-view-harness { min-height: 0 !important; }
+    .fc-list { margin-bottom: 0 !important; }
+    .fc-list-day:not(.has-events) { display: none; }
+
+    .calendar-page, .calendar-container, #calendar, .fc { max-width: 100% !important; width: 100% !important; overflow-x: hidden !important; }
+    .fc-list, .fc-list-day, .fc-list-event { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+    .fc-list-event { min-width: 0 !important; }
+    .fc-list-event-time { min-width: 0 !important; padding: 8px 10px !important; }
+    .fc-list-event-title { padding: 10px 12px !important; word-break: break-word !important; }
+    .list-task-title, .list-task-desc, .list-task-meta { max-width: 100% !important; word-break: break-word !important; }
+    .list-task-content { gap: 8px !important; }
+
     .calendar-container { padding: 8px; }
     .fc .fc-toolbar-title { font-size: 1em !important; }
     .fc .fc-button { padding: 5px 8px !important; font-size: 11px !important; }
@@ -1008,6 +1021,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     if (!calendarEl) return;
 
+    function cleanupModalArtifacts() {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        document.querySelectorAll('.modal-backdrop').forEach(function (bd) { bd.remove(); });
+    }
+
+    document.querySelectorAll('.modal').forEach(function (modalEl) {
+        modalEl.addEventListener('hidden.bs.modal', cleanupModalArtifacts);
+    });
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         headerToolbar: {
@@ -1071,6 +1095,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return { html: '<div class="fc-event-title">' + countBadge + timeStr + ' ' + escapeHtml(arg.event.title) + '</div>' };
         },
         eventDidMount: function(info) {
+            info.el.setAttribute('data-event-id', info.event.id);
             if (info.view.type === 'listWeek') {
                 customizeListEvent(info);
             }
@@ -1144,8 +1169,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             var modalEl = document.getElementById('createTaskModal');
-            if (modalEl) new bootstrap.Modal(modalEl).show();
+            if (modalEl) (bootstrap.Modal.getOrCreateInstance(modalEl)).show();
             calendar.unselect();
+        },
+        dateClick: function(info) {
+            var dateInput = document.getElementById('taskDueDate');
+            var timeInput = document.getElementById('taskDueTime');
+            var endInput = document.getElementById('taskEndTime');
+            var startStr = info.dateStr;
+
+            if (dateInput) dateInput.value = startStr.split('T')[0];
+
+            if (startStr.includes('T')) {
+                var startTime = startStr.split('T')[1].substring(0, 5);
+                if (timeInput) timeInput.value = startTime;
+                if (endInput) {
+                    var parts = startTime.split(':');
+                    var h = parseInt(parts[0], 10);
+                    var m = parseInt(parts[1], 10);
+                    m += 30;
+                    if (m >= 60) { h += 1; m -= 60; }
+                    if (h >= 24) { h = 23; m = 59; }
+                    var endTime = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+                    endInput.value = endTime;
+                }
+            } else {
+                if (timeInput) timeInput.value = '';
+                if (endInput) endInput.value = '';
+            }
+
+            var modalEl = document.getElementById('createTaskModal');
+            if (modalEl) (bootstrap.Modal.getOrCreateInstance(modalEl)).show();
         },
         eventClick: function(info) {
             info.jsEvent.preventDefault();
@@ -1193,11 +1247,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteForm.action = updateStatusBaseUrl + '/' + task.id;
             }
 
-            new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
+            (bootstrap.Modal.getOrCreateInstance(document.getElementById('taskDetailModal'))).show();
         }
     });
 
     calendar.render();
+
+    document.getElementById('calendar').addEventListener('click', function(e) {
+        var listEventEl = e.target.closest('.fc-list-event');
+        if (!listEventEl || !calendarEl.contains(listEventEl)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var eventApi = calendar.getEventById(listEventEl.getAttribute('data-event-id'));
+        if (eventApi) {
+            var task = eventApi;
+            var props = task.extendedProps;
+            document.getElementById('taskDetailTitle').textContent = task.title;
+            document.getElementById('taskDetailDescription').textContent = props.description || 'لا يوجد وصف';
+            document.getElementById('taskDetailAssignee').textContent = props.assigneeName || '-';
+            document.getElementById('taskDetailStatus').innerHTML = '<span class="status-badge ' + props.status + '">' + props.statusLabel + '</span>';
+            document.getElementById('taskDetailAssigner').textContent = props.assignerName || '-';
+            document.getElementById('taskDetailCreated').textContent = props.createdDate;
+            document.getElementById('taskDetailDue').textContent = props.dueDate || '-';
+
+            var timeRow = document.getElementById('taskDetailTimeRow');
+            var endTimeCol = document.getElementById('taskDetailEndTimeCol');
+            if (props.dueTime) {
+                timeRow.style.display = '';
+                document.getElementById('taskDetailTime').textContent = formatTime12Str(props.dueTime);
+                if (props.endTime) {
+                    endTimeCol.style.display = '';
+                    document.getElementById('taskDetailEndTime').textContent = formatTime12Str(props.endTime);
+                } else {
+                    endTimeCol.style.display = 'none';
+                }
+            } else {
+                timeRow.style.display = 'none';
+            }
+
+            var statusForm = document.getElementById('taskStatusForm');
+            if (statusForm) {
+                statusForm.action = updateStatusBaseUrl + '/' + task.id + '/status';
+                var statusSelect = document.getElementById('taskStatusSelect');
+                if (statusSelect) statusSelect.value = props.status;
+            }
+
+            var editBtn = document.getElementById('editTaskBtn');
+            if (editBtn) {
+                editBtn.setAttribute('data-task-id', task.id);
+                editBtn.setAttribute('data-task-props', JSON.stringify(props));
+            }
+
+            var deleteForm = document.getElementById('deleteTaskForm');
+            if (deleteForm) {
+                deleteForm.action = updateStatusBaseUrl + '/' + task.id;
+            }
+
+            (bootstrap.Modal.getOrCreateInstance(document.getElementById('taskDetailModal'))).show();
+        }
+    });
 
     var initialActiveTab = document.querySelector('.assignee-type-tab.active');
     if (initialActiveTab) {
@@ -1307,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 handleAssigneeTabSwitch(activeTab.getAttribute('data-type'));
             }
         }
-        new bootstrap.Modal(document.getElementById('createTaskModal')).show();
+        (bootstrap.Modal.getOrCreateInstance(document.getElementById('createTaskModal'))).show();
     };
 
     var repeatCheckbox = document.getElementById('repeatTask');
@@ -1456,7 +1564,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 50);
         }
 
-        new bootstrap.Modal(document.getElementById('createTaskModal')).show();
+        (bootstrap.Modal.getOrCreateInstance(document.getElementById('createTaskModal'))).show();
     }
 
     var statusForm = document.getElementById('taskStatusForm');
