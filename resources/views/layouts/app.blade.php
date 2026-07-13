@@ -37,7 +37,7 @@
             --danger: #c0392b;
             --sidebar-width: 260px;
             --sidebar-collapsed-width: 70px;
-            --header-height: 65px;
+            --header-height: 70px;
         }
 
         * { box-sizing: border-box; }
@@ -731,7 +731,7 @@
 
         .page-title {
             flex: 1;
-            font-size: 18px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--primary);
             margin: 0;

@@ -42,21 +42,21 @@
         .page-hero {
             background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
             color: white;
-            padding: 32px 20px;
+            padding: 14px 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(24,43,72,0.15);
+            box-shadow: 0 2px 12px rgba(24,43,72,0.12);
         }
 
         .page-hero h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
-            margin: 0 0 8px 0;
+            margin: 0 0 4px 0;
         }
 
         .page-hero p {
             opacity: 0.85;
             margin: 0;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .container-main {

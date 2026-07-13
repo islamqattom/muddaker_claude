@@ -4,76 +4,18 @@
 
 @section('hero')
 <div class="page-hero">
-    <div class="hero-title-row">
-        <div class="hero-logo-wrap">
-            <img src="{{ asset('images/logo-white.png') }}" alt="مدكر" class="hero-logo">
-        </div>
-        <div class="hero-title-text">
-            <h1><i class="fas fa-book-quran me-2"></i>اختبار الأجزاء</h1>
-            <p>صفحة اختبار أجزاء القرآن - للأولياء والمشرفين</p>
-        </div>
-    </div>
+    <h1><i class="fas fa-book-quran me-2"></i>اختبار الأجزاء</h1>
+    <p>صفحة اختبار أجزاء القرآن - للأولياء والمشرفين</p>
 </div>
 @endsection
 
 @push('styles')
 <style>
-    .page-hero {
-        position: relative;
+    .container-main {
+        margin-top: 10px;
     }
-    .page-hero .hero-title-row {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 22px;
-        flex-wrap: wrap;
-    }
-    .page-hero .hero-logo-wrap {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-        position: relative;
-        z-index: 2;
-    }
-    .page-hero .hero-logo {
-        height: 110px;
-        width: auto;
-        object-fit: contain;
-        filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.3));
-    }
-    .page-hero .hero-title-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        width: 100%;
-        z-index: 1;
-        pointer-events: none;
-    }
-    .page-hero .hero-title-text h1 {
-        margin: 0 0 6px 0;
-    }
-    .page-hero .hero-title-text p {
-        margin: 0;
-    }
-
-    @media (max-width: 640px) {
-        .page-hero {
-            padding: 22px 16px;
-        }
-        .page-hero .hero-logo {
-            height: 70px;
-        }
-        .page-hero .hero-title-text h1 {
-            font-size: 20px;
-        }
-        .page-hero .hero-title-text p {
-            font-size: 12px;
-        }
-        .page-hero .hero-title-text {
-            padding: 0 90px;
-        }
+    .page-hero h1 {
+        font-size: 32px;
     }
 </style>
 @endpush
