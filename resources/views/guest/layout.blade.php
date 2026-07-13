@@ -7,7 +7,8 @@
     <title>@yield('title', 'يوم الهمة')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <style>
         :root {
             --gold: #d4a030;
@@ -389,10 +390,14 @@
     @stack('styles')
 </head>
 <body>
+    @hasSection('hero')
+        @yield('hero')
+    @else
     <div class="page-hero">
         <h1><i class="fas fa-mosque me-2"></i>يوم الهمة</h1>
         <p>صفحة تقييم سرد الطالب - للأولياء والمشرفين</p>
     </div>
+    @endif
 
     <div class="container-main">
         @if(isset($step))
@@ -406,7 +411,12 @@
         @yield('content')
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        toastr.options = { "closeButton": true, "progressBar": true, "positionClass": "toast-top-left", "rtl": true };
+    </script>
     @stack('scripts')
 </body>
 </html>

@@ -237,10 +237,10 @@
                                     <div class="user-avatar">
                                     <i class="fas fa-user"></i>
                                 </div>
-                                    <span>{{ $session->student->user->name }}</span>
+                                    <span>{{ $session->student_name ?? ($session->student->user->name ?? 'غير معروف') }}</span>
                                 </div>
                             </td>
-                            <td class="supervisor-cell">{{ $session->supervisor->name }}</td>
+                            <td class="supervisor-cell">{{ $session->supervisor->name ?? '—' }}</td>
                             <td><span class="badge-modern info">{{ $session->type_label }}</span></td>
                             <td><span class="badge-modern {{ $session->status_color }}">{{ $session->status_label }}</span></td>
                             <td class="date-cell">{{ $session->session_date->format('d/m') }}</td>

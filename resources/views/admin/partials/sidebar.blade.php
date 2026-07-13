@@ -49,6 +49,10 @@
     <div class="icon-wrapper"><i class="fas fa-microphone"></i></div>
     <span>جلسات التسميع</span>
 </a>
+<a href="{{ route('admin.mafsil-history.index') }}" class="nav-link {{ request()->routeIs('admin.mafsil-history.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
+    <span>سجل اختبار الأجزاء</span>
+</a>
 <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-chart-line"></i></div>
     <span>التقارير الشاملة</span>

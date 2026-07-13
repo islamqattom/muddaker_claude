@@ -38,6 +38,18 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::get('/result/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'result'])->name('result');
 });
 
+// ============================
+// PUBLIC: Mafsil (مفصل) - No auth required
+// ============================
+Route::prefix('public/recitation')->name('public.recitation.')->group(function () {
+    Route::get('/mafsil', [\App\Http\Controllers\Guest\MafsilController::class, 'index'])->name('mafsil');
+    Route::post('/mafsil', [\App\Http\Controllers\Guest\MafsilController::class, 'index'])->name('mafsil.post');
+    Route::post('/mafsil/save', [\App\Http\Controllers\Guest\MafsilController::class, 'saveSession'])->name('mafsil.save');
+    Route::get('/mafsil/result/{session}', [\App\Http\Controllers\Guest\MafsilController::class, 'result'])->name('mafsil.result');
+    Route::get('/mafsil-position/{mafsilPosition}/ayahs', [\App\Http\Controllers\Guest\MafsilController::class, 'getMafsilPositionAyahs'])->name('mafsil-position.ayahs');
+    Route::get('/tajweed-rules', [\App\Http\Controllers\Guest\MafsilController::class, 'tajweedRules'])->name('tajweed-rules');
+});
+
     // Push subscription routes (authenticated)
     Route::middleware('auth')->group(function () {
         Route::post('/push/subscribe', [PushController::class, 'subscribe'])->name('push.subscribe');
@@ -90,6 +102,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/recitation', [Admin\ReportController::class, 'recitation'])->name('recitation');
         Route::get('/attendance', [Admin\ReportController::class, 'attendance'])->name('attendance');
     });
+
+    // Mafil history (اختبار الأجزاء)
+    Route::get('/mafsil-history', [Admin\SessionController::class, 'mafsilHistory'])->name('mafsil-history.index');
+    Route::get('/mafsil-history/{session}', [Admin\SessionController::class, 'mafsilShow'])->name('mafsil-history.show');
 
     // Warnings
     Route::resource('warnings', Admin\WarningController::class);

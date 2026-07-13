@@ -35,10 +35,11 @@ class RecitationSession extends Model
     ];
 
     protected $fillable = [
-        'student_id', 'supervisor_id', 'type', 'part_id',
+        'student_id', 'student_name', 'mahd_name', 'supervisor_id', 'type', 'part_id',
         'start_page', 'end_page', 'total_pages',
         'total_errors', 'total_hesitations', 'status',
         'mafsil_type', 'max_score', 'final_score',
+        'error_score', 'hesitation_score', 'fail_score',
         'unmastered_pages_count', 'session_date', 'day', 'notes',
         'additional_pages', 'repeated_pages'
     ];
@@ -47,6 +48,9 @@ class RecitationSession extends Model
         'session_date' => 'date',
         'max_score' => 'float',
         'final_score' => 'float',
+        'error_score' => 'float',
+        'hesitation_score' => 'float',
+        'fail_score' => 'float',
     ];
 
     protected static function boot()

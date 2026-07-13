@@ -74,4 +74,60 @@ class SessionController extends Controller {
 
         return view('admin.sessions.show', compact('session'));
     }
+
+    public function mafsilHistory(Request $request) {
+        $request->validate([
+            'student_name' => 'nullable|string|max:255',
+            'mahd_name' => 'nullable|string|max:255',
+            'status' => 'nullable|in:passed,failed,incomplete,in_progress,failed_continued,not_recitate',
+            'mafsil_type' => 'nullable|integer|min:1|max:30',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
+
+        $query = RecitationSession::with(['student.user', 'pages', 'supervisor'])
+            ->where('type', RecitationSession::TYPE_MAFSIL);
+
+        if ($request->filled('student_name')) {
+            $query->where('student_name', 'like', '%' . $request->student_name . '%');
+        }
+
+        if ($request->filled('mahd_name')) {
+            $query->where('mahd_name', 'like', '%' . $request->mahd_name . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('mafsil_type')) {
+            $query->where('mafsil_type', $request->mafsil_type);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('session_date', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('session_date', '<=', $request->to_date);
+        }
+
+        $sessions = $query->latest('session_date')->latest('id')->paginate(20)->withQueryString();
+
+        $stats = [
+            'total' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->count(),
+            'passed' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->where('status', 'passed')->count(),
+            'failed' => RecitationSession::where('type', RecitationSession::TYPE_MAFSIL)->where('status', 'failed')->count(),
+        ];
+
+        return view('admin.mafsil-history.index', compact('sessions', 'stats'));
+    }
+
+    public function mafsilShow(RecitationSession $session) {
+        abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);
+
+        $session->load(['student.user', 'pages', 'supervisor']);
+
+        return view('admin.mafsil-history.show', compact('session'));
+    }
 }
