@@ -144,11 +144,10 @@ class SessionController extends Controller {
         return view('admin.mafsil-history.index', compact('sessions', 'stats', 'source'));
     }
 
-    public function mafsilShow(RecitationSession $session) {
-        $session->unsetRelation('student')->unsetRelation('supervisor')->unsetRelation('pages');
+    public function mafsilShow(int $sessionId) {
         $session = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
             ->with(['student.user', 'pages', 'supervisor'])
-            ->findOrFail($session->id);
+            ->findOrFail($sessionId);
 
         abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);
 
