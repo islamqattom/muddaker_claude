@@ -989,19 +989,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function prependDateSeparatorIfNeeded(date, beforeEl) {
-        const last = messagesEl.querySelector('.wa-msg:last-of-type, .wa-msg:last-child, .wa-date-sep:last-of-type');
-        const lastDate = last && last.dataset ? last.dataset.date : null;
+        // The previous selector used `:last-of-type` which silently failed
+        // when a sibling <div> (the typing indicator) came after the
+        // messages, because `:last-of-type` matches the last *div*, not
+        // the last `.wa-msg`. The result was `lastDate === null`, so a
+        // fresh "Today" separator was added on every message. Look for
+        // the last `.wa-msg` by iterating from the end instead, falling
+        // back to the last `.wa-date-sep` if there are no messages yet.
         const newDate = new Date(date).toDateString();
-        if (lastDate !== newDate) {
-            const sep = document.createElement('div');
-            sep.className = 'wa-date-sep';
-            sep.dataset.date = newDate;
-            sep.innerHTML = `<span>${dateLabel(date)}</span>`;
-            if (beforeEl) {
-                messagesEl.insertBefore(sep, beforeEl);
-            } else {
-                messagesEl.appendChild(sep);
+        let lastDate = null;
+        for (let i = messagesEl.children.length - 1; i >= 0; i--) {
+            const child = messagesEl.children[i];
+            if (child.classList.contains('wa-msg') || child.classList.contains('wa-date-sep')) {
+                lastDate = child.dataset.date || null;
+                break;
             }
+        }
+        if (lastDate === newDate) return;
+        const sep = document.createElement('div');
+        sep.className = 'wa-date-sep';
+        sep.dataset.date = newDate;
+        sep.innerHTML = `<span>${dateLabel(date)}</span>`;
+        if (beforeEl) {
+            messagesEl.insertBefore(sep, beforeEl);
+        } else {
+            messagesEl.appendChild(sep);
         }
     }
 
