@@ -303,6 +303,40 @@ class ChatController extends Controller
         ]);
     }
 
+    /**
+     * Returns the current read-state of the requested message IDs from the
+     * viewer's perspective. Used by the chat page to update the tick
+     * marks on a sender's own messages as soon as the recipient opens
+     * the conversation (and thus calls /read).
+     *
+     * Body: { message_ids: [1, 2, ...] }
+     * Response: { states: { "1": "read", "2": "delivered", "3": "sent" } }
+     */
+    public function readStates(Request $request, Conversation $conversation)
+    {
+        $user = Auth::user();
+        if (!$conversation->participants()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'message_ids' => 'required|array|max:200',
+            'message_ids.*' => 'integer|exists:messages,id',
+        ]);
+
+        $ids = $validated['message_ids'];
+        $messages = Message::whereIn('id', $ids)
+            ->where('conversation_id', $conversation->id)
+            ->get();
+
+        $states = [];
+        foreach ($messages as $m) {
+            $states[(string) $m->id] = $m->readStateFor($user->id);
+        }
+
+        return response()->json(['states' => $states]);
+    }
+
     public function getUsers(Request $request)
     {
         $search = $request->get('search', '');

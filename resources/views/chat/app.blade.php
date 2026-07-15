@@ -851,6 +851,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     pendingFiles = [];
                     rebuildAttachmentPreview();
                     try { addMessageToChat(data.message, true); } catch (e) { console.error('render error', e); }
+                    // As soon as we land here, ask the server for the
+                    // current read-state of the just-sent message(s).
+                    // If the recipient happens to have the chat open,
+                    // their polling has already triggered /read and the
+                    // server will report delivered/read right away.
+                    setTimeout(refreshSentReadStates, 100);
                 } else {
                     alert(data.error || 'فشل إرسال الرسالة');
                 }
@@ -1126,6 +1132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lastKnownId = Math.max(lastKnownId, parseInt(m.id) || 0);
             });
         })
+        .then(() => refreshSentReadStates())
         .catch(() => {});
     }
     pollNewMessages();
@@ -1135,6 +1142,60 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('visibilitychange', function() {
         if (document.visibilityState === 'visible') pollNewMessages();
     });
+
+    // ----- Refresh tick state on the sender's own messages -----
+    // The recipient opening the chat triggers /read on the server, which
+    // updates their last_read_at. We don't have Pusher in this env, so
+    // poll the read-state of our own sent messages and flip the ticks
+    // the moment the recipient has loaded the conversation.
+    function refreshSentReadStates() {
+        const sentEls = messagesEl.querySelectorAll('.wa-msg.sent');
+        if (!sentEls.length) return;
+        const ids = Array.from(sentEls).map(el => parseInt(el.dataset.messageId)).filter(Boolean);
+        if (!ids.length) return;
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        fetch(`/chat/${activeId}/read-states`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message_ids: ids })
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data || !data.states) return;
+            Object.keys(data.states).forEach(id => {
+                const state = data.states[id];
+                const msgEl = messagesEl.querySelector(`.wa-msg.sent[data-message-id="${id}"]`);
+                if (!msgEl) return;
+                const meta = msgEl.querySelector('.wa-bubble-meta');
+                if (!meta) return;
+                const existing = meta.querySelector('.wa-tick');
+                if (existing) {
+                    // Replace the existing tick
+                    let newHtml;
+                    if (state === 'read') newHtml = '<i class="fas fa-check-double wa-tick read"></i>';
+                    else if (state === 'delivered') newHtml = '<i class="fas fa-check-double wa-tick delivered"></i>';
+                    else newHtml = '<i class="fas fa-check wa-tick sent-only"></i>';
+                    if (existing.outerHTML !== newHtml) existing.outerHTML = newHtml;
+                } else {
+                    // No tick yet — append one
+                    const tick = document.createElement('i');
+                    if (state === 'read') tick.className = 'fas fa-check-double wa-tick read';
+                    else if (state === 'delivered') tick.className = 'fas fa-check-double wa-tick delivered';
+                    else tick.className = 'fas fa-check wa-tick sent-only';
+                    meta.appendChild(tick);
+                }
+            });
+        })
+        .catch(() => {});
+    }
+    // Tick refresh at a slightly slower cadence to avoid hammering the
+    // server — every 3s piggy-backs on the new-message poll, plus an
+    // extra 1.5s timer in case the new-message poll was a no-op.
+    setInterval(refreshSentReadStates, 4500);
 
     function updatePresence(presence) {
         if (!Array.isArray(presence)) return;
