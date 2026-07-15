@@ -9,22 +9,7 @@
     $isFirstInCluster = $loop ?? null;
 @endphp
 
-@if($showDateSeparator)
-    <div class="wa-date-sep" data-date="{{ $currentDate }}">
-        <span>
-            @php
-                $d = \Carbon\Carbon::parse($currentDate);
-                $today = \Carbon\Carbon::today();
-                $yesterday = \Carbon\Carbon::yesterday();
-                if ($d->isSameDay($today)) echo 'اليوم';
-                elseif ($d->isSameDay($yesterday)) echo 'أمس';
-                elseif ($d->gt($today->copy()->subDays(7))) echo $d->locale('ar')->dayName;
-                else echo $d->locale('ar')->translatedFormat('j F Y');
-            @endphp
-        </span>
-    </div>
-@endif
-
+{{-- Date separator removed: user prefers bubble-only chat look. --}}
 <div class="wa-msg {{ $bubbleClass }} {{ $loop && $loop->first ? 'leading' : 'followed' }}" data-message-id="{{ $message->id }}" data-date="{{ $message->created_at->toDateString() }}">
     <div class="wa-bubble">
         @if(!$isSent && $isGroup && ($loop && $loop->first || ($loop && $loop->index > 0 && $message->user_id !== $message->conversation->messages[$loop->index - 1]->user_id)))

@@ -131,9 +131,6 @@
                         'message' => $message,
                         'isSent' => $isSent,
                         'bubbleClass' => $bubbleClass,
-                        'showDateSeparator' => $loop->first || $active->messages[$loop->index - 1]->created_at->toDateString() !== $message->created_at->toDateString(),
-                        'previousDate' => $loop->first ? null : $active->messages[$loop->index - 1]->created_at->toDateString(),
-                        'currentDate' => $message->created_at->toDateString(),
                         'currentUserId' => $currentUserId,
                     ])
                 @empty
@@ -888,20 +885,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
         return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + units[i];
     }
-    function dateLabel(date) {
-        const d = (date instanceof Date) ? date : new Date(date);
-        const today = new Date();
-        const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
-        const sameDay = (a, b) => a.toDateString() === b.toDateString();
-        if (sameDay(d, today)) return 'اليوم';
-        if (sameDay(d, yesterday)) return 'أمس';
-        const days = (today - d) / (1000*60*60*24);
-        if (days < 7) {
-            return d.toLocaleDateString('ar', { weekday: 'long' });
-        }
-        return d.toLocaleDateString('ar', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
     function renderAttachments(attachments) {
         if (!attachments || !attachments.length) return '';
         let html = '<div class="wa-attach">';
@@ -996,32 +979,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function prependDateSeparatorIfNeeded(date, beforeEl) {
-        // The previous selector used `:last-of-type` which silently failed
-        // when a sibling <div> (the typing indicator) came after the
-        // messages, because `:last-of-type` matches the last *div*, not
-        // the last `.wa-msg`. The result was `lastDate === null`, so a
-        // fresh "Today" separator was added on every message. Look for
-        // the last `.wa-msg` by iterating from the end instead, falling
-        // back to the last `.wa-date-sep` if there are no messages yet.
-        const newDate = new Date(date).toDateString();
-        let lastDate = null;
-        for (let i = messagesEl.children.length - 1; i >= 0; i--) {
-            const child = messagesEl.children[i];
-            if (child.classList.contains('wa-msg') || child.classList.contains('wa-date-sep')) {
-                lastDate = child.dataset.date || null;
-                break;
-            }
-        }
-        if (lastDate === newDate) return;
-        const sep = document.createElement('div');
-        sep.className = 'wa-date-sep';
-        sep.dataset.date = newDate;
-        sep.innerHTML = `<span>${dateLabel(date)}</span>`;
-        if (beforeEl) {
-            messagesEl.insertBefore(sep, beforeEl);
-        } else {
-            messagesEl.appendChild(sep);
-        }
+        // Date separators intentionally disabled. The user requested
+        // removing the "Today" / "Yesterday" pills from the chat
+        // (the date label kept appearing on every message and the
+        // user prefers a cleaner bubble-only look). We still keep
+        // this function as a no-op so callers don't need to change.
     }
 
     function addMessageToChat(data, isLocal) {
@@ -1368,13 +1330,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.messages && data.messages.length) {
                     const fragment = [];
-                    let lastDate = null;
                     data.messages.forEach(m => {
-                        const mDate = new Date(m.created_at).toDateString();
-                        if (mDate !== lastDate) {
-                            fragment.push(`<div class="wa-date-sep" data-date="${mDate}"><span>${dateLabel(m.created_at)}</span></div>`);
-                            lastDate = mDate;
-                        }
                         const isSent = m.user_id === currentUserId;
                         const prev = data.messages[data.messages.indexOf(m) - 1];
                         const leading = !prev || prev.user_id !== m.user_id;
