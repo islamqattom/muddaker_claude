@@ -259,6 +259,9 @@ class ChatController extends Controller
     /**
      * Paginate older messages (for scroll-up loading). Returns up to PAGE_SIZE
      * messages with id < $beforeId in descending order, then reversed.
+     *
+     * If `since_id` is provided, returns messages with id > $sinceId in
+     * ASCENDING order (used by the polling fallback to fetch only new ones).
      */
     public function messages(Request $request, Conversation $conversation)
     {
@@ -268,6 +271,22 @@ class ChatController extends Controller
         }
 
         $beforeId = (int) $request->query('before_id', 0);
+        $sinceId = (int) $request->query('since_id', 0);
+
+        if ($sinceId > 0) {
+            // Polling: only newer messages
+            $messages = Message::where('conversation_id', $conversation->id)
+                ->where('id', '>', $sinceId)
+                ->with(['user', 'attachments'])
+                ->orderBy('id', 'asc')
+                ->limit(50)
+                ->get();
+            return response()->json([
+                'messages' => $messages,
+                'latest_id' => $messages->isNotEmpty() ? $messages->last()->id : $sinceId,
+            ]);
+        }
+
         $query = Message::where('conversation_id', $conversation->id)
             ->with(['user', 'attachments'])
             ->orderBy('id', 'desc')

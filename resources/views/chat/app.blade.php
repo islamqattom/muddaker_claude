@@ -721,6 +721,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastTypingSent = 0;
     let heartbeatTimer = null;
     let typingHideTimer = null;
+    let pollTimer = null;
+    let lastKnownId = 0;
+    let lastMessageInDom = messagesEl.querySelector('.wa-msg:last-of-type');
+    if (lastMessageInDom) {
+        lastKnownId = parseInt(lastMessageInDom.dataset.messageId) || 0;
+    }
 
     function scrollToBottom() {
         messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -1018,6 +1024,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const html = makeMessageHtml(data, { leading, showSender, readState: isSent ? (isLocal ? 'sent' : 'delivered') : null });
         messagesEl.insertAdjacentHTML('beforeend', html);
 
+        lastKnownId = Math.max(lastKnownId, parseInt(data.id) || 0);
+
         // Mark previous sent bubble as "delivered" if it was only "sent" (best effort)
         // (we don't know who else is in the conversation client-side; skip)
 
@@ -1089,6 +1097,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     heartbeat();
     heartbeatTimer = setInterval(heartbeat, 15000);
+
+    // ----- Polling fallback for new messages (used when Pusher isn't
+    // configured, but always-on as a safety net).
+    function pollNewMessages() {
+        if (document.visibilityState === 'hidden') return;
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        fetch(`/chat/${activeId}/messages?since_id=${lastKnownId}`, {
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+            if (!data || !data.messages) return;
+            data.messages.forEach(m => {
+                addMessageToChat(m, false);
+                lastKnownId = Math.max(lastKnownId, parseInt(m.id) || 0);
+            });
+        })
+        .catch(() => {});
+    }
+    pollNewMessages();
+    pollTimer = setInterval(pollNewMessages, 3000);
+
+    // Re-poll immediately when the tab becomes visible again
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') pollNewMessages();
+    });
 
     function updatePresence(presence) {
         if (!Array.isArray(presence)) return;
@@ -1285,6 +1319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clean up on unload
     window.addEventListener('beforeunload', function() {
         if (heartbeatTimer) clearInterval(heartbeatTimer);
+        if (pollTimer) clearInterval(pollTimer);
     });
 });
 </script>

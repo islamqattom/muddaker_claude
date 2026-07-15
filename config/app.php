@@ -33,7 +33,7 @@ return [
 
     'providers' => [
         Illuminate\Auth\AuthServiceProvider::class,
-        Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
         Illuminate\Cache\CacheServiceProvider::class,
         Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
@@ -63,3 +63,4 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
     ])->toArray(),
 ];
+
