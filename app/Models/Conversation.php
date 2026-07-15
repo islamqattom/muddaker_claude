@@ -47,13 +47,14 @@ class Conversation extends Model
         });
     }
 
-    public function getUnreadCountAttribute(int $userId): int
+    public function unreadCountFor(int $userId): int
     {
         $participant = $this->participants()->where('user_id', $userId)->first();
-        if (!$participant || !$participant->pivot->last_read_at) {
-            return $this->messages()->count();
+        $query = $this->messages()->where('user_id', '!=', $userId);
+        if ($participant && $participant->pivot->last_read_at) {
+            $query->where('created_at', '>', $participant->pivot->last_read_at);
         }
-        return $this->messages()->where('created_at', '>', $participant->pivot->last_read_at)->count();
+        return $query->count();
     }
 
     /**

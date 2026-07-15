@@ -50,7 +50,7 @@
                     $isActive = $active && $active->id === $c->id;
                 @endphp
                 <a href="{{ route('chat.index', ['conversation' => $c->id]) }}"
-                   class="wa-conv {{ $isActive ? 'active' : '' }} {{ ($c->unread_count ?? 0) > 0 ? 'unread' : '' }}"
+                   class="wa-conv {{ $isActive ? 'active' : '' }} {{ (($c->id !== ($activeConversation?->id ?? null)) && ($c->unread_count ?? 0) > 0) ? 'unread' : '' }}"
                    data-id="{{ $c->id }}"
                    data-title="{{ $c->title }}"
                    data-search="{{ $c->title }} {{ $preview }}">
@@ -74,7 +74,7 @@
                         </div>
                         <div class="wa-conv-bottom">
                             <div class="wa-conv-preview">{{ $preview }}</div>
-                            @if(($c->unread_count ?? 0) > 0)
+                            @if(($c->id !== ($activeConversation?->id ?? null)) && ($c->unread_count ?? 0) > 0)
                                 <span class="wa-unread-badge">{{ $c->unread_count }}</span>
                             @endif
                         </div>
@@ -992,6 +992,9 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSidebarPreview(data);
             return;
         }
+        // Active conversation: the user is looking at it, so the sidebar
+        // badge for this conv must be 0 regardless of who sent the message.
+        resetActiveSidebarBadge();
         if (messagesEl.querySelector(`[data-message-id="${data.id}"]`)) return;
 
         const lastMsg = messagesEl.querySelector('.wa-msg:last-of-type');
@@ -1054,6 +1057,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Clear the sidebar badge for the currently-open conversation.
+    // The user is viewing it, so there are no unseen messages to count.
+    function resetActiveSidebarBadge() {
+        if (!activeId) return;
+        const convLink = document.querySelector(`.wa-conv[data-id="${activeId}"]`);
+        if (!convLink) return;
+        const badge = convLink.querySelector('.wa-unread-badge');
+        if (badge) badge.remove();
+        convLink.classList.remove('unread');
+    }
+
     function markAsRead() {
         const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
         fetch(`/chat/${activeId}/read`, {
@@ -1062,6 +1076,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(() => {});
     }
     markAsRead();
+    // Defensive: clear any stale badge the server may have rendered for
+    // the active conv before markConversationAsRead ran.
+    resetActiveSidebarBadge();
 
     // ----- Heartbeat for last_seen -----
     function heartbeat() {

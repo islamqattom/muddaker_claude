@@ -36,7 +36,7 @@ class ChatController extends Controller
             ->orderByDesc('updated_at')
             ->get()
             ->each(function ($c) use ($user) {
-                $c->unread_count = $c->getUnreadCountAttribute($user->id);
+                $c->unread_count = $c->unreadCountFor($user->id);
                 $c->title = $c->displayTitleFor($user->id);
                 $c->avatar = $c->displayAvatarFor($user->id);
                 if ($c->lastMessage) {
@@ -64,6 +64,12 @@ class ChatController extends Controller
                     : $active->participants->first(fn ($p) => $p->id !== $user->id);
                 $this->chatService->markConversationAsRead($active, $user->id);
                 $active->load('participants');
+                // The user is currently viewing this conversation, so any
+                // pre-existing unread messages have just been marked read.
+                // The view suppresses the sidebar badge for the active
+                // conv via $activeConversation, so we don't mutate the
+                // model here (avoids dirty state if the model is later
+                // saved by another path, e.g. sendMessage).
             } else {
                 $active = null;
             }
