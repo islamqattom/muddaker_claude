@@ -969,6 +969,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const contentHtml = data.content ? `<div class="wa-bubble-text">${escapeHtml(data.content)}</div>` : '';
         const timeStr = formatTime12(new Date(data.created_at));
         const hasAttach = attachments.length > 0;
+        const dateStr = new Date(data.created_at).toDateString();
         const cls = ['wa-msg', isSent ? 'sent' : 'received'];
         if (opts && opts.leading) cls.push('leading');
         else cls.push('followed');
@@ -984,7 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isSent && opts && opts.showSender) {
             senderHtml = `<span class="wa-bubble-sender">${escapeHtml(senderName)}</span>`;
         }
-        return `<div class="${cls.join(' ')}" data-message-id="${data.id}">
+        return `<div class="${cls.join(' ')}" data-message-id="${data.id}" data-date="${dateStr}">
             <div class="wa-bubble">
                 ${senderHtml}
                 ${attachHtml}
