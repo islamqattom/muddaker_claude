@@ -174,14 +174,16 @@ class ChatService
 
     public function markConversationAsRead(Conversation $conversation, int $userId): void
     {
+        $now = now();
+
         $conversation->participants()
             ->where('user_id', $userId)
-            ->update(['last_read_at' => now()]);
+            ->update(['last_read_at' => $now, 'last_seen_at' => $now]);
 
-        Message::where('conversation_id', $conversation->id)
+        $updated = Message::where('conversation_id', $conversation->id)
             ->where('user_id', '!=', $userId)
             ->whereNull('read_at')
-            ->update(['read_at' => now()]);
+            ->update(['read_at' => $now]);
 
         Notification::where('user_id', $userId)
             ->whereIn(
@@ -190,6 +192,58 @@ class ChatService
             )
             ->where('is_read', false)
             ->update(['is_read' => true]);
+
+        if ($updated > 0) {
+            $messageIds = Message::where('conversation_id', $conversation->id)
+                ->where('user_id', '!=', $userId)
+                ->where('read_at', $now)
+                ->pluck('id')
+                ->toArray();
+            try {
+                event(new \App\Events\MessageRead(
+                    $conversation,
+                    \App\Models\User::find($userId),
+                    $messageIds
+                ));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to broadcast MessageRead', [
+                    'conversation_id' => $conversation->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Heartbeat: update last_seen_at for the user in this conversation.
+     * Does NOT mark messages as read. Cheap; called every ~15s while chat is open.
+     */
+    public function heartbeat(Conversation $conversation, int $userId): void
+    {
+        $conversation->participants()
+            ->where('user_id', $userId)
+            ->update(['last_seen_at' => now()]);
+    }
+
+    /**
+     * Get participants' last_seen / last_read info, for presence display.
+     *
+     * @return array<int, array{id:int,name:string,last_seen:?string,last_read:?string,is_online:bool}>
+     */
+    public function getPresence(Conversation $conversation): array
+    {
+        $now = now();
+        return $conversation->participants->map(function ($p) use ($now) {
+            $lastSeen = $p->pivot->last_seen_at;
+            $lastRead = $p->pivot->last_read_at;
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'last_seen' => $lastSeen ? $lastSeen->toIso8601String() : null,
+                'last_read' => $lastRead ? $lastRead->toIso8601String() : null,
+                'is_online' => $lastSeen ? $lastSeen->gt($now->copy()->subSeconds(60)) : false,
+            ];
+        })->values()->all();
     }
 
     public function createGroupConversation(array $userIds, string $name, User $creator): Conversation

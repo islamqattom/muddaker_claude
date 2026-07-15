@@ -68,6 +68,9 @@ Route::prefix('public/recitation')->name('public.recitation.')->group(function (
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
     Route::post('/chat/{conversation}/message', [ChatController::class, 'sendMessage'])->name('chat.sendMessage');
     Route::post('/chat/{conversation}/read', [ChatController::class, 'markAsRead'])->name('chat.markAsRead');
+    Route::post('/chat/{conversation}/heartbeat', [ChatController::class, 'heartbeat'])->name('chat.heartbeat');
+    Route::post('/chat/{conversation}/typing', [ChatController::class, 'typing'])->name('chat.typing');
+    Route::get('/chat/{conversation}/messages', [ChatController::class, 'messages'])->name('chat.messages');
     Route::get('/chat/users/search', [ChatController::class, 'getUsers'])->name('chat.users');
     Route::post('/chat/{conversation}/participants', [ChatController::class, 'addParticipant'])->name('chat.addParticipant');
     Route::delete('/chat/{conversation}/participants/{user}', [ChatController::class, 'removeParticipant'])->name('chat.removeParticipant');

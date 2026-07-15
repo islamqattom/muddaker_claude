@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Events\MessageRead;
 use App\Events\NewMessage;
+use App\Events\UserTyping;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -15,45 +17,74 @@ use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
+    public const PAGE_SIZE = 30;
+
     public function __construct(
         private readonly ChatService $chatService,
     ) {}
-    public function index()
+
+    /**
+     * Single-page WhatsApp-style chat. Renders the split-pane layout with the
+     * conversation list + (optionally) the right pane for a given conversation.
+     */
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $conversations = Conversation::forUser($user->id)
-            ->with('participants')
-            ->with(['messages' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(1);
-            }])
-            ->orderByDesc('updated_at')
-            ->get();
 
-        return view('chat.index', compact('conversations'));
+        $conversations = Conversation::forUser($user->id)
+            ->with(['participants', 'lastMessage'])
+            ->orderByDesc('updated_at')
+            ->get()
+            ->each(function ($c) use ($user) {
+                $c->unread_count = $c->getUnreadCountAttribute($user->id);
+                $c->title = $c->displayTitleFor($user->id);
+                $c->avatar = $c->displayAvatarFor($user->id);
+                if ($c->lastMessage) {
+                    $c->lastMessage->loadMissing(['user', 'attachments']);
+                }
+            });
+
+        $active = null;
+        $activeId = $request->query('conversation');
+        if ($activeId) {
+            $active = Conversation::with(['participants', 'messages.user', 'messages.attachments'])
+                ->find($activeId);
+            if ($active && $active->participants()->where('user_id', $user->id)->exists()) {
+                $messages = Message::where('conversation_id', $active->id)
+                    ->with(['user', 'attachments'])
+                    ->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->limit(self::PAGE_SIZE)
+                    ->get()
+                    ->reverse()
+                    ->values();
+                $active->setRelation('messages', $messages);
+                $active->other_user = $active->is_group
+                    ? null
+                    : $active->participants->first(fn ($p) => $p->id !== $user->id);
+                $this->chatService->markConversationAsRead($active, $user->id);
+                $active->load('participants');
+            } else {
+                $active = null;
+            }
+        }
+
+        return response()->view('chat.app', [
+            'conversations' => $conversations,
+            'activeConversation' => $active,
+        ]);
     }
 
+    /**
+     * Deep-link alias for /chat/{id}: redirects to the split-pane view.
+     */
     public function show(Conversation $conversation)
     {
         $user = Auth::user();
-
         if (!$conversation->participants()->where('user_id', $user->id)->exists()) {
             abort(403);
         }
-
-        $messages = Message::where('conversation_id', $conversation->id)
-            ->orderBy('created_at', 'desc')
-            ->orderBy('id', 'desc')
-            ->limit(100)
-            ->get()
-            ->reverse()
-            ->values();
-
-        $conversation->setRelation('messages', $messages);
-        $conversation->load('participants');
-
-        $this->chatService->markConversationAsRead($conversation, $user->id);
-
-        return view('chat.show', compact('conversation'));
+        return redirect()->route('chat.index', ['conversation' => $conversation->id]);
     }
 
     public function store(Request $request)
@@ -81,7 +112,7 @@ class ChatController extends Controller
             $otherUserId = (int) $validated['user_ids'][0];
             $existing = $this->findDirectConversation($user->id, $otherUserId);
             if ($existing) {
-                return redirect()->route('chat.show', $existing);
+                return redirect()->route('chat.index', ['conversation' => $existing->id]);
             }
 
             $conversation = Conversation::create([
@@ -93,7 +124,7 @@ class ChatController extends Controller
 
         $conversation->participants()->attach($userIds);
 
-        return redirect()->route('chat.show', $conversation);
+        return redirect()->route('chat.index', ['conversation' => $conversation->id]);
     }
 
     public function sendMessage(Request $request, Conversation $conversation)
@@ -186,6 +217,71 @@ class ChatController extends Controller
         $this->chatService->markConversationAsRead($conversation, $user->id);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * Heartbeat: updates last_seen_at for the current user in this conversation.
+     * Returns the latest presence info for the conversation.
+     */
+    public function heartbeat(Conversation $conversation)
+    {
+        $user = Auth::user();
+
+        if (!$conversation->participants()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $this->chatService->heartbeat($conversation, $user->id);
+
+        return response()->json([
+            'presence' => $this->chatService->getPresence($conversation->fresh('participants')),
+        ]);
+    }
+
+    /**
+     * Broadcast a typing indicator (debounced on the client).
+     */
+    public function typing(Conversation $conversation)
+    {
+        $user = Auth::user();
+        if (!$conversation->participants()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+        try {
+            event(new UserTyping($conversation, $user));
+        } catch (\Throwable $e) {
+            // Typing is best-effort; never block the user
+            \Illuminate\Support\Facades\Log::debug('Typing broadcast failed', ['error' => $e->getMessage()]);
+        }
+        return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Paginate older messages (for scroll-up loading). Returns up to PAGE_SIZE
+     * messages with id < $beforeId in descending order, then reversed.
+     */
+    public function messages(Request $request, Conversation $conversation)
+    {
+        $user = Auth::user();
+        if (!$conversation->participants()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $beforeId = (int) $request->query('before_id', 0);
+        $query = Message::where('conversation_id', $conversation->id)
+            ->with(['user', 'attachments'])
+            ->orderBy('id', 'desc')
+            ->limit(self::PAGE_SIZE);
+        if ($beforeId > 0) {
+            $query->where('id', '<', $beforeId);
+        }
+        $messages = $query->get()->reverse()->values();
+
+        return response()->json([
+            'messages' => $messages,
+            'has_more' => $messages->count() === self::PAGE_SIZE,
+            'oldest_id' => $messages->isNotEmpty() ? $messages->first()->id : null,
+        ]);
     }
 
     public function getUsers(Request $request)

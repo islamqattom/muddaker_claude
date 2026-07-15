@@ -60,6 +60,13 @@ class NewMessage implements ShouldBroadcast
                 'is_audio' => $a->is_audio,
                 'icon' => $a->icon,
             ])->values()->all(),
+            'conversation' => [
+                'id' => $this->message->conversation_id,
+                'is_group' => (bool) $this->message->conversation?->is_group,
+                'title' => $this->message->conversation
+                    ? $this->message->conversation->displayTitleFor($this->message->user_id)
+                    : null,
+            ],
         ];
     }
 }
