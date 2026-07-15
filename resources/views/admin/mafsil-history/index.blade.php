@@ -234,6 +234,24 @@
         background: var(--primary-light);
         color: white;
     }
+    .btn-action.danger {
+        background: var(--danger);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    .btn-action.danger:hover {
+        background: #a82d22;
+        color: white;
+    }
+    .actions-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .actions-wrap form { display: inline; margin: 0; }
     .btn-reset {
         background: white;
         color: #6c7a89;
@@ -503,9 +521,18 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{{ route('admin.mafsil-history.show', $session) }}" class="btn-action view">
-                            <i class="fas fa-eye"></i> عرض
-                        </a>
+                        <div class="actions-wrap">
+                            <a href="{{ route('admin.mafsil-history.show', $session) }}" class="btn-action view">
+                                <i class="fas fa-eye"></i> عرض
+                            </a>
+                            <form action="{{ route('admin.mafsil-history.destroy', ['sessionId' => $session->id, 'source' => $source]) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا السجل؟ لا يمكن التراجع عن هذه العملية.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-action danger" title="حذف">
+                                    <i class="fas fa-trash-alt"></i> حذف
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

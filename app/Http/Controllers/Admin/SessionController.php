@@ -153,4 +153,23 @@ class SessionController extends Controller {
 
         return view('admin.mafsil-history.show', compact('session'));
     }
+
+    public function mafsilDestroy(Request $request, int $sessionId) {
+        $session = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->findOrFail($sessionId);
+
+        abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);
+
+        $session->delete();
+
+        $source = $request->input('source', 'all');
+        $allowed = ['all', 'public', 'supervised'];
+        if (!in_array($source, $allowed, true)) {
+            $source = 'all';
+        }
+
+        return redirect()
+            ->route('admin.mafsil-history.index', ['source' => $source])
+            ->with('success', 'تم حذف سجل اختبار الأجزاء بنجاح');
+    }
 }

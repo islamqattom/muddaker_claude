@@ -110,6 +110,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Mafil history (اختبار الأجزاء)
     Route::get('/mafsil-history', [Admin\SessionController::class, 'mafsilHistory'])->name('mafsil-history.index');
     Route::get('/mafsil-history/{sessionId}', [Admin\SessionController::class, 'mafsilShow'])->name('mafsil-history.show');
+    Route::delete('/mafsil-history/{sessionId}', [Admin\SessionController::class, 'mafsilDestroy'])->name('mafsil-history.destroy');
 
     // Warnings
     Route::resource('warnings', Admin\WarningController::class);
