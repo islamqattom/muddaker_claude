@@ -64,6 +64,16 @@
 }
 .task-modal .modal-title { color: #fff; font-weight: 700; }
 .task-modal .btn-close-white { filter: brightness(0) invert(1); }
+.task-modal .modal-content { max-height: 90vh; }
+.task-modal .modal-body {
+    max-height: calc(90vh - 140px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.task-modal .modal-body::-webkit-scrollbar { width: 8px; }
+.task-modal .modal-body::-webkit-scrollbar-track { background: #f1f3f5; border-radius: 4px; }
+.task-modal .modal-body::-webkit-scrollbar-thumb { background: #c4cdd5; border-radius: 4px; }
+.task-modal .modal-body::-webkit-scrollbar-thumb:hover { background: #182B48; }
 .form-control, .form-select {
     border-radius: 12px; border: 2px solid #e9ecef;
     padding: 12px 16px; transition: all 0.3s ease;
@@ -751,6 +761,13 @@
                 <button type="button" class="btn" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
+                <form id="deleteTaskForm" method="POST" action="/student/tasks/__TASK_ID__" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" id="deleteTaskBtn" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                        <i class="fas fa-trash"></i> حذف
+                    </button>
+                </form>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
             </div>
         </div>
@@ -885,6 +902,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 editBtn.setAttribute('data-task-props', JSON.stringify(props));
             }
 
+            var deleteForm = document.getElementById('deleteTaskForm');
+            if (deleteForm) {
+                deleteForm.action = '/student/tasks/' + task.id;
+            }
+
             new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
         },
         eventDidMount: function(info) {
@@ -1005,6 +1027,49 @@ document.addEventListener('DOMContentLoaded', function() {
             if (detailModal) detailModal.hide();
 
             openEditTaskModal(taskId, props);
+        });
+    }
+
+    var deleteBtn = document.getElementById('deleteTaskBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            if (!currentTaskId) {
+                alert('لم يتم تحديد المهمة');
+                return;
+            }
+            if (!confirm('هل أنت متأكد من حذف هذه المهمة؟ لا يمكن التراجع.')) return;
+            var form = document.getElementById('deleteTaskForm');
+            if (!form) return;
+            var url = '/student/tasks/' + currentTaskId;
+            var tokenInput = form.querySelector('input[name="_token"]');
+            var token = tokenInput ? tokenInput.value : '';
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                },
+                body: '_method=DELETE&_token=' + encodeURIComponent(token)
+            }).then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) { return { ok: r.ok, body: j }; }); })
+              .then(function(res) {
+                  if (res.ok && (res.body.success === undefined || res.body.success)) {
+                      var detailModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailModal'));
+                      if (detailModal) detailModal.hide();
+                      window.location.reload();
+                  } else {
+                      alert(res.body.message || 'فشل حذف المهمة');
+                      deleteBtn.disabled = false;
+                      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                  }
+              })
+              .catch(function() {
+                  alert('حدث خطأ في الاتصال');
+                  deleteBtn.disabled = false;
+                  deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+              });
         });
     }
 
