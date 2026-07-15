@@ -99,6 +99,11 @@ class User extends Authenticatable
         return $this->notifications()->where('is_read', false)->count();
     }
 
+    public function unreadNonChatNotificationsCount(): int
+    {
+        return $this->notifications()->where('is_read', false)->where('type', '!=', 'message')->count();
+    }
+
     public function pushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PushSubscription::class);

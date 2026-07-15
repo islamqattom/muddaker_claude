@@ -3003,7 +3003,7 @@
                 <div class="dropdown">
                     <div class="notification-bell" data-bs-toggle="dropdown" id="notifBell">
                         <i class="fas fa-bell"></i>
-                        @php $notifCount = auth()->user()->unreadNotificationsCount(); @endphp
+                        @php $notifCount = auth()->user()->unreadNonChatNotificationsCount(); @endphp
                         @if($notifCount > 0)
                             <span class="notification-badge" id="notifBadge">{{ $notifCount }}</span>
                         @endif
@@ -3025,7 +3025,7 @@
                             @endif
                         </div>
                         <div class="notif-list">
-                            @forelse(auth()->user()->notifications()->latest()->take(10)->get() as $notif)
+                            @forelse(auth()->user()->notifications()->nonChat()->latest()->take(10)->get() as $notif)
                                 <a href="{{ $notif->link ?? ($notif->is_read ? '#' : route('notifications.markAsRead', $notif->id)) }}"
                                    class="notif-item {{ !$notif->is_read ? 'unread' : '' }} mark-as-read-header"
                                    data-notif-id="{{ $notif->id }}"

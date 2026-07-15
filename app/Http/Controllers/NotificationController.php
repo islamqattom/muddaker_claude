@@ -43,7 +43,7 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
-        $request->user()->notifications()->where('is_read', false)->update(['is_read' => true]);
+        $request->user()->notifications()->nonChat()->where('is_read', false)->update(['is_read' => true]);
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true]);
@@ -54,7 +54,7 @@ class NotificationController extends Controller
 
     public function unreadCount(Request $request): \Illuminate\Http\JsonResponse
     {
-        $count = $request->user()->notifications()->where('is_read', false)->count();
+        $count = $request->user()->notifications()->nonChat()->where('is_read', false)->count();
         return response()->json(['count' => $count]);
     }
 }

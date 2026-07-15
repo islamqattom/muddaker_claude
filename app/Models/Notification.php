@@ -41,4 +41,9 @@ class Notification extends Model
     {
         return $this->belongsTo(Message::class, 'message_id');
     }
+
+    public function scopeNonChat($query)
+    {
+        return $query->where('type', '!=', 'message');
+    }
 }
