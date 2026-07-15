@@ -64,10 +64,21 @@
         <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'إنشاء ومتابعة البرامج الإيمانية للطلاب' }}</p>
     </div>
     @if($scope === 'self' || $student)
-        <div style="margin-right:auto;">
+        <div style="margin-right:auto;display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{{ route('admin.iman-program.bulk-assign') }}"
+               style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 18px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                <i class="fas fa-bullhorn"></i> تعيين جماعي
+            </a>
             <a href="{{ $scope === 'self' ? route('admin.iman-program.create', ['scope' => 'self']) : route('admin.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
                style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                 <i class="fas fa-plus-circle"></i> برنامج جديد
+            </a>
+        </div>
+    @else
+        <div style="margin-right:auto;">
+            <a href="{{ route('admin.iman-program.bulk-assign') }}"
+               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                <i class="fas fa-bullhorn"></i> تعيين جماعي
             </a>
         </div>
     @endif

@@ -251,14 +251,34 @@ document.querySelectorAll('.number-cell').forEach(function (input) {
 document.querySelectorAll('.save-table-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
         document.querySelectorAll('.save-table-btn').forEach(function (b) { b.classList.add('is-saving'); });
-        const inputs = document.querySelectorAll('.number-cell');
-        inputs.forEach(function (input) {
+        const requests = [];
+        document.querySelectorAll('.number-cell').forEach(function (input) {
             clearTimeout(input._saveTimer);
             const td = input.closest('td');
             const data = { criterion_id: td.dataset.criterion, date: td.dataset.date, value: parseInt(input.value || 0, 10) };
-            fetch(input.dataset.url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }, body: JSON.stringify(data), keepalive: true }).catch(() => {});
+            requests.push(
+                fetch(input.dataset.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: JSON.stringify(data),
+                    keepalive: true,
+                }).catch(() => {})
+            );
         });
-        location.reload();
+        document.querySelectorAll('.check-cell').forEach(function (cbtn) {
+            const td = cbtn.closest('td');
+            const data = { criterion_id: td.dataset.criterion, date: td.dataset.date, is_checked: cbtn.classList.contains('is-checked') };
+            requests.push(
+                fetch(cbtn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: JSON.stringify(data),
+                    keepalive: true,
+                }).catch(() => {})
+            );
+        });
+        if (requests.length === 0) { location.reload(); return; }
+        Promise.all(requests).finally(function () { location.reload(); });
     });
 });
 </script>

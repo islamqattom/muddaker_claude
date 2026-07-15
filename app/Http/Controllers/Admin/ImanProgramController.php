@@ -336,6 +336,109 @@ class ImanProgramController extends Controller
         return view('admin.iman-program.student-report', $data);
     }
 
+    public function bulkAssign(Request $request)
+    {
+        $oldCriteria = old('criteria');
+        $items = $oldCriteria !== null
+            ? collect($oldCriteria)
+            : collect([['name' => '', 'type' => 'check', 'target_value' => null]]);
+
+        $students = Student::with('user')->orderBy('id')->get();
+        $supervisors = User::where('role', 'supervisor')->orderBy('id')->get();
+
+        return view('admin.iman-program.bulk-assign', [
+            'items' => $items,
+            'students' => $students,
+            'supervisors' => $supervisors,
+            'old' => $request->old(),
+        ]);
+    }
+
+    public function bulkStore(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'start_date' => 'nullable|date',
+            'criteria' => 'nullable|array|min:1',
+            'criteria.*.name' => 'required_with:criteria.*|string|max:255',
+            'criteria.*.type' => 'required_with:criteria.*|in:check,number',
+            'criteria.*.target_value' => 'nullable|integer|min:0',
+            'all_students' => 'sometimes|boolean',
+            'student_ids' => 'sometimes|array',
+            'student_ids.*' => 'integer|exists:students,id',
+            'all_supervisors' => 'sometimes|boolean',
+            'supervisor_ids' => 'sometimes|array',
+            'supervisor_ids.*' => 'integer|exists:users,id',
+        ]);
+
+        $studentMorph = (new Student)->getMorphClass();
+        $userMorph = (new User)->getMorphClass();
+
+        $ownerIds = [];
+
+        if ($request->boolean('all_students')) {
+            $ownerIds[] = [Student::pluck('id')->all(), $studentMorph];
+        } elseif ($request->filled('student_ids')) {
+            $ownerIds[] = [array_map('intval', (array) $request->input('student_ids')), $studentMorph];
+        }
+
+        if ($request->boolean('all_supervisors')) {
+            $ownerIds[] = [User::where('role', 'supervisor')->pluck('id')->all(), $userMorph];
+        } elseif ($request->filled('supervisor_ids')) {
+            $ownerIds[] = [array_map('intval', (array) $request->input('supervisor_ids')), $userMorph];
+        }
+
+        $targets = [];
+        foreach ($ownerIds as [$ids, $type]) {
+            foreach ($ids as $id) {
+                $targets[] = ['id' => (int) $id, 'type' => $type];
+            }
+        }
+
+        $targets = collect($targets)->unique(fn ($t) => $t['type'] . '|' . $t['id'])->values();
+
+        if ($targets->isEmpty()) {
+            return back()->withErrors(['targets' => 'يجب اختيار طالب واحد على الأقل أو مشرف لتعيين البرنامج له.'])->withInput();
+        }
+
+        $created = 0;
+        $skipped = 0;
+
+        DB::transaction(function () use ($data, $targets, &$created, &$skipped) {
+            foreach ($targets as $target) {
+                $exists = ImanProgram::where('owner_id', $target['id'])
+                    ->where('owner_type', $target['type'])
+                    ->where('name', $data['name'])
+                    ->exists();
+                if ($exists) {
+                    $skipped++;
+                    continue;
+                }
+
+                $program = ImanProgram::create([
+                    'name' => $data['name'],
+                    'description' => $data['description'] ?? null,
+                    'created_by' => auth()->id(),
+                    'owner_id' => $target['id'],
+                    'owner_type' => $target['type'],
+                    'is_active' => true,
+                    'start_date' => $data['start_date'] ?? null,
+                ]);
+
+                $this->syncCriteria($program, $data['criteria'] ?? []);
+                $created++;
+            }
+        });
+
+        $msg = "تم إنشاء البرنامج بنجاح لـ {$created} مستخدم";
+        if ($skipped > 0) {
+            $msg .= " (تم تخطي {$skipped} لوجود برنامج بنفس الاسم)";
+        }
+
+        return redirect()->route('admin.iman-program.bulk-assign')->with('success', $msg);
+    }
+
     protected function resolveOwner(Request $request)
     {
         $scope = $request->get('scope', 'self');
