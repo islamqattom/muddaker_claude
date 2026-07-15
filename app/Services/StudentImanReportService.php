@@ -27,6 +27,8 @@ class StudentImanReportService
         $entriesByProgram = [];
         $criteriaStats = [];
 
+        $totalCriteria = max(1, $programs->sum(fn ($p) => $p->criteria->count()));
+
         foreach ($programs as $program) {
             $entries = ImanDailyEntry::where('iman_program_id', $program->id)
                 ->whereBetween('entry_date', [$fromDate->toDateString(), $toDate->toDateString()])
@@ -50,10 +52,11 @@ class StudentImanReportService
                     }
                 }
 
-                $expected = max(1, $fromDate->diffInDays($toDate) + 1);
                 $completion = $criterion->isCheckType()
-                    ? min(100, round(($checked / $expected) * 100))
-                    : ($criterion->target_value ? min(100, round(($valueSum / max(1, $criterion->target_value * $expected)) * 100)) : 0);
+                    ? min(100, round(($checked / $totalCriteria) * 100))
+                    : ($criterion->target_value
+                        ? min(100, round(($valueSum / ($criterion->target_value * $totalCriteria)) * 100))
+                        : 0);
 
                 $criteriaStats[$program->id][$criterion->id] = [
                     'name' => $criterion->name,

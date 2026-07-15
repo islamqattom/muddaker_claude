@@ -201,6 +201,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::post('/', [Admin\ImanProgramController::class, 'store'])->name('store');
         Route::get('/bulk-assign', [Admin\ImanProgramController::class, 'bulkAssign'])->name('bulk-assign');
         Route::post('/bulk-assign', [Admin\ImanProgramController::class, 'bulkStore'])->name('bulk-store');
+        Route::get('/bulk-assign/load/{program}', [Admin\ImanProgramController::class, 'loadProgram'])->name('bulk-load');
         Route::get('/{program}/edit', [Admin\ImanProgramController::class, 'edit'])->name('edit');
         Route::put('/{program}', [Admin\ImanProgramController::class, 'update'])->name('update');
         Route::delete('/{program}', [Admin\ImanProgramController::class, 'destroy'])->name('destroy');

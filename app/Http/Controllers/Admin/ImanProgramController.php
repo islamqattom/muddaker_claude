@@ -346,31 +346,113 @@ class ImanProgramController extends Controller
         $students = Student::with('user')->orderBy('id')->get();
         $supervisors = User::where('role', 'supervisor')->orderBy('id')->get();
 
+        $existingPrograms = ImanProgram::query()
+            ->select('id', 'name', 'description', 'start_date')
+            ->orderBy('name')
+            ->orderByDesc('id')
+            ->get()
+            ->groupBy('name')
+            ->map(function ($group, $name) {
+                $first = $group->first();
+                return (object) [
+                    'id' => $first->id,
+                    'name' => $name,
+                    'description' => $first->description,
+                    'start_date' => $first->start_date ? $first->start_date->format('Y-m-d') : null,
+                    'owners_count' => $group->count(),
+                    'criteria_count' => \App\Models\ImanCriterion::whereIn('iman_program_id', $group->pluck('id'))->count(),
+                ];
+            })
+            ->values();
+
         return view('admin.iman-program.bulk-assign', [
             'items' => $items,
             'students' => $students,
             'supervisors' => $supervisors,
+            'existingPrograms' => $existingPrograms,
             'old' => $request->old(),
+        ]);
+    }
+
+    public function loadProgram(ImanProgram $program)
+    {
+        $program->load('criteria');
+        $programs = ImanProgram::where('name', $program->name)->get();
+        $studentMorph = (new Student)->getMorphClass();
+        $userMorph = (new User)->getMorphClass();
+
+        $studentIds = $programs->where('owner_type', $studentMorph)->pluck('owner_id');
+        $userIds = $programs->where('owner_type', $userMorph)->pluck('owner_id');
+
+        $students = Student::with('user')->whereIn('id', $studentIds)->get()
+            ->map(fn ($s) => ['id' => $s->id, 'name' => $s->user->name ?? '—', 'type' => 'student']);
+        $supervisors = User::whereIn('id', $userIds)->get()
+            ->map(fn ($u) => ['id' => $u->id, 'name' => $u->name, 'type' => 'user']);
+
+        $owners = $students->merge($supervisors)->values();
+
+        return response()->json([
+            'id' => $program->id,
+            'name' => $program->name,
+            'description' => $program->description,
+            'start_date' => $program->start_date ? $program->start_date->format('Y-m-d') : null,
+            'criteria' => $program->criteria->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'type' => $c->type,
+                'target_value' => $c->target_value,
+            ])->values(),
+            'owners_count' => $programs->count(),
+            'owners' => $owners,
         ]);
     }
 
     public function bulkStore(Request $request)
     {
-        $data = $request->validate([
+        $mode = $request->input('mode', 'create');
+
+        $rules = [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
             'start_date' => 'nullable|date',
-            'criteria' => 'nullable|array|min:1',
-            'criteria.*.name' => 'required_with:criteria.*|string|max:255',
-            'criteria.*.type' => 'required_with:criteria.*|in:check,number',
-            'criteria.*.target_value' => 'nullable|integer|min:0',
-            'all_students' => 'sometimes|boolean',
-            'student_ids' => 'sometimes|array',
-            'student_ids.*' => 'integer|exists:students,id',
-            'all_supervisors' => 'sometimes|boolean',
-            'supervisor_ids' => 'sometimes|array',
-            'supervisor_ids.*' => 'integer|exists:users,id',
-        ]);
+        ];
+
+        if ($mode === 'delete') {
+            $rules['criteria'] = 'nullable';
+        } else {
+            $rules += [
+                'criteria' => 'nullable|array|min:1',
+                'criteria.*.name' => 'required_with:criteria.*|string|max:255',
+                'criteria.*.type' => 'required_with:criteria.*|in:check,number',
+                'criteria.*.target_value' => 'nullable|integer|min:0',
+            ];
+        }
+
+        if ($mode === 'create') {
+            $rules += [
+                'all_students' => 'sometimes|boolean',
+                'student_ids' => 'sometimes|array',
+                'student_ids.*' => 'integer|exists:students,id',
+                'all_supervisors' => 'sometimes|boolean',
+                'supervisor_ids' => 'sometimes|array',
+                'supervisor_ids.*' => 'integer|exists:users,id',
+            ];
+        } else {
+            $rules += [
+                'source_program_id' => 'required|integer|exists:iman_programs,id',
+                'confirm_delete' => 'sometimes|boolean',
+            ];
+        }
+
+        $data = $request->validate($rules);
+
+        if ($mode === 'edit') {
+            return $this->bulkUpdate($request, $data);
+        }
+
+        if ($mode === 'delete') {
+            return $this->bulkDelete($request, $data);
+        }
 
         $studentMorph = (new Student)->getMorphClass();
         $userMorph = (new User)->getMorphClass();
@@ -437,6 +519,59 @@ class ImanProgramController extends Controller
         }
 
         return redirect()->route('admin.iman-program.bulk-assign')->with('success', $msg);
+    }
+
+    protected function bulkUpdate(Request $request, array $data)
+    {
+        $source = ImanProgram::with('criteria')->findOrFail($data['source_program_id']);
+
+        $programs = ImanProgram::where('name', $source->name)->get();
+
+        if ($programs->isEmpty()) {
+            return back()->withErrors(['source_program_id' => 'لم يتم العثور على برامج بهذا الاسم.'])->withInput();
+        }
+
+        $updated = 0;
+        $skipped = 0;
+
+        DB::transaction(function () use ($data, $programs, &$updated, &$skipped) {
+            foreach ($programs as $program) {
+                $program->update([
+                    'name' => $data['name'],
+                    'description' => $data['description'] ?? null,
+                    'start_date' => $data['start_date'] ?? null,
+                ]);
+                $this->syncCriteria($program, $data['criteria'] ?? []);
+                $updated++;
+            }
+        });
+
+        $msg = "تم تحديث معايير برنامج «{$source->name}» لـ {$updated} مستخدم";
+        return redirect()->route('admin.iman-program.bulk-assign', ['mode' => 'edit', 'program' => $source->id])->with('success', $msg);
+    }
+
+    protected function bulkDelete(Request $request, array $data)
+    {
+        if (! $request->boolean('confirm_delete')) {
+            return back()->withErrors(['confirm_delete' => 'يجب تأكيد الحذف قبل المتابعة.'])->withInput();
+        }
+
+        $source = ImanProgram::findOrFail($data['source_program_id']);
+        $programName = $source->name;
+
+        $programs = ImanProgram::where('name', $programName)->get();
+        $programIds = $programs->pluck('id');
+
+        $deleted = DB::transaction(function () use ($programIds) {
+            $count = $programIds->count();
+            ImanDailyEntry::whereIn('iman_program_id', $programIds)->delete();
+            ImanCriterion::whereIn('iman_program_id', $programIds)->delete();
+            ImanProgram::whereIn('id', $programIds)->delete();
+            return $count;
+        });
+
+        $msg = "تم حذف برنامج «{$programName}» من {$deleted} مستخدم (مع جميع المعايير والإدخالات)";
+        return redirect()->route('admin.iman-program.bulk-assign', ['mode' => 'delete'])->with('success', $msg);
     }
 
     protected function resolveOwner(Request $request)
