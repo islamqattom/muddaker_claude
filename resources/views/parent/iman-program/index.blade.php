@@ -107,6 +107,7 @@
             :week-dates="$weekDates"
             :entries="$entries"
             :today="$today"
+            :edit-route="route('parent.iman-program.show', $program)"
             :can-manage="false"
             :can-edit="false" />
     @empty
