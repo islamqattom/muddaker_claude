@@ -57,6 +57,15 @@
     gap: 10px; align-items: center; margin-bottom: 10px;
     padding: 10px; border-radius: 12px; background: #f8f9fc;
 }
+.iman-form-page .criterion-row .form-control { min-width: 0; }
+@media (max-width: 768px) {
+    .iman-form-page .criterion-row { grid-template-columns: 1fr auto; gap: 10px; padding: 12px; }
+    .iman-form-page .criterion-row > input[type="text"] { grid-column: 1 / -1; width: 100%; font-size: 16px; padding: 12px 14px; }
+    .iman-form-page .criterion-row > .target-input { grid-column: 1 / -1; width: 100%; font-size: 16px; padding: 12px 14px; }
+    .iman-form-page .criterion-row .type-select { grid-column: 1 / 2; width: 100%; flex-wrap: wrap; }
+    .iman-form-page .criterion-row .type-select label { flex: 1 1 0; justify-content: center; padding: 10px 8px; }
+    .iman-form-page .criterion-row .remove-btn { grid-column: 2 / 3; height: 42px; align-self: center; }
+}
 .iman-form-page .criterion-row .remove-btn {
     background: rgba(192,57,43,0.1); color: var(--danger); border: none;
     width: 40px; height: 40px; border-radius: 10px; cursor: pointer;
@@ -87,6 +96,14 @@
 
 .iman-form-page .form-actions {
     display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;
+    flex-wrap: wrap;
+}
+@media (max-width: 576px) {
+    .iman-form-page .form-actions { justify-content: stretch; }
+    .iman-form-page .form-actions .btn-gold,
+    .iman-form-page .form-actions .btn-cancel { flex: 1; text-align: center; }
+    .iman-form-page .form-card { padding: 16px; }
+    .iman-form-page .page-hero { padding: 18px; }
 }
 .iman-form-page .btn-gold {
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
