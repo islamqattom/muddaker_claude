@@ -127,7 +127,7 @@ class ImanProgramController extends Controller
 
         $data = $this->validateProgram($request);
 
-        DB::transaction(function () use ($program, $data) {
+        DB::transaction(function () use ($program, $data, $request) {
             $program->update([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
