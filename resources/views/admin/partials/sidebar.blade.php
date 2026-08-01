@@ -21,6 +21,10 @@
     <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
     <span>تقويم المهام</span>
 </a>
+<a href="{{ route('admin.subjects.index') }}" class="nav-link {{ request()->routeIs('admin.subjects.*') || request()->routeIs('admin.lessons.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book-reader"></i></div>
+    <span>المواد والدروس</span>
+</a>
 
 <span class="nav-section-title">إدارة المستخدمين</span>
 <a href="{{ route('admin.supervisors.index') }}" class="nav-link {{ request()->routeIs('admin.supervisors.*') ? 'active' : '' }}">

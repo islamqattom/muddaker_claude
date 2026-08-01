@@ -13,6 +13,10 @@
     <div class="icon-wrapper"><i class="fas fa-calendar-alt"></i></div>
     <span>تقويم المهام</span>
 </a>
+<a href="{{ route('supervisor.subjects.index') }}" class="nav-link {{ request()->routeIs('supervisor.subjects.*') || request()->routeIs('supervisor.lessons.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-book-reader"></i></div>
+    <span>المواد والدروس</span>
+</a>
 <a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
     <span>المحادثات</span>
