@@ -163,18 +163,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     });
 
     // Subjects & Lessons (المواد والدروس)
-    Route::resource('subjects', Admin\SubjectController::class);
-    Route::get('subjects/{subject}/calendar', [Admin\SubjectController::class, 'calendar'])->name('subjects.calendar');
-    Route::get('subjects/{subject}/feed', [Admin\SubjectController::class, 'feed'])->name('subjects.feed');
-    Route::get('subjects/{subject}/lessons/create', [Admin\LessonController::class, 'create'])->name('lessons.create');
-    Route::post('subjects/{subject}/lessons', [Admin\LessonController::class, 'store'])->name('lessons.store');
-    Route::get('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'show'])->name('lessons.show');
-    Route::get('subjects/{subject}/lessons/{lesson}/edit', [Admin\LessonController::class, 'edit'])->name('lessons.edit');
-    Route::put('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'update'])->name('lessons.update');
-    Route::put('subjects/{subject}/lessons/{lesson}/status', [Admin\LessonController::class, 'updateStatus'])->name('lessons.updateStatus');
-    Route::delete('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
-    Route::get('subjects/{subject}/lessons-template', [Admin\LessonController::class, 'downloadTemplate'])->name('lessons.template');
-    Route::post('subjects/{subject}/lessons-import', [Admin\LessonController::class, 'import'])->name('lessons.import');
+    // (routes moved to shared group at the end of this file so that
+    // both admins and supervisors can access them via /admin/subjects
+    // and /supervisor/subjects)
 
     // Audit Logs
     Route::resource('audit-logs', Admin\AuditLogController::class)->only(['index', 'show']);
@@ -327,19 +318,9 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::delete('/tasks/{task}', [Supervisor\TaskController::class, 'destroy'])->name('tasks.destroy');
 
     // Subjects & Lessons (المواد والدروس)
-    Route::resource('subjects', Supervisor\SubjectController::class)->except(['index']);
-    Route::get('/subjects', [Supervisor\SubjectController::class, 'index'])->name('subjects.index');
-    Route::get('subjects/{subject}/calendar', [Supervisor\SubjectController::class, 'calendar'])->name('subjects.calendar');
-    Route::get('subjects/{subject}/feed', [Supervisor\SubjectController::class, 'feed'])->name('subjects.feed');
-    Route::get('subjects/{subject}/lessons/create', [Supervisor\LessonController::class, 'create'])->name('lessons.create');
-    Route::post('subjects/{subject}/lessons', [Supervisor\LessonController::class, 'store'])->name('lessons.store');
-    Route::get('subjects/{subject}/lessons/{lesson}', [Supervisor\LessonController::class, 'show'])->name('lessons.show');
-    Route::get('subjects/{subject}/lessons/{lesson}/edit', [Supervisor\LessonController::class, 'edit'])->name('lessons.edit');
-    Route::put('subjects/{subject}/lessons/{lesson}', [Supervisor\LessonController::class, 'update'])->name('lessons.update');
-    Route::put('subjects/{subject}/lessons/{lesson}/status', [Supervisor\LessonController::class, 'updateStatus'])->name('lessons.updateStatus');
-    Route::delete('subjects/{subject}/lessons/{lesson}', [Supervisor\LessonController::class, 'destroy'])->name('lessons.destroy');
-    Route::get('subjects/{subject}/lessons-template', [Supervisor\LessonController::class, 'downloadTemplate'])->name('lessons.template');
-    Route::post('subjects/{subject}/lessons-import', [Supervisor\LessonController::class, 'import'])->name('lessons.import');
+    // (routes moved to shared group at the end of this file so that
+    // both admins and supervisors can access them via /admin/subjects
+    // and /supervisor/subjects)
 
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [Supervisor\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');
@@ -540,3 +521,24 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     // Billing
     Route::get('/billing', [ParentPortal\BillingController::class, 'index'])->name('billing');
 });
+
+// ============================
+// SHARED SUBJECTS & LESSONS ROUTES
+// (accessible to both admins and supervisors)
+// ============================
+foreach (['admin', 'supervisor'] as $prefix) {
+    Route::prefix($prefix)->name($prefix . '.')->middleware(['auth', 'role:admin,supervisor'])->group(function () {
+        Route::resource('subjects', Admin\SubjectController::class);
+        Route::get('subjects/{subject}/calendar', [Admin\SubjectController::class, 'calendar'])->name('subjects.calendar');
+        Route::get('subjects/{subject}/feed', [Admin\SubjectController::class, 'feed'])->name('subjects.feed');
+        Route::get('subjects/{subject}/lessons/create', [Admin\LessonController::class, 'create'])->name('lessons.create');
+        Route::post('subjects/{subject}/lessons', [Admin\LessonController::class, 'store'])->name('lessons.store');
+        Route::get('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'show'])->name('lessons.show');
+        Route::get('subjects/{subject}/lessons/{lesson}/edit', [Admin\LessonController::class, 'edit'])->name('lessons.edit');
+        Route::put('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'update'])->name('lessons.update');
+        Route::put('subjects/{subject}/lessons/{lesson}/status', [Admin\LessonController::class, 'updateStatus'])->name('lessons.updateStatus');
+        Route::delete('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
+        Route::get('subjects/{subject}/lessons-template', [Admin\LessonController::class, 'downloadTemplate'])->name('lessons.template');
+        Route::post('subjects/{subject}/lessons-import', [Admin\LessonController::class, 'import'])->name('lessons.import');
+    });
+}
