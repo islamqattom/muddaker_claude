@@ -157,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
     calendar.render();
 });
 
+const rolePrefix = @json($role);
+
 function showLessonDetails(props, lessonId) {
     const statusBadge = `<span class="status-badge ${props.isOverdue ? 'overdue' : props.status}">${props.isOverdue ? 'متأخر' : props.statusLabel}</span>`;
     const timeRange = (props.startTime ? props.startTime : '-') + (props.endTime ? ' - ' + props.endTime : '');
@@ -205,10 +207,10 @@ function showLessonDetails(props, lessonId) {
 
     const subjectId = props.subjectId;
     let footer = `
-        <a href="/${role}/subjects/${subjectId}/lessons/${lessonId}" class="btn" style="background: #3498db; color: #fff; border-radius: 10px;">
+        <a href="/${rolePrefix}/subjects/${subjectId}/lessons/${lessonId}" class="btn" style="background: #3498db; color: #fff; border-radius: 10px;">
             <i class="fas fa-eye ms-1"></i> عرض كامل
         </a>
-        <a href="/${role}/subjects/${subjectId}/lessons/${lessonId}/edit" class="btn" style="background: #8e44ad; color: #fff; border-radius: 10px;">
+        <a href="/${rolePrefix}/subjects/${subjectId}/lessons/${lessonId}/edit" class="btn" style="background: #8e44ad; color: #fff; border-radius: 10px;">
             <i class="fas fa-edit ms-1"></i> تعديل
         </a>
     `;
@@ -230,7 +232,7 @@ function showLessonDetails(props, lessonId) {
 }
 
 function setLessonStatus(subjectId, lessonId, status) {
-    const url = `/${role}/subjects/${subjectId}/lessons/${lessonId}/status`;
+    const url = `/${rolePrefix}/subjects/${subjectId}/lessons/${lessonId}/status`;
     fetch(url, {
         method: 'PUT',
         headers: {

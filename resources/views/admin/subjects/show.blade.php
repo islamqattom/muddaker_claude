@@ -262,8 +262,9 @@
 
 @push('scripts')
 <script>
+const rolePrefix = @json($role);
 function toggleLessonStatus(subjectId, lessonId, status, btn) {
-    const url = `/${role}/subjects/${subjectId}/lessons/${lessonId}/status`;
+    const url = `/${rolePrefix}/subjects/${subjectId}/lessons/${lessonId}/status`;
     fetch(url, {
         method: 'PUT',
         headers: {
@@ -295,7 +296,7 @@ function deleteLesson(subjectId, lessonId, name) {
         if (result.isConfirmed) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `/${role}/subjects/${subjectId}/lessons/${lessonId}`;
+            form.action = `/${rolePrefix}/subjects/${subjectId}/lessons/${lessonId}`;
             form.innerHTML = `@csrf @method('DELETE')`;
             document.body.appendChild(form);
             form.submit();

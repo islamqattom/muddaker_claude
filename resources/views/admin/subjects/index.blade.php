@@ -369,6 +369,7 @@
 
 @push('scripts')
 <script>
+const rolePrefix = @json($role);
 function deleteSubject(id, name) {
     Swal.fire({
         title: 'تأكيد الحذف',
@@ -383,7 +384,7 @@ function deleteSubject(id, name) {
         if (result.isConfirmed) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `/${role}/subjects/${id}`;
+            form.action = `/${rolePrefix}/subjects/${id}`;
             form.innerHTML = `@csrf @method('DELETE')`;
             document.body.appendChild(form);
             form.submit();
