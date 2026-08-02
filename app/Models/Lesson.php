@@ -33,6 +33,7 @@ class Lesson extends Model
         'end_time',
         'status',
         'notes',
+        'sort_order',
         'completed_at',
     ];
 

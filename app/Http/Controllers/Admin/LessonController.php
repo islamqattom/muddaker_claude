@@ -43,6 +43,7 @@ class LessonController extends Controller
             return $this->errorResponse($request, 'الحد الأقصى للتكرار 60 أسبوعاً');
         }
 
+        $nextOrder = (int) Lesson::where('subject_id', $subject->id)->max('sort_order') + 1;
         $created = [];
         foreach ($dates as $date) {
             $created[] = Lesson::create([
@@ -55,6 +56,7 @@ class LessonController extends Controller
                 'end_time' => $validated['end_time'] ?? null,
                 'notes' => $validated['notes'] ?? null,
                 'status' => $status,
+                'sort_order' => $nextOrder++,
                 'completed_at' => $status === 'completed' ? now() : null,
             ]);
         }

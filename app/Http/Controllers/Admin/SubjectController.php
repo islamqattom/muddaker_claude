@@ -107,7 +107,10 @@ class SubjectController extends Controller
             },
         ]);
 
-        $query = $subject->lessons()->orderBy('lesson_date')->orderBy('start_time');
+        $query = $subject->lessons()
+            ->orderBy('sort_order')
+            ->orderBy('lesson_date')
+            ->orderBy('start_time');
 
         if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
@@ -177,7 +180,11 @@ class SubjectController extends Controller
     {
         $this->authorizeAccess($subject);
 
-        $lessons = $subject->lessons()->orderBy('lesson_date')->get();
+        $lessons = $subject->lessons()
+            ->orderBy('sort_order')
+            ->orderBy('lesson_date')
+            ->orderBy('start_time')
+            ->get();
         $events = $lessons->map(fn($l) => $l->toCalendarEvent($subject));
 
         return view('admin.subjects.calendar', [
@@ -190,7 +197,11 @@ class SubjectController extends Controller
     {
         $this->authorizeAccess($subject);
 
-        $lessons = $subject->lessons()->orderBy('lesson_date')->get();
+        $lessons = $subject->lessons()
+            ->orderBy('sort_order')
+            ->orderBy('lesson_date')
+            ->orderBy('start_time')
+            ->get();
         return response()->json($lessons->map(fn($l) => $l->toCalendarEvent($subject)));
     }
 

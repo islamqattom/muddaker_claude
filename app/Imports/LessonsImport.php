@@ -21,9 +21,11 @@ class LessonsImport implements ToCollection, WithStartRow, WithChunkReading, Wit
     public int $createdCount = 0;
     public int $skippedCount = 0;
     public array $errors = [];
+    protected int $nextOrder = 0;
 
     public function __construct(public Subject $subject)
     {
+        $this->nextOrder = (int) Lesson::where('subject_id', $subject->id)->max('sort_order') + 1;
     }
 
     public function startRow(): int
@@ -133,6 +135,7 @@ class LessonsImport implements ToCollection, WithStartRow, WithChunkReading, Wit
                     'end_time' => $endTimeFormatted,
                     'status' => $status,
                     'notes' => $notes ?: null,
+                    'sort_order' => $this->nextOrder++,
                     'completed_at' => $status === 'completed' ? now() : null,
                 ]);
                 $this->createdCount++;
