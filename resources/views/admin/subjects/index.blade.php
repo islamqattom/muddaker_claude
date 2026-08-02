@@ -383,7 +383,7 @@ function deleteSubject(id, name) {
         if (result.isConfirmed) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `{{ url('/' . $role) }}/subjects/${id}`;
+            form.action = `/${role}/subjects/${id}`;
             form.innerHTML = `@csrf @method('DELETE')`;
             document.body.appendChild(form);
             form.submit();

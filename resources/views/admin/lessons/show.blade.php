@@ -152,7 +152,7 @@
 @push('scripts')
 <script>
 function setStatus(status) {
-    const url = `{{ url('/' . $role) }}/subjects/{{ $subject->id }}/lessons/{{ $lesson->id }}/status`;
+    const url = `/${role}/subjects/{{ $subject->id }}/lessons/{{ $lesson->id }}/status`;
     fetch(url, {
         method: 'PUT',
         headers: {
@@ -182,7 +182,7 @@ function deleteLesson() {
         if (result.isConfirmed) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `{{ url('/' . $role) }}/subjects/{{ $subject->id }}/lessons/{{ $lesson->id }}`;
+            form.action = `/${role}/subjects/{{ $subject->id }}/lessons/{{ $lesson->id }}`;
             form.innerHTML = `@csrf @method('DELETE')`;
             document.body.appendChild(form);
             form.submit();
