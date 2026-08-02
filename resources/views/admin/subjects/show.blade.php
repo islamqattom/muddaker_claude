@@ -125,6 +125,12 @@
             <a href="{{ route($role . '.subjects.calendar', $subject->id) }}" class="btn btn-primary" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); color: #fff;">
                 <i class="fas fa-calendar-alt ms-1"></i> التقويم
             </a>
+            <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background: #16a085; color: #fff;">
+                <i class="fas fa-file-excel ms-1"></i> تنزيل قالب
+            </a>
+            <button type="button" class="btn" style="background: #f39c12; color: #fff;" onclick="document.getElementById('importModal').classList.add('show');document.getElementById('importModal').style.display='block';">
+                <i class="fas fa-file-upload ms-1"></i> استيراد من Excel
+            </button>
             <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background: {{ $subject->color }}; color: #fff;">
                 <i class="fas fa-plus-circle ms-1"></i> إضافة درس
             </a>
@@ -297,4 +303,72 @@ function deleteLesson(subjectId, lessonId, name) {
     });
 }
 </script>
+
+<div class="modal fade" id="importModal" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: #fff; border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title" style="color: #fff; font-weight: 700;"><i class="fas fa-file-excel ms-2"></i> استيراد دروس من ملف Excel</h5>
+                <button type="button" class="btn-close btn-close-white" onclick="document.getElementById('importModal').classList.remove('show');document.getElementById('importModal').style.display='none';"></button>
+            </div>
+            <form method="POST" action="{{ route($role . '.lessons.import', $subject->id) }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body" style="padding: 24px;">
+                    <div class="alert" style="background: rgba(212,160,48,0.10); border: 1px dashed #d4a030; border-radius: 12px; padding: 16px; color: #182B48;">
+                        <h6 style="font-weight: 800; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> إرشادات الاستيراد</h6>
+                        <ol style="margin: 0; padding-right: 18px; line-height: 1.9; font-size: 13px;">
+                            <li>قم بتنزيل القالب أولاً من زر <strong>"تنزيل قالب"</strong>.</li>
+                            <li>القالب يحتوي على العناوين التالية: العنوان، المحتوى، التاريخ، وقت البداية، وقت النهاية، الحالة، الملاحظات.</li>
+                            <li>الحقل الوحيد الإلزامي هو <strong>العنوان</strong>، البقية اختيارية.</li>
+                            <li>صيغة التاريخ: <code>YYYY-MM-DD</code> (مثال: 2026-08-15).</li>
+                            <li>صيغة الوقت: <code>HH:MM</code> (مثال: 08:30).</li>
+                            <li>الحالة تكون إحدى القيم: <code>pending</code> (لم يتم) أو <code>completed</code> (تم) أو <code>cancelled</code> (ملغى).</li>
+                            <li>الحد الأقصى: 10 ميجابايت.</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background: #16a085; color: #fff; border-radius: 10px;">
+                            <i class="fas fa-download ms-1"></i> تنزيل القالب
+                        </a>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label" style="color: #182B48; font-weight: 700;">اختر ملف Excel</label>
+                        <input type="file" name="file" accept=".xlsx,.xls,.csv" class="form-control" required style="border: 2px dashed #d4a030; padding: 20px; border-radius: 12px; background: rgba(212,160,48,0.04);">
+                        <small class="form-text text-muted">الصيغ المدعومة: xlsx, xls, csv</small>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #e9ecef; border-radius: 0 0 16px 16px;">
+                    <button type="button" class="btn" style="background: #f0f4f8; color: #182B48; border-radius: 10px;" onclick="document.getElementById('importModal').classList.remove('show');document.getElementById('importModal').style.display='none';">إلغاء</button>
+                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: #fff; border-radius: 10px;"><i class="fas fa-upload ms-1"></i> رفع واستيراد</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@if(session('import_errors'))
+<div id="importErrorsData" data-errors='@json(session('import_errors'))'></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const data = document.getElementById('importErrorsData');
+    if (data) {
+        const errors = JSON.parse(data.dataset.errors);
+        if (errors.length > 0) {
+            let html = '<ul style="text-align: right; margin: 0; padding-right: 20px;">';
+            errors.forEach(e => { html += '<li>' + e + '</li>'; });
+            html += '</ul>';
+            Swal.fire({
+                title: 'تفاصيل التخطي',
+                html: html,
+                icon: 'warning',
+                confirmButtonText: 'حسناً',
+                width: 600
+            });
+        }
+    }
+});
+</script>
+@endif
 @endpush

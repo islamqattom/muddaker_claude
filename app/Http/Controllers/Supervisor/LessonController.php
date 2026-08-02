@@ -55,4 +55,16 @@ class LessonController extends Controller
         $controller = new AdminLessonController();
         return $controller->destroy($request, $subject, $lesson);
     }
+
+    public function downloadTemplate(\Illuminate\Http\Request $request, Subject $subject)
+    {
+        $controller = new AdminLessonController();
+        return $controller->downloadTemplate($request, $subject);
+    }
+
+    public function import(\Illuminate\Http\Request $request, Subject $subject)
+    {
+        $controller = new AdminLessonController();
+        return $controller->import($request, $subject);
+    }
 }

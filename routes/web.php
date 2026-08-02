@@ -173,6 +173,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::put('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'update'])->name('lessons.update');
     Route::put('subjects/{subject}/lessons/{lesson}/status', [Admin\LessonController::class, 'updateStatus'])->name('lessons.updateStatus');
     Route::delete('subjects/{subject}/lessons/{lesson}', [Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
+    Route::get('subjects/{subject}/lessons-template', [Admin\LessonController::class, 'downloadTemplate'])->name('lessons.template');
+    Route::post('subjects/{subject}/lessons-import', [Admin\LessonController::class, 'import'])->name('lessons.import');
 
     // Audit Logs
     Route::resource('audit-logs', Admin\AuditLogController::class)->only(['index', 'show']);
@@ -336,6 +338,8 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
     Route::put('subjects/{subject}/lessons/{lesson}', [Supervisor\LessonController::class, 'update'])->name('lessons.update');
     Route::put('subjects/{subject}/lessons/{lesson}/status', [Supervisor\LessonController::class, 'updateStatus'])->name('lessons.updateStatus');
     Route::delete('subjects/{subject}/lessons/{lesson}', [Supervisor\LessonController::class, 'destroy'])->name('lessons.destroy');
+    Route::get('subjects/{subject}/lessons-template', [Supervisor\LessonController::class, 'downloadTemplate'])->name('lessons.template');
+    Route::post('subjects/{subject}/lessons-import', [Supervisor\LessonController::class, 'import'])->name('lessons.import');
 
     // Yawm Al-Himma (يوم الهمة)
     Route::get('/yawm-al-himma', [Supervisor\YawmAlHimmaController::class, 'index'])->name('yawm-al-himma.index');

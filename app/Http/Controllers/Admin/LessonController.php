@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Exports\LessonsTemplateExport;
+use App\Imports\LessonsImport;
 use App\Models\Lesson;
 use App\Models\Subject;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Excel;
 
 class LessonController extends Controller
 {
@@ -180,6 +183,75 @@ class LessonController extends Controller
 
         return redirect()->route('admin.subjects.show', $subject->id)
             ->with('success', 'تم حذف الدرس بنجاح');
+    }
+
+    public function downloadTemplate(Request $request, Subject $subject)
+    {
+        $this->authorizeSubject($subject);
+
+        $filename = 'قالب_دروس_' . $subject->name . '_' . date('Y_m_d') . '.xlsx';
+        $filename = preg_replace('/[^\p{L}\p{N}_\-\.]/u', '_', $filename);
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new LessonsTemplateExport(),
+            $filename,
+            \Maatwebsite\Excel\Excel::XLSX
+        );
+    }
+
+    public function import(Request $request, Subject $subject)
+    {
+        $this->authorizeSubject($subject);
+
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'file.required' => 'الرجاء اختيار ملف',
+            'file.mimes' => 'يجب أن يكون الملف بصيغة xlsx أو xls أو csv',
+            'file.max' => 'حجم الملف يجب ألا يتجاوز 10 ميجابايت',
+        ]);
+
+        try {
+            $import = new LessonsImport($subject);
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+
+            $message = "تم استيراد {$import->createdCount} درس بنجاح";
+            if ($import->skippedCount > 0) {
+                $message .= "، تم تخطي {$import->skippedCount} صف";
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'created' => $import->createdCount,
+                    'skipped' => $import->skippedCount,
+                    'errors' => array_slice($import->errors, 0, 20),
+                ]);
+            }
+
+            $redirect = redirect()->route('admin.subjects.show', $subject->id)
+                ->with('success', $message);
+
+            if (!empty($import->errors)) {
+                $redirect->with('import_errors', array_slice($import->errors, 0, 20));
+            }
+
+            return $redirect;
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $msg = 'أخطاء في الملف: ' . count($failures) . ' خطأ';
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $msg, 'errors' => $failures], 422);
+            }
+            return redirect()->back()->with('error', $msg);
+        } catch (\Exception $e) {
+            $msg = 'حدث خطأ أثناء قراءة الملف: ' . $e->getMessage();
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $msg], 500);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
     }
 
     private function resolveLessonDates(array $validated): array
