@@ -31,7 +31,7 @@ class MeetingMinuteController extends Controller
             $query->where('meeting_date', '<=', $request->to_date);
         }
 
-        $meetingMinutes = $query->orderBy('meeting_date', 'desc')->paginate(15);
+        $meetingMinutes = $query->orderBy('meeting_date', 'desc')->paginate(10);
 
         return view('admin.meeting-minutes.index', compact('meetingMinutes'));
     }

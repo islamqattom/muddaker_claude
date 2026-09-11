@@ -14,6 +14,7 @@ class AuditLogController extends Controller
     {
         $logs = AuditLog::with('user')
             ->filterByRequest($request)
+            ->where('created_at', '>=', now()->subWeeks(3))
             ->latest()
             ->paginate(50);
 
