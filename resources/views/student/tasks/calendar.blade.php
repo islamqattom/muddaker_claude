@@ -105,6 +105,59 @@
 .status-badge.in_progress { background: rgba(52,152,219,0.15); color: #3498db; }
 .status-badge.partially_done { background: rgba(142,68,173,0.15); color: #8e44ad; }
 .status-badge.completed { background: rgba(39,174,96,0.15); color: #27ae60; }
+
+/* ===== Manage Recurring Tasks Modal ===== */
+.mg-card {
+    background: #fff;
+    border: 1px solid #eef1f6;
+    border-right: 5px solid var(--mg-accent, #c0392b);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(24,43,72,0.05);
+    transition: box-shadow 0.2s ease;
+}
+.mg-card:hover { box-shadow: 0 4px 14px rgba(24,43,72,0.10); }
+.mg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.mg-title { font-weight: 700; color: #182B48; font-size: 15px; }
+.mg-title i { color: var(--mg-accent, #c0392b); margin-left: 6px; }
+.mg-count { background: rgba(39,174,96,0.12); color: #1e8449; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.mg-range { color: #7f8c8d; font-size: 12px; margin: 6px 0; }
+.mg-range i { color: var(--mg-accent, #c0392b); margin-left: 4px; }
+.mg-dates { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 12px; }
+.badge-date {
+    background: rgba(24,43,72,0.06);
+    color: #182B48;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.badge-date-more {
+    background: rgba(192,57,43,0.12);
+    color: #c0392b;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.mg-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.mg-btn {
+    border: none; border-radius: 8px;
+    padding: 6px 12px; font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 5px;
+    cursor: pointer; transition: all 0.2s ease;
+}
+.mg-btn:hover { transform: translateY(-1px); }
+.mg-btn-series { background: linear-gradient(135deg, #c0392b, #a93226); color: #fff; }
+.mg-btn-future { background: rgba(243,156,18,0.18); color: #d68910; border: 1px solid rgba(243,156,18,0.4); }
+.mg-btn-past { background: rgba(52,152,219,0.15); color: #2874a6; border: 1px solid rgba(52,152,219,0.4); }
+.mg-btn-single { background: linear-gradient(135deg, #c0392b, #a93226); color: #fff; }
+.mg-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+#manageTasksModal .modal-header {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+}
+#manageTasksModal .modal-body { max-height: 60vh; }
 .status-badge.cancelled { background: rgba(192,57,43,0.15); color: #c0392b; }
 .status-badge.overdue { background: rgba(192,57,43,0.15); color: #c0392b; }
 .detail-label { color: #182B48; font-weight: 700; margin-bottom: 4px; display: block; }
@@ -582,6 +635,9 @@
         <button class="btn btn-primary" onclick="openCreateTaskModal()" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); border: none;">
             <i class="fas fa-plus"></i> إضافة مهمة شخصية
         </button>
+        <button class="btn" onclick="openManageTasksModal()" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+            <i class="fas fa-tasks"></i> إدارة وحذف المهام المتكررة
+        </button>
     </div>
 
     <div class="legend-container">
@@ -761,14 +817,54 @@
                 <button type="button" class="btn" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
-                <form id="deleteTaskForm" method="POST" action="/student/tasks/__TASK_ID__" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" id="deleteTaskBtn" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
-                        <i class="fas fa-trash"></i> حذف
-                    </button>
-                </form>
+                <button type="button" id="deleteTaskBtn" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                    <i class="fas fa-trash"></i> حذف هذه المهمة
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade task-modal" id="manageTasksModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-tasks"></i>
+                    اختر المهام المراد حذفها
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="manageTasksBody">
+                <div id="manageTasksToolbar" class="mg-toolbar d-none">
+                    <div class="mg-toolbar-left">
+                        <label class="mg-check-all">
+                            <input type="checkbox" id="mgSelectAll">
+                            <span>تحديد الكل</span>
+                        </label>
+                        <span class="mg-counter" id="mgCounter">0 محدد</span>
+                    </div>
+                    <div class="mg-toolbar-right">
+                        <button type="button" class="mg-tool-btn" id="mgExpandAll" title="فتح الكل">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <button type="button" class="mg-tool-btn" id="mgCollapseAll" title="طي الكل">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="manageTasksEmpty" class="text-center text-muted py-5 d-none">
+                    <i class="fas fa-check-circle" style="font-size: 48px; color: #27ae60;"></i>
+                    <p class="mt-3 mb-0">لا توجد مهام. كل شيء مرتب!</p>
+                </div>
+                <div id="manageTasksList"></div>
+            </div>
+            <div class="modal-footer mg-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                <button type="button" id="mgBulkDeleteBtn" class="btn mg-bulk-delete" disabled>
+                    <i class="fas fa-trash"></i> <span>حذف المحدد</span>
+                </button>
             </div>
         </div>
     </div>
@@ -896,18 +992,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.style.fontWeight = isCurrent ? '700' : '500';
             });
 
-            var editBtn = document.getElementById('editTaskBtn');
-            if (editBtn) {
-                editBtn.setAttribute('data-task-id', task.id);
-                editBtn.setAttribute('data-task-props', JSON.stringify(props));
-            }
+var editBtn = document.getElementById('editTaskBtn');
+        if (editBtn) {
+            editBtn.setAttribute('data-task-id', task.id);
+            editBtn.setAttribute('data-task-props', JSON.stringify(props));
+        }
 
-            var deleteForm = document.getElementById('deleteTaskForm');
-            if (deleteForm) {
-                deleteForm.action = '/student/tasks/' + task.id;
-            }
-
-            new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
+        new bootstrap.Modal(document.getElementById('taskDetailModal')).show();
         },
         eventDidMount: function(info) {
             if (info.view.type === 'listWeek') {
@@ -986,6 +1077,251 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    window.openManageTasksModal = function() {
+        var modalEl = document.getElementById('manageTasksModal');
+        var listEl = document.getElementById('manageTasksList');
+        var emptyEl = document.getElementById('manageTasksEmpty');
+        var toolbarEl = document.getElementById('manageTasksToolbar');
+
+        // Group events: recurring series + single tasks
+        var groups = {};
+        var singleTasks = [];
+        calendar.getEvents().forEach(function(ev) {
+            var p = ev.extendedProps || {};
+            var gid = p.recurrenceGroupId || null;
+            if (gid) {
+                if (!groups[gid]) groups[gid] = [];
+                groups[gid].push(ev);
+            } else {
+                singleTasks.push(ev);
+            }
+        });
+
+        var html = '';
+        var hasAny = false;
+
+        // Render each series as a group with collapsible header
+        Object.keys(groups).forEach(function(gid) {
+            var events = groups[gid].sort(function(a, b) { return a.startStr.localeCompare(b.startStr); });
+            var first = events[0];
+            var last = events[events.length - 1];
+            var p = first.extendedProps || {};
+            var color = p.color || '#c0392b';
+            html += renderSeriesGroup({
+                groupId: gid,
+                title: first.title,
+                events: events,
+                color: color
+            });
+            hasAny = true;
+        });
+
+        // Render single tasks
+        if (singleTasks.length > 0) {
+            singleTasks.sort(function(a, b) { return a.startStr.localeCompare(b.startStr); });
+            html += '<div class="mg-section-header"><i class="fas fa-calendar-day me-1"></i> مهام فردية</div>';
+            singleTasks.forEach(function(ev) {
+                var p = ev.extendedProps || {};
+                html += renderTaskRow({
+                    taskId: ev.id,
+                    title: ev.title,
+                    startStr: ev.startStr,
+                    color: p.color || '#27ae60',
+                    status: p.status,
+                    statusLabel: p.statusLabel,
+                    groupId: null
+                });
+                hasAny = true;
+            });
+        }
+
+        listEl.innerHTML = html;
+        emptyEl.classList.toggle('d-none', hasAny);
+        toolbarEl.classList.toggle('d-none', !hasAny);
+        bindManageSelections();
+        updateBulkDeleteState();
+        new bootstrap.Modal(modalEl).show();
+    };
+
+    function renderSeriesGroup(opts) {
+        var events = opts.events;
+        var rowsHtml = events.map(function(ev) {
+            var p = ev.extendedProps || {};
+            return renderTaskRow({
+                taskId: ev.id,
+                title: ev.title,
+                startStr: ev.startStr,
+                color: opts.color,
+                status: p.status,
+                statusLabel: p.statusLabel,
+                groupId: opts.groupId
+            });
+        }).join('');
+
+        return '' +
+        '<div class="mg-group" data-group-id="' + escapeHtml(opts.groupId) + '">' +
+            '<div class="mg-group-head" style="--mg-accent: ' + opts.color + ';">' +
+                '<label class="mg-row mg-row-select-all">' +
+                    '<input type="checkbox" class="mg-group-check" data-group-id="' + escapeHtml(opts.groupId) + '">' +
+                    '<span class="mg-row-main">' +
+                        '<i class="fas fa-bookmark mg-row-icon"></i>' +
+                        '<span class="mg-row-title">' + escapeHtml(opts.title) + '</span>' +
+                    '</span>' +
+                    '<span class="mg-row-badge">' + events.length + ' مهمة</span>' +
+                    '<span class="mg-row-toggle"><i class="fas fa-chevron-down"></i></span>' +
+                '</label>' +
+            '</div>' +
+            '<div class="mg-group-body">' + rowsHtml + '</div>' +
+        '</div>';
+    }
+
+    function renderTaskRow(opts) {
+        var dateStr = formatDateAr(opts.startStr);
+        var status = opts.status || 'pending';
+        var statusLabel = opts.statusLabel || 'لم تتم';
+        return '' +
+        '<label class="mg-row mg-task-row" data-task-id="' + opts.taskId + '" style="--mg-accent: ' + opts.color + ';">' +
+            '<input type="checkbox" class="mg-task-check" value="' + opts.taskId + '" data-group-id="' + (opts.groupId || '') + '">' +
+            '<span class="mg-row-main">' +
+                '<span class="mg-row-date"><i class="fas fa-calendar"></i> ' + dateStr + '</span>' +
+                '<span class="mg-status-chip mg-status-' + status + '">' + statusLabel + '</span>' +
+            '</span>' +
+        '</label>';
+    }
+
+    function bindManageSelections() {
+        // Group checkbox toggles all tasks in the group
+        document.querySelectorAll('.mg-group-check').forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                var gid = this.getAttribute('data-group-id');
+                document.querySelectorAll('.mg-task-check[data-group-id="' + gid + '"]').forEach(function(t) {
+                    t.checked = cb.checked;
+                });
+                updateBulkDeleteState();
+            });
+        });
+
+        // Individual task checkbox
+        document.querySelectorAll('.mg-task-check').forEach(function(cb) {
+            cb.addEventListener('change', updateBulkDeleteState);
+        });
+
+        // Group head row (clicking anywhere except checkbox toggles collapse)
+        document.querySelectorAll('.mg-group-head .mg-row-select-all').forEach(function(label) {
+            label.addEventListener('click', function(e) {
+                if (e.target.tagName === 'INPUT') return; // checkbox handles itself
+                if (e.target.closest('.mg-row-toggle')) {
+                    e.preventDefault();
+                    var group = this.closest('.mg-group');
+                    group.classList.toggle('mg-collapsed');
+                    return;
+                }
+            });
+        });
+
+        // Select all
+        var selectAllCb = document.getElementById('mgSelectAll');
+        if (selectAllCb) {
+            selectAllCb.addEventListener('change', function() {
+                document.querySelectorAll('.mg-task-check').forEach(function(t) { t.checked = this.checked; }.bind(this));
+                document.querySelectorAll('.mg-group-check').forEach(function(g) { g.checked = this.checked; }.bind(this));
+                updateBulkDeleteState();
+            });
+        }
+
+        // Expand all / collapse all
+        var expandBtn = document.getElementById('mgExpandAll');
+        var collapseBtn = document.getElementById('mgCollapseAll');
+        if (expandBtn) expandBtn.addEventListener('click', function() {
+            document.querySelectorAll('.mg-group').forEach(function(g) { g.classList.remove('mg-collapsed'); });
+        });
+        if (collapseBtn) collapseBtn.addEventListener('click', function() {
+            document.querySelectorAll('.mg-group').forEach(function(g) { g.classList.add('mg-collapsed'); });
+        });
+
+        // Bulk delete
+        var bulkBtn = document.getElementById('mgBulkDeleteBtn');
+        if (bulkBtn) {
+            bulkBtn.addEventListener('click', performBulkDelete);
+        }
+    }
+
+    function updateBulkDeleteState() {
+        var checked = document.querySelectorAll('.mg-task-check:checked');
+        var counter = document.getElementById('mgCounter');
+        var btn = document.getElementById('mgBulkDeleteBtn');
+        var n = checked.length;
+        if (counter) counter.textContent = n + ' ' + (n === 1 ? 'مهمة محددة' : (n === 2 ? 'مهمتان محددتان' : 'مهام محددة'));
+        if (btn) {
+            btn.disabled = n === 0;
+            btn.querySelector('span').textContent = n > 0 ? ('حذف المحدد (' + n + ')') : 'حذف المحدد';
+        }
+
+        // Sync select-all and group-checkboxes state
+        var totalTasks = document.querySelectorAll('.mg-task-check').length;
+        var selectAll = document.getElementById('mgSelectAll');
+        if (selectAll) {
+            selectAll.checked = totalTasks > 0 && n === totalTasks;
+            selectAll.indeterminate = n > 0 && n < totalTasks;
+        }
+        document.querySelectorAll('.mg-group-check').forEach(function(g) {
+            var gid = g.getAttribute('data-group-id');
+            var inGroup = document.querySelectorAll('.mg-task-check[data-group-id="' + gid + '"]');
+            var checkedInGroup = document.querySelectorAll('.mg-task-check[data-group-id="' + gid + '"]:checked');
+            g.checked = inGroup.length > 0 && inGroup.length === checkedInGroup.length;
+            g.indeterminate = checkedInGroup.length > 0 && checkedInGroup.length < inGroup.length;
+        });
+    }
+
+    function performBulkDelete() {
+        var checked = Array.from(document.querySelectorAll('.mg-task-check:checked'));
+        if (checked.length === 0) return;
+        if (!confirm('هل تريد حذف ' + checked.length + ' مهمة؟ لا يمكن التراجع.')) return;
+
+        var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        var token = tokenMeta ? tokenMeta.content : '';
+        var btn = document.getElementById('mgBulkDeleteBtn');
+        var originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
+
+        var ids = checked.map(function(c) { return c.value; });
+
+        fetch('/student/tasks/bulk-delete', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ ids: ids, _token: token })
+        }).then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) { return { ok: r.ok, body: j }; }); })
+          .then(function(res) {
+              if (res.ok && (res.body.success === undefined || res.body.success)) {
+                  window.location.reload();
+              } else {
+                  alert(res.body.message || 'فشل الحذف');
+                  btn.disabled = false;
+                  btn.innerHTML = originalHtml;
+                  updateBulkDeleteState();
+              }
+          })
+          .catch(function() {
+              alert('حدث خطأ في الاتصال');
+              btn.disabled = false;
+              btn.innerHTML = originalHtml;
+              updateBulkDeleteState();
+          });
+    }
+
+    function formatDateAr(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        var months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
     var createForm = document.getElementById('createTaskForm');
     if (createForm) {
         createForm.addEventListener('submit', async function(e) {
@@ -1038,14 +1374,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             if (!confirm('هل أنت متأكد من حذف هذه المهمة؟ لا يمكن التراجع.')) return;
-            var form = document.getElementById('deleteTaskForm');
-            if (!form) return;
-            var url = '/student/tasks/' + currentTaskId;
-            var tokenInput = form.querySelector('input[name="_token"]');
-            var token = tokenInput ? tokenInput.value : '';
+            var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            var token = tokenMeta ? tokenMeta.content : '';
             deleteBtn.disabled = true;
             deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
-            fetch(url, {
+            fetch('/student/tasks/' + currentTaskId, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': token,
@@ -1062,13 +1395,13 @@ document.addEventListener('DOMContentLoaded', function() {
                   } else {
                       alert(res.body.message || 'فشل حذف المهمة');
                       deleteBtn.disabled = false;
-                      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف هذه المهمة';
                   }
               })
               .catch(function() {
                   alert('حدث خطأ في الاتصال');
                   deleteBtn.disabled = false;
-                  deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+                  deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف هذه المهمة';
               });
         });
     }

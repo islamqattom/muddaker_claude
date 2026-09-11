@@ -31,7 +31,11 @@ trait HasStudentPartRecords
         foreach (range(1, 30) as $partNumber) {
             $existing = $existingRecords->get($partNumber);
 
-            if ($existing && $existing->is_manual_override) {
+            // A mafsilsession always forces the part status to "مفصل",
+            // overriding any previous manual edit.
+            $hasMafsil = ($partSessionTypes[$partNumber] ?? null) === RecitationSession::TYPE_MAFSIL;
+
+            if ($existing && $existing->is_manual_override && !$hasMafsil) {
                 continue;
             }
 

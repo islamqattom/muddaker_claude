@@ -477,6 +477,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <select name="mastery_status" id="editMasteryStatus" class="form-select-modal">
                             <option value="متقن">متقن</option>
                             <option value="غير متقن">غير متقن</option>
+                            <option value="مفصل">مفصل</option>
                         </select>
                     </div>
                 </div>

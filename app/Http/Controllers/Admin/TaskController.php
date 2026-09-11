@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\MeetingTask;
 use App\Models\Student;
-use App\Notifications\NewMeetingTaskAssigned;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -104,13 +104,35 @@ class TaskController extends Controller
             }
         }
 
-        $task->delete();
+        $scope = $request->input('scope', 'single');
+        $deletedCount = 1;
 
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'تم حذف المهمة بنجاح']);
+        if ($scope === 'series' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)->delete();
+        } elseif ($scope === 'future' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '>=', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } elseif ($scope === 'past' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '<', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } else {
+            $task->delete();
         }
 
-        return redirect()->back()->with('success', 'تم حذف المهمة بنجاح');
+        $message = match (true) {
+            $deletedCount > 1 && $scope === 'series' => "تم حذف {$deletedCount} مهمة (السلسلة الكاملة)",
+            $deletedCount > 1 && $scope === 'future' => "تم حذف {$deletedCount} مهمة (هذه وجميع اللاحقة)",
+            $deletedCount > 1 && $scope === 'past' => "تم حذف {$deletedCount} مهمة (السابقة في السلسلة)",
+            default => 'تم حذف المهمة بنجاح',
+        };
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => $message, 'deleted_count' => $deletedCount]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function update(Request $request, MeetingTask $task)
@@ -279,6 +301,7 @@ class TaskController extends Controller
         $createdTasks = [];
         $notifiedAlready = false;
         $sharedColor = MeetingTask::generateUniqueColor();
+        $recurrenceGroupId = count($dates) > 1 ? (string) Str::uuid() : null;
 
         foreach ($dates as $date) {
             $taskData = [
@@ -287,6 +310,7 @@ class TaskController extends Controller
                 'assignee_id' => $assigneeId,
                 'assignee_type' => $assigneeType,
                 'assigned_by' => auth()->id(),
+                'recurrence_group_id' => $recurrenceGroupId,
                 'due_date' => $date,
                 'due_time' => $validated['due_time'] ?? null,
                 'end_time' => $endTime,
@@ -433,6 +457,7 @@ class TaskController extends Controller
                 'isOverdue' => $task->is_overdue,
                 'assigneeType' => $task->assignee_type,
                 'color' => $task->effective_color,
+                'recurrenceGroupId' => $task->recurrence_group_id,
             ]
         ];
     }

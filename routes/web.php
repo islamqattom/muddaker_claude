@@ -433,6 +433,7 @@ Route::prefix('student')->name('student.')->middleware(['auth', 'role:student'])
     Route::put('/tasks/{task}', [Student\TaskController::class, 'update'])->name('tasks.update');
     Route::put('/tasks/{task}/status', [Student\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
     Route::delete('/tasks/{task}', [Student\TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::post('/tasks/bulk-delete', [Student\TaskController::class, 'bulkDelete'])->name('tasks.bulkDelete');
     Route::get('/reviews/session', [Student\ReviewController::class, 'session'])->name('reviews.session');
     Route::post('/reviews/{reviewItem}/submit', [Student\ReviewController::class, 'submitReview'])->name('reviews.submit');
     Route::post('/reviews/add', [Student\ReviewController::class, 'addToReviews'])->name('reviews.add');

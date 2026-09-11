@@ -7,6 +7,7 @@ use App\Models\MeetingTask;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TaskController extends Controller
 {
@@ -68,11 +69,13 @@ class TaskController extends Controller
 
         $createdTasks = [];
         $sharedColor = MeetingTask::generateUniqueColor();
+        $recurrenceGroupId = count($dates) > 1 ? (string) Str::uuid() : null;
         foreach ($dates as $date) {
             $task = MeetingTask::create([
                 'assignee_id' => $student->id,
                 'assignee_type' => 'student',
                 'assigned_by' => auth()->id(),
+                'recurrence_group_id' => $recurrenceGroupId,
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'due_date' => $date,
@@ -179,13 +182,77 @@ class TaskController extends Controller
             abort(403);
         }
 
-        $task->delete();
+        $scope = $request->input('scope', 'single');
+        $deletedCount = 1;
 
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'تم حذف المهمة']);
+        if ($scope === 'series' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->delete();
+        } elseif ($scope === 'future' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '>=', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } elseif ($scope === 'past' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '<', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } else {
+            $task->delete();
         }
 
-        return redirect()->back()->with('success', 'تم حذف المهمة');
+        $message = match (true) {
+            $deletedCount > 1 && $scope === 'series' => "تم حذف {$deletedCount} مهمة (السلسلة الكاملة)",
+            $deletedCount > 1 && $scope === 'future' => "تم حذف {$deletedCount} مهمة (هذه وجميع اللاحقة)",
+            $deletedCount > 1 && $scope === 'past' => "تم حذف {$deletedCount} مهمة (السابقة في السلسلة)",
+            default => 'تم حذف المهمة',
+        };
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'deleted_count' => $deletedCount,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $student = Student::where('user_id', auth()->id())->firstOrFail();
+
+        $ids = $request->input('ids',');
+        if (!is_array($ids) || empty($ids)) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'لم يتم تحديد أي مهمة'], 422);
+            }
+            return redirect()->back()->with('error', 'لم يتم تحديد أي مهمة');
+        }
+
+        $ids = array_map('intval', $ids);
+
+        $deletedCount = MeetingTask::whereIn('id', $ids)
+            ->where(function ($q) use ($student) {
+                $q->where(function ($sub) use ($student) {
+                    $sub->where('assignee_type', 'student')->where('assignee_id', $student->id);
+                })->orWhere(function ($sub) use ($student) {
+                    $sub->where('assignee_type', 'user')->where('assignee_id', $student->user_id);
+                });
+            })
+            ->delete();
+
+        $message = "تم حذف {$deletedCount} مهمة";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'deleted_count' => $deletedCount,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function update(Request $request, MeetingTask $task)
@@ -279,6 +346,7 @@ class TaskController extends Controller
                 'isOwnTask' => true,
                 'assigneeType' => $task->assignee_type,
                 'color' => $task->effective_color,
+                'recurrenceGroupId' => $task->recurrence_group_id,
             ]
         ];
     }

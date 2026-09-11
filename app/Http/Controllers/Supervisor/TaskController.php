@@ -7,6 +7,7 @@ use App\Models\MeetingTask;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TaskController extends Controller
 {
@@ -135,6 +136,7 @@ class TaskController extends Controller
 
         $createdTasks = [];
         $sharedColor = MeetingTask::generateUniqueColor();
+        $recurrenceGroupId = count($dates) > 1 ? (string) Str::uuid() : null;
         foreach ($dates as $date) {
             $task = MeetingTask::create([
                 'title' => $validated['title'],
@@ -142,6 +144,7 @@ class TaskController extends Controller
                 'assignee_id' => $assigneeId,
                 'assignee_type' => $assigneeType,
                 'assigned_by' => $supervisorId,
+                'recurrence_group_id' => $recurrenceGroupId,
                 'due_date' => $date,
                 'due_time' => $validated['due_time'] ?? null,
                 'end_time' => $endTime,
@@ -335,13 +338,35 @@ class TaskController extends Controller
             abort(403, 'لا تملك صلاحية حذف هذه المهمة');
         }
 
-        $task->delete();
+        $scope = $request->input('scope', 'single');
+        $deletedCount = 1;
 
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'تم حذف المهمة بنجاح']);
+        if ($scope === 'series' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)->delete();
+        } elseif ($scope === 'future' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '>=', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } elseif ($scope === 'past' && $task->recurrence_group_id) {
+            $deletedCount = MeetingTask::where('recurrence_group_id', $task->recurrence_group_id)
+                ->where('due_date', '<', $task->due_date->format('Y-m-d'))
+                ->delete();
+        } else {
+            $task->delete();
         }
 
-        return redirect()->back()->with('success', 'تم حذف المهمة بنجاح');
+        $message = match (true) {
+            $deletedCount > 1 && $scope === 'series' => "تم حذف {$deletedCount} مهمة (السلسلة الكاملة)",
+            $deletedCount > 1 && $scope === 'future' => "تم حذف {$deletedCount} مهمة (هذه وجميع اللاحقة)",
+            $deletedCount > 1 && $scope === 'past' => "تم حذف {$deletedCount} مهمة (السابقة في السلسلة)",
+            default => 'تم حذف المهمة بنجاح',
+        };
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => $message, 'deleted_count' => $deletedCount]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     private function formatTaskForCalendar(MeetingTask $task): array
@@ -386,6 +411,7 @@ class TaskController extends Controller
                 'isOverdue' => $task->is_overdue,
                 'assigneeType' => $task->assignee_type,
                 'color' => $task->effective_color,
+                'recurrenceGroupId' => $task->recurrence_group_id,
             ]
         ];
     }

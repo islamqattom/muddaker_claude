@@ -992,13 +992,28 @@
                 <button type="button" class="btn btn-info" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
-                <form id="deleteTaskForm" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" id="deleteTaskBtn" class="btn" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                <div class="dropdown d-inline-block">
+                    <button type="button" id="deleteTaskBtn" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
                         <i class="fas fa-trash"></i> حذف
                     </button>
-                </form>
+                    <ul class="dropdown-menu dropdown-menu-end" id="deleteScopeMenu">
+                        <li>
+                            <a class="dropdown-item delete-scope" href="#" data-scope="single">
+                                <i class="fas fa-calendar-day me-2"></i> حذف هذه المهمة فقط
+                            </a>
+                        </li>
+                        <li class="delete-scope-future d-none">
+                            <a class="dropdown-item delete-scope" href="#" data-scope="future">
+                                <i class="fas fa-calendar-plus me-2"></i> حذف هذه وجميع اللاحقة
+                            </a>
+                        </li>
+                        <li class="delete-scope-series d-none">
+                            <a class="dropdown-item delete-scope" href="#" data-scope="series">
+                                <i class="fas fa-calendar-week me-2"></i> حذف السلسلة كاملة (<span class="series-count">0</span> مهمة)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
             </div>
         </div>
@@ -1247,6 +1262,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteForm.action = updateStatusBaseUrl + '/' + task.id;
             }
 
+            configureDeleteDropdown(calendar, task, props);
+
             (bootstrap.Modal.getOrCreateInstance(document.getElementById('taskDetailModal'))).show();
         }
     });
@@ -1302,6 +1319,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (deleteForm) {
                 deleteForm.action = updateStatusBaseUrl + '/' + task.id;
             }
+
+            configureDeleteDropdown(calendar, task, props);
 
             (bootstrap.Modal.getOrCreateInstance(document.getElementById('taskDetailModal'))).show();
         }
@@ -1481,43 +1500,73 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var deleteBtn = document.getElementById('deleteTaskBtn');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', function() {
-            if (!confirm('هل أنت متأكد من حذف هذه المهمة؟ لا يمكن التراجع.')) return;
-            var form = document.getElementById('deleteTaskForm');
-            if (!form || !form.action) return;
-            var url = form.action;
-            var tokenInput = form.querySelector('input[name="_token"]');
-            var token = tokenInput ? tokenInput.value : '';
-            deleteBtn.disabled = true;
-            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                    'X-HTTP-Method-Override': 'DELETE',
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Accept': 'application/json'
-                },
-                body: '_method=DELETE&_token=' + encodeURIComponent(token)
-            }).then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) { return { ok: r.ok, body: j }; }); })
-              .then(function(res) {
-                  if (res.ok && (res.body.success === undefined || res.body.success)) {
-                      var detailModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailModal'));
-                      if (detailModal) detailModal.hide();
-                      window.location.reload();
-                  } else {
-                      alert(res.body.message || 'فشل حذف المهمة');
-                      deleteBtn.disabled = false;
-                      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
-                  }
-              })
-              .catch(function() {
-                  alert('حدث خطأ في الاتصال');
+    function performDelete(url, scope) {
+        if (!confirm(scope === 'series' ? 'هل تريد حذف السلسلة كاملة؟ لا يمكن التراجع.' : scope === 'future' ? 'هل تريد حذف هذه وجميع اللاحقة؟' : 'هل أنت متأكد من حذف هذه المهمة؟ لا يمكن التراجع.')) return;
+        var tokenMeta = document.querySelector('meta[name="csrf-token"]');
+        var token = tokenMeta ? tokenMeta.content : '';
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ الحذف...';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            },
+            body: '_method=DELETE&_token=' + encodeURIComponent(token) + '&scope=' + encodeURIComponent(scope)
+        }).then(function(r) { return r.json().catch(function() { return {}; }).then(function(j) { return { ok: r.ok, body: j }; }); })
+          .then(function(res) {
+              if (res.ok && (res.body.success === undefined || res.body.success)) {
+                  var detailModal = bootstrap.Modal.getInstance(document.getElementById('taskDetailModal'));
+                  if (detailModal) detailModal.hide();
+                  window.location.reload();
+              } else {
+                  alert(res.body.message || 'فشل حذف المهمة');
                   deleteBtn.disabled = false;
                   deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
-              });
+              }
+          })
+          .catch(function() {
+              alert('حدث خطأ في الاتصال');
+              deleteBtn.disabled = false;
+              deleteBtn.innerHTML = '<i class="fas fa-trash"></i> حذف';
+          });
+    }
+
+    if (deleteBtn) {
+        document.querySelectorAll('.delete-scope').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var scope = this.getAttribute('data-scope') || 'single';
+                var form = document.getElementById('deleteTaskForm');
+                if (!form || !form.action) return;
+                performDelete(form.action, scope);
+            });
         });
+    }
+
+    function configureDeleteDropdown(calendar, task, props) {
+        var seriesGroupId = props.recurrenceGroupId;
+        var futureItem = document.querySelector('.delete-scope-future');
+        var seriesItem = document.querySelector('.delete-scope-series');
+        if (seriesGroupId) {
+            var allSeriesEvents = calendar.getEvents().filter(function(e) {
+                return e.extendedProps && e.extendedProps.recurrenceGroupId === seriesGroupId;
+            });
+            var seriesCount = allSeriesEvents.length;
+            var futureCount = allSeriesEvents.filter(function(e) {
+                return e.startStr >= task.startStr;
+            }).length;
+            if (futureItem) futureItem.classList.toggle('d-none', futureCount < 2);
+            if (seriesItem) {
+                seriesItem.classList.toggle('d-none', seriesCount < 2);
+                var counter = seriesItem.querySelector('.series-count');
+                if (counter) counter.textContent = seriesCount;
+            }
+        } else {
+            if (futureItem) futureItem.classList.add('d-none');
+            if (seriesItem) seriesItem.classList.add('d-none');
+        }
     }
 
     function openEditTaskModal(taskId, props) {

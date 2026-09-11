@@ -14,6 +14,7 @@ class MeetingTask extends Model
 
     protected $fillable = [
         'meeting_minute_id',
+        'recurrence_group_id',
         'assignee_id',
         'assignee_type',
         'assigned_by',
@@ -159,5 +160,13 @@ class MeetingTask extends Model
                     });
             });
         });
+    }
+
+    public function scopeInSeries($query, ?string $groupId)
+    {
+        if (empty($groupId)) {
+            return $query->whereRaw('1 = 0');
+        }
+        return $query->where('recurrence_group_id', $groupId);
     }
 }
