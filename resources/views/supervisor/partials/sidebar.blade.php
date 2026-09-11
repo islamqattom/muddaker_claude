@@ -17,10 +17,6 @@
     <div class="icon-wrapper"><i class="fas fa-book-reader"></i></div>
     <span>المواد والدروس</span>
 </a>
-<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
-    <span>المحادثات</span>
-</a>
 
 <span class="nav-section-title">إدارة الطلاب</span>
 <a href="{{ route('supervisor.students.index') }}" class="nav-link {{ request()->routeIs('supervisor.students.*') ? 'active' : '' }}">

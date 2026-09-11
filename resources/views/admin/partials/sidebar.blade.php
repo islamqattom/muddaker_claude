@@ -5,10 +5,6 @@
 </a>
 
 <span class="nav-section-title">البرامج</span>
-<a href="{{ route('chat.index') }}" class="nav-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
-    <span>المحادثات</span>
-</a>
 <a href="{{ route('admin.yawm-al-himma.index') }}" class="nav-link {{ request()->routeIs('admin.yawm-al-himma.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-mosque"></i></div>
     <span>يوم الهمة</span>

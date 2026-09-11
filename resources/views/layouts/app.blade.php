@@ -2987,12 +2987,6 @@
             <h1 class="page-title">@yield('page-title', 'الرئيسية')</h1>
 
             <div class="header-actions">
-                <!-- Chat -->
-                <a href="{{ route('chat.index') }}" class="notification-bell" id="chatIcon" title="المحادثات">
-                    <i class="fas fa-comments"></i>
-                    <span class="notification-badge" id="chatBadge" style="display: none;">0</span>
-                </a>
-
                 <!-- Enable Notifications Button -->
                 <button class="notification-permission-btn" id="headerEnableNotifBtn" style="display: none;">
                     <i class="fas fa-bell"></i>
@@ -3318,23 +3312,6 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         function updateBadges() {
-            fetch('/chat/unread/count')
-                .then(response => response.json())
-                .then(data => {
-                    const badge = document.getElementById('chatBadge');
-                    if (!badge) return;
-                    if (window.location.pathname === '/chat') {
-                        badge.textContent = '0';
-                        badge.style.display = 'none';
-                    } else if (data.unread > 0) {
-                        badge.textContent = data.unread;
-                        badge.style.display = 'flex';
-                    } else {
-                        badge.textContent = '0';
-                        badge.style.display = 'none';
-                    }
-                });
-
             fetch('/notifications/unread-count')
                 .then(response => response.json())
                 .then(data => {
@@ -3406,17 +3383,6 @@
         @if(config('broadcasting.default') === 'pusher')
         const pusher = new Pusher('{{ config('broadcasting.connections.pusher.key') }}', {
             cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}'
-        });
-
-        const channel = pusher.subscribe('chat.{{ auth()->id() }}');
-        channel.bind('new-message', function(data) {
-            if (window.location.pathname === '/chat') return;
-            const badge = document.getElementById('chatBadge');
-            if (badge) {
-                let count = parseInt(badge.textContent) || 0;
-                badge.textContent = count + 1;
-                badge.style.display = 'flex';
-            }
         });
         @endif
     });
