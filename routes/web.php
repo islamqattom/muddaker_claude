@@ -20,12 +20,12 @@ Route::get('/', function () {
 });
 
 // Auth Routes
-Route::middleware('throttle:5,1')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-    Route::get('/logout', [LoginController::class, 'logout']);
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-});
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])
+    ->middleware('throttle:20,1')
+    ->name('login.post');
+Route::get('/logout', [LoginController::class, 'logout']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ============================
 // GUEST: Yawm Al-Himma (يوم الهمة)
