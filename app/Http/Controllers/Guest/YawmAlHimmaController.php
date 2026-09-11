@@ -177,7 +177,7 @@ class YawmAlHimmaController extends Controller
 
     public function editSession(YawmAlHimmaSession $session)
     {
-        $parts = QuranPart::orderBy('part_number')->get(['id', 'part_number', 'name']);
+        $parts = QuranPart::orderBy('part_number')->get(['id', 'part_number', 'name', 'start_page', 'end_page']);
 
         return view('guest.yawm-al-himma.edit-session', [
             'session' => $session,
@@ -193,17 +193,33 @@ class YawmAlHimmaController extends Controller
             'session_date' => 'required|date',
             'parts' => 'required|array|min:1',
             'parts.*' => 'integer|min:1|max:30',
+            'pages' => 'required|array',
+            'pages.*.part_number' => 'required|integer|min:1|max:30',
+            'pages.*.page_number' => 'required|integer|min:1',
+            'pages.*.errors' => 'required|integer|min:0',
+            'pages.*.hesitations' => 'required|integer|min:0',
             'notes' => 'nullable|string|max:2000',
         ]);
 
         $selectedParts = array_values(array_unique(array_map('intval', $data['parts'])));
         sort($selectedParts);
 
+        $pages = array_values($data['pages']);
+        $totalErrors = 0;
+        $totalHesitations = 0;
+        foreach ($pages as $p) {
+            $totalErrors += (int) $p['errors'];
+            $totalHesitations += (int) $p['hesitations'];
+        }
+
         $session->update([
             'supervisor_name' => $data['supervisor_name'],
             'student_name' => $data['student_name'],
             'session_date' => $data['session_date'],
             'parts' => $selectedParts,
+            'pages_data' => $pages,
+            'total_errors' => $totalErrors,
+            'total_hesitations' => $totalHesitations,
             'notes' => $data['notes'] ?? null,
         ]);
 
