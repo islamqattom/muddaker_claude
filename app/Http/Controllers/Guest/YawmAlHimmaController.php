@@ -155,16 +155,60 @@ class YawmAlHimmaController extends Controller
         ]);
     }
 
-    public function updateSupervisor(Request $request, YawmAlHimmaSession $session)
+    public function sessionsIndex(Request $request)
+    {
+        $supervisorName = trim((string) $request->query('supervisor_name', ''));
+
+        $sessions = collect();
+        if ($supervisorName !== '') {
+            $sessions = YawmAlHimmaSession::query()
+                ->where('supervisor_name', 'like', '%' . $supervisorName . '%')
+                ->orderByDesc('session_date')
+                ->orderByDesc('id')
+                ->paginate(15)
+                ->withQueryString();
+        }
+
+        return view('guest.yawm-al-himma.sessions', [
+            'supervisorName' => $supervisorName,
+            'sessions' => $sessions,
+        ]);
+    }
+
+    public function editSession(YawmAlHimmaSession $session)
+    {
+        $parts = QuranPart::orderBy('part_number')->get(['id', 'part_number', 'name']);
+
+        return view('guest.yawm-al-himma.edit-session', [
+            'session' => $session,
+            'parts' => $parts,
+        ]);
+    }
+
+    public function updateSession(Request $request, YawmAlHimmaSession $session)
     {
         $data = $request->validate([
             'supervisor_name' => 'required|string|max:255',
+            'student_name' => 'required|string|max:255',
+            'session_date' => 'required|date',
+            'parts' => 'required|array|min:1',
+            'parts.*' => 'integer|min:1|max:30',
+            'notes' => 'nullable|string|max:2000',
         ]);
 
-        $session->update(['supervisor_name' => $data['supervisor_name']]);
+        $selectedParts = array_values(array_unique(array_map('intval', $data['parts'])));
+        sort($selectedParts);
+
+        $session->update([
+            'supervisor_name' => $data['supervisor_name'],
+            'student_name' => $data['student_name'],
+            'session_date' => $data['session_date'],
+            'parts' => $selectedParts,
+            'notes' => $data['notes'] ?? null,
+        ]);
 
         return redirect()
-            ->route('guest.yawm-al-himma.result', ['session' => $session->id])
-            ->with('supervisor_updated', true);
+            ->route('guest.yawm-al-himma.sessions.index', ['supervisor_name' => $data['supervisor_name']])
+            ->with('session_updated', true);
     }
 }

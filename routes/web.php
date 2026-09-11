@@ -36,7 +36,9 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::post('/evaluate', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'showEvaluation'])->name('evaluate');
     Route::post('/save', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'save'])->name('save');
     Route::get('/result/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'result'])->name('result');
-    Route::patch('/result/{session}/supervisor', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'updateSupervisor'])->name('supervisor.update');
+    Route::get('/sessions', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'sessionsIndex'])->name('sessions.index');
+    Route::get('/sessions/{session}/edit', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'editSession'])->name('sessions.edit');
+    Route::patch('/sessions/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'updateSession'])->name('sessions.update');
 });
 
 // ============================

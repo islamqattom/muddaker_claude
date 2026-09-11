@@ -46,9 +46,11 @@
     </form>
 </div>
 
-<div class="alert alert-gold">
-    <i class="fas fa-info-circle me-1"></i>
-    هذه الصفحة مخصصة ليوم الهمة - يمكن للمشرف أو ولي الأمر تسجيل تقييم الطالب دون الحاجة لتسجيل دخول.
+<div class="alert alert-gold d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div><i class="fas fa-info-circle me-1"></i> هذه الصفحة مخصصة ليوم الهمة - يمكن للمشرف أو ولي الأمر تسجيل تقييم الطالب دون الحاجة لتسجيل دخول.</div>
+    <a href="{{ route('guest.yawm-al-himma.sessions.index') }}" style="color: var(--navy); font-weight: 700; text-decoration: underline;">
+        <i class="fas fa-edit me-1"></i> تعديل جلسات سابقة
+    </a>
 </div>
 @endsection
 
