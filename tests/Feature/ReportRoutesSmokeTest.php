@@ -1,0 +1,141 @@
+<?php
+namespace Tests\Feature;
+
+use App\Models\User;
+use App\Models\Student;
+use App\Models\Supervisor;
+use App\Models\ParentProfile;
+use App\Models\Level;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Hash;
+use Tests\CreatesApplication;
+
+class ReportRoutesSmokeTest extends BaseTestCase
+{
+    use CreatesApplication;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seedUsers();
+    }
+
+    private function seedUsers(): void
+    {
+        if (!Level::find(1)) {
+            Level::create(['id' => 1, 'name' => 'مستوى 1', 'level_number' => 1, 'new_memorization_pages' => 3, 'review_pages' => 6, 'description' => 'تجريبي']);
+        }
+        User::unguard();
+        User::updateOrCreate(
+            ['email' => 'admin@test.local'],
+            ['id' => 1, 'name' => 'مدير النظام', 'username' => 'admin', 'password' => Hash::make('secret'), 'role' => 'admin']
+        );
+        User::updateOrCreate(
+            ['email' => 'sup@test.local'],
+            ['id' => 2, 'name' => 'مشرف تجريبي', 'username' => 'supervisor', 'password' => Hash::make('secret'), 'role' => 'supervisor']
+        );
+        User::updateOrCreate(
+            ['email' => 'stu@test.local'],
+            ['id' => 3, 'name' => 'طالب تجريبي', 'username' => 'student', 'password' => Hash::make('secret'), 'role' => 'student']
+        );
+        User::updateOrCreate(
+            ['email' => 'par@test.local'],
+            ['id' => 4, 'name' => 'ولي أمر تجريبي', 'username' => 'parent', 'password' => Hash::make('secret'), 'role' => 'parent']
+        );
+
+        Supervisor::updateOrCreate(
+            ['user_id' => 2],
+            ['employee_number' => 'SUP-001']
+        );
+        Student::updateOrCreate(
+            ['user_id' => 3],
+            ['supervisor_id' => 2, 'student_number' => 'STU-001', 'level_id' => 1]
+        );
+        $stu = Student::where('user_id', 3)->first();
+        ParentProfile::updateOrCreate(
+            ['user_id' => 4],
+            ['national_id' => '9999999999', 'phone' => '0500000000', 'relationship' => 'father']
+        );
+        $pp = ParentProfile::where('user_id', 4)->first();
+        if ($pp && $stu && !\DB::table('parent_student')->where('parent_id', $pp->id)->where('student_id', $stu->id)->exists()) {
+            \DB::table('parent_student')->insert(['parent_id' => $pp->id, 'student_id' => $stu->id]);
+        }
+        User::reguard();
+        fwrite(STDERR, 'seeded: ' . User::count() . PHP_EOL);
+    }
+
+    private function hit($method, $url, $userId)
+    {
+        $user = User::find($userId);
+        if (!$user) {
+            $this->markTestSkipped("no user $userId");
+            return;
+        }
+        $response = $this->actingAs($user)->call($method, $url);
+        $status = $response->getStatusCode();
+        $body = $response->getContent() ?: '';
+        $snippet = preg_replace('/\s+/', ' ', strip_tags($body));
+        $snippet = mb_substr($snippet, 0, 200);
+        $msg = sprintf('%s %s as %s -> %d  %s', $method, $url, $user->role, $status, $snippet);
+        fwrite(STDERR, $msg . PHP_EOL);
+        $this->assertLessThan(500, $status, "Route returned server error: $url");
+    }
+
+    public function test_admin_routes()
+    {
+        $urls = [
+            '/admin/reports',
+            '/admin/reports/recitation',
+            '/admin/reports/recitation?period=today',
+            '/admin/reports/attendance',
+            '/admin/reports/quarter',
+            '/admin/reports/quarter?year=2026&quarter=3',
+            '/admin/reports/half',
+            '/admin/reports/year',
+            '/admin/reports/quarter?export=excel',
+            '/admin/reports/quarter?export=print',
+            '/admin/reports/quarter?export=pdf',
+            '/admin/reports/recitation?export=excel',
+            '/admin/reports/recitation?export=print',
+            '/admin/reports/recitation?export=pdf',
+            '/admin/reports/attendance?export=excel',
+            '/admin/reports/attendance?export=print',
+            '/admin/reports/attendance?export=pdf',
+        ];
+        foreach ($urls as $u) {
+            $this->hit('GET', $u, 1);
+        }
+    }
+
+    public function test_supervisor_routes()
+    {
+        $student = Student::where('user_id', 3)->first();
+        $urls = [
+            '/supervisor/reports',
+            '/supervisor/reports/recitation',
+            '/supervisor/reports/attendance',
+            '/supervisor/reports/quarter',
+            '/supervisor/reports/half',
+            '/supervisor/reports/year',
+            '/supervisor/reports/quarter?export=excel',
+            '/supervisor/reports/recitation?export=excel',
+        ];
+        foreach ($urls as $u) {
+            $this->hit('GET', $u, 2);
+        }
+        if ($student) {
+            $this->hit('GET', '/supervisor/reports/student/' . $student->id, 2);
+            $this->hit('GET', '/supervisor/reports/student/' . $student->id . '?export=pdf', 2);
+        }
+    }
+
+    public function test_student_routes()
+    {
+        $this->hit('GET', '/student/reports', 3);
+    }
+
+    public function test_parent_routes()
+    {
+        $this->hit('GET', '/parent/reports', 4);
+    }
+}

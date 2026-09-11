@@ -13,437 +13,195 @@
 @endsection
 
 @php
-$reports = [
-    [
-        'title' => 'تقرير التسميع',
-        'desc' => 'عرض إحصائيات وتسجيلات جلسات التسميع للطلاب مع إمكانية التصفية حسب الطالب والنوع والفترة الزمنية',
-        'icon' => 'fa-quran',
-        'color' => 'primary',
-        'gradient' => 'linear-gradient(135deg, #182B48 0%, #2A4570 100%)',
-        'icon_bg' => 'linear-gradient(135deg, #d4a030 0%, #e6b84d 100%)',
-        'link' => route('supervisor.reports.recitation'),
-        'stat_color' => '#d4a030',
-        'features' => ['إحصائيات شاملة', 'تصفية متقدمة', 'تصدير PDF']
-    ],
-    [
-        'title' => 'تقرير الحضور والغياب',
-        'desc' => 'عرض سجلات الحضور والغياب للطلاب مع إحصائيات كاملة ونسبة الحضور',
-        'icon' => 'fa-calendar-check',
-        'color' => 'success',
-        'gradient' => 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-        'icon_bg' => 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-        'link' => route('supervisor.reports.attendance'),
-        'stat_color' => '#059669',
-        'features' => ['نسبة الحضور', 'حضور الطلاب', 'سجل كامل']
-    ],
-    [
-        'title' => 'تقرير الطلاب',
-        'desc' => 'تقرير مفصل لكل طالب يشمل进度 التسميع والحضور والإنجاز',
-        'icon' => 'fa-users',
-        'color' => 'info',
-        'gradient' => 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
-        'icon_bg' => 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
-        'link' => route('supervisor.students.index'),
-        'stat_color' => '#0891b2',
-        'features' => ['بيانات شاملة', 'تقييم الأداء', 'سجل متكامل']
-    ],
-    [
-        'title' => 'إحصائيات عامة',
-        'desc' => 'عرض ملخص الإحصائيات العامة للمرافقين والإحصائيات الموسمية',
-        'icon' => 'fa-chart-pie',
-        'color' => 'warning',
-        'gradient' => 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-        'icon_bg' => 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-        'link' => '#',
-        'stat_color' => '#d97706',
-        'features' => ['ملخص شامل', 'تقارير موسمية', 'تحليل البيانات']
-    ]
-];
+    $successRate = $stats['total_sessions'] > 0
+        ? round(($stats['passed_sessions'] / $stats['total_sessions']) * 100)
+        : 0;
 @endphp
 
-@push('styles')
-<style>
-.reports-index {
-    --gold: #d4a030;
-    --gold-light: #e6b84d;
-    --navy: #182B48;
-    --navy-light: #2A4570;
-}
-
-.reports-index .hero-section {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 16px;
-    padding: 28px 32px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-}
-
-.reports-index .hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
-}
-
-.reports-index .hero-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.reports-index .hero-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: white;
-    box-shadow: 0 8px 24px rgba(212, 160, 48, 0.4);
-    flex-shrink: 0;
-}
-
-.reports-index .hero-text h1 {
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-
-.reports-index .hero-text p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
-    margin: 0;
-}
-
-.reports-index .report-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 100%;
-    border: 1px solid rgba(24, 43, 72, 0.04);
-}
-
-.reports-index .report-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-}
-
-.reports-index .report-card-header {
-    padding: 20px 24px;
-    position: relative;
-    overflow: hidden;
-}
-
-.reports-index .report-card-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-}
-
-.reports-index .report-card-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: white;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-    margin-bottom: 16px;
-}
-
-.reports-index .report-card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 8px;
-}
-
-.reports-index .report-card-desc {
-    font-size: 13px;
-    color: #6b7280;
-    line-height: 1.6;
-    margin-bottom: 16px;
-}
-
-.reports-index .report-card-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.reports-index .feature-badge {
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.04) 0%, rgba(42, 69, 112, 0.06) 100%);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.reports-index .feature-badge i {
-    color: var(--gold);
-}
-
-.reports-index .report-card-footer {
-    padding: 16px 24px;
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.03) 100%);
-    border-top: 1px solid rgba(24, 43, 72, 0.04);
-}
-
-.reports-index .report-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    width: 100%;
-}
-
-.reports-index .report-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    color: white;
-}
-
-.reports-index .quick-stats {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-}
-
-.reports-index .quick-stats-header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 18px 24px;
-    position: relative;
-    overflow: hidden;
-}
-
-.reports-index .quick-stats-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-}
-
-.reports-index .quick-stats-header h5 {
-    color: white;
-    font-weight: 700;
-    margin: 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.reports-index .quick-stats-header h5 i {
-    color: var(--gold);
-}
-
-.reports-index .stat-card {
-    padding: 20px;
-    text-align: center;
-    border-left: 1px solid rgba(24, 43, 72, 0.06);
-    transition: all 0.3s ease;
-}
-
-.reports-index .stat-card:hover {
-    background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.03) 100%);
-}
-
-.reports-index .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 20px;
-}
-
-.reports-index .stat-value {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
-}
-
-.reports-index .stat-label {
-    font-size: 12px;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.reports-index .islamic-border {
-    border-radius: 16px;
-    position: relative;
-}
-
-.reports-index .islamic-border::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    border-radius: 0 0 0 4px;
-}
-
-.reports-index .bismillah {
-    font-family: 'Amiri', serif;
-    font-size: 28px;
-    color: var(--navy);
-    text-align: center;
-    margin-bottom: 20px;
-    opacity: 0.6;
-}
-
-@media (max-width: 768px) {
-    .reports-index .stat-card {
-        border-left: none;
-        border-bottom: 1px solid rgba(24, 43, 72, 0.06);
-    }
-}
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-@endpush
-
 @section('content')
-<div class="reports-index">
-    <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+@include('admin.reports._styles')
 
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="hero-text">
-                <h1>التقارير والإحصائيات</h1>
-                <p>عرض شامل للتقارير والإحصائيات الخاصة بالتسميع والحضور والإنجاز</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        @foreach($reports as $report)
-        <div class="col-md-6">
-            <div class="report-card">
-                <div class="report-card-header" style="background: {{ $report['gradient'] }};">
-                    <div class="report-card-icon" style="background: {{ $report['icon_bg'] }};">
-                        <i class="fas {{ $report['icon'] }}"></i>
-                    </div>
-                    <h4 class="report-card-title" style="color: white;">{{ $report['title'] }}</h4>
-                </div>
-                <div class="card-body" style="padding: 20px 24px;">
-                    <p class="report-card-desc">{{ $report['desc'] }}</p>
-                    <div class="report-card-features">
-                        @foreach($report['features'] as $feature)
-                        <span class="feature-badge">
-                            <i class="fas fa-check-circle"></i>
-                            {{ $feature }}
-                        </span>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="report-card-footer">
-                    <a href="{{ $report['link'] }}" class="report-btn" style="background: {{ $report['gradient'] }}; color: white;">
-                        <i class="fas fa-arrow-right"></i>
-                        عرض التقرير
-                    </a>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
-
-    <div class="quick-stats islamic-border">
-        <div class="quick-stats-header">
-            <h5>
-                <i class="fas fa-chart-line"></i>
-                ملخص سريع لهذا الشهر
-            </h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="row g-0">
-                @php
-                    $currentMonth = \Carbon\Carbon::now()->startOfMonth();
-                    $currentMonthEnd = \Carbon\Carbon::now()->endOfMonth();
-                    $totalStudents = $students->count();
-                    $monthSessions = \App\Models\RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', auth()->id()))->whereBetween('session_date', [$currentMonth, $currentMonthEnd])->count();
-                    $monthAttendances = \App\Models\Attendance::where('supervisor_id', auth()->id())->whereBetween('date', [$currentMonth, $currentMonthEnd])->count();
-                    $totalAttendance = \App\Models\Attendance::where('supervisor_id', auth()->id())->whereBetween('date', [$currentMonth, $currentMonthEnd])->count();
-                    $presentAttendance = \App\Models\Attendance::where('supervisor_id', auth()->id())->whereBetween('date', [$currentMonth, $currentMonthEnd])->where('status', 'present')->count();
-                    $attendanceRate = $totalAttendance > 0 ? round(($presentAttendance / $totalAttendance) * 100) : 0;
-                @endphp
-                <div class="col-md-3 col-6">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(24, 43, 72, 0.1), rgba(42, 69, 112, 0.15)); color: var(--navy);">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-value" style="color: var(--navy);">{{ $totalStudents }}</div>
-                        <div class="stat-label">إجمالي الطلاب</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(212, 160, 48, 0.15), rgba(230, 184, 77, 0.2)); color: var(--gold);">
-                            <i class="fas fa-book-quran"></i>
-                        </div>
-                        <div class="stat-value" style="color: var(--gold);">{{ $monthSessions }}</div>
-                        <div class="stat-label">جلسات التسميع</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.15), rgba(16, 185, 129, 0.2)); color: #059669;">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="stat-value" style="color: #059669;">{{ $monthAttendances }}</div>
-                        <div class="stat-label">سجلات الحضور</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(167, 139, 250, 0.2)); color: #8b5cf6;">
-                            <i class="fas fa-percentage"></i>
-                        </div>
-                        <div class="stat-value" style="color: #8b5cf6;">{{ $attendanceRate }}%</div>
-                        <div class="stat-label">نسبة الحضور</div>
-                    </div>
-                </div>
-            </div>
+<div class="rpt-header">
+    <div class="rpt-header-content">
+        <div class="rpt-header-icon"><i class="fas fa-chart-bar"></i></div>
+        <div class="rpt-header-text">
+            <h4>التقارير والإحصائيات</h4>
+            <p>عرض شامل للتقارير والإحصائيات الخاصة بالتسميع والحضور والإنجاز</p>
         </div>
     </div>
 </div>
+
+<div class="rpt-kpi-grid">
+    <div class="rpt-kpi" style="--kpi-color:#182B48;--kpi-bg:rgba(24,43,72,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-user-graduate"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['total_students'] }}</div>
+        <div class="rpt-kpi-label">إجمالي الطلاب</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#3498db;--kpi-bg:rgba(52,152,219,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-microphone"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['total_sessions'] }}</div>
+        <div class="rpt-kpi-label">إجمالي الجلسات</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#27ae60;--kpi-bg:rgba(39,174,96,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['passed_sessions'] }}</div>
+        <div class="rpt-kpi-label">جلسات ناجحة</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#c0392b;--kpi-bg:rgba(192,57,43,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['failed_sessions'] }}</div>
+        <div class="rpt-kpi-label">جلسات راسبة</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#d4a030;--kpi-bg:rgba(212,160,48,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-percentage"></i></div>
+        <div class="rpt-kpi-value">{{ $successRate }}%</div>
+        <div class="rpt-kpi-label">نسبة النجاح</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#8e44ad;--kpi-bg:rgba(142,68,173,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-star"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['avg_score'] }}%</div>
+        <div class="rpt-kpi-label">متوسط الدرجات</div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+    <div class="rpt-chart-card">
+        <h6><i class="fas fa-chart-line"></i> أداء التسميع — الشهر الحالي</h6>
+        <div class="rpt-chart-wrap"><canvas id="supRecMonthChart"></canvas></div>
+    </div>
+    <div class="rpt-chart-card">
+        <h6><i class="fas fa-calendar-check"></i> الحضور — الشهر الحالي</h6>
+        <div class="rpt-chart-wrap"><canvas id="supAttMonthChart"></canvas></div>
+    </div>
+</div>
+
+<div class="rpt-chart-card" style="margin-bottom: 24px;">
+    <h6><i class="fas fa-trophy"></i> أفضل الطلاب أداءً (الشهر)</h6>
+    @if(!empty($topStudents))
+        <div class="rpt-mini-list">
+            @foreach($topStudents as $i => $s)
+                <div class="rpt-mini-row r{{ $i+1 }}">
+                    <span class="rpt-mini-rank">{{ $i+1 }}</span>
+                    <span class="rpt-mini-name">{{ $s['name'] }}</span>
+                    <div class="rpt-mini-bar"><div class="rpt-mini-bar-fill" style="width: {{ min(100, $s['avg_score']) }}%"></div></div>
+                    <span class="rpt-mini-score">{{ $s['avg_score'] }}%</span>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <div class="rpt-empty"><p>لا توجد بيانات لهذا الشهر</p></div>
+    @endif
+</div>
+
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
+    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#182B48,#2A4570);padding:20px;display:flex;align-items:center;gap:18px;">
+            <div style="width:54px;height:54px;background:linear-gradient(135deg,#d4a030,#B4802C);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;flex-shrink:0;"><i class="fas fa-quran"></i></div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير التسميع</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">جلسات التسميع والاختبارات</div>
+            </div>
+        </div>
+        <div style="padding:20px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">عرض تقارير شاملة لجلسات التسميع مع إحصائيات النجاح والرسوب، الرسوم البيانية، والتصدير.</p>
+            <a href="{{ route('supervisor.reports.recitation') }}" class="rpt-btn rpt-btn-primary"><i class="fas fa-chart-line"></i> عرض التقرير</a>
+        </div>
+    </div>
+
+    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#059669,#10b981);padding:20px;display:flex;align-items:center;gap:18px;">
+            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#059669;font-size:22px;flex-shrink:0;"><i class="fas fa-calendar-check"></i></div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير الحضور</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">سجلات الحضور والانصراف</div>
+            </div>
+        </div>
+        <div style="padding:20px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">عرض تقارير الحضور مع نسب الحضور والغياب، الرسوم البيانية، والتصدير.</p>
+            <a href="{{ route('supervisor.reports.attendance') }}" class="rpt-btn rpt-btn-success"><i class="fas fa-chart-line"></i> عرض التقرير</a>
+        </div>
+    </div>
+
+    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#0891b2,#06b6d4);padding:20px;display:flex;align-items:center;gap:18px;">
+            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#0891b2;font-size:22px;flex-shrink:0;"><i class="fas fa-users"></i></div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير طالب</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">تقرير مفصل لكل طالب</div>
+            </div>
+        </div>
+        <div style="padding:20px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">تقرير مفصل لكل طالب يشمل بيانات التسميع والحضور والإنجاز.</p>
+            <a href="{{ route('supervisor.students.index') }}" class="rpt-btn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;box-shadow:0 4px 12px rgba(8,145,178,0.25);"><i class="fas fa-users"></i> اختيار طالب</a>
+        </div>
+    </div>
+
+    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:20px;display:flex;align-items:center;gap:18px;">
+            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:22px;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700;">التقرير الربعي</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">تقرير شامل لكل ربع من السنة</div>
+            </div>
+        </div>
+        <div style="padding:20px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">تقرير ربعي يجمع إحصائيات التسميع والحضور على مدى 3 أشهر، مع رسوم بيانية شهرية وفلاتر متقدمة وتصدير.</p>
+            <a href="{{ route('supervisor.reports.quarter') }}" class="rpt-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.25);"><i class="fas fa-chart-line"></i> عرض التقرير</a>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+(function () {
+    if (!window.Chart) return;
+    var recTrend = @json($monthTrend ?? []);
+    var attTrend = @json($attendanceTrend ?? []);
+    var recEl = document.getElementById('supRecMonthChart');
+    if (recEl) {
+        new Chart(recEl, {
+            type: 'bar',
+            data: {
+                labels: recTrend.map(function (t) { return t.date; }),
+                datasets: [
+                    { type: 'bar',  label: 'إجمالي',  data: recTrend.map(function (t) { return t.total; }), backgroundColor: 'rgba(24,43,72,0.65)', borderColor: '#182B48', borderWidth: 1, borderRadius: 6, yAxisID: 'y' },
+                    { type: 'line', label: 'ناجح',    data: recTrend.map(function (t) { return t.passed; }), borderColor: '#d4a030', backgroundColor: 'rgba(212,160,48,0.15)', borderWidth: 2, tension: 0.35, pointRadius: 3, yAxisID: 'y' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                    y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 }, grid: { color: '#f1f5f9' } }
+                }
+            }
+        });
+    }
+    var attEl = document.getElementById('supAttMonthChart');
+    if (attEl) {
+        new Chart(attEl, {
+            type: 'line',
+            data: {
+                labels: attTrend.map(function (t) { return t.date; }),
+                datasets: [
+                    { label: 'إجمالي', data: attTrend.map(function (t) { return t.total; }), borderColor: '#182B48', backgroundColor: 'rgba(24,43,72,0.12)', tension: 0.35, fill: true, pointRadius: 3, yAxisID: 'y' },
+                    { label: 'حاضر',  data: attTrend.map(function (t) { return t.present; }), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.12)', tension: 0.35, fill: true, pointRadius: 3, yAxisID: 'y' },
+                    { label: 'نسبة الحضور %', data: attTrend.map(function (t) { return t.rate; }), borderColor: '#d4a030', borderDash: [5, 4], borderWidth: 2, tension: 0.35, pointRadius: 2, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                    y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 }, grid: { color: '#f1f5f9' } },
+                    y1: { beginAtZero: true, position: 'right', max: 100, ticks: { font: { size: 10 }, callback: function (v) { return v + '%'; } }, grid: { display: false } }
+                }
+            }
+        });
+    }
+})();
+</script>
+@endpush
 @endsection
