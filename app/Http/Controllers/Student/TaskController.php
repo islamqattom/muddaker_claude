@@ -222,7 +222,7 @@ class TaskController extends Controller
     {
         $student = Student::where('user_id', auth()->id())->firstOrFail();
 
-        $ids = $request->input('ids',');
+        $ids = $request->input('ids',[]);
         if (!is_array($ids) || empty($ids)) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'لم يتم تحديد أي مهمة'], 422);

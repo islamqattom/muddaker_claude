@@ -154,4 +154,17 @@ class YawmAlHimmaController extends Controller
             'session' => $session,
         ]);
     }
+
+    public function updateSupervisor(Request $request, YawmAlHimmaSession $session)
+    {
+        $data = $request->validate([
+            'supervisor_name' => 'required|string|max:255',
+        ]);
+
+        $session->update(['supervisor_name' => $data['supervisor_name']]);
+
+        return redirect()
+            ->route('guest.yawm-al-himma.result', ['session' => $session->id])
+            ->with('supervisor_updated', true);
+    }
 }

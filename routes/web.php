@@ -36,6 +36,7 @@ Route::prefix('guest/yawm-al-himma')->name('guest.yawm-al-himma.')->group(functi
     Route::post('/evaluate', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'showEvaluation'])->name('evaluate');
     Route::post('/save', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'save'])->name('save');
     Route::get('/result/{session}', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'result'])->name('result');
+    Route::patch('/result/{session}/supervisor', [\App\Http\Controllers\Guest\YawmAlHimmaController::class, 'updateSupervisor'])->name('supervisor.update');
 });
 
 // ============================
@@ -105,6 +106,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/', [Admin\ReportController::class, 'index'])->name('index');
         Route::get('/recitation', [Admin\ReportController::class, 'recitation'])->name('recitation');
         Route::get('/attendance', [Admin\ReportController::class, 'attendance'])->name('attendance');
+        Route::get('/quarter', [Admin\ReportController::class, 'quarter'])->name('quarter');
+        Route::get('/half', [Admin\ReportController::class, 'half'])->name('half');
+        Route::get('/year', [Admin\ReportController::class, 'year'])->name('year');
     });
 
     // Mafil history (اختبار الأجزاء)
@@ -266,6 +270,9 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/', [Supervisor\ReportController::class, 'index'])->name('index');
         Route::get('/recitation', [Supervisor\ReportController::class, 'recitationReport'])->name('recitation');
         Route::get('/attendance', [Supervisor\ReportController::class, 'attendanceReport'])->name('attendance');
+        Route::get('/quarter', [Supervisor\ReportController::class, 'quarterReport'])->name('quarter');
+        Route::get('/half', [Supervisor\ReportController::class, 'halfReport'])->name('half');
+        Route::get('/year', [Supervisor\ReportController::class, 'yearReport'])->name('year');
         Route::get('/student/{student}', [Supervisor\ReportController::class, 'studentReport'])->name('student');
     });
 
