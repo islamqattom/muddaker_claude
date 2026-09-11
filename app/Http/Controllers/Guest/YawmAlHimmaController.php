@@ -193,23 +193,40 @@ class YawmAlHimmaController extends Controller
             'session_date' => 'required|date',
             'parts' => 'required|array|min:1',
             'parts.*' => 'integer|min:1|max:30',
-            'pages' => 'required|array',
-            'pages.*.part_number' => 'required|integer|min:1|max:30',
-            'pages.*.page_number' => 'required|integer|min:1',
-            'pages.*.errors' => 'required|integer|min:0',
-            'pages.*.hesitations' => 'required|integer|min:0',
+            'pages' => 'nullable|array',
+            'pages.*.part_number' => 'nullable|integer|min:1|max:30',
+            'pages.*.page_number' => 'nullable|integer|min:1',
+            'pages.*.errors' => 'nullable|integer|min:0',
+            'pages.*.hesitations' => 'nullable|integer|min:0',
             'notes' => 'nullable|string|max:2000',
         ]);
 
         $selectedParts = array_values(array_unique(array_map('intval', $data['parts'])));
         sort($selectedParts);
 
-        $pages = array_values($data['pages']);
+        $rawPages = $data['pages'] ?? [];
+        $pages = [];
         $totalErrors = 0;
         $totalHesitations = 0;
-        foreach ($pages as $p) {
-            $totalErrors += (int) $p['errors'];
-            $totalHesitations += (int) $p['hesitations'];
+        foreach ($rawPages as $key => $p) {
+            $partNumber = (int) ($p['part_number'] ?? 0);
+            $pageNumber = (int) ($p['page_number'] ?? 0);
+            if ($partNumber < 1 || $pageNumber < 1) {
+                continue;
+            }
+            if (! in_array($partNumber, $selectedParts, true)) {
+                continue;
+            }
+            $errors = max(0, (int) ($p['errors'] ?? 0));
+            $hesitations = max(0, (int) ($p['hesitations'] ?? 0));
+            $pages[] = [
+                'part_number' => $partNumber,
+                'page_number' => $pageNumber,
+                'errors' => $errors,
+                'hesitations' => $hesitations,
+            ];
+            $totalErrors += $errors;
+            $totalHesitations += $hesitations;
         }
 
         $session->update([

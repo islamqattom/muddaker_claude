@@ -111,8 +111,8 @@
                         @php
                             $key = $part->part_number . '_' . $pageNum;
                             $existing = $existingPages->get($key);
-                            $errorsVal = old("pages.{$key}.errors", $existing['errors'] ?? 0);
-                            $hesitationsVal = old("pages.{$key}.hesitations", $existing['hesitations'] ?? 0);
+                            $errorsVal = (int) (old("pages.{$key}.errors", $existing['errors'] ?? 0));
+                            $hesitationsVal = (int) (old("pages.{$key}.hesitations", $existing['hesitations'] ?? 0));
                         @endphp
                         <div class="page-row" data-part="{{ $part->part_number }}" data-page="{{ $pageNum }}">
                             <div class="page-number-badge">ص {{ $pageNum }}</div>
@@ -123,6 +123,7 @@
                                            id="err-{{ $key }}"
                                            name="pages[{{ $key }}][errors]"
                                            data-part="{{ $part->part_number }}" data-page="{{ $pageNum }}" data-kind="errors"
+                                           {{ $isSelected ? '' : 'disabled' }}
                                            oninput="recalc()">
                                     <button type="button" class="counter-btn plus" onclick="adj('err-{{ $key }}', 1)">+</button>
                                 </div>
@@ -134,12 +135,13 @@
                                            id="hes-{{ $key }}"
                                            name="pages[{{ $key }}][hesitations]"
                                            data-part="{{ $part->part_number }}" data-page="{{ $pageNum }}" data-kind="hesitations"
+                                           {{ $isSelected ? '' : 'disabled' }}
                                            oninput="recalc()">
                                     <button type="button" class="counter-btn plus" onclick="adj('hes-{{ $key }}', 1)">+</button>
                                 </div>
                             </div>
-                            <input type="hidden" name="pages[{{ $key }}][part_number]" value="{{ $part->part_number }}">
-                            <input type="hidden" name="pages[{{ $key }}][page_number]" value="{{ $pageNum }}">
+                            <input type="hidden" name="pages[{{ $key }}][part_number]" value="{{ $part->part_number }}" {{ $isSelected ? '' : 'disabled' }}>
+                            <input type="hidden" name="pages[{{ $key }}][page_number]" value="{{ $pageNum }}" {{ $isSelected ? '' : 'disabled' }}>
                         </div>
                     @endforeach
                 </div>
@@ -210,7 +212,11 @@ document.addEventListener('DOMContentLoaded', function () {
             var partNum = cb.dataset.part;
             var section = document.querySelector('.part-pages[data-part="' + partNum + '"]');
             if (!section) return;
-            section.style.display = cb.checked ? '' : 'none';
+            var enabled = cb.checked;
+            section.style.display = enabled ? '' : 'none';
+            section.querySelectorAll('input').forEach(function (inp) {
+                inp.disabled = !enabled;
+            });
             recalc();
         });
     });
