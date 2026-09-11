@@ -42,12 +42,12 @@
     </div>
     @endif
 
-    <div class="text-center mt-4 d-flex flex-wrap gap-2 justify-content-center">
-        <a href="{{ route('guest.yawm-al-himma.index') }}" class="btn-gold">
-            <i class="fas fa-plus me-1"></i> تسجيل تقييم جديد
-        </a>
+    <div class="d-flex flex-wrap gap-2 justify-content-between mt-4">
         <a href="{{ route('guest.yawm-al-himma.sessions.index') }}" class="btn-outline-navy">
             <i class="fas fa-edit me-1"></i> تعديل جلسات سابقة
+        </a>
+        <a href="{{ route('guest.yawm-al-himma.index') }}" class="btn-gold">
+            <i class="fas fa-plus me-1"></i> تسجيل تقييم جديد
         </a>
     </div>
 </div>
