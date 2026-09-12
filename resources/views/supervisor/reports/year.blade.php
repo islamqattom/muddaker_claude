@@ -98,6 +98,11 @@
 </div>
 @endif
 
+@if(!empty($breakdown))
+@php $periodLabel = 'السنة'; @endphp
+    @include('admin.reports._written_report')
+@endif
+
 <div class="rpt-filter">
     <div class="rpt-filter-header"><i class="fas fa-filter"></i><span>فلاتر التقرير</span></div>
     <div class="rpt-filter-body">

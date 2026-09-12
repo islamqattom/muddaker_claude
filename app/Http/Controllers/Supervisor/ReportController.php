@@ -239,6 +239,7 @@ class ReportController extends Controller
             'recTrend'       => $this->reports->recitationMonthlyTrend($allSessions),
             'attTrend'       => $this->reports->attendanceMonthlyTrend($allAttendances),
             'top'            => $this->reports->topStudents($allSessions, 5),
+            'breakdown'      => $this->reports->studentBreakdown($allSessions),
             'fromDate'       => $fromDate,
             'toDate'         => $toDate,
         ];

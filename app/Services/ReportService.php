@@ -316,6 +316,43 @@ class ReportService
             ->toArray();
     }
 
+    /**
+     * Per-student textual breakdown of recitation sessions by type.
+     * Used by the admin/supervisor quarter / half / year reports to render
+     * a written summary: how many parts each student recited as mafsil,
+     * how many new parts they memorized, how many review/recitation
+     * sessions they had, etc.
+     */
+    public function studentBreakdown(Collection $sessions): array
+    {
+        return $sessions
+            ->groupBy('student_id')
+            ->map(function ($group) {
+                $student = $group->first()?->student;
+                $review        = $group->where('type', 'review');
+                $newMemorize   = $group->where('type', 'new_memorization');
+                $recitation    = $group->where('type', 'recitation');
+                $unmastered    = $group->where('type', 'unmastered');
+                $mafsil        = $group->where('type', 'mafsil');
+
+                return [
+                    'student_id'                  => $student?->id,
+                    'name'                        => $student?->user?->name ?? '—',
+                    'total_sessions'              => $group->count(),
+                    'review_sessions'             => $review->count(),
+                    'new_memorization_sessions'   => $newMemorize->count(),
+                    'new_memorization_parts'      => $newMemorize->pluck('part_id')->filter()->unique()->count(),
+                    'recitation_sessions'         => $recitation->count(),
+                    'unmastered_sessions'         => $unmastered->count(),
+                    'mafsil_sessions'             => $mafsil->count(),
+                    'mafsil_parts'                => $mafsil->pluck('part_id')->filter()->unique()->count(),
+                ];
+            })
+            ->sortBy('name')
+            ->values()
+            ->toArray();
+    }
+
     public function dropdownData(Request $request, ?int $supervisorScopeUserId = null): array
     {
         $supervisors = Supervisor::with('user')->orderBy('employee_number')->get();
