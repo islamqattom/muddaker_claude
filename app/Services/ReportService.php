@@ -340,17 +340,39 @@ class ReportService
                     'name'                        => $student?->user?->name ?? '—',
                     'total_sessions'              => $group->count(),
                     'review_sessions'             => $review->count(),
+                    'review_pages'                => $this->sumPages($review),
                     'new_memorization_sessions'   => $newMemorize->count(),
                     'new_memorization_parts'      => $newMemorize->pluck('part_id')->filter()->unique()->count(),
+                    'new_memorization_pages'      => $this->sumPages($newMemorize),
                     'recitation_sessions'         => $recitation->count(),
+                    'recitation_pages'            => $this->sumPages($recitation),
                     'unmastered_sessions'         => $unmastered->count(),
                     'mafsil_sessions'             => $mafsil->count(),
                     'mafsil_parts'                => $mafsil->pluck('part_id')->filter()->unique()->count(),
+                    'mafsil_pages'                => $this->sumPages($mafsil),
                 ];
             })
             ->sortBy('name')
             ->values()
             ->toArray();
+    }
+
+    /**
+     * Sum pages across a session collection. Prefers the persisted
+     * `total_pages` column and falls back to (end_page - start_page + 1)
+     * when null. Treats missing start/end as 0.
+     */
+    private function sumPages(Collection $sessions): int
+    {
+        return (int) $sessions->sum(function ($s) {
+            if ($s->total_pages !== null) {
+                return (int) $s->total_pages;
+            }
+            if ($s->start_page && $s->end_page) {
+                return max(0, ((int) $s->end_page) - ((int) $s->start_page) + 1);
+            }
+            return 0;
+        });
     }
 
     public function dropdownData(Request $request, ?int $supervisorScopeUserId = null): array

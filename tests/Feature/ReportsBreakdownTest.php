@@ -64,13 +64,15 @@ class ReportsBreakdownTest extends BaseTestCase
         ]);
     }
 
-    private function makeSession(int $studentId, string $type, ?int $partId = null, string $status = 'passed'): void
+    private function makeSession(int $studentId, string $type, ?int $partId = null, int $totalPages = 3, string $status = 'passed'): void
     {
         RecitationSession::create([
             'student_id' => $studentId, 'student_name' => 'طالب',
             'supervisor_id' => $this->supervisorId, 'type' => $type, 'part_id' => $partId,
             'session_date' => now()->toDateString(),
             'total_errors' => 0, 'total_hesitations' => 0, 'status' => $status,
+            'total_pages' => $totalPages,
+            'start_page' => 1, 'end_page' => $totalPages,
             'final_score' => 85.0,
         ]);
     }
@@ -114,12 +116,12 @@ class ReportsBreakdownTest extends BaseTestCase
     public function test_breakdown_counts_match_actual_sessions(): void
     {
         $student = $this->makeStudent('طالب عدّ', 'count');
-        // 2 mafsil sessions
-        $this->makeSession($student->id, 'mafsil', null);
-        $this->makeSession($student->id, 'mafsil', null);
-        // 3 review sessions
+        // 2 mafsil sessions of 4 pages each
+        $this->makeSession($student->id, 'mafsil', null, 4);
+        $this->makeSession($student->id, 'mafsil', null, 4);
+        // 3 review sessions of 5 pages each = 15 review pages
         for ($i = 0; $i < 3; $i++) {
-            $this->makeSession($student->id, 'review', 1);
+            $this->makeSession($student->id, 'review', 1, 5);
         }
 
         $admin = User::firstWhere('role', 'admin');
@@ -134,22 +136,37 @@ class ReportsBreakdownTest extends BaseTestCase
             'Breakdown row for student should exist');
         $row = $matches[0];
 
-        // Mafsil: 0 distinct parts (no part_id on mafsil), 2 sessions
-        $this->assertStringContainsString('عدد الأجزاء المقدمة مفصل', $row,
-            'Should include mafsil section for student');
-        // Both numbers (0 parts, 2 sessions) appear in the row in the mafsil block
+        // Mafsil: 0 distinct parts (no part_id on mafsil), 2 sessions, 8 pages
         preg_match('/عدد الأجزاء المقدمة مفصل.*?<\/div>/s', $row, $mafsilBlock);
         $this->assertNotEmpty($mafsilBlock, 'mafsil block should be extracted');
-        $this->assertStringContainsString('>0<', $mafsilBlock[0],
-            'Should show 0 mafsil parts');
-        $this->assertStringContainsString('>2<', $mafsilBlock[0],
-            'Should show 2 mafsil sessions');
+        $this->assertStringContainsString('>0<', $mafsilBlock[0], 'Should show 0 mafsil parts');
+        $this->assertStringContainsString('>2<', $mafsilBlock[0], 'Should show 2 mafsil sessions');
+        $this->assertStringContainsString('8 صفحة', $mafsilBlock[0], 'Should show 8 mafsil pages');
 
-        // Review: 3 sessions
+        // Review: 3 sessions, 15 pages
         preg_match('/المراجعة:.*?<\/div>/s', $row, $reviewBlock);
         $this->assertNotEmpty($reviewBlock, 'review block should be extracted');
-        $this->assertStringContainsString('>3<', $reviewBlock[0],
-            'Should show 3 review sessions');
+        $this->assertStringContainsString('>3<', $reviewBlock[0], 'Should show 3 review sessions');
         $this->assertStringContainsString('جلسات مراجعة', $reviewBlock[0]);
+        $this->assertStringContainsString('15 صفحة', $reviewBlock[0], 'Should show 15 review pages');
+    }
+
+    public function test_breakdown_includes_pages_count_for_new_memorization(): void
+    {
+        $student = $this->makeStudent('طالب حفظ', 'memorize');
+        // 2 new memorization sessions of 6 pages each = 12 pages, on the same part_id (1)
+        // so we test the pages total rather than parts count
+        $this->makeSession($student->id, 'new_memorization', 1, 6);
+        $this->makeSession($student->id, 'new_memorization', 1, 6);
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get('/admin/reports/quarter?student_id=' . $student->id);
+        $resp->assertStatus(200);
+        $body = $resp->getContent();
+
+        preg_match('/إجمالي الأجزاء الجديدة المحفوظة.*?<\/div>/s', $body, $block);
+        $this->assertNotEmpty($block, 'new_memorization block should be extracted');
+        $this->assertStringContainsString('>2<', $block[0], 'Should show 2 sessions');
+        $this->assertStringContainsString('12 صفحة', $block[0], 'Should show 12 new memorization pages');
     }
 }

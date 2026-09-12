@@ -16,6 +16,7 @@
                             </span>
                             <span>
                                 <strong style="color:#182B48;">{{ $row['mafsil_parts'] }}</strong> جزء
+                                ({{ number_format($row['mafsil_pages']) }} صفحة)
                                 في
                                 <strong style="color:#182B48;">{{ $row['mafsil_sessions'] }}</strong>
                                 {{ $row['mafsil_sessions'] == 1 ? 'جلسة' : 'جلسات' }}
@@ -30,6 +31,7 @@
                             </span>
                             <span>
                                 <strong style="color:#182B48;">{{ $row['new_memorization_parts'] }}</strong> جزء
+                                ({{ number_format($row['new_memorization_pages']) }} صفحة)
                                 في
                                 <strong style="color:#182B48;">{{ $row['new_memorization_sessions'] }}</strong>
                                 {{ $row['new_memorization_sessions'] == 1 ? 'جلسة' : 'جلسات' }}
@@ -45,6 +47,7 @@
                             <span>
                                 <strong style="color:#182B48;">{{ $row['review_sessions'] }}</strong>
                                 {{ $row['review_sessions'] == 1 ? 'جلسة مراجعة' : 'جلسات مراجعة' }}
+                                ({{ number_format($row['review_pages']) }} صفحة)
                             </span>
                         </div>
                     @endif
@@ -57,6 +60,7 @@
                             <span>
                                 <strong style="color:#182B48;">{{ $row['recitation_sessions'] }}</strong>
                                 {{ $row['recitation_sessions'] == 1 ? 'جلسة سرد' : 'جلسات سرد' }}
+                                ({{ number_format($row['recitation_pages']) }} صفحة)
                             </span>
                         </div>
                     @endif
@@ -69,6 +73,7 @@
                             <span>
                                 <strong style="color:#182B48;">{{ $row['unmastered_sessions'] }}</strong>
                                 {{ $row['unmastered_sessions'] == 1 ? 'جلسة' : 'جلسات' }}
+                                ({{ number_format($row['unmastered_pages'] ?? 0) }} صفحة)
                             </span>
                         </div>
                     @endif
