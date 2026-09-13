@@ -7,6 +7,7 @@ use App\Models\QuranPart;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Hash;
 use Tests\CreatesApplication;
@@ -42,12 +43,28 @@ class ReportsBreakdownTest extends BaseTestCase
                 'password' => Hash::make('secret'), 'role' => 'admin', 'is_active' => true,
             ]);
         }
-        if (!Level::first()) {
-            Level::create(['id' => 1, 'name' => 'مستوى 1', 'level_number' => 1, 'new_memorization_pages' => 3, 'review_pages' => 6, 'description' => 'تجريبي']);
+
+        // This class does not wrap tests in transactions, so make the seed
+        // resilient to ids already consumed by earlier factory-based tests
+        // (RefreshDatabase rollbacks do not reset AUTO_INCREMENT).
+        Model::unguard();
+
+        Level::firstOrCreate(['id' => 1], [
+            'name' => 'مستوى 1', 'level_number' => 1,
+            'new_memorization_pages' => 3, 'review_pages' => 6, 'description' => 'تجريبي',
+        ]);
+
+        // part_number is unique: free it from any stale row before seeding id=1.
+        $stalePart = QuranPart::where('part_number', 1)->where('id', '!=', 1)->first();
+        if ($stalePart) {
+            RecitationSession::where('part_id', $stalePart->id)->update(['part_id' => null]);
+            $stalePart->delete();
         }
-        if (!QuranPart::first()) {
-            QuranPart::create(['id' => 1, 'part_number' => 1, 'name' => 'الجزء الأول', 'start_page' => 1, 'end_page' => 20]);
-        }
+        QuranPart::firstOrCreate(['id' => 1], [
+            'part_number' => 1, 'name' => 'الجزء الأول', 'start_page' => 1, 'end_page' => 20,
+        ]);
+
+        Model::reguard();
     }
 
     private function makeStudent(string $name, string $suffix): Student

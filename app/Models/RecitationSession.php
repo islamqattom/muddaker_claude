@@ -53,7 +53,7 @@ class RecitationSession extends Model
         'mafsil_type', 'max_score', 'final_score',
         'error_score', 'hesitation_score', 'fail_score',
         'unmastered_pages_count', 'session_date', 'day', 'notes',
-        'additional_pages', 'repeated_pages'
+        'additional_pages', 'repeated_pages', 'attendance_id', 'auto_generated'
     ];
 
     protected $casts = [
@@ -63,6 +63,7 @@ class RecitationSession extends Model
         'error_score' => 'float',
         'hesitation_score' => 'float',
         'fail_score' => 'float',
+        'auto_generated' => 'boolean',
     ];
 
     protected static function boot()
@@ -89,6 +90,11 @@ class RecitationSession extends Model
     public function part()
     {
         return $this->belongsTo(QuranPart::class, 'part_id');
+    }
+
+    public function attendance()
+    {
+        return $this->belongsTo(Attendance::class, 'attendance_id');
     }
 
     public function pages()

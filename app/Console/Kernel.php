@@ -15,6 +15,12 @@ class Kernel extends ConsoleKernel {
 
         $schedule->command('notifications:daily-reminder')
             ->dailyAt('08:00');
+
+        // Auto-register "لم يسمع" sessions for present students who were not
+        // recited within the grace period (Saturday/Tuesday by default).
+        $schedule->command('recitation:register-missed')
+            ->hourly()
+            ->withoutOverlapping();
     }
     protected function commands(): void { $this->load(__DIR__.'/Commands'); require base_path('routes/console.php'); }
 }

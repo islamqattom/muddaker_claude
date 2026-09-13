@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\ParentProfile;
 use App\Models\Level;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Hash;
 use Tests\CreatesApplication;
@@ -22,10 +23,15 @@ class ReportRoutesSmokeTest extends BaseTestCase
 
     private function seedUsers(): void
     {
-        if (!Level::find(1)) {
-            Level::create(['id' => 1, 'name' => 'مستوى 1', 'level_number' => 1, 'new_memorization_pages' => 3, 'review_pages' => 6, 'description' => 'تجريبي']);
-        }
-        User::unguard();
+        // Force canonical ids: this class does not use transactions and
+        // AUTO_INCREMENT is not reset by RefreshDatabase rollbacks.
+        Model::unguard();
+
+        Level::firstOrCreate(['id' => 1], [
+            'name' => 'مستوى 1', 'level_number' => 1,
+            'new_memorization_pages' => 3, 'review_pages' => 6, 'description' => 'تجريبي',
+        ]);
+
         User::updateOrCreate(
             ['email' => 'admin@test.local'],
             ['id' => 1, 'name' => 'مدير النظام', 'username' => 'admin', 'password' => Hash::make('secret'), 'role' => 'admin']
