@@ -19,10 +19,6 @@
 </a>
 
 <span class="nav-section-title">إدارة الطلاب</span>
-<a href="{{ route('supervisor.students.index') }}" class="nav-link {{ request()->routeIs('supervisor.students.*') ? 'active' : '' }}">
-    <div class="icon-wrapper"><i class="fas fa-users"></i></div>
-    <span>الطلاب</span>
-</a>
 <a href="{{ route('supervisor.attendance.index') }}" class="nav-link {{ request()->routeIs('supervisor.attendance.index') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-calendar-check"></i></div>
     <span>الحضور والغياب</span>

@@ -27,7 +27,9 @@ class StudentImanReportService
         $entriesByProgram = [];
         $criteriaStats = [];
 
-        $totalCriteria = max(1, $programs->sum(fn ($p) => $p->criteria->count()));
+        // Completion of a criterion is measured against the number of days
+        // in the selected period, not against the number of criteria.
+        $daysInPeriod = max(1, ((int) abs($fromDate->copy()->startOfDay()->diffInDays($toDate->copy()->startOfDay()))) + 1);
 
         foreach ($programs as $program) {
             $entries = ImanDailyEntry::where('iman_program_id', $program->id)
@@ -53,9 +55,9 @@ class StudentImanReportService
                 }
 
                 $completion = $criterion->isCheckType()
-                    ? min(100, round(($checked / $totalCriteria) * 100))
+                    ? min(100, round(($checked / $daysInPeriod) * 100))
                     : ($criterion->target_value
-                        ? min(100, round(($valueSum / ($criterion->target_value * $totalCriteria)) * 100))
+                        ? min(100, round(($valueSum / ($criterion->target_value * $daysInPeriod)) * 100))
                         : 0);
 
                 $criteriaStats[$program->id][$criterion->id] = [
@@ -133,7 +135,9 @@ class StudentImanReportService
         $end = Carbon::parse($toDate)->endOfDay();
         $allProgramIds = $programs->pluck('id');
         $criteriaById = $programs->flatMap->criteria->keyBy('id');
-        $expectedPerDay = max(1, $programs->sum(fn ($p) => $p->criteria->count()));
+        // Only active programs set the daily expectation; criteria of
+        // inactive programs would otherwise deflate the completion rate.
+        $expectedPerDay = max(1, $programs->where('is_active', true)->sum(fn ($p) => $p->criteria->count()));
 
         while ($period->lte($end)) {
             $dateStr = $period->toDateString();
@@ -212,7 +216,7 @@ class StudentImanReportService
 
         $allProgramIds = $programs->pluck('id');
         $criteriaById = $programs->flatMap->criteria->keyBy('id');
-        $expectedPerDay = max(1, $programs->sum(fn ($p) => $p->criteria->count()));
+        $expectedPerDay = max(1, $programs->where('is_active', true)->sum(fn ($p) => $p->criteria->count()));
         $dayLabels = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
         $weekComparison = [];
 
@@ -349,7 +353,9 @@ class StudentImanReportService
             foreach ($criteriaDayLabels as $day) {
                 $cell = $byCriterionDay[$cid][$day['date']] ?? null;
                 if ($isCheck) {
-                    $val = $cell ? 1 : 0;
+                    // Only count the day when the entry is actually checked;
+                    // an entry row may exist with is_checked = false.
+                    $val = ($cell && $cell['check']) ? 1 : 0;
                 } else {
                     $val = $cell ? (int) $cell['value'] : 0;
                 }

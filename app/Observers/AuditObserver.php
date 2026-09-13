@@ -8,6 +8,15 @@ use Illuminate\Support\Str;
 
 class AuditObserver
 {
+    public const SENSITIVE_FIELDS = [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'api_token',
+        'access_token',
+    ];
+
     public function created($model): void
     {
         $this->logAudit($model, 'created', null, $model->getAttributes());
@@ -15,8 +24,9 @@ class AuditObserver
 
     public function updated($model): void
     {
-        $original = $model->getOriginal();
-        $this->logAudit($model, 'updated', $original, $model->getAttributes());
+        $changes = $model->getChanges();
+        $original = array_intersect_key($model->getOriginal(), $changes);
+        $this->logAudit($model, 'updated', $original, $changes);
     }
 
     public function deleting($model): void
@@ -34,10 +44,25 @@ class AuditObserver
             'action' => $action,
             'model_type' => get_class($model),
             'model_id' => $model->id ?? null,
-            'old_values' => $oldValues,
-            'new_values' => $newValues,
+            'old_values' => $this->scrubSensitive($oldValues),
+            'new_values' => $this->scrubSensitive($newValues),
             'ip_address' => request()->ip(),
             'user_agent' => Str::limit(request()->userAgent(), 500),
         ]);
+    }
+
+    protected function scrubSensitive(?array $values): ?array
+    {
+        if ($values === null) {
+            return null;
+        }
+
+        foreach (self::SENSITIVE_FIELDS as $field) {
+            if (array_key_exists($field, $values)) {
+                $values[$field] = '[REDACTED]';
+            }
+        }
+
+        return $values;
     }
 }

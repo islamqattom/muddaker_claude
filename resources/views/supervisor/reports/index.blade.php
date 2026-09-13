@@ -57,11 +57,6 @@
         <div class="rpt-kpi-value">{{ $successRate }}%</div>
         <div class="rpt-kpi-label">نسبة النجاح</div>
     </div>
-    <div class="rpt-kpi" style="--kpi-color:#8e44ad;--kpi-bg:rgba(142,68,173,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-star"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['avg_score'] }}%</div>
-        <div class="rpt-kpi-label">متوسط الدرجات</div>
-    </div>
 </div>
 
 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Supervisor;
 
+use App\Http\Controllers\Concerns\BuildsReportData;
 use App\Http\Controllers\Controller;
 use App\Models\{Student, Attendance, RecitationSession};
 use App\Services\ReportExporter;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
+    use BuildsReportData;
+
     public function __construct(
         private ReportService $reports,
         private ReportExporter $exporter,
@@ -52,135 +55,52 @@ class ReportController extends Controller
 
     public function recitationReport(Request $request)
     {
-        $supervisorId = Auth::id();
         $request->validate([
             'student_id' => 'nullable|exists:students,id',
             'type' => 'nullable|in:new_memorization,review,unmastered,recitation,mafsil,all',
         ]);
 
-        $query = $this->reports->recitationQuery($request, $supervisorId);
-        $sessions = (clone $query)->orderBy('session_date', 'desc')->paginate(20)->withQueryString();
-
-        $allSessions = (clone $query)->get();
-        $stats = $this->reports->recitationStats($allSessions);
-        $trend = $this->reports->recitationDailyTrend($allSessions);
-        $top   = $this->reports->topStudents($allSessions, 5);
-
-        [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
-        $dropdowns = $this->reports->dropdownData($request, $supervisorId);
+        $data = $this->buildRecitationData($request, Auth::id());
 
         if ($export = $request->export) {
-            return $this->exportRecitation($export, $allSessions, $stats, $fromDate, $toDate, $period);
+            return $this->exporter->exportRecitation(
+                $export, $data['allSessions'], $data['stats'], $data['fromDate'], $data['toDate'], $data['period'], $data['summary']
+            );
         }
 
-        return view('supervisor.reports.recitation', array_merge(
-            compact('sessions', 'stats', 'trend', 'top', 'fromDate', 'toDate', 'period'),
-            $dropdowns
-        ));
+        return view('reports.recitation', $data);
     }
 
     public function attendanceReport(Request $request)
     {
-        $supervisorId = Auth::id();
         $request->validate([
             'student_id' => 'nullable|exists:students,id',
         ]);
 
-        $query = $this->reports->attendanceQuery($request, $supervisorId);
-        $attendances = (clone $query)->orderBy('date', 'desc')->paginate(20)->withQueryString();
-
-        $allAttendances = (clone $query)->get();
-        $stats = $this->reports->attendanceStats($allAttendances);
-        $trend = $this->reports->attendanceDailyTrend($allAttendances);
-
-        [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
-        $dropdowns = $this->reports->dropdownData($request, $supervisorId);
+        $data = $this->buildAttendanceData($request, Auth::id());
 
         if ($export = $request->export) {
-            return $this->exportAttendance($export, $allAttendances, $stats, $fromDate, $toDate, $period);
+            return $this->exporter->exportAttendance(
+                $export, $data['allAttendances'], $data['stats'], $data['fromDate'], $data['toDate'], $data['period'], $data['summary']
+            );
         }
 
-        return view('supervisor.reports.attendance', array_merge(
-            compact('attendances', 'stats', 'trend', 'fromDate', 'toDate', 'period'),
-            $dropdowns
-        ));
+        return view('reports.attendance', $data);
     }
 
     public function quarterReport(Request $request)
     {
-        $supervisorId = Auth::id();
-        $year    = (int) ($request->year ?? Carbon::now()->year);
-        $quarter = (int) ($request->quarter ?? ReportService::quarterOf());
-        $request->merge(['period' => 'quarter', 'year' => $year, 'quarter' => $quarter]);
-
-        [$fromDate, $toDate] = ReportService::quarterRange($year, $quarter);
-        $payload = $this->aggregateReportData($request, $fromDate, $toDate, $supervisorId);
-        $dropdowns = $this->reports->dropdownData($request, $supervisorId);
-
-        if ($export = $request->export) {
-            return $this->exporter->exportAggregate($export, $payload, [
-                'title'    => 'التقرير الربعي — الربع ' . $this->arabicOrdinal($quarter) . ' ' . $year,
-                'subtitle' => 'الفترة: ' . $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d'),
-                'filename' => 'supervisor-quarterly-' . $year . '-Q' . $quarter,
-            ]);
-        }
-
-        return view('supervisor.reports.quarter', array_merge(
-            $payload,
-            $dropdowns,
-            ['year' => $year, 'quarter' => $quarter]
-        ));
+        return $this->aggregateResponse($request, 'quarter', Auth::id(), true, 'supervisor-');
     }
 
     public function halfReport(Request $request)
     {
-        $supervisorId = Auth::id();
-        $year = (int) ($request->year ?? Carbon::now()->year);
-        $half = (int) ($request->half ?? ReportService::halfOf());
-        $request->merge(['period' => 'half', 'year' => $year, 'half' => $half]);
-
-        [$fromDate, $toDate] = ReportService::halfRange($year, $half);
-        $payload = $this->aggregateReportData($request, $fromDate, $toDate, $supervisorId);
-        $dropdowns = $this->reports->dropdownData($request, $supervisorId);
-
-        if ($export = $request->export) {
-            return $this->exporter->exportAggregate($export, $payload, [
-                'title'    => 'التقرير نصف السنوي — ' . $this->arabicOrdinal($half) . ' ' . $year,
-                'subtitle' => 'الفترة: ' . $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d'),
-                'filename' => 'supervisor-half-yearly-' . $year . '-H' . $half,
-            ]);
-        }
-
-        return view('supervisor.reports.half', array_merge(
-            $payload,
-            $dropdowns,
-            ['year' => $year, 'half' => $half]
-        ));
+        return $this->aggregateResponse($request, 'half', Auth::id(), true, 'supervisor-');
     }
 
     public function yearReport(Request $request)
     {
-        $supervisorId = Auth::id();
-        $year = (int) ($request->year ?? Carbon::now()->year);
-        $request->merge(['period' => 'year', 'year' => $year]);
-
-        [$fromDate, $toDate] = ReportService::yearRange($year);
-        $payload = $this->aggregateReportData($request, $fromDate, $toDate, $supervisorId);
-        $dropdowns = $this->reports->dropdownData($request, $supervisorId);
-
-        if ($export = $request->export) {
-            return $this->exporter->exportAggregate($export, $payload, [
-                'title'    => 'التقرير السنوي — ' . $year,
-                'subtitle' => 'الفترة: ' . $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d'),
-                'filename' => 'supervisor-annual-' . $year,
-            ]);
-        }
-
-        return view('supervisor.reports.year', array_merge(
-            $payload,
-            $dropdowns,
-            ['year' => $year]
-        ));
+        return $this->aggregateResponse($request, 'year', Auth::id(), true, 'supervisor-');
     }
 
     public function studentReport(Request $request, Student $student)
@@ -216,126 +136,5 @@ class ReportController extends Controller
         return view('supervisor.reports.student', compact(
             'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'fromDate', 'toDate'
         ));
-    }
-
-    private function aggregateReportData(Request $request, $fromDate, $toDate, int $supervisorId): array
-    {
-        $recQuery = $this->reports->recitationQuery($request, $supervisorId);
-        $attQuery = $this->reports->attendanceQuery($request, $supervisorId);
-
-        $allSessions    = (clone $recQuery)->orderBy('session_date')->get();
-        $allAttendances = (clone $attQuery)->orderBy('date')->get();
-
-        $recSessions    = (clone $recQuery)->orderBy('session_date', 'desc')->paginate(20)->withQueryString();
-        $attAttendances = (clone $attQuery)->orderBy('date', 'desc')->paginate(20)->withQueryString();
-
-        return [
-            'recSessions'    => $recSessions,
-            'attAttendances' => $attAttendances,
-            'allSessions'    => $allSessions,
-            'allAttendances' => $allAttendances,
-            'recStats'       => $this->reports->recitationStats($allSessions),
-            'attStats'       => $this->reports->attendanceStats($allAttendances),
-            'recTrend'       => $this->reports->recitationMonthlyTrend($allSessions),
-            'attTrend'       => $this->reports->attendanceMonthlyTrend($allAttendances),
-            'top'            => $this->reports->topStudents($allSessions, 5),
-            'breakdown'      => $this->reports->studentBreakdown($allSessions),
-            'fromDate'       => $fromDate,
-            'toDate'         => $toDate,
-        ];
-    }
-
-    private function arabicOrdinal(int $n): string
-    {
-        return [1 => 'الأول', 2 => 'الثاني', 3 => 'الثالث', 4 => 'الرابع'][$n] ?? (string) $n;
-    }
-
-    private function exportRecitation(string $format, $sessions, array $stats, $fromDate, $toDate, string $period)
-    {
-        $headers = ['#', 'الطالب', 'النوع', 'الجزء', 'الصفحات', 'الأخطاء', 'الترددات', 'الدرجة', 'الحالة', 'التاريخ'];
-        $rows = $sessions->values()->map(function ($s, $i) {
-            return [
-                $i + 1,
-                $s->student->user->name ?? '—',
-                $s->type_label,
-                $s->parts_label,
-                $s->total_pages ?? '—',
-                $s->total_errors ?? 0,
-                $s->total_hesitations ?? 0,
-                $s->final_score !== null ? number_format($s->final_score, 1) . '%' : '—',
-                $s->status_label,
-                $s->session_date?->format('Y/m/d') ?? '—',
-            ];
-        })->toArray();
-
-        $subtitle = 'الفترة: ' . ($fromDate && $toDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'كل الفترات');
-        $statsForExport = [
-            'الإجمالي' => $stats['total'],
-            'ناجح' => $stats['passed'],
-            'راسب' => $stats['failed'],
-            'نسبة النجاح' => $stats['pass_rate'] . '%',
-        ];
-
-        $filename = 'supervisor-recitation-' . now()->format('Ymd-His');
-
-        return match ($format) {
-            'excel', 'xlsx' => \Maatwebsite\Excel\Facades\Excel::download(
-                new \App\Exports\RecitationReportExport('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle),
-                $filename . '.xlsx'
-            ),
-            'print' => response()->view('admin.reports.print', [
-                'title' => 'تقرير التسميع',
-                'headers' => $headers,
-                'rows' => $rows,
-                'stats' => $statsForExport,
-                'subtitle' => $subtitle,
-            ]),
-            default => $this->exporter->exportRecitationPdf($sessions, $stats, $fromDate, $toDate),
-        };
-    }
-
-    private function exportAttendance(string $format, $attendances, array $stats, $fromDate, $toDate, string $period)
-    {
-        $headers = ['#', 'الطالب', 'الحالة', 'وقت الحضور', 'ملاحظة', 'التاريخ'];
-        $rows = $attendances->values()->map(function ($a, $i) {
-            $statusLabel = match ($a->status) {
-                'present' => 'حاضر', 'absent' => 'غائب', 'late' => 'متأخر', 'excused' => 'معذور', 'holiday' => 'عطلة', default => $a->status,
-            };
-            return [
-                $i + 1,
-                $a->student->user->name ?? '—',
-                $statusLabel,
-                $a->arrival_time ?? '—',
-                $a->notes ?? '—',
-                $a->date?->format('Y/m/d') ?? '—',
-            ];
-        })->toArray();
-
-        $subtitle = 'الفترة: ' . ($fromDate && $toDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'كل الفترات');
-        $statsForExport = [
-            'الإجمالي' => $stats['total'],
-            'حاضر' => $stats['present'],
-            'غائب' => $stats['absent'],
-            'متأخر' => $stats['late'],
-            'بعذر' => $stats['excused'],
-            'نسبة الحضور' => $stats['attendance_rate'] . '%',
-        ];
-
-        $filename = 'supervisor-attendance-' . now()->format('Ymd-His');
-
-        return match ($format) {
-            'excel', 'xlsx' => \Maatwebsite\Excel\Facades\Excel::download(
-                new \App\Exports\AttendanceReportExport('تقرير الحضور والغياب', $headers, $rows, $statsForExport, $subtitle),
-                $filename . '.xlsx'
-            ),
-            'print' => response()->view('admin.reports.print', [
-                'title' => 'تقرير الحضور والغياب',
-                'headers' => $headers,
-                'rows' => $rows,
-                'stats' => $statsForExport,
-                'subtitle' => $subtitle,
-            ]),
-            default => $this->exporter->exportAttendancePdf($attendances, $stats, $fromDate, $toDate),
-        };
     }
 }

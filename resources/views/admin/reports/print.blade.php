@@ -119,6 +119,36 @@
         </tbody>
     </table>
 
+    @if(!empty($breakdown))
+    <h2 style="font-size:16px;color:#182B48;margin:22px 0 8px;">ملخص النشاط لكل طالب</h2>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>الطالب</th>
+                <th>مفصل</th>
+                <th>حفظ جديد</th>
+                <th>مراجعة</th>
+                <th>سرد</th>
+                <th>غير متقن</th>
+                <th>إجمالي الجلسات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($breakdown as $row)
+                <tr>
+                    <td>{{ $row['name'] }}</td>
+                    <td>{{ $row['mafsil_parts'] }} جزء ({{ $row['mafsil_pages'] }} ص)</td>
+                    <td>{{ $row['new_memorization_parts'] }} جزء ({{ $row['new_memorization_pages'] }} ص)</td>
+                    <td>{{ $row['review_sessions'] }} جلسة ({{ $row['review_pages'] }} ص)</td>
+                    <td>{{ $row['recitation_sessions'] }} جلسة ({{ $row['recitation_pages'] }} ص)</td>
+                    <td>{{ $row['unmastered_sessions'] }} جلسة ({{ $row['unmastered_pages'] }} ص)</td>
+                    <td>{{ $row['total_sessions'] }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
+
     <footer>
         تم إنشاء التقرير في {{ now()->format('Y/m/d H:i') }} — {{ config('app.name', config('app.center_name', 'نظام مدكر')) }}
     </footer>

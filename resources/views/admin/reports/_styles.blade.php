@@ -283,6 +283,41 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 /* Action buttons cluster */
 .rpt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* ========== KPI period-over-period deltas ========== */
+.rpt-kpi-delta {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 6px; font-size: 11px; font-weight: 700;
+}
+.rpt-kpi-delta span { color: #94a3b8; font-weight: 500; }
+.rpt-kpi-delta.up { color: #27ae60; }
+.rpt-kpi-delta.down { color: #c0392b; }
+.rpt-kpi-delta.flat { color: #94a3b8; }
+
+/* ========== Active filter chips ========== */
+.rpt-chips {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin: -8px 0 24px;
+}
+.rpt-chips-label { font-size: 12px; font-weight: 700; color: #6c7a89; }
+.rpt-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    background: rgba(24,43,72,0.06); color: var(--primary);
+    font-size: 12px; font-weight: 700;
+}
+.rpt-chip i { color: var(--gold); }
+.rpt-chip a { color: #c0392b; text-decoration: none; font-weight: 800; }
+.rpt-chip-reset { background: rgba(192,57,43,0.10); color: #c0392b; text-decoration: none; }
+
+/* ========== Responsive two-column report grid ========== */
+.rpt-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+.rpt-grid-2 > .rpt-chart-card { margin-bottom: 0; }
+
 @media (max-width: 992px) {
     .rpt-header { flex-direction: column; align-items: flex-start; }
     .rpt-header-content { margin-bottom: 10px; }

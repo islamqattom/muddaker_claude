@@ -1,6 +1,6 @@
 import { test, expect, TEST_USERS } from './base';
 
-test.describe('Supervisor Students List', () => {
+test.describe('Supervisor Student Reports', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login');
     await page.fill('input[name="login"]', TEST_USERS.supervisor.email);
@@ -10,20 +10,26 @@ test.describe('Supervisor Students List', () => {
     await page.goto('/supervisor/students');
   });
 
-  test('should display students list page', async ({ page }) => {
+  test('should display the student report filter page', async ({ page }) => {
     // Check page title
     await expect(page.locator('h1')).toBeVisible();
-    // Should have a table or list
-    await expect(page.locator('table, .card').first()).toBeVisible();
+    // Student selector filter should be present
+    await expect(page.locator('select[name="student_id"]')).toBeVisible();
+    await expect(page.locator('select[name="period"]')).toBeVisible();
   });
 
-  test('should navigate to student detail', async ({ page }) => {
-    // Look for a student detail link (fa-eye icon) and click it
-    const studentLink = page.locator('a[title="عرض"]');
-    if (await studentLink.first().isVisible()) {
-      await studentLink.first().click();
-      // Should navigate to student detail page
-      await expect(page).toHaveURL(/supervisor\/students\/\d+/);
+  test('should show report for a selected student', async ({ page }) => {
+    const options = page.locator('select[name="student_id"] option');
+    const count = await options.count();
+    if (count > 1) {
+      const value = await options.nth(1).getAttribute('value');
+      await page.selectOption('select[name="student_id"]', value);
+      // Written report section should render for the selected student
+      await expect(page).toHaveURL(/student_id=/);
+      await expect(page.locator('.rpt-written-report')).toBeVisible();
+    } else {
+      // No students: empty state should be shown
+      await expect(page.locator('.rpt-empty')).toBeVisible();
     }
   });
 });

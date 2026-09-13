@@ -13,9 +13,25 @@
 @endsection
 
 @php
-    $successRate = $stats['total_sessions'] > 0
-        ? round(($stats['passed_sessions'] / $stats['total_sessions']) * 100)
-        : 0;
+    $periodLabels = [
+        'today'   => 'اليوم',
+        'week'    => 'هذا الأسبوع',
+        'month'   => 'الشهر الحالي',
+        'quarter' => 'الربع الحالي',
+        'half'    => 'النصف الحالي',
+        'year'    => 'السنة الحالية',
+        'all'     => 'كل الفترات',
+        'custom'  => 'فترة مخصصة',
+    ];
+    $periodLabel = $periodLabels[$period] ?? 'الشهر الحالي';
+
+    $linkParams = ['period' => $period];
+    if ($period === 'custom') {
+        $linkParams['from_date'] = $fromDate?->format('Y-m-d');
+        $linkParams['to_date']   = $toDate?->format('Y-m-d');
+    }
+    $recUrl = route('admin.reports.recitation', $linkParams);
+    $attUrl = route('admin.reports.attendance', $linkParams);
 @endphp
 
 @section('content')
@@ -31,46 +47,96 @@
     </div>
 </div>
 
-<div class="rpt-kpi-grid">
-    <div class="rpt-kpi" style="--kpi-color:#182B48; --kpi-bg:rgba(24,43,72,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-user-graduate"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['total_students'] }}</div>
-        <div class="rpt-kpi-label">إجمالي الطلاب</div>
+<div class="rpt-filter">
+    <div class="rpt-filter-header">
+        <i class="fas fa-filter"></i>
+        <span>تحديد الفترة</span>
     </div>
-    <div class="rpt-kpi" style="--kpi-color:#3498db; --kpi-bg:rgba(52,152,219,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-microphone"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['total_sessions'] }}</div>
-        <div class="rpt-kpi-label">إجمالي الجلسات</div>
-    </div>
-    <div class="rpt-kpi" style="--kpi-color:#27ae60; --kpi-bg:rgba(39,174,96,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-check-circle"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['passed_sessions'] }}</div>
-        <div class="rpt-kpi-label">جلسات ناجحة</div>
-    </div>
-    <div class="rpt-kpi" style="--kpi-color:#c0392b; --kpi-bg:rgba(192,57,43,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-times-circle"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['failed_sessions'] }}</div>
-        <div class="rpt-kpi-label">جلسات راسبة</div>
-    </div>
-    <div class="rpt-kpi" style="--kpi-color:#d4a030; --kpi-bg:rgba(212,160,48,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-percentage"></i></div>
-        <div class="rpt-kpi-value">{{ $successRate }}%</div>
-        <div class="rpt-kpi-label">نسبة النجاح الإجمالية</div>
-    </div>
-    <div class="rpt-kpi" style="--kpi-color:#8e44ad; --kpi-bg:rgba(142,68,173,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-star"></i></div>
-        <div class="rpt-kpi-value">{{ $stats['avg_score'] }}%</div>
-        <div class="rpt-kpi-label">متوسط الدرجات</div>
+    <div class="rpt-filter-body">
+        <form method="GET">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">الفترة</label>
+                    <select name="period" class="form-select" id="periodSelect" onchange="handlePeriodChange()">
+                        <option value="all"    {{ request('period') == 'all' ? 'selected' : '' }}>الكل</option>
+                        <option value="today"  {{ request('period') == 'today' ? 'selected' : '' }}>اليوم</option>
+                        <option value="week"   {{ request('period') == 'week' ? 'selected' : '' }}>أسبوع</option>
+                        <option value="month"  {{ request('period') == 'month' || !request('period') ? 'selected' : '' }}>شهر</option>
+                        <option value="custom" {{ request('period') == 'custom' ? 'selected' : '' }}>مخصص</option>
+                    </select>
+                </div>
+                <div class="col-md-3" id="fromDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
+                    <label class="form-label">من تاريخ</label>
+                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date', $fromDate ? $fromDate->format('Y-m-d') : now()->startOfMonth()->toDateString()) }}">
+                </div>
+                <div class="col-md-3" id="toDateCol" style="{{ request('period') == 'custom' ? '' : 'display:none;' }}">
+                    <label class="form-label">إلى تاريخ</label>
+                    <input type="date" name="to_date" class="form-control" value="{{ request('to_date', $toDate ? $toDate->format('Y-m-d') : now()->toDateString()) }}">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="rpt-btn rpt-btn-primary flex-fill"><i class="fas fa-search"></i> تطبيق</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
-    <div class="rpt-chart-card">
-        <h6><i class="fas fa-chart-line"></i> أداء التسميع — الشهر الحالي</h6>
-        <div class="rpt-chart-wrap"><canvas id="adminRecMonthChart"></canvas></div>
+<div class="rpt-kpi-grid">
+    <a href="{{ route('admin.students.index') }}" class="rpt-kpi" style="--kpi-color:#182B48; --kpi-bg:rgba(24,43,72,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-user-graduate"></i></div>
+        <div class="rpt-kpi-value">{{ $totals['total_students'] }}</div>
+        <div class="rpt-kpi-label">إجمالي الطلاب</div>
+        <div class="rpt-kpi-sub">منذ البداية</div>
+    </a>
+    <a href="{{ $recUrl }}" class="rpt-kpi" style="--kpi-color:#3498db; --kpi-bg:rgba(52,152,219,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-microphone"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['total'] }}</div>
+        <div class="rpt-kpi-label">جلسات الفترة</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+    <a href="{{ $recUrl }}" class="rpt-kpi" style="--kpi-color:#27ae60; --kpi-bg:rgba(39,174,96,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['passed'] }}</div>
+        <div class="rpt-kpi-label">جلسات ناجحة</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+    <a href="{{ $recUrl }}" class="rpt-kpi" style="--kpi-color:#c0392b; --kpi-bg:rgba(192,57,43,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['failed'] }}</div>
+        <div class="rpt-kpi-label">جلسات راسبة</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+    <a href="{{ $recUrl }}" class="rpt-kpi" style="--kpi-color:#d4a030; --kpi-bg:rgba(212,160,48,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-percentage"></i></div>
+        <div class="rpt-kpi-value">{{ $stats['pass_rate'] }}%</div>
+        <div class="rpt-kpi-label">نسبة النجاح</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+    <a href="{{ $attUrl }}" class="rpt-kpi" style="--kpi-color:#059669; --kpi-bg:rgba(5,150,105,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="rpt-kpi-value">{{ $attStats['attendance_rate'] }}%</div>
+        <div class="rpt-kpi-label">نسبة الحضور</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+    <a href="{{ $attUrl }}" class="rpt-kpi" style="--kpi-color:#e74c3c; --kpi-bg:rgba(231,76,60,0.10); display:block; text-decoration:none;">
+        <div class="rpt-kpi-icon"><i class="fas fa-user-times"></i></div>
+        <div class="rpt-kpi-value">{{ $attStats['absent'] }}</div>
+        <div class="rpt-kpi-label">أيام الغياب</div>
+        <div class="rpt-kpi-sub">{{ $periodLabel }}</div>
+    </a>
+</div>
+
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
+    <div class="rpt-chart-card" style="margin-bottom:0;">
+        <h6><i class="fas fa-chart-line"></i> أداء التسميع — {{ $periodLabel }}</h6>
+        @if(!empty($trend))
+            <div class="rpt-chart-wrap"><canvas id="adminRecMonthChart"></canvas></div>
+        @else
+            <div class="rpt-empty"><p>لا توجد بيانات لهذه الفترة</p></div>
+        @endif
     </div>
-    <div class="rpt-chart-card">
-        <h6><i class="fas fa-trophy"></i> أفضل الطلاب أداءً (الشهر)</h6>
+    <div class="rpt-chart-card" style="margin-bottom:0;">
+        <h6><i class="fas fa-trophy"></i> أفضل الطلاب أداءً ({{ $periodLabel }})</h6>
         @if(!empty($topStudents))
             <div class="rpt-mini-list">
                 @foreach($topStudents as $i => $s)
@@ -83,7 +149,7 @@
                 @endforeach
             </div>
         @else
-            <div class="rpt-empty"><p>لا توجد بيانات لهذا الشهر</p></div>
+            <div class="rpt-empty"><p>لا توجد بيانات لهذه الفترة</p></div>
         @endif
     </div>
 </div>
@@ -190,29 +256,22 @@
     </div>
 </div>
 
-@if($stats['total_sessions'] > 0)
-<div class="rpt-chart-card">
-    <h6><i class="fas fa-percentage"></i> نسبة النجاح الإجمالية</h6>
-    <div style="height:32px;background:#e9ecef;border-radius:16px;overflow:hidden;position:relative;">
-        <div style="height:100%;width:{{ $successRate }}%;background:linear-gradient(90deg,#27ae60,#2ecc71);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;transition:width 1s ease;">
-            {{ $successRate }}% نجاح
-        </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:13px;">
-        <span style="color:#6c7a89;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#27ae60;margin-left:6px;"></span>ناجح: <b style="color:#182B48;">{{ $stats['passed_sessions'] }} جلسة</b></span>
-        <span style="color:#6c7a89;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c0392b;margin-left:6px;"></span>راسب: <b style="color:#182B48;">{{ $stats['failed_sessions'] }} جلسة</b></span>
-    </div>
-</div>
-@endif
-
 @push('scripts')
 <script>
+function handlePeriodChange() {
+    var period = document.getElementById('periodSelect').value;
+    document.getElementById('fromDateCol').style.display = period === 'custom' ? '' : 'none';
+    document.getElementById('toDateCol').style.display   = period === 'custom' ? '' : 'none';
+}
 (function () {
     if (!window.Chart) return;
     var el = document.getElementById('adminRecMonthChart');
     if (!el) return;
-    var trend = @json($monthTrend ?? []);
-    var labels = trend.map(function (t) { return t.date; });
+    var trend = @json($trend ?? []);
+    var labels = trend.map(function (t) {
+        var p = t.date.split('-');
+        return p[2] + '/' + p[1];
+    });
     var totals = trend.map(function (t) { return t.total; });
     var passes = trend.map(function (t) { return t.passed; });
     new Chart(el, {

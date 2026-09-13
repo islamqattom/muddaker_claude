@@ -59,11 +59,6 @@
         <div class="rpt-kpi-value">{{ $attendanceStats['attendance_rate'] }}%</div>
         <div class="rpt-kpi-label">نسبة الحضور</div>
     </div>
-    <div class="rpt-kpi" style="--kpi-color:#8e44ad;--kpi-bg:rgba(142,68,173,0.10);">
-        <div class="rpt-kpi-icon"><i class="fas fa-star"></i></div>
-        <div class="rpt-kpi-value">{{ $sessionStats['avg_score'] }}%</div>
-        <div class="rpt-kpi-label">متوسط الدرجة</div>
-    </div>
 </div>
 
 <div class="rpt-table-card" style="margin-bottom:24px;">

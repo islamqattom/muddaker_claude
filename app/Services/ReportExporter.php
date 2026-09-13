@@ -9,16 +9,19 @@ use TCPDF;
 
 class ReportExporter
 {
-    public function exportRecitation(string $format, $sessions, array $stats, $fromDate, $toDate, string $period)
+    public function exportRecitation(string $format, $sessions, array $stats, $fromDate, $toDate, string $period, array $summary = [])
     {
-        $headers = ['#', 'الطالب', 'المشرف', 'الجزء', 'الصفحات', 'الدرجة', 'الحالة', 'التاريخ'];
+        $headers = ['#', 'الطالب', 'المشرف', 'النوع', 'الجزء', 'الصفحات', 'الأخطاء', 'الترددات', 'الدرجة', 'الحالة', 'التاريخ'];
         $rows = $sessions->values()->map(function ($s, $i) {
             return [
                 $i + 1,
                 $s->student->user->name ?? '—',
                 $s->supervisor->name ?? '—',
+                $s->type_label,
                 $s->parts_label,
-                ($s->start_page ?? '—') . ' - ' . ($s->end_page ?? '—'),
+                $s->total_pages ?? '—',
+                $s->total_errors ?? 0,
+                $s->total_hesitations ?? 0,
                 $s->final_score !== null ? number_format($s->final_score, 1) . '%' : '—',
                 $s->status_label,
                 $s->session_date?->format('Y/m/d') ?? '—',
@@ -37,7 +40,7 @@ class ReportExporter
 
         return match ($format) {
             'excel', 'xlsx' => Excel::download(
-                new RecitationReportExport('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle),
+                new RecitationReportExport('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle, $summary, 'recitation'),
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle),
@@ -45,7 +48,7 @@ class ReportExporter
         };
     }
 
-    public function exportAttendance(string $format, $attendances, array $stats, $fromDate, $toDate, string $period)
+    public function exportAttendance(string $format, $attendances, array $stats, $fromDate, $toDate, string $period, array $summary = [])
     {
         $headers = ['#', 'الطالب', 'المشرف', 'التاريخ', 'وقت الحضور', 'وقت الانصراف', 'الحالة'];
         $rows = $attendances->values()->map(function ($a, $i) {
@@ -75,7 +78,7 @@ class ReportExporter
 
         return match ($format) {
             'excel', 'xlsx' => Excel::download(
-                new AttendanceReportExport('تقرير الحضور والغياب', $headers, $rows, $statsForExport, $subtitle),
+                new AttendanceReportExport('تقرير الحضور والغياب', $headers, $rows, $statsForExport, $subtitle, $summary, 'attendance'),
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('تقرير الحضور والغياب', $headers, $rows, $statsForExport, $subtitle),
@@ -126,7 +129,6 @@ class ReportExporter
             'ناجح'           => $payload['recStats']['passed'],
             'راسب'           => $payload['recStats']['failed'],
             'نسبة النجاح'     => $payload['recStats']['pass_rate'] . '%',
-            'متوسط الدرجة'    => $payload['recStats']['avg_score'] . '%',
             'حضور (إجمالي)'   => $payload['attStats']['total'],
             'حاضر'           => $payload['attStats']['present'],
             'غائب'           => $payload['attStats']['absent'],
@@ -137,10 +139,10 @@ class ReportExporter
 
         return match ($format) {
             'excel', 'xlsx' => Excel::download(
-                new RecitationReportExport($meta['title'], $headers, $rows, $statsForExport, $meta['subtitle']),
+                new RecitationReportExport($meta['title'], $headers, $rows, $statsForExport, $meta['subtitle'], $payload['summary'] ?? [], 'both'),
                 $filename . '.xlsx'
             ),
-            'print' => $this->printView($meta['title'], $headers, $rows, $statsForExport, $meta['subtitle']),
+            'print' => $this->printView($meta['title'], $headers, $rows, $statsForExport, $meta['subtitle'], $payload['breakdown'] ?? []),
             default => $this->aggregatePdf($payload, $meta),
         };
     }
@@ -198,9 +200,157 @@ class ReportExporter
         return $pdf->Output('تقرير-' . $student->user->name . '.pdf', 'D');
     }
 
-    protected function printView(string $title, array $headers, array $rows, array $stats, ?string $subtitle)
+    /**
+     * Export the written report (بطاقة تقرير الطالب) for a single student
+     * as a PDF document.
+     */
+    public function exportWrittenReportPdf($student, array $breakdown, string $periodLabel, $fromDate, $toDate)
     {
-        return response()->view('admin.reports.print', compact('title', 'headers', 'rows', 'stats', 'subtitle'));
+        $row = $breakdown[0] ?? null;
+
+        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->setRTL(true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(12, 12, 12);
+        $pdf->SetAutoPageBreak(true, 12);
+        $pdf->AddPage();
+        $pdf->SetFont('aealarabiya', '', 12);
+
+        $centerName = config('app.center_name', 'مركز التسميع');
+        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 8, $centerName, 0, true, 'C', 0);
+        $pdf->SetFontSize(18);
+        $pdf->Cell(0, 10, 'بطاقة تقرير الطالب', 0, true, 'C', 0);
+        $pdf->SetFontSize(12);
+        $pdf->Cell(0, 7, 'الطالب: ' . ($student->user->name ?? '-'), 0, true, 'C', 0);
+        $pdf->Cell(0, 7, 'المستوى: ' . ($student->level->name ?? '-') . '   |   رقم الطالب: ' . ($student->student_number ?? '-'), 0, true, 'C', 0);
+        $pdf->Cell(0, 7, 'الفترة: ' . ($fromDate && $toDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'كل الفترات'), 0, true, 'C', 0);
+        $pdf->Ln(3);
+
+        if (!$row) {
+            $pdf->SetFontSize(12);
+            $pdf->Cell(0, 12, 'لا توجد بيانات في هذه الفترة.', 0, true, 'C', 0);
+
+            return $this->pdfDownload($pdf, 'student-written-report.pdf');
+        }
+
+        $v   = fn ($key) => $row[$key] ?? 0;
+        $num = fn ($n) => number_format((float) $n);
+
+        // Value palettes: green = passed, red = failed, navy = neutral.
+        $ok   = ['text' => '#1e7e34', 'bg' => '#e8f6ec'];
+        $bad  = ['text' => '#c0392b', 'bg' => '#fdecea'];
+        $warn = ['text' => '#b45309', 'bg' => '#fef3c7'];
+        $info = ['text' => '#1d4ed8', 'bg' => '#e8effd'];
+        $base = ['text' => '#182B48', 'bg' => '#ffffff'];
+
+        $table   = fn (string $rows) => '<table border="1" cellpadding="6" style="font-size:12px;">' . $rows . '</table><br/>';
+        $section = fn (string $title, string $accent) =>
+            '<tr><td colspan="2" bgcolor="' . $accent . '" color="#ffffff" align="center"><b>' . $title . '</b></td></tr>';
+        $line = fn (string $label, $value, array $palette) =>
+            '<tr><td width="62%" color="#475569">' . $label . '</td>'
+            . '<td width="38%" align="center" bgcolor="' . $palette['bg'] . '" color="' . $palette['text'] . '"><b>' . $value . '</b></td></tr>';
+
+        $html = '';
+
+        // الحضور والغياب (green)
+        $rows  = $section('الحضور والغياب', '#059669');
+        $rows .= $line('1- العدد الكلي للجلسات', $num($v('att_total')), $base);
+        $rows .= $line('2- عدد أيام الحضور', $num($v('att_present')), $ok);
+        $rows .= $line('3- عدد أيام الغياب', $num($v('att_absent')), $bad);
+        $rows .= $line('4- عدد أيام التأخير', $num($v('att_late')), $warn);
+        $rows .= $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info);
+        $html .= $table($rows);
+
+        // الحفظ الجديد (navy)
+        $rows  = $section('الحفظ الجديد', '#182B48');
+        $rows .= $line('1- عدد جلسات الحفظ الجديد', $num($v('new_memorization_sessions')), $base);
+        $rows .= $line('2- عدد الجلسات النّاجحة', $num($v('new_memorization_passed')), $ok);
+        $rows .= $line('3- عدد الجلسات الرّاسبة', $num($v('new_memorization_failed')), $bad);
+        $rows .= $line('4- عدد صفحات الحفظ الجديد النّاجحة', $num($v('new_memorization_pages')), $ok);
+        $rows .= $line('5- عدد صفحات الحفظ الجديد الرّاسبة', $num($v('new_memorization_failed_pages')), $bad);
+        $rows .= $line('6- عدد الأجزاء المحفوظة', $num($v('new_memorization_parts')), $base);
+        $html .= $table($rows);
+
+        // المراجعة (blue)
+        $rows  = $section('المراجعة', '#2980b9');
+        $rows .= $line('1- عدد جلسات المراجعة', $num($v('review_sessions')), $base);
+        $rows .= $line('2- عدد الجلسات النّاجحة', $num($v('review_passed')), $ok);
+        $rows .= $line('3- عدد الجلسات الرّاسبة', $num($v('review_failed')), $bad);
+        $rows .= $line('4- عدد صفحات المراجعة النّاجحة', $num($v('review_pages')), $ok);
+        $rows .= $line('5- عدد صفحات المراجعة الرّاسبة', $num($v('review_failed_pages')), $bad);
+        $rows .= $line('6- عدد الأجزاء المراجعة', $num($v('review_parts')), $base);
+        $html .= $table($rows);
+
+        // السرد (teal)
+        if ($v('recitation_sessions') > 0) {
+            $rows  = $section('السرد', '#16a085');
+            $rows .= $line('1- عدد الجلسات', $num($v('recitation_sessions')), $base);
+            $rows .= $line('2- عدد الجلسات النّاجحة', $num($v('recitation_passed')), $ok);
+            $rows .= $line('3- عدد الجلسات الرّاسبة', $num($v('recitation_failed')), $bad);
+            $html .= $table($rows);
+        }
+
+        // الحفظ غير المتقن (purple)
+        if ($v('unmastered_sessions') > 0) {
+            $rows  = $section('الحفظ غير المتقن', '#7c3aed');
+            $rows .= $line('1- عدد جلسات الحفظ غير المتقن', $num($v('unmastered_sessions')), $base);
+            $rows .= $line('2- عدد الجلسات النّاجحة', $num($v('unmastered_passed')), $ok);
+            $rows .= $line('3- عدد الجلسات الرّاسبة', $num($v('unmastered_failed')), $bad);
+            $rows .= $line('4- عدد صفحات الحفظ غير المتقن النّاجحة', $num($v('unmastered_pages')), $ok);
+            $rows .= $line('5- عدد صفحات الحفظ غير المتقن الرّاسبة', $num($v('unmastered_failed_pages')), $bad);
+            $rows .= $line('6- عدد الأجزاء غير المتقنة', $num($v('unmastered_parts')), $base);
+            $html .= $table($rows);
+        }
+
+        // المفصل (gold) — each presented mafsil colored by its result
+        if (!empty($row['mafsil_details'])) {
+            $rows = $section('المفصل', '#d4a030');
+            foreach ($row['mafsil_details'] as $i => $m) {
+                $passed = ($m['status'] ?? '') === 'passed';
+                $rows .= $line(
+                    ($i + 1) . '- المفصل الذي تقدم له: ' . ($m['label'] ?? ''),
+                    $m['status_label'] ?? '',
+                    $passed ? $ok : $bad
+                );
+            }
+            $html .= $table($rows);
+        }
+
+        // الإجمالي
+        $total  = '<tr><td width="62%" bgcolor="#f1f5f9" color="#182B48"><b>إجمالي جلسات ' . $periodLabel . '</b></td>';
+        $total .= '<td width="38%" align="center" bgcolor="#182B48" color="#ffffff"><b>' . $num($v('total_sessions')) . '</b></td></tr>';
+        $html .= $table($total);
+
+        // مفتاح الألوان
+        $html .= '<p style="font-size:10px;" color="#6b7280">'
+            . '<font color="#1e7e34">■</font> ناجح&nbsp;&nbsp;'
+            . '<font color="#c0392b">■</font> راسب&nbsp;&nbsp;'
+            . '<font color="#182B48">■</font> إجمالي/محايد'
+            . '</p>';
+
+        $pdf->writeHTML($html, true, false, false, false, '');
+
+        return $this->pdfDownload($pdf, 'student-written-report.pdf');
+    }
+
+    /**
+     * Return a PDF as a downloadable Laravel response.
+     */
+    private function pdfDownload(TCPDF $pdf, string $filename)
+    {
+        $content = $pdf->Output($filename, 'S');
+
+        return response($content, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    protected function printView(string $title, array $headers, array $rows, array $stats, ?string $subtitle, array $breakdown = [])
+    {
+        return response()->view('admin.reports.print', compact('title', 'headers', 'rows', 'stats', 'subtitle', 'breakdown'));
     }
 
     protected function recitationPdf($sessions, $stats, $fromDate, $toDate)
@@ -233,7 +383,9 @@ class ReportExporter
         $html .= '</tr>';
 
         $i = 1;
-        foreach ($sessions as $s) {
+        $pdfRowLimit = 500;
+        $truncated = $sessions->count() > $pdfRowLimit;
+        foreach ($sessions->take($pdfRowLimit) as $s) {
             $part = $s->parts_label;
             $pages = ($s->start_page && $s->end_page) ? ($s->start_page . ' - ' . $s->end_page) : '-';
             $score = $s->final_score !== null ? number_format($s->final_score, 1) . '%' : '-';
@@ -256,6 +408,11 @@ class ReportExporter
         }
         $html .= '</table>';
         $pdf->writeHTML($html, true, false, false, false, '');
+
+        if ($truncated) {
+            $pdf->SetFontSize(10);
+            $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' سجل من أصل ' . $sessions->count() . '. استخدم تصدير Excel لعرض كل السجلات.', 0, true, 'C', 0);
+        }
 
         $filename = $fromDate
             ? 'تقرير-التسميع-' . $fromDate->format('Y-m-d') . '.pdf'
@@ -293,7 +450,9 @@ class ReportExporter
         $html .= '</tr>';
 
         $i = 1;
-        foreach ($attendances as $a) {
+        $pdfRowLimit = 500;
+        $truncated = $attendances->count() > $pdfRowLimit;
+        foreach ($attendances->take($pdfRowLimit) as $a) {
             $statusLabel = $this->attendanceStatusLabel($a->status);
             $statusColor = match ($a->status) {
                 'present' => '#28a745', 'absent' => '#dc3545', 'late' => '#ffc107', 'excused' => '#17a2b8', default => '#6c757d',
@@ -310,6 +469,11 @@ class ReportExporter
         }
         $html .= '</table>';
         $pdf->writeHTML($html, true, false, false, false, '');
+
+        if ($truncated) {
+            $pdf->SetFontSize(10);
+            $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' سجل من أصل ' . $attendances->count() . '. استخدم تصدير Excel لعرض كل السجلات.', 0, true, 'C', 0);
+        }
 
         $filename = $fromDate
             ? 'تقرير-الحضور-' . $fromDate->format('Y-m-d') . '.pdf'
@@ -347,10 +511,18 @@ class ReportExporter
             <td align="center" bgcolor="#28a745" color="white"><b>ناجح</b><br>' . $recStats['passed'] . '</td>
             <td align="center" bgcolor="#dc3545" color="white"><b>راسب</b><br>' . $recStats['failed'] . '</td>
             <td align="center" bgcolor="#ffc107"><b>نسبة النجاح</b><br>' . $recStats['pass_rate'] . '%</td>
-            <td align="center" bgcolor="#6c757d" color="white"><b>متوسط الدرجة</b><br>' . $recStats['avg_score'] . '%</td>
             <td align="center" bgcolor="#059669" color="white"><b>نسبة الحضور</b><br>' . $attStats['attendance_rate'] . '%</td>
         </tr></table>', true, false, false, false, 'C');
         $pdf->Ln(8);
+
+        // التقرير المكتوب لكل طالب
+        if (!empty($payload['breakdown'])) {
+            $pdf->SetFontSize(14);
+            $pdf->Cell(0, 8, 'التقرير المكتوب', 0, true, 'R', 0);
+            $pdf->SetFontSize(11);
+            $pdf->writeHTML($this->aggregateWrittenReportHtml($payload['breakdown']), true, false, false, false, '');
+            $pdf->Ln(5);
+        }
 
         if ($allSessions->isNotEmpty()) {
             $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
@@ -359,7 +531,9 @@ class ReportExporter
             }
             $html .= '</tr>';
             $i = 1;
-            foreach ($allSessions as $s) {
+            $pdfRowLimit = 500;
+            $truncatedSessions = $allSessions->count() > $pdfRowLimit;
+            foreach ($allSessions->take($pdfRowLimit) as $s) {
                 $statusColor = match ($s->status) {
                     'passed' => '#28a745', 'failed', 'failed_continued' => '#dc3545', 'in_progress' => '#ffc107', default => '#6c757d',
                 };
@@ -377,6 +551,10 @@ class ReportExporter
             $pdf->SetFontSize(14);
             $pdf->Cell(0, 8, 'جلسات التسميع', 0, true, 'R', 0);
             $pdf->writeHTML($html, true, false, false, false, '');
+            if ($truncatedSessions) {
+                $pdf->SetFontSize(10);
+                $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' جلسة من أصل ' . $allSessions->count() . '. استخدم تصدير Excel لعرض كل الجلسات.', 0, true, 'C', 0);
+            }
             $pdf->Ln(5);
         }
 
@@ -387,7 +565,9 @@ class ReportExporter
             }
             $html .= '</tr>';
             $i = 1;
-            foreach ($allAttendances as $a) {
+            $pdfRowLimit = 500;
+            $truncatedAtt = $allAttendances->count() > $pdfRowLimit;
+            foreach ($allAttendances->take($pdfRowLimit) as $a) {
                 $statusLabel = $this->attendanceStatusLabel($a->status);
                 $statusColor = match ($a->status) {
                     'present' => '#28a745', 'absent' => '#dc3545', 'late' => '#ffc107', 'excused' => '#17a2b8', default => '#6c757d',
@@ -405,9 +585,121 @@ class ReportExporter
             $pdf->SetFontSize(14);
             $pdf->Cell(0, 8, 'سجلات الحضور', 0, true, 'R', 0);
             $pdf->writeHTML($html, true, false, false, false, '');
+            if ($truncatedAtt) {
+                $pdf->SetFontSize(10);
+                $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' سجل من أصل ' . $allAttendances->count() . '. استخدم تصدير Excel لعرض كل السجلات.', 0, true, 'C', 0);
+            }
         }
 
         return $pdf->Output($meta['filename'] . '.pdf', 'D');
+    }
+
+    /**
+     * Build the written-report HTML (all students) for the aggregate PDF.
+     */
+    protected function aggregateWrittenReportHtml(array $breakdown): string
+    {
+        $ok   = ['text' => '#1e7e34', 'bg' => '#e8f6ec'];
+        $bad  = ['text' => '#c0392b', 'bg' => '#fdecea'];
+        $warn = ['text' => '#b45309', 'bg' => '#fef3c7'];
+        $info = ['text' => '#1d4ed8', 'bg' => '#e8effd'];
+        $base = ['text' => '#182B48', 'bg' => '#ffffff'];
+
+        $table   = fn (string $rows) => '<table border="1" cellpadding="5" style="font-size:11px;">' . $rows . '</table>';
+        $section = fn (string $title, string $accent) =>
+            '<tr><td colspan="2" bgcolor="' . $accent . '" color="#ffffff" align="center"><b>' . $title . '</b></td></tr>';
+        $line = fn (string $label, $value, array $palette) =>
+            '<tr><td width="62%" color="#475569">' . $label . '</td>'
+            . '<td width="38%" align="center" bgcolor="' . $palette['bg'] . '" color="' . $palette['text'] . '"><b>' . $value . '</b></td></tr>';
+
+        $html = '';
+
+        foreach ($breakdown as $row) {
+            $v   = fn ($key) => $row[$key] ?? 0;
+            $num = fn ($n) => number_format((float) $n);
+
+            $html .= '<table border="1" cellpadding="6"><tr bgcolor="#2A4570" color="#ffffff">'
+                . '<td align="center"><b>الطالب: ' . ($row['name'] ?? '-') . '</b></td></tr></table>';
+
+            // الحضور والغياب
+            $html .= $table(
+                $section('الحضور والغياب', '#059669')
+                . $line('1- العدد الكلي للجلسات', $num($v('att_total')), $base)
+                . $line('2- عدد أيام الحضور', $num($v('att_present')), $ok)
+                . $line('3- عدد أيام الغياب', $num($v('att_absent')), $bad)
+                . $line('4- عدد أيام التأخير', $num($v('att_late')), $warn)
+                . $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info)
+            );
+
+            // الحفظ الجديد
+            $html .= $table(
+                $section('الحفظ الجديد', '#182B48')
+                . $line('1- عدد جلسات الحفظ الجديد', $num($v('new_memorization_sessions')), $base)
+                . $line('2- عدد الجلسات النّاجحة', $num($v('new_memorization_passed')), $ok)
+                . $line('3- عدد الجلسات الرّاسبة', $num($v('new_memorization_failed')), $bad)
+                . $line('4- عدد صفحات الحفظ الجديد النّاجحة', $num($v('new_memorization_pages')), $ok)
+                . $line('5- عدد صفحات الحفظ الجديد الرّاسبة', $num($v('new_memorization_failed_pages')), $bad)
+                . $line('6- عدد الأجزاء المحفوظة', $num($v('new_memorization_parts')), $base)
+            );
+
+            // المراجعة
+            $html .= $table(
+                $section('المراجعة', '#2980b9')
+                . $line('1- عدد جلسات المراجعة', $num($v('review_sessions')), $base)
+                . $line('2- عدد الجلسات النّاجحة', $num($v('review_passed')), $ok)
+                . $line('3- عدد الجلسات الرّاسبة', $num($v('review_failed')), $bad)
+                . $line('4- عدد صفحات المراجعة النّاجحة', $num($v('review_pages')), $ok)
+                . $line('5- عدد صفحات المراجعة الرّاسبة', $num($v('review_failed_pages')), $bad)
+                . $line('6- عدد الأجزاء المراجعة', $num($v('review_parts')), $base)
+            );
+
+            // السرد
+            if ($v('recitation_sessions') > 0) {
+                $html .= $table(
+                    $section('السرد', '#16a085')
+                    . $line('1- عدد الجلسات', $num($v('recitation_sessions')), $base)
+                    . $line('2- عدد الجلسات النّاجحة', $num($v('recitation_passed')), $ok)
+                    . $line('3- عدد الجلسات الرّاسبة', $num($v('recitation_failed')), $bad)
+                );
+            }
+
+            // الحفظ غير المتقن
+            if ($v('unmastered_sessions') > 0) {
+                $html .= $table(
+                    $section('الحفظ غير المتقن', '#7c3aed')
+                    . $line('1- عدد جلسات الحفظ غير المتقن', $num($v('unmastered_sessions')), $base)
+                    . $line('2- عدد الجلسات النّاجحة', $num($v('unmastered_passed')), $ok)
+                    . $line('3- عدد الجلسات الرّاسبة', $num($v('unmastered_failed')), $bad)
+                    . $line('4- عدد صفحات الحفظ غير المتقن النّاجحة', $num($v('unmastered_pages')), $ok)
+                    . $line('5- عدد صفحات الحفظ غير المتقن الرّاسبة', $num($v('unmastered_failed_pages')), $bad)
+                    . $line('6- عدد الأجزاء غير المتقنة', $num($v('unmastered_parts')), $base)
+                );
+            }
+
+            // المفصل
+            if (!empty($row['mafsil_details'])) {
+                $rows = $section('المفصل', '#d4a030');
+                foreach ($row['mafsil_details'] as $i => $m) {
+                    $passed = ($m['status'] ?? '') === 'passed';
+                    $rows .= $line(
+                        ($i + 1) . '- المفصل الذي تقدم له: ' . ($m['label'] ?? ''),
+                        $m['status_label'] ?? '',
+                        $passed ? $ok : $bad
+                    );
+                }
+                $html .= $table($rows);
+            }
+
+            // الإجمالي
+            $html .= $table(
+                '<tr><td width="62%" bgcolor="#f1f5f9" color="#182B48"><b>إجمالي الجلسات</b></td>'
+                . '<td width="38%" align="center" bgcolor="#182B48" color="#ffffff"><b>' . $num($v('total_sessions')) . '</b></td></tr>'
+            );
+
+            $html .= '<br/>';
+        }
+
+        return $html;
     }
 
     protected function pdfStatsTable(array $stats, string $headerColor, array $palette): string

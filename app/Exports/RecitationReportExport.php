@@ -18,6 +18,8 @@ class RecitationReportExport implements FromView, ShouldAutoSize, WithEvents
         public array $rows,
         public array $stats = [],
         public ?string $subtitle = null,
+        public array $summary = [],
+        public string $summaryMode = 'recitation',
     ) {}
 
     public function view(): View
@@ -28,6 +30,8 @@ class RecitationReportExport implements FromView, ShouldAutoSize, WithEvents
             'headers'  => $this->headers,
             'rows'     => $this->rows,
             'stats'    => $this->stats,
+            'summary'  => $this->summary,
+            'summaryMode' => $this->summaryMode,
             'orient'   => 'landscape',
         ]);
     }

@@ -45,5 +45,42 @@
             @endforeach
         </tbody>
     </table>
+
+    @php $summaryMode = $summaryMode ?? 'recitation'; @endphp
+    @if(!empty($summary))
+    <h1 style="font-size:14px; margin:18px 0 8px;">ملخص الطلاب</h1>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>الطالب</th>
+                @if($summaryMode !== 'attendance')
+                    <th>الجلسات</th><th>ناجح</th><th>نسبة النجاح</th><th>الصفحات</th>
+                @endif
+                @if($summaryMode !== 'recitation')
+                    <th>حضور</th><th>غياب</th><th>تأخير</th><th>نسبة الحضور</th>
+                @endif
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($summary as $row)
+                <tr>
+                    <td>{{ $row['name'] }}</td>
+                    @if($summaryMode !== 'attendance')
+                        <td>{{ $row['sessions'] }}</td>
+                        <td>{{ $row['passed'] }}</td>
+                        <td>{{ $row['pass_rate'] }}%</td>
+                        <td>{{ $row['pages'] }}</td>
+                    @endif
+                    @if($summaryMode !== 'recitation')
+                        <td>{{ $row['att_present'] }}</td>
+                        <td>{{ $row['att_absent'] }}</td>
+                        <td>{{ $row['att_late'] }}</td>
+                        <td>{{ is_null($row['attendance_rate']) ? '—' : $row['attendance_rate'] . '%' }}</td>
+                    @endif
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
 </body>
 </html>

@@ -1,8 +1,10 @@
 <?php
 namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
-use App\Models\{Student, User, Level};
+use App\Models\{Student, User, Level, Attendance, RecitationSession};
 use App\Services\AnalyticsService;
+use App\Services\ReportExporter;
+use App\Services\ReportService;
 use App\Traits\AvatarUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,23 +14,71 @@ use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller {
     use AvatarUpload;
-    public function index() {
-        $query = Student::where('supervisor_id', Auth::id())->with('user', 'level');
+    public function index(Request $request) {
+        $supervisorId = Auth::id();
 
-        if (request('search')) {
-            $search = request('search');
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            })->orWhere('national_id', 'like', "%{$search}%")
-              ->orWhere('student_number', 'like', "%{$search}%");
+        $allStudents = Student::where('supervisor_id', $supervisorId)
+            ->with('user', 'level')
+            ->get()
+            ->sortBy(fn ($s) => $s->user->name ?? '')
+            ->values();
+
+        $reports = app(ReportService::class);
+
+        $request->merge(['period' => $request->period ?? 'year']);
+        [$fromDate, $toDate, $period] = $reports->resolvePeriod($request);
+
+        $periodLabels = [
+            'today'   => 'اليوم',
+            'week'    => 'هذا الأسبوع',
+            'month'   => 'هذا الشهر',
+            'quarter' => 'هذا الربع',
+            'half'    => 'هذا النصف',
+            'year'    => 'هذه السنة',
+            'all'     => 'كل الفترات',
+            'custom'  => 'فترة مخصصة',
+        ];
+        $periodLabel = $periodLabels[$period] ?? 'هذه السنة';
+
+        $selectedStudent = $request->student_id
+            ? $allStudents->firstWhere('id', (int) $request->student_id)
+            : null;
+
+        $breakdown = [];
+        $recStats  = null;
+        $attStats  = null;
+
+        if ($selectedStudent) {
+            $sessionsQuery = RecitationSession::where('student_id', $selectedStudent->id)
+                ->with(['student.user', 'student.supervisor', 'supervisor', 'part', 'pages']);
+            $attendanceQuery = Attendance::where('student_id', $selectedStudent->id);
+
+            if ($fromDate && $toDate) {
+                $sessionsQuery->whereBetween('session_date', [$fromDate->toDateString(), $toDate->toDateString()]);
+                $attendanceQuery->whereBetween('date', [$fromDate->toDateString(), $toDate->toDateString()]);
+            }
+
+            $sessions    = $sessionsQuery->get();
+            $attendances = $attendanceQuery->get();
+
+            $breakdown = $reports->studentBreakdown($sessions, $attendances);
+            $recStats  = $reports->recitationStats($sessions);
+            $attStats  = $reports->attendanceStats($attendances);
         }
 
-        if (request('level_id')) {
-            $query->where('level_id', request('level_id'));
+        if ($request->export === 'pdf') {
+            if ($selectedStudent) {
+                return app(ReportExporter::class)->exportWrittenReportPdf(
+                    $selectedStudent, $breakdown, $periodLabel, $fromDate, $toDate
+                );
+            }
+
+            return redirect()->route('supervisor.students.index');
         }
 
-        $students = $query->paginate(20);
-        return view('supervisor.students.index', compact('students'));
+        return view('supervisor.students.index', compact(
+            'allStudents', 'selectedStudent', 'breakdown', 'periodLabel', 'period', 'recStats', 'attStats', 'fromDate', 'toDate'
+        ));
     }
 
     public function create() {
