@@ -362,9 +362,22 @@ class ReportService
     {
         $attendanceByStudent = $this->attendanceSummaryByStudent($attendances ?? collect());
 
+        // Load all-time memorization + recitation sessions (with pages) for
+        // every student in the breakdown, in a single batched query. Page
+        // mastery for "الأجزاء المحفوظة" must be evaluated against the
+        // student's full history: the new-memorization sessions that prove
+        // each page are usually spread across multiple periods (the سرد that
+        // qualifies the part is itself period-scoped). When no DB is
+        // available (e.g. isolated unit tests with plain objects), the
+        // returned map is empty and callers fall back to the in-period
+        // $group, preserving previous behavior.
+        $historyByStudent = $this->loadAllTimeMemorizationHistory(
+            $sessions->pluck('student_id')->filter()->unique()->values()
+        );
+
         return $sessions
             ->groupBy('student_id')
-            ->map(function ($group, $studentId) use ($attendanceByStudent) {
+            ->map(function ($group, $studentId) use ($attendanceByStudent, $historyByStudent) {
                 $student = $group->first()?->student;
 
                 // In-progress sessions are unfinished: exclude them from
@@ -397,7 +410,7 @@ class ReportService
                     'new_memorization_sessions'   => $newMemorize->count(),
                     'new_memorization_passed'     => $newMemorize->where('status', RecitationSession::STATUS_PASSED)->count(),
                     'new_memorization_failed'     => $newMemorize->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])->count(),
-                    'new_memorization_parts'      => $this->countFullyMemorizedParts($group),
+                    'new_memorization_parts'      => $this->countFullyMemorizedParts($group, $historyByStudent[$studentId] ?? null),
                     'new_memorization_pages'      => $this->countPassedPages($newMemorize),
                     'new_memorization_failed_pages' => $this->countFailedPages($newMemorize),
                     'recitation_sessions'         => $recitation->count(),
@@ -547,13 +560,45 @@ class ReportService
     }
 
     /**
+     * Load all-time new-memorization + recitation sessions (with their
+     * pages) for the given student ids, grouped by student_id. Returns an
+     * array [student_id => Collection] ready to be merged with any
+     * period-scoped groups. Returns [] when no database is reachable
+     * (e.g. isolated unit tests that pass plain objects) so callers can
+     * fall back to their in-period session groups.
+     */
+    private function loadAllTimeMemorizationHistory(Collection $studentIds): array
+    {
+        if ($studentIds->isEmpty()) {
+            return [];
+        }
+
+        try {
+            return RecitationSession::whereIn('student_id', $studentIds)
+                ->whereIn('type', [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION])
+                ->with('pages')
+                ->get()
+                ->groupBy('student_id')
+                ->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
      * Count the parts a student has fully memorized and then passed a
      * recitation (سرد) for. A part qualifies only when every page in the
      * part has at least one successful page record (from a new-memorization
      * or recitation session) and there is a passed recitation session for
      * that same part.
+     *
+     * The passed-سَرد qualifying event is taken from the in-period
+     * $group; the page-mastery check uses the student's full history so
+     * that memorization sessions from previous periods still prove the
+     * pages. Pass $history = null (e.g. when no DB is available) to fall
+     * back to evaluating page mastery on $group alone.
      */
-    private function countFullyMemorizedParts(Collection $group): int
+    private function countFullyMemorizedParts(Collection $group, ?Collection $history = null): int
     {
         $recitedPartIds = $group
             ->where('type', RecitationSession::TYPE_RECITATION)
@@ -570,8 +615,11 @@ class ReportService
         // page_number => true for every page successfully recited/memorized.
         // A page is considered mastered if it passed in a new-memorization
         // session OR in a recitation session (a passed سرد proves the page).
+        // Use the student's full history when available so memorization
+        // sessions from previous periods still count toward mastery.
+        $source = $history ?? $group;
         $masteredByPart = [];
-        foreach ($group->whereIn('type', [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION]) as $session) {
+        foreach ($source->whereIn('type', [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION]) as $session) {
             foreach ($this->pagesOf($session) as $page) {
                 if (!$page->is_passed) {
                     continue;

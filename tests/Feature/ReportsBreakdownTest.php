@@ -242,6 +242,60 @@ class ReportsBreakdownTest extends BaseTestCase
         );
     }
 
+    public function test_parts_count_uses_all_time_history_when_sard_in_current_period_has_black_page(): void
+    {
+        $student = $this->makeStudent('طالب سرد بفاصل', 'sardperiod');
+
+        // Previous quarter (Q2 2026): all 20 pages of part 1 memorized and
+        // successfully passed. This is where the page-level proof of
+        // mastery lives.
+        $mem = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'new_memorization', 'part_id' => 1,
+            'session_date' => '2026-05-15', 'status' => 'passed',
+            'start_page' => 1, 'end_page' => 20, 'total_pages' => 20,
+            'total_errors' => 0, 'total_hesitations' => 0,
+        ]);
+        for ($p = 1; $p <= 20; $p++) {
+            \App\Models\RecitationPage::create([
+                'session_id' => $mem->id, 'page_number' => $p,
+                'errors' => 0, 'hesitations' => 0,
+                'color_status' => 'green', 'is_passed' => true,
+            ]);
+        }
+
+        // Current quarter (Q3 2026): a سرد for the same part that passes
+        // overall (total errors 3 < 6) but has one black page (page 5
+        // with 3 errors → score 9 → failed at the page level). Without
+        // the all-time history fix the Q3 report would undercount the
+        // part to 0 because the period-scoped group only sees the سرد.
+        $sard = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'recitation', 'part_id' => 1,
+            'session_date' => '2026-08-15', 'status' => 'passed',
+            'start_page' => 1, 'end_page' => 20, 'total_pages' => 20,
+            'total_errors' => 3, 'total_hesitations' => 0, 'final_score' => 95,
+        ]);
+        for ($p = 1; $p <= 20; $p++) {
+            $isBlack = $p === 5;
+            \App\Models\RecitationPage::create([
+                'session_id' => $sard->id, 'page_number' => $p,
+                'errors' => $isBlack ? 3 : 0, 'hesitations' => 0,
+                'color_status' => $isBlack ? 'black' : 'green', 'is_passed' => !$isBlack,
+            ]);
+        }
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get('/admin/reports/quarter?student_id=' . $student->id . '&year=2026&quarter=3');
+        $resp->assertStatus(200);
+
+        $this->assertMatchesRegularExpression(
+            '/عدد الأجزاء المحفوظة:\s*<strong[^>]*>1<\/strong>/u',
+            $resp->getContent(),
+            'A part whose سرد passed in the current period should still count when the pages were memorized in a previous period, even if the سرد had a black page'
+        );
+    }
+
     public function test_review_part_counts_when_all_pages_reviewed_even_if_a_page_failed(): void
     {
         $student = $this->makeStudent('طالب مراجعة', 'revpart');
