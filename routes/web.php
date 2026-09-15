@@ -111,6 +111,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/quarter', [Admin\ReportController::class, 'quarter'])->name('quarter');
         Route::get('/half', [Admin\ReportController::class, 'half'])->name('half');
         Route::get('/year', [Admin\ReportController::class, 'year'])->name('year');
+        Route::get('/student/{student}', [Admin\ReportController::class, 'studentReport'])->name('student');
     });
 
     // Mafil history (اختبار الأجزاء)

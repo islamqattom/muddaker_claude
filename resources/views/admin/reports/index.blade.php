@@ -254,6 +254,34 @@
             </a>
         </div>
     </div>
+
+    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:20px;display:flex;align-items:center;gap:18px;">
+            <div style="width:54px;height:54px;background:linear-gradient(135deg,#dbeafe,#93c5fd);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:22px;flex-shrink:0;">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير طالب</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">جلسات التسميع والحضور لطالب محدد</div>
+            </div>
+        </div>
+        <div style="padding:20px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">
+                اختر طالباً لعرض جلسات التسميع وسجلات الحضور الخاصة به في الفترة المختارة، مع إمكانية التصدير إلى PDF.
+            </p>
+            <form method="GET" action="{{ route('admin.reports.student', ['student' => '__ID__']) }}" id="adminStudentReportForm">
+                <select name="student_picker" class="form-select form-select-sm mb-2" required>
+                    <option value="" disabled selected>اختر طالباً…</option>
+                    @foreach($students as $s)
+                        <option value="{{ $s->id }}">{{ $s->user->name ?? '—' }}@if($s->student_number) — {{ $s->student_number }}@endif</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="rpt-btn" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25);width:100%;">
+                    <i class="fas fa-file-alt"></i> عرض التقرير
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -263,6 +291,12 @@ function handlePeriodChange() {
     document.getElementById('fromDateCol').style.display = period === 'custom' ? '' : 'none';
     document.getElementById('toDateCol').style.display   = period === 'custom' ? '' : 'none';
 }
+document.getElementById('adminStudentReportForm')?.addEventListener('submit', function (e) {
+    var sel = this.querySelector('select[name="student_picker"]');
+    if (!sel.value) return;
+    var id = sel.value;
+    this.action = this.action.replace('__ID__', encodeURIComponent(id));
+});
 (function () {
     if (!window.Chart) return;
     var el = document.getElementById('adminRecMonthChart');

@@ -89,6 +89,7 @@ class ReportRoutesSmokeTest extends BaseTestCase
 
     public function test_admin_routes()
     {
+        $student = Student::where('user_id', 3)->first();
         $urls = [
             '/admin/reports',
             '/admin/reports/recitation',
@@ -117,6 +118,10 @@ class ReportRoutesSmokeTest extends BaseTestCase
         ];
         foreach ($urls as $u) {
             $this->hit('GET', $u, 1);
+        }
+        if ($student) {
+            $this->hit('GET', '/admin/reports/student/' . $student->id, 1);
+            $this->hit('GET', '/admin/reports/student/' . $student->id . '?export=pdf', 1);
         }
     }
 
