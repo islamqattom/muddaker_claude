@@ -2,10 +2,18 @@
 namespace App\Http\Controllers\ParentPortal;
 use App\Http\Controllers\Controller;
 use App\Models\{RecitationSession, Attendance};
+use App\Services\ReportExporter;
+use App\Services\ReportService;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class ReportController extends Controller {
+    public function __construct(
+        private ReportService $reports,
+        private ReportExporter $exporter,
+    ) {
+    }
+
     public function index() {
         $parent = Auth::user()->parentProfile()->with('students.user', 'students.level', 'students.supervisor')->first();
         $students = $parent->students;
@@ -48,7 +56,8 @@ class ReportController extends Controller {
         }
 
         // Get sessions statistics
-        $sessionsQuery = RecitationSession::whereIn('student_id', $filteredStudentIds);
+        $sessionsQuery = RecitationSession::whereIn('student_id', $filteredStudentIds)
+            ->with(['student.user', 'part', 'pages']);
         if ($fromDate && $toDate) {
             $sessionsQuery->whereBetween('session_date', [$fromDate, $toDate]);
         }
@@ -98,11 +107,44 @@ class ReportController extends Controller {
             ];
         }
 
+        // التقرير المكتوب (تظهر لولي الأمر بنفس منطق تقارير المشرف).
+        $breakdown = $this->reports->studentBreakdown($sessions, $attendances, $toDate);
+        $periodLabel = $this->periodLabel($period);
+
+        if (request('export') === 'pdf') {
+            if ($studentId && $students->contains('id', $studentId)) {
+                return $this->exporter->exportWrittenReportPdf(
+                    $students->firstWhere('id', (int) $studentId),
+                    $breakdown,
+                    $periodLabel,
+                    $fromDate,
+                    $toDate
+                );
+            }
+
+            return redirect()->route('parent.reports.index', request()->query());
+        }
+
         return view('parent.reports.index', compact(
             'parent', 'students', 'studentsData', 'studentId',
-            'fromDate', 'toDate',
+            'fromDate', 'toDate', 'period',
             'totalSessions', 'passedSessions', 'failedSessions',
-            'totalAttendances', 'presentCount', 'absentCount', 'lateCount', 'excusedCount', 'holidayCount', 'attendanceRate'
+            'totalAttendances', 'presentCount', 'absentCount', 'lateCount', 'excusedCount', 'holidayCount', 'attendanceRate',
+            'breakdown', 'periodLabel'
         ));
+    }
+
+    private function periodLabel(?string $period): string
+    {
+        return [
+            'today'   => 'اليوم',
+            'week'    => 'هذا الأسبوع',
+            'month'   => 'هذا الشهر',
+            'quarter' => 'هذا الربع',
+            'half'    => 'هذا النصف',
+            'year'    => 'هذه السنة',
+            'all'     => 'كل الفترات',
+            'custom'  => 'فترة مخصصة',
+        ][$period] ?? 'هذه الفترة';
     }
 }

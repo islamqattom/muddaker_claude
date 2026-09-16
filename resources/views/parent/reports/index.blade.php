@@ -323,6 +323,15 @@
             </div>
         </div>
     </div>
+
+    @include('admin.reports._styles')
+
+    @include('reports._written_report', [
+        'breakdown'    => $breakdown,
+        'periodLabel'  => $periodLabel,
+        'studentLabel' => 'طالب',
+        'pdfUrl'       => fn ($sid) => route('parent.reports.index', array_merge(request()->query(), ['student_id' => $sid, 'export' => 'pdf'])),
+    ])
 </div>
 
 <style>

@@ -4,8 +4,14 @@
     <div class="rpt-written-report" style="display:flex; flex-direction:column; gap:14px;">
         @foreach($breakdown as $row)
             <div class="rpt-written-row" style="background: linear-gradient(135deg, #f8f9fc 0%, #eef1f6 100%); border-right: 4px solid var(--primary, #182B48); border-radius: 10px; padding: 14px 16px;">
-                <div style="font-weight: 700; color: var(--primary, #182B48); font-size: 15px; margin-bottom: 8px;">
-                    <i class="fas fa-user-graduate me-1"></i> {{ $row['name'] }}
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-weight: 700; color: var(--primary, #182B48); font-size: 15px; margin-bottom: 8px;">
+                    <span><i class="fas fa-user-graduate me-1"></i> {{ $row['name'] }}</span>
+                    @if(!empty($pdfUrl) && !empty($row['student_id']))
+                        <a href="{{ is_callable($pdfUrl) ? $pdfUrl($row['student_id']) : $pdfUrl }}"
+                           class="rpt-btn rpt-btn-danger" style="padding: 6px 12px; font-size: 12px;" target="_blank">
+                            <i class="fas fa-file-pdf"></i> تصدير PDF
+                        </a>
+                    @endif
                 </div>
                 <div class="rpt-written-lines" style="display:flex; flex-direction:column; gap:6px; color: #182B48; font-size: 14px; line-height: 1.8;">
                     <div>

@@ -327,6 +327,48 @@
             </div>
         </div>
     </div>
+
+    @include('admin.reports._styles')
+
+    @php
+        $periodOptions = [
+            'today'   => 'اليوم',
+            'week'    => 'هذا الأسبوع',
+            'month'   => 'هذا الشهر',
+            'quarter' => 'هذا الربع',
+            'half'    => 'هذا النصف',
+            'year'    => 'هذه السنة',
+            'all'     => 'كل الفترات',
+        ];
+    @endphp
+
+    <div class="rpt-filter" style="margin-top: 24px;">
+        <div class="rpt-filter-header">
+            <i class="fas fa-file-alt"></i>
+            <span>التقرير المكتوب</span>
+        </div>
+        <div class="rpt-filter-body">
+            <form method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">الفترة</label>
+                        <select name="period" class="form-select" onchange="this.form.submit()">
+                            @foreach($periodOptions as $key => $label)
+                                <option value="{{ $key }}" {{ ($period ?? 'year') === $key ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @include('reports._written_report', [
+        'breakdown'    => $breakdown,
+        'periodLabel'  => $periodLabel,
+        'studentLabel' => 'طالب',
+        'pdfUrl'       => route('student.reports.index', array_merge(request()->query(), ['export' => 'pdf'])),
+    ])
 </div>
 
 <style>
