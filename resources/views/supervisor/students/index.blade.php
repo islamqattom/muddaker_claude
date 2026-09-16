@@ -117,11 +117,11 @@
         </div>
         <div class="sp-student-rates">
             <div class="sp-rate">
-                <span class="sp-rate-value {{ $selectedStudent->attendance_rate < 50 ? 'text-danger' : 'text-success' }}">{{ $selectedStudent->attendance_rate }}%</span>
+                <span class="sp-rate-value {{ $attStats['attendance_rate'] < 50 ? 'text-danger' : 'text-success' }}">{{ $attStats['attendance_rate'] }}%</span>
                 <span class="sp-rate-label">نسبة الحضور</span>
             </div>
             <div class="sp-rate">
-                <span class="sp-rate-value text-info">{{ $selectedStudent->pass_rate }}%</span>
+                <span class="sp-rate-value text-info">{{ $recStats['pass_rate'] }}%</span>
                 <span class="sp-rate-label">نسبة النجاح</span>
             </div>
         </div>

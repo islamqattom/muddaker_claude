@@ -44,7 +44,7 @@ class ReportController extends Controller
             'total_students' => $students->count(),
             'total_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->count(),
             'passed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->where('status', 'passed')->count(),
-            'failed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereIn('status', ['failed', 'failed_continued'])->count(),
+            'failed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count(),
             'avg_score' => round((float) RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereNotNull('final_score')->avg('final_score') ?? 0, 1),
         ];
 

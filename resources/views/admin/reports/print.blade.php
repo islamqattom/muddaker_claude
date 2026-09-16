@@ -130,6 +130,7 @@
                 <th>مراجعة</th>
                 <th>سرد</th>
                 <th>غير متقن</th>
+                <th>أيام لم يسمع</th>
                 <th>إجمالي الجلسات</th>
             </tr>
         </thead>
@@ -142,6 +143,7 @@
                     <td>{{ $row['review_sessions'] }} جلسة ({{ $row['review_pages'] }} ص)</td>
                     <td>{{ $row['recitation_sessions'] }} جلسة ({{ $row['recitation_pages'] }} ص)</td>
                     <td>{{ $row['unmastered_sessions'] }} جلسة ({{ $row['unmastered_pages'] }} ص)</td>
+                    <td>{{ $row['not_recite_days'] ?? 0 }}</td>
                     <td>{{ $row['total_sessions'] }}</td>
                 </tr>
             @endforeach

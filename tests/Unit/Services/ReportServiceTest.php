@@ -178,6 +178,27 @@ class ReportServiceTest extends TestCase
         $this->assertSame(50.0, $stats['attendance_rate']);
     }
 
+    public function test_attendance_stats_counts_late_in_attendance_but_keeps_present_exclusive(): void
+    {
+        $attendances = collect([
+            $this->attendance('present'),
+            $this->attendance('present'),
+            $this->attendance('late'),
+            $this->attendance('absent'),
+        ]);
+
+        $stats = $this->svc->attendanceStats($attendances);
+
+        $this->assertSame(4, $stats['total']);
+        // Exclusive status used by the breakdowns/exports.
+        $this->assertSame(2, $stats['present']);
+        $this->assertSame(1, $stats['late']);
+        // Headline metric counted by the KPI card: late is still attendance.
+        $this->assertSame(3, $stats['attendance']);
+        // 3 attended out of 4 (no excused) = 75%.
+        $this->assertSame(75.0, $stats['attendance_rate']);
+    }
+
     public function test_attendance_daily_trend_excludes_excused_from_rate(): void
     {
         $attendances = collect([

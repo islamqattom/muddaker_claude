@@ -23,6 +23,15 @@
                     </div>
                     <div>
                         <div style="margin-bottom: 4px;">
+                            <i class="fas fa-user-slash" style="color:#6c757d;"></i>
+                            <strong>عدم التسميع:</strong>
+                        </div>
+                        <div class="rpt-written-lines" style="display:flex; flex-direction:column; gap:4px; padding-right:22px; color:#182B48; font-size:14px; line-height:1.8;">
+                            <div>عدد الأيام التي لم يسمع بها: <strong style="color:#6c757d;">{{ $row['not_recite_days'] ?? 0 }}</strong></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 4px;">
                             <i class="fas fa-plus-circle" style="color:#27ae60;"></i>
                             <strong>الحفظ الجديد:</strong>
                         </div>

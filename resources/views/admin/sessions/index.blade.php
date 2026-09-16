@@ -154,6 +154,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .type-badge.unmastered { background: rgba(243,156,18,0.15); color: #f39c12; }
 .type-badge.recitation { background: rgba(155,89,182,0.15); color: #8e44ad; }
 .type-badge.mafsil { background: rgba(231,76,60,0.15); color: #c0392b; }
+.type-badge.not_recitate { background: rgba(108,117,125,0.15); color: #6c757d; }
 .type-badge i { font-size: 10px; }
 
 .participant-cell {
@@ -314,6 +315,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <option value="unmastered" {{ request('type') == 'unmastered' ? 'selected' : '' }}>حفظ غير متقن</option>
                     <option value="recitation" {{ request('type') == 'recitation' ? 'selected' : '' }}>سرد</option>
                     <option value="mafsil" {{ request('type') == 'mafsil' ? 'selected' : '' }}>مفصل</option>
+                    <option value="not_recitate" {{ request('type') == 'not_recitate' ? 'selected' : '' }}>لم يسمع</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -388,8 +390,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     <i class="fas fa-exclamation-circle"></i>غير متقن
                                 @elseif($session->type === 'recitation')
                                     <i class="fas fa-book-open"></i>سرد
-                                @else
+                                @elseif($session->type === 'mafsil')
                                     <i class="fas fa-layer-group"></i>مفصل
+                                @elseif($session->type === 'not_recitate')
+                                    <i class="fas fa-times-circle"></i>لم يسمع
+                                @else
+                                    <i class="fas fa-question-circle"></i>{{ $session->type_label }}
                                 @endif
                             </span>
                         </td>
@@ -407,7 +413,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         </td>
                         <td>
                             <span class="pages-cell">
-                                @if($session->type === 'mafsil')
+                                @if($session->type === 'not_recitate')
+                                    —
+                                @elseif($session->type === 'mafsil')
                                     @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
                                     {{ count($partNumbers) > 0 ? 'أجزاء ' . implode(', ', $partNumbers) : ($session->part ? 'جزء ' . $session->part->part_number : '—') }}
                                 @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))

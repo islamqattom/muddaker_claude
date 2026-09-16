@@ -124,7 +124,7 @@
 
 <div class="rpt-kpi-grid">
     @include('reports._kpi', ['label' => 'إجمالي السجلات', 'value' => $stats['total'], 'icon' => 'fa-list', 'color' => '#182B48', 'bg' => 'rgba(24,43,72,0.10)', 'delta' => $d('total'), 'deltaSuffix' => ''])
-    @include('reports._kpi', ['label' => 'حاضر', 'value' => $stats['present'], 'icon' => 'fa-check-circle', 'color' => '#059669', 'bg' => 'rgba(5,150,105,0.10)', 'delta' => $d('present'), 'deltaSuffix' => ''])
+    @include('reports._kpi', ['label' => 'الحضور', 'value' => $stats['attendance'], 'icon' => 'fa-check-circle', 'color' => '#059669', 'bg' => 'rgba(5,150,105,0.10)', 'delta' => $d('attendance'), 'deltaSuffix' => ''])
     @include('reports._kpi', ['label' => 'غائب', 'value' => $stats['absent'], 'icon' => 'fa-times-circle', 'color' => '#c0392b', 'bg' => 'rgba(192,57,43,0.10)', 'delta' => $d('absent'), 'deltaSuffix' => '', 'deltaInvert' => true])
     @include('reports._kpi', ['label' => 'متأخر', 'value' => $stats['late'], 'icon' => 'fa-clock', 'color' => '#f39c12', 'bg' => 'rgba(243,156,18,0.10)', 'delta' => $d('late'), 'deltaSuffix' => '', 'deltaInvert' => true])
     @include('reports._kpi', ['label' => 'بعذر', 'value' => $stats['excused'], 'icon' => 'fa-file-alt', 'color' => '#3498db', 'bg' => 'rgba(52,152,219,0.10)', 'delta' => $d('excused'), 'deltaSuffix' => ''])
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () { filterStudents(); })
                 labels: trend.map(function (t) { var p = t.date.split('-'); return p[2] + '/' + p[1]; }),
                 datasets: [
                     { label: 'إجمالي', data: trend.map(function (t) { return t.total; }), borderColor: '#182B48', backgroundColor: 'rgba(24,43,72,0.12)', tension: 0.35, fill: true, pointRadius: 3, yAxisID: 'y' },
-                    { label: 'حاضر',  data: trend.map(function (t) { return t.present; }), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.12)', tension: 0.35, fill: true, pointRadius: 3, yAxisID: 'y' },
+                    { label: 'الحضور',  data: trend.map(function (t) { return t.present; }), borderColor: '#059669', backgroundColor: 'rgba(5,150,105,0.12)', tension: 0.35, fill: true, pointRadius: 3, yAxisID: 'y' },
                     { label: 'نسبة الحضور %', data: trend.map(function (t) { return t.rate; }), borderColor: '#d4a030', borderDash: [5, 4], borderWidth: 2, tension: 0.35, pointRadius: 2, yAxisID: 'y1' }
                 ]
             },

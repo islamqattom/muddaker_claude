@@ -54,7 +54,7 @@
             <tr>
                 <th>الطالب</th>
                 @if($summaryMode !== 'attendance')
-                    <th>الجلسات</th><th>ناجح</th><th>نسبة النجاح</th><th>الصفحات</th>
+                    <th>الجلسات</th><th>ناجح</th><th>نسبة النجاح</th><th>الصفحات</th><th>أيام لم يسمع</th>
                 @endif
                 @if($summaryMode !== 'recitation')
                     <th>حضور</th><th>غياب</th><th>تأخير</th><th>نسبة الحضور</th>
@@ -70,6 +70,7 @@
                         <td>{{ $row['passed'] }}</td>
                         <td>{{ $row['pass_rate'] }}%</td>
                         <td>{{ $row['pages'] }}</td>
+                        <td>{{ $row['not_recite_days'] ?? 0 }}</td>
                     @endif
                     @if($summaryMode !== 'recitation')
                         <td>{{ $row['att_present'] }}</td>

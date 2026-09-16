@@ -56,7 +56,7 @@ class ReportController extends Controller {
 
         $totalSessions = $sessions->count();
         $passedSessions = $sessions->where('status', 'passed')->count();
-        $failedSessions = $sessions->whereIn('status', ['failed', 'failed_continued'])->count();
+        $failedSessions = $sessions->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count();
 
         // Get attendance statistics
         $attendancesQuery = Attendance::whereIn('student_id', $filteredStudentIds);
@@ -84,7 +84,7 @@ class ReportController extends Controller {
                 'sessions' => [
                     'total' => $studentSessions->count(),
                     'passed' => $studentSessions->where('status', 'passed')->count(),
-                    'failed' => $studentSessions->whereIn('status', ['failed', 'failed_continued'])->count(),
+                    'failed' => $studentSessions->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count(),
                 ],
                 'attendance' => [
                     'total' => $studentAttendances->count(),

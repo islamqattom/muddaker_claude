@@ -61,7 +61,7 @@ class StudentController extends Controller {
             $sessions    = $sessionsQuery->get();
             $attendances = $attendanceQuery->get();
 
-            $breakdown = $reports->studentBreakdown($sessions, $attendances);
+            $breakdown = $reports->studentBreakdown($sessions, $attendances, $toDate);
             $recStats  = $reports->recitationStats($sessions);
             $attStats  = $reports->attendanceStats($attendances);
         }

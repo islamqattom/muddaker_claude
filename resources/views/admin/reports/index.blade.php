@@ -267,19 +267,11 @@
         </div>
         <div style="padding:20px;">
             <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">
-                اختر طالباً لعرض جلسات التسميع وسجلات الحضور الخاصة به في الفترة المختارة، مع إمكانية التصدير إلى PDF.
+                تقرير مفصّل لكل طالب يشمل التقرير المكتوب وبيانات التسميع والحضور والإنجاز، مع التصدير إلى PDF.
             </p>
-            <form method="GET" action="{{ route('admin.reports.student', ['student' => '__ID__']) }}" id="adminStudentReportForm">
-                <select name="student_picker" class="form-select form-select-sm mb-2" required>
-                    <option value="" disabled selected>اختر طالباً…</option>
-                    @foreach($students as $s)
-                        <option value="{{ $s->id }}">{{ $s->user->name ?? '—' }}@if($s->student_number) — {{ $s->student_number }}@endif</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="rpt-btn" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25);width:100%;">
-                    <i class="fas fa-file-alt"></i> عرض التقرير
-                </button>
-            </form>
+            <a href="{{ route('admin.reports.students') }}" class="rpt-btn" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+                <i class="fas fa-users"></i> اختيار طالب
+            </a>
         </div>
     </div>
 </div>
@@ -291,12 +283,6 @@ function handlePeriodChange() {
     document.getElementById('fromDateCol').style.display = period === 'custom' ? '' : 'none';
     document.getElementById('toDateCol').style.display   = period === 'custom' ? '' : 'none';
 }
-document.getElementById('adminStudentReportForm')?.addEventListener('submit', function (e) {
-    var sel = this.querySelector('select[name="student_picker"]');
-    if (!sel.value) return;
-    var id = sel.value;
-    this.action = this.action.replace('__ID__', encodeURIComponent(id));
-});
 (function () {
     if (!window.Chart) return;
     var el = document.getElementById('adminRecMonthChart');

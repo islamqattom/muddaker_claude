@@ -117,7 +117,7 @@ trait BuildsReportData
             'recTrend'           => $this->reports->recitationMonthlyTrend($allSessions),
             'attTrend'           => $this->reports->attendanceMonthlyTrend($allAttendances),
             'top'                => $this->reports->topStudents($allSessions, 5),
-            'breakdown'          => $this->reports->studentBreakdown($allSessions, $allAttendances),
+            'breakdown'          => $this->reports->studentBreakdown($allSessions, $allAttendances, $toDate),
             'typeDistribution'   => $this->reports->typeDistribution($allSessions),
             'statusDistribution' => $this->attendanceStatusDistribution($allAttendances),
             'summary'            => $this->reports->studentSummary($allSessions, $allAttendances),

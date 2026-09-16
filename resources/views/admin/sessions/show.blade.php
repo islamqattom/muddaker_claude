@@ -115,6 +115,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .type-badge.unmastered { background: rgba(243,156,18,0.25); color: #f1c40f; border: 1px solid rgba(243,156,18,0.3); }
 .type-badge.recitation { background: rgba(155,89,182,0.25); color: #bb8fce; border: 1px solid rgba(155,89,182,0.3); }
 .type-badge.mafsil { background: rgba(231,76,60,0.25); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+.type-badge.not_recitate { background: rgba(108,117,125,0.25); color: #adb5bd; border: 1px solid rgba(108,117,125,0.3); }
 .type-badge i { font-size: 12px; }
 
 .section-card {
@@ -273,8 +274,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                 <i class="fas fa-exclamation-circle"></i>غير متقن
                             @elseif($session->type === 'recitation')
                                 <i class="fas fa-book-open"></i>سرد
-                            @else
+                            @elseif($session->type === 'mafsil')
                                 <i class="fas fa-layer-group"></i>مفصل
+                            @elseif($session->type === 'not_recitate')
+                                <i class="fas fa-times-circle"></i>لم يسمع
+                            @else
+                                <i class="fas fa-question-circle"></i>{{ $session->type_label }}
                             @endif
                         </span>
                     </div>

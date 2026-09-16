@@ -175,6 +175,33 @@ class ReportsBreakdownTest extends BaseTestCase
         $this->assertMatchesRegularExpression('/عدد صفحات المراجعة الرّاسبة:\s*<strong[^>]*>0<\/strong>/u', $reviewBlock[1]);
     }
 
+    public function test_incomplete_sessions_are_counted_with_failed(): void
+    {
+        $student = $this->makeStudent('طالب لم يكمل', 'incomplete');
+
+        // A passed review plus a review the student did not complete.
+        $this->makeSession($student->id, 'review', 1, 3, 'passed');
+        $this->makeSession($student->id, 'review', 1, 3, 'incomplete');
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get('/admin/reports/quarter?student_id=' . $student->id);
+        $resp->assertStatus(200);
+
+        $body = $resp->getContent();
+        $rowPattern = '/<div class="rpt-written-row"[^>]*>.*?طالب لم يكمل.*?إجمالي جلسات الربع.*?<\/div>\s*<\/div>/s';
+        $this->assertTrue((bool) preg_match($rowPattern, $body, $matches), 'Breakdown row should exist');
+        $row = $matches[0];
+
+        preg_match('/المراجعة:<\/strong>\s*<\/div>\s*<div class="rpt-written-lines"[^>]*>(.*?)<\/div>\s*<\/div>/s', $row, $reviewBlock);
+        $this->assertNotEmpty($reviewBlock, 'review block should be extracted');
+
+        // The incomplete session counts toward the sessions total and the
+        // failed bucket, keeping sessions = passed + failed.
+        $this->assertMatchesRegularExpression('/عدد جلسات المراجعة:\s*<strong[^>]*>2<\/strong>/u', $reviewBlock[1]);
+        $this->assertMatchesRegularExpression('/عدد الجلسات النّاجحة:\s*<strong[^>]*>1<\/strong>/u', $reviewBlock[1]);
+        $this->assertMatchesRegularExpression('/عدد الجلسات الرّاسبة:\s*<strong[^>]*>1<\/strong>/u', $reviewBlock[1]);
+    }
+
     public function test_breakdown_includes_pages_count_for_new_memorization(): void
     {
         $student = $this->makeStudent('طالب حفظ', 'memorize');
@@ -239,6 +266,98 @@ class ReportsBreakdownTest extends BaseTestCase
             '/عدد الأجزاء المحفوظة:\s*<strong[^>]*>1<\/strong>/u',
             $resp->getContent(),
             'A part whose سرد passed over all pages should count even if a new-memorization page failed'
+        );
+    }
+
+    public function test_part_does_not_count_when_sard_precedes_page_completion(): void
+    {
+        $student = $this->makeStudent('طالب سرد قبل الحفظ', 'sardbefore');
+
+        // A سرد was passed over only the first pages of part 1, before the
+        // rest of the part was memorized.
+        $sard = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'recitation', 'part_id' => 1,
+            'session_date' => now()->subMonths(4)->toDateString(), 'status' => 'passed',
+            'start_page' => 1, 'end_page' => 10, 'total_pages' => 10,
+            'total_errors' => 0, 'total_hesitations' => 0, 'final_score' => 95,
+        ]);
+        for ($p = 1; $p <= 10; $p++) {
+            \App\Models\RecitationPage::create([
+                'session_id' => $sard->id, 'page_number' => $p,
+                'errors' => 0, 'hesitations' => 0, 'color_status' => 'green', 'is_passed' => true,
+            ]);
+        }
+
+        // The remaining pages of part 1 are memorized later.
+        $mem = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'new_memorization', 'part_id' => 1,
+            'session_date' => now()->toDateString(), 'status' => 'passed',
+            'start_page' => 11, 'end_page' => 20, 'total_pages' => 10,
+            'total_errors' => 0, 'total_hesitations' => 0,
+        ]);
+        for ($p = 11; $p <= 20; $p++) {
+            \App\Models\RecitationPage::create([
+                'session_id' => $mem->id, 'page_number' => $p,
+                'errors' => 0, 'hesitations' => 0, 'color_status' => 'green', 'is_passed' => true,
+            ]);
+        }
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get('/admin/reports/quarter?student_id=' . $student->id);
+        $resp->assertStatus(200);
+
+        $this->assertMatchesRegularExpression(
+            '/عدد الأجزاء المحفوظة:\s*<strong[^>]*>0<\/strong>/u',
+            $resp->getContent(),
+            'A سرد passed before the part pages were completed must not qualify the part'
+        );
+    }
+
+    public function test_part_counts_when_sard_passes_after_all_pages(): void
+    {
+        $student = $this->makeStudent('طالب سرد بعد الحفظ', 'sardafter');
+
+        // All pages of part 1 memorized first.
+        $mem = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'new_memorization', 'part_id' => 1,
+            'session_date' => now()->toDateString(), 'status' => 'passed',
+            'start_page' => 1, 'end_page' => 20, 'total_pages' => 20,
+            'total_errors' => 0, 'total_hesitations' => 0,
+        ]);
+        for ($p = 1; $p <= 20; $p++) {
+            \App\Models\RecitationPage::create([
+                'session_id' => $mem->id, 'page_number' => $p,
+                'errors' => 0, 'hesitations' => 0, 'color_status' => 'green', 'is_passed' => true,
+            ]);
+        }
+
+        // The سرد is passed afterwards (same period is fine, the ordering is
+        // what matters).
+        $sard = RecitationSession::create([
+            'student_id' => $student->id, 'student_name' => 'طالب',
+            'supervisor_id' => $this->supervisorId, 'type' => 'recitation', 'part_id' => 1,
+            'session_date' => now()->toDateString(), 'status' => 'passed',
+            'start_page' => 1, 'end_page' => 20, 'total_pages' => 20,
+            'total_errors' => 0, 'total_hesitations' => 0, 'final_score' => 95,
+        ]);
+        for ($p = 1; $p <= 20; $p++) {
+            \App\Models\RecitationPage::create([
+                'session_id' => $sard->id, 'page_number' => $p,
+                'errors' => 0, 'hesitations' => 0, 'color_status' => 'green', 'is_passed' => true,
+            ]);
+        }
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get('/admin/reports/quarter?student_id=' . $student->id);
+        $resp->assertStatus(200);
+
+        $this->assertMatchesRegularExpression(
+            '/عدد الأجزاء المحفوظة:\s*<strong[^>]*>1<\/strong>/u',
+            $resp->getContent(),
+            'A part is memorized when the سرد passes after all its pages are completed'
         );
     }
 

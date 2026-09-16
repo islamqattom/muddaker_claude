@@ -10,7 +10,7 @@ class SessionController extends Controller {
         $request->validate([
             'student_id' => 'nullable|exists:students,id',
             'supervisor_id' => 'nullable|exists:supervisors,user_id',
-            'type' => 'nullable|in:new_memorization,review,unmastered,recitation,mafsil,all',
+            'type' => 'nullable|in:new_memorization,review,unmastered,recitation,mafsil,not_recitate,all',
         ]);
 
         // Handle period filter

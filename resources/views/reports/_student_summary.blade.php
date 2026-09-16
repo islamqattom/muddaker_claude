@@ -20,6 +20,7 @@
                             <th data-sort="num">ناجح</th>
                             <th data-sort="num">نسبة النجاح</th>
                             <th data-sort="num">الصفحات</th>
+                            <th data-sort="num">أيام لم يسمع</th>
                         @endif
                         @if($showAtt)
                             <th data-sort="num">حضور</th>
@@ -45,6 +46,7 @@
                                     <span class="rpt-score {{ $row['pass_rate'] >= 90 ? 'high' : ($row['pass_rate'] >= 75 ? 'medium' : 'low') }}">{{ $row['pass_rate'] }}%</span>
                                 </td>
                                 <td data-sort-value="{{ $row['pages'] }}">{{ $row['pages'] }}</td>
+                                <td data-sort-value="{{ $row['not_recite_days'] ?? 0 }}">{{ $row['not_recite_days'] ?? 0 }}</td>
                             @endif
                             @if($showAtt)
                                 <td data-sort-value="{{ $row['att_present'] }}" style="color:#27ae60;font-weight:700;">{{ $row['att_present'] }}</td>

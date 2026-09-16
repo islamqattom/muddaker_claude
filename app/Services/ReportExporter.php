@@ -263,6 +263,11 @@ class ReportExporter
         $rows .= $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info);
         $html .= $table($rows);
 
+        // عدم التسميع (gray) - separate section
+        $rows  = $section('عدم التسميع', '#6c757d');
+        $rows .= $line('1- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base);
+        $html .= $table($rows);
+
         // الحفظ الجديد (navy)
         $rows  = $section('الحفظ الجديد', '#182B48');
         $rows .= $line('1- عدد جلسات الحفظ الجديد', $num($v('new_memorization_sessions')), $base);
@@ -629,6 +634,12 @@ class ReportExporter
                 . $line('3- عدد أيام الغياب', $num($v('att_absent')), $bad)
                 . $line('4- عدد أيام التأخير', $num($v('att_late')), $warn)
                 . $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info)
+            );
+
+            // عدم التسميع (separate section)
+            $html .= $table(
+                $section('عدم التسميع', '#6c757d')
+                . $line('1- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base)
             );
 
             // الحفظ الجديد

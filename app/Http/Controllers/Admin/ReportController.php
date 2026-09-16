@@ -93,6 +93,74 @@ class ReportController extends Controller
     }
 
     /**
+     * Student reports (تقرير الطلاب): pick a student and a period, then show
+     * the written breakdown plus recitation/attendance KPIs. Mirrors the
+     * supervisor's students report, but the admin picks from every student.
+     */
+    public function studentsReport(Request $request)
+    {
+        $allStudents = Student::with('user', 'level')
+            ->get()
+            ->sortBy(fn ($s) => $s->user->name ?? '')
+            ->values();
+
+        $request->merge(['period' => $request->period ?? 'year']);
+        [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
+
+        $periodLabels = [
+            'today'   => 'اليوم',
+            'week'    => 'هذا الأسبوع',
+            'month'   => 'هذا الشهر',
+            'quarter' => 'هذا الربع',
+            'half'    => 'هذا النصف',
+            'year'    => 'هذه السنة',
+            'all'     => 'كل الفترات',
+            'custom'  => 'فترة مخصصة',
+        ];
+        $periodLabel = $periodLabels[$period] ?? 'هذه السنة';
+
+        $selectedStudent = $request->student_id
+            ? $allStudents->firstWhere('id', (int) $request->student_id)
+            : null;
+
+        $breakdown = [];
+        $recStats  = null;
+        $attStats  = null;
+
+        if ($selectedStudent) {
+            $sessionsQuery = RecitationSession::where('student_id', $selectedStudent->id)
+                ->with(['student.user', 'student.supervisor', 'supervisor', 'part', 'pages']);
+            $attendanceQuery = Attendance::where('student_id', $selectedStudent->id);
+
+            if ($fromDate && $toDate) {
+                $sessionsQuery->whereBetween('session_date', [$fromDate->toDateString(), $toDate->toDateString()]);
+                $attendanceQuery->whereBetween('date', [$fromDate->toDateString(), $toDate->toDateString()]);
+            }
+
+            $sessions    = $sessionsQuery->get();
+            $attendances = $attendanceQuery->get();
+
+            $breakdown = $this->reports->studentBreakdown($sessions, $attendances, $toDate);
+            $recStats  = $this->reports->recitationStats($sessions);
+            $attStats  = $this->reports->attendanceStats($attendances);
+        }
+
+        if ($request->export === 'pdf') {
+            if ($selectedStudent) {
+                return $this->exporter->exportWrittenReportPdf(
+                    $selectedStudent, $breakdown, $periodLabel, $fromDate, $toDate
+                );
+            }
+
+            return redirect()->route('admin.reports.students');
+        }
+
+        return view('admin.reports.students', compact(
+            'allStudents', 'selectedStudent', 'breakdown', 'periodLabel', 'period', 'recStats', 'attStats', 'fromDate', 'toDate'
+        ));
+    }
+
+    /**
      * Per-student report (تقرير طالب): recitation sessions + attendance
      * for one student in a chosen date range. Mirrors the supervisor
      * student report but is not bound to a single supervisor.

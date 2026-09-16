@@ -133,7 +133,8 @@ class ReportService
 
         if ($request->status && in_array($request->status, ['passed', 'failed', 'in_progress'], true)) {
             if ($request->status === 'failed') {
-                $query->whereIn('status', ['failed', 'failed_continued']);
+                // Not-completed (لم يكمل) sessions are shown with the failing ones.
+                $query->whereIn('status', ['failed', 'failed_continued', 'incomplete']);
             } else {
                 $query->where('status', $request->status);
             }
@@ -178,13 +179,16 @@ class ReportService
         $total    = $sessions->count();
         $passedSessions = $sessions->where('status', 'passed');
         $passed   = $passedSessions->count();
-        $failed   = $sessions->whereIn('status', ['failed', 'failed_continued'])->count();
+        // Sessions that were not completed (لم يكمل) are reported with the
+        // failing ones.
+        $failedStatuses = ['failed', 'failed_continued', 'incomplete'];
+        $failed   = $sessions->whereIn('status', $failedStatuses)->count();
         $decided  = $passed + $failed;
         $inProgress = $sessions->where('status', 'in_progress')->count();
 
         // Decided sessions (passed + failed) have complete error/hesitation
         // data; in-progress sessions only carry partial numbers.
-        $decidedSessions = $sessions->whereIn('status', ['passed', 'failed', 'failed_continued']);
+        $decidedSessions = $sessions->whereIn('status', array_merge(['passed'], $failedStatuses));
 
         $avgScore = $decidedSessions->whereNotNull('final_score')->avg('final_score');
         $passRate = $decided > 0 ? round(($passed / $decided) * 100, 1) : 0.0;
@@ -206,10 +210,17 @@ class ReportService
     public function attendanceStats(Collection $attendances): array
     {
         $total   = $attendances->count();
-        $present = $attendances->whereIn('status', ['present', 'late'])->count();
-        $absent  = $attendances->where('status', 'absent')->count();
+        $present = $attendances->where('status', 'present')->count();
         $late    = $attendances->where('status', 'late')->count();
+        $absent  = $attendances->where('status', 'absent')->count();
         $excused = $attendances->where('status', 'excused')->count();
+
+        // Late arrivals are still attendance days. "attendance" is the
+        // headline metric (present + late) used by the KPI card and the
+        // rate numerator, while "present" stays the exclusive status used
+        // by the breakdowns (donut, exports, written report) so those
+        // partitions still add up to the total.
+        $attendance = $present + $late;
 
         // Excused days are excluded from the rate denominator so they
         // neither reward nor penalize the student's attendance rate.
@@ -217,11 +228,12 @@ class ReportService
 
         return [
             'total'           => $total,
-            'present'         => $attendances->where('status', 'present')->count(),
+            'present'         => $present,
+            'attendance'      => $attendance,
             'late'            => $late,
             'absent'          => $absent,
             'excused'         => $excused,
-            'attendance_rate' => $effective > 0 ? round(($present / $effective) * 100, 1) : 0.0,
+            'attendance_rate' => $effective > 0 ? round(($attendance / $effective) * 100, 1) : 0.0,
         ];
     }
 
@@ -233,7 +245,7 @@ class ReportService
             ->map(function ($group, $date) {
                 $total = $group->count();
                 $passed = $group->where('status', 'passed')->count();
-                $decided = $passed + $group->whereIn('status', ['failed', 'failed_continued'])->count();
+                $decided = $passed + $group->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count();
                 return [
                     'date' => $date,
                     'total' => $total,
@@ -256,7 +268,7 @@ class ReportService
             ->map(function ($group, $month) {
                 $total = $group->count();
                 $passed = $group->where('status', 'passed')->count();
-                $failed = $group->whereIn('status', ['failed', 'failed_continued'])->count();
+                $failed = $group->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count();
                 $decided = $passed + $failed;
                 $avgScore = $group->whereNotNull('final_score')->avg('final_score');
                 return [
@@ -325,7 +337,7 @@ class ReportService
                 $name = $group->first()?->student?->user?->name ?? '—';
                 $total = $group->count();
                 $passed = $group->where('status', 'passed')->count();
-                $decided = $passed + $group->whereIn('status', ['failed', 'failed_continued'])->count();
+                $decided = $passed + $group->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count();
                 $avg = $group->whereNotNull('final_score')->avg('final_score');
                 return [
                     'name'      => $name,
@@ -358,21 +370,24 @@ class ReportService
      * how many new parts they memorized, how many review/recitation
      * sessions they had, etc.
      */
-    public function studentBreakdown(Collection $sessions, ?Collection $attendances = null): array
+    public function studentBreakdown(Collection $sessions, ?Collection $attendances = null, ?Carbon $untilDate = null): array
     {
         $attendanceByStudent = $this->attendanceSummaryByStudent($attendances ?? collect());
 
-        // Load all-time memorization + recitation sessions (with pages) for
-        // every student in the breakdown, in a single batched query. Page
-        // mastery for "الأجزاء المحفوظة" must be evaluated against the
-        // student's full history: the new-memorization sessions that prove
-        // each page are usually spread across multiple periods (the سرد that
-        // qualifies the part is itself period-scoped). When no DB is
-        // available (e.g. isolated unit tests with plain objects), the
+        // Load memorization + recitation sessions (with pages) up to the end
+        // of the selected period for every student in the breakdown, in a
+        // single batched query. Page mastery for "الأجزاء المحفوظة" must be
+        // evaluated against the student's full history up to that date: the
+        // new-memorization sessions that prove each page are usually spread
+        // across multiple periods, and the qualifying سرد may also have been
+        // passed in an earlier period. Capping at $untilDate keeps a past
+        // period report from counting pages/parts completed later. When no
+        // DB is available (e.g. isolated unit tests with plain objects), the
         // returned map is empty and callers fall back to the in-period
         // $group, preserving previous behavior.
         $historyByStudent = $this->loadAllTimeMemorizationHistory(
-            $sessions->pluck('student_id')->filter()->unique()->values()
+            $sessions->pluck('student_id')->filter()->unique()->values(),
+            $untilDate
         );
 
         return $sessions
@@ -380,10 +395,16 @@ class ReportService
             ->map(function ($group, $studentId) use ($attendanceByStudent, $historyByStudent) {
                 $student = $group->first()?->student;
 
-                // In-progress sessions are unfinished: exclude them from
-                // session counts so the written report only reflects
-                // completed activity.
-                $decided = $group->whereIn('status', ['passed', 'failed', 'failed_continued']);
+                // A session that was not completed (لم يكمل) is reported with
+                // the failing sessions, so each type reconciles as
+                // sessions = passed + failed. Only truly in-progress/not-heard
+                // sessions are left out of the report.
+                $failedStatuses = [
+                    RecitationSession::STATUS_FAILED,
+                    RecitationSession::STATUS_FAILED_CONTINUED,
+                    RecitationSession::STATUS_INCOMPLETE,
+                ];
+                $decided = $group->whereIn('status', array_merge([RecitationSession::STATUS_PASSED], $failedStatuses));
                 // Pages and parts are accomplishments: only sessions the
                 // student actually passed are counted.
                 $passed  = $group->where('status', 'passed');
@@ -394,6 +415,14 @@ class ReportService
                 $unmastered    = $decided->where('type', 'unmastered');
                 $mafsil        = $decided->where('type', 'mafsil');
 
+                // Days the student did not recite (لم يسمع). These are not
+                // "decided" sessions, so they are reported separately as a
+                // distinct day count.
+                $notRecite = $group->filter(
+                    fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
+                        || $s->status === RecitationSession::STATUS_NOT_RECITE
+                );
+
                 $recitationPassed  = $passed->where('type', 'recitation');
                 $mafsilPassed      = $passed->where('type', 'mafsil');
 
@@ -401,25 +430,30 @@ class ReportService
                     'student_id'                  => $student?->id,
                     'name'                        => $student?->user?->name ?? '—',
                     'total_sessions'              => $decided->count(),
+                    'not_recite_days'             => $notRecite
+                        ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                        ->filter()
+                        ->unique()
+                        ->count(),
                     'review_sessions'             => $review->count(),
                     'review_passed'               => $review->where('status', RecitationSession::STATUS_PASSED)->count(),
-                    'review_failed'               => $review->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])->count(),
+                    'review_failed'               => $review->whereIn('status', $failedStatuses)->count(),
                     'review_pages'                => $this->countPassedPages($review),
                     'review_failed_pages'         => $this->countFailedPages($review),
                     'review_parts'                => $this->countFullyReviewedParts($group),
                     'new_memorization_sessions'   => $newMemorize->count(),
                     'new_memorization_passed'     => $newMemorize->where('status', RecitationSession::STATUS_PASSED)->count(),
-                    'new_memorization_failed'     => $newMemorize->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])->count(),
+                    'new_memorization_failed'     => $newMemorize->whereIn('status', $failedStatuses)->count(),
                     'new_memorization_parts'      => $this->countFullyMemorizedParts($group, $historyByStudent[$studentId] ?? null),
                     'new_memorization_pages'      => $this->countPassedPages($newMemorize),
                     'new_memorization_failed_pages' => $this->countFailedPages($newMemorize),
                     'recitation_sessions'         => $recitation->count(),
                     'recitation_passed'           => $recitation->where('status', RecitationSession::STATUS_PASSED)->count(),
-                    'recitation_failed'           => $recitation->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])->count(),
+                    'recitation_failed'           => $recitation->whereIn('status', $failedStatuses)->count(),
                     'recitation_pages'            => $this->sumPages($recitationPassed),
                     'unmastered_sessions'         => $unmastered->count(),
                     'unmastered_passed'           => $unmastered->where('status', RecitationSession::STATUS_PASSED)->count(),
-                    'unmastered_failed'           => $unmastered->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])->count(),
+                    'unmastered_failed'           => $unmastered->whereIn('status', $failedStatuses)->count(),
                     'unmastered_pages'            => $this->countPassedPages($unmastered),
                     'unmastered_failed_pages'     => $this->countFailedPages($unmastered),
                     'unmastered_parts'            => $this->countFullyUnmasteredParts($group),
@@ -468,6 +502,30 @@ class ReportService
             return max(0, ((int) $s->end_page) - ((int) $s->start_page) + 1);
         }
         return 0;
+    }
+
+    /**
+     * Normalise a session's date to Carbon (Eloquent casts it, plain test
+     * objects may not). Returns null when the date is missing/unparseable so
+     * callers can skip ordering checks.
+     */
+    private function sessionDate($session): ?Carbon
+    {
+        $date = $session->session_date ?? null;
+
+        if (!$date) {
+            return null;
+        }
+
+        if ($date instanceof Carbon) {
+            return $date;
+        }
+
+        try {
+            return Carbon::parse($date);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**
@@ -560,14 +618,15 @@ class ReportService
     }
 
     /**
-     * Load all-time new-memorization + recitation sessions (with their
-     * pages) for the given student ids, grouped by student_id. Returns an
-     * array [student_id => Collection] ready to be merged with any
-     * period-scoped groups. Returns [] when no database is reachable
-     * (e.g. isolated unit tests that pass plain objects) so callers can
-     * fall back to their in-period session groups.
+     * Load new-memorization + recitation sessions (with their pages) for the
+     * given student ids, grouped by student_id, optionally capped at
+     * $untilDate (the end of the selected report period). Returns an array
+     * [student_id => Collection] ready to be merged with any period-scoped
+     * groups. Returns [] when no database is reachable (e.g. isolated unit
+     * tests that pass plain objects) so callers can fall back to their
+     * in-period session groups.
      */
-    private function loadAllTimeMemorizationHistory(Collection $studentIds): array
+    private function loadAllTimeMemorizationHistory(Collection $studentIds, ?Carbon $untilDate = null): array
     {
         if ($studentIds->isEmpty()) {
             return [];
@@ -576,6 +635,7 @@ class ReportService
         try {
             return RecitationSession::whereIn('student_id', $studentIds)
                 ->whereIn('type', [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION])
+                ->when($untilDate, fn ($q) => $q->where('session_date', '<=', $untilDate->toDateString()))
                 ->with('pages')
                 ->get()
                 ->groupBy('student_id')
@@ -587,64 +647,101 @@ class ReportService
 
     /**
      * Count the parts a student has fully memorized and then passed a
-     * recitation (سرد) for. A part qualifies only when every page in the
-     * part has at least one successful page record (from a new-memorization
-     * or recitation session) and there is a passed recitation session for
-     * that same part.
+     * recitation (سرد) for. A part qualifies only when:
+     *  - every page in the part has at least one successful page record
+     *    (from a new-memorization or recitation session), and
+     *  - a passed recitation (سرد) session for that same part happened on or
+     *    after the day the last of those pages was passed. A سرد that was
+     *    passed before the part's pages were completed does NOT qualify.
      *
-     * The passed-سَرد qualifying event is taken from the in-period
-     * $group; the page-mastery check uses the student's full history so
-     * that memorization sessions from previous periods still prove the
-     * pages. Pass $history = null (e.g. when no DB is available) to fall
-     * back to evaluating page mastery on $group alone.
+     * Evaluated against the student's history up to the end of the report
+     * period when available, so this works regardless of which period holds
+     * the memorization sessions or the qualifying سرد. The parts a سرد
+     * qualifies are derived from its pages as well as its optional part_id,
+     * because part_id is nullable and a سرد can span a part boundary.
+     * Pass $history = null (e.g. when no DB is available) to fall back to
+     * the in-period $group alone.
      */
     private function countFullyMemorizedParts(Collection $group, ?Collection $history = null): int
     {
-        $recitedPartIds = $group
-            ->where('type', RecitationSession::TYPE_RECITATION)
-            ->where('status', RecitationSession::STATUS_PASSED)
-            ->pluck('part_id')
-            ->filter()
-            ->unique()
-            ->values();
-
-        if ($recitedPartIds->isEmpty()) {
-            return 0;
-        }
-
-        // page_number => true for every page successfully recited/memorized.
-        // A page is considered mastered if it passed in a new-memorization
-        // session OR in a recitation session (a passed سرد proves the page).
-        // Use the student's full history when available so memorization
-        // sessions from previous periods still count toward mastery.
         $source = $history ?? $group;
-        $masteredByPart = [];
-        foreach ($source->whereIn('type', [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION]) as $session) {
+
+        // part_id => [page_number => earliest date that page was passed].
+        $firstMasteredAt = [];
+        // part_id => [dates of passed سرد sessions covering the part].
+        $passedSardDates = [];
+
+        foreach ($source as $session) {
+            $type = $session->type;
+            if (!in_array($type, [RecitationSession::TYPE_NEW_MEMORIZATION, RecitationSession::TYPE_RECITATION], true)) {
+                continue;
+            }
+
+            $date = $this->sessionDate($session);
+            $coveredParts = [];
+
+            if ($session->part_id) {
+                $coveredParts[(int) $session->part_id] = true;
+            }
+
             foreach ($this->pagesOf($session) as $page) {
+                $partId = $this->resolvePartId($session, (int) $page->page_number);
+                if (!$partId) {
+                    continue;
+                }
+
+                $partId = (int) $partId;
+                $coveredParts[$partId] = true;
+
                 if (!$page->is_passed) {
                     continue;
                 }
-                $partId = $this->resolvePartId($session, (int) $page->page_number);
-                if ($partId) {
-                    $masteredByPart[$partId][(int) $page->page_number] = true;
+
+                $pageNumber = (int) $page->page_number;
+                $prev = $firstMasteredAt[$partId][$pageNumber] ?? null;
+                if ($prev === null || ($date && $date->lt($prev))) {
+                    $firstMasteredAt[$partId][$pageNumber] = $date ?? $prev;
+                }
+            }
+
+            if ($type === RecitationSession::TYPE_RECITATION && $session->status === RecitationSession::STATUS_PASSED) {
+                foreach (array_keys($coveredParts) as $partId) {
+                    $passedSardDates[$partId][] = $date;
                 }
             }
         }
 
+        if (empty($passedSardDates)) {
+            return 0;
+        }
+
         $count = 0;
-        foreach (QuranPart::whereIn('id', $recitedPartIds)->get() as $part) {
-            $pages = $masteredByPart[$part->id] ?? [];
+        foreach (QuranPart::whereIn('id', array_keys($passedSardDates))->get() as $part) {
+            $pages = $firstMasteredAt[$part->id] ?? [];
             $complete = true;
+            $completedAt = null; // the day the last page was passed
 
             for ($page = (int) $part->start_page; $page <= (int) $part->end_page; $page++) {
                 if (!isset($pages[$page])) {
                     $complete = false;
                     break;
                 }
+                $date = $pages[$page];
+                if ($date && ($completedAt === null || $date->gt($completedAt))) {
+                    $completedAt = $date;
+                }
             }
 
-            if ($complete) {
-                $count++;
+            if (!$complete) {
+                continue;
+            }
+
+            // The qualifying سرد must be on/after the part's completion.
+            foreach ($passedSardDates[$part->id] as $sardDate) {
+                if ($completedAt === null || $sardDate === null || $sardDate->gte($completedAt)) {
+                    $count++;
+                    break;
+                }
             }
         }
 
@@ -789,7 +886,9 @@ class ReportService
             'mafsil'           => ['label' => 'مفصل',           'color' => '#d4a030'],
         ];
 
-        $decided = $sessions->whereIn('status', ['passed', 'failed', 'failed_continued']);
+        // Include not-completed (لم يكمل) sessions so every finished session
+        // is represented in the distribution.
+        $decided = $sessions->whereIn('status', ['passed', 'failed', 'failed_continued', 'incomplete']);
 
         $out = [];
         foreach ($meta as $key => $info) {
@@ -815,7 +914,8 @@ class ReportService
         $rows = [];
 
         foreach ($sessions->groupBy('student_id') as $studentId => $group) {
-            $decided = $group->whereIn('status', ['passed', 'failed', 'failed_continued']);
+            // Not-completed (لم يكمل) sessions count with the failing ones.
+            $decided = $group->whereIn('status', ['passed', 'failed', 'failed_continued', 'incomplete']);
             $passed  = $group->where('status', 'passed');
             $avg     = $group->whereNotNull('final_score')->avg('final_score');
             $total   = $decided->count();
@@ -829,6 +929,13 @@ class ReportService
                 'pass_rate'  => $total > 0 ? round(($passCnt / $total) * 100, 1) : 0.0,
                 'avg_score'  => $avg ? round($avg, 1) : 0.0,
                 'pages'      => $this->sumPages($passed),
+                'not_recite_days' => $group
+                    ->filter(fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
+                        || $s->status === RecitationSession::STATUS_NOT_RECITE)
+                    ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                    ->filter()
+                    ->unique()
+                    ->count(),
             ], $this->emptyAttendanceSummary());
         }
 
@@ -850,6 +957,9 @@ class ReportService
             $present = $group->whereIn('status', ['present', 'late'])->count();
 
             $rows[$studentId]['att_total']        = $total;
+            // att_present stays the exclusive status so the summary row
+            // (present + absent + late) still reconciles with att_total.
+            // Late is already rewarded through $present in the rate below.
             $rows[$studentId]['att_present']      = $group->where('status', 'present')->count();
             $rows[$studentId]['att_absent']       = $group->where('status', 'absent')->count();
             $rows[$studentId]['att_late']         = $group->where('status', 'late')->count();
@@ -889,6 +999,9 @@ class ReportService
 
             $out[$studentId] = [
                 'att_total'       => $total,
+                // Exclusive status: the written report lists present /
+                // absent / late as a numbered breakdown of att_total.
+                // Late still rewards the rate through $present below.
                 'att_present'     => $group->where('status', 'present')->count(),
                 'att_absent'      => $group->where('status', 'absent')->count(),
                 'att_late'        => $group->where('status', 'late')->count(),
