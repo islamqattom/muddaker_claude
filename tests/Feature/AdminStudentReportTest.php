@@ -154,7 +154,7 @@ class AdminStudentReportTest extends BaseTestCase
         $resp->assertStatus(404);
     }
 
-    public function test_admin_student_report_pdf_export_returns_pdf(): void
+    public function test_admin_student_report_pdf_export_returns_pdf_with_arabic_filename(): void
     {
         $student = $this->makeStudent('طالب PDF');
 
@@ -163,10 +163,40 @@ class AdminStudentReportTest extends BaseTestCase
             '/admin/reports/student/' . $student->id . '?export=pdf'
         );
 
-        // TCPDF Output('D') streams the PDF as a download, which bypasses
-        // the test response's content buffer. The status code is enough to
-        // confirm the export path runs without error (the same approach
-        // used in ReportRoutesSmokeTest for ?export=pdf routes).
-        $this->assertLessThan(500, $resp->getStatusCode());
+        $resp->assertStatus(200);
+        $this->assertSame('application/pdf', $resp->headers->get('Content-Type'));
+        $this->assertStringStartsWith('%PDF', $resp->getContent());
+
+        // The download name combines the report type, the student name and
+        // the period, encoded as UTF-8 (RFC 5987) for Arabic.
+        $disposition = (string) $resp->headers->get('Content-Disposition');
+        $this->assertStringContainsString("filename*=UTF-8''", $disposition);
+        $this->assertStringContainsString(rawurlencode('تقرير-طالب'), $disposition);
+        $this->assertStringContainsString(
+            rawurlencode(str_replace(' ', '-', $student->user->name)),
+            $disposition
+        );
+    }
+
+    public function test_admin_written_report_pdf_export_has_arabic_filename(): void
+    {
+        $student = $this->makeStudent('طالب تقرير مكتوب');
+
+        $admin = User::firstWhere('role', 'admin');
+        $resp = $this->actingAs($admin)->get(
+            '/admin/reports/students?student_id=' . $student->id . '&period=year&export=pdf'
+        );
+
+        $resp->assertStatus(200);
+        $this->assertSame('application/pdf', $resp->headers->get('Content-Type'));
+        $this->assertStringStartsWith('%PDF', $resp->getContent());
+
+        $disposition = (string) $resp->headers->get('Content-Disposition');
+        $this->assertStringContainsString("filename*=UTF-8''", $disposition);
+        $this->assertStringContainsString(rawurlencode('التقرير-المكتوب'), $disposition);
+        $this->assertStringContainsString(
+            rawurlencode(str_replace(' ', '-', $student->user->name)),
+            $disposition
+        );
     }
 }

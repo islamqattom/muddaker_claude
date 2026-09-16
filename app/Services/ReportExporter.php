@@ -44,7 +44,7 @@ class ReportExporter
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle),
-            default => $this->recitationPdf($sessions, $stats, $fromDate, $toDate),
+            default => $this->recitationPdf($sessions, $stats, $fromDate, $toDate, $period),
         };
     }
 
@@ -82,7 +82,7 @@ class ReportExporter
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('تقرير الحضور والغياب', $headers, $rows, $statsForExport, $subtitle),
-            default => $this->attendancePdf($attendances, $stats, $fromDate, $toDate),
+            default => $this->attendancePdf($attendances, $stats, $fromDate, $toDate, $period),
         };
     }
 
@@ -197,7 +197,13 @@ class ReportExporter
             <td align="center" bgcolor="#ffc107"><b>نسبة النجاح</b><br>' . $passRate . '%</td>
         </tr></table>', true, false, false, false, 'R');
 
-        return $pdf->Output('تقرير-' . $student->user->name . '.pdf', 'D');
+        $filename = $this->pdfFilename(
+            'تقرير طالب',
+            $student->user->name ?? null,
+            $this->periodSlug($fromDate, $toDate)
+        );
+
+        return $this->pdfDownload($pdf, $filename);
     }
 
     /**
@@ -207,6 +213,12 @@ class ReportExporter
     public function exportWrittenReportPdf($student, array $breakdown, string $periodLabel, $fromDate, $toDate)
     {
         $row = $breakdown[0] ?? null;
+
+        $filename = $this->pdfFilename(
+            'التقرير المكتوب',
+            $student->user->name ?? null,
+            $this->periodSlug($fromDate, $toDate, $periodLabel)
+        );
 
         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -232,7 +244,7 @@ class ReportExporter
             $pdf->SetFontSize(12);
             $pdf->Cell(0, 12, 'لا توجد بيانات في هذه الفترة.', 0, true, 'C', 0);
 
-            return $this->pdfDownload($pdf, 'student-written-report.pdf');
+            return $this->pdfDownload($pdf, $filename);
         }
 
         $v   = fn ($key) => $row[$key] ?? 0;
@@ -337,7 +349,7 @@ class ReportExporter
 
         $pdf->writeHTML($html, true, false, false, false, '');
 
-        return $this->pdfDownload($pdf, 'student-written-report.pdf');
+        return $this->pdfDownload($pdf, $filename);
     }
 
     /**
@@ -345,12 +357,88 @@ class ReportExporter
      */
     private function pdfDownload(TCPDF $pdf, string $filename)
     {
+        if (!str_ends_with($filename, '.pdf')) {
+            $filename .= '.pdf';
+        }
+
         $content = $pdf->Output($filename, 'S');
+
+        // RFC 5987: send a percent-encoded UTF-8 name for Arabic filenames,
+        // plus a stripped ASCII fallback for clients that ignore filename*.
+        $ascii = preg_replace('/[^\x20-\x7E]/', '', pathinfo($filename, PATHINFO_FILENAME));
+        $ascii = trim(preg_replace('/[-_ ]+/', '-', (string) $ascii), '-');
+        $fallback = $ascii !== '' ? $ascii . '.pdf' : 'report.pdf';
 
         return response($content, 200, [
             'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="' . $fallback . '"; filename*=UTF-8\'\'' . rawurlencode($filename),
         ]);
+    }
+
+    /**
+     * Build an Arabic report filename from the report type, the subject
+     * (student name) and the period, stripping characters that are not
+     * allowed in filenames.
+     */
+    protected function pdfFilename(string $type, ?string $subject, ?string $period): string
+    {
+        $parts = array_filter(
+            [$type, $subject, $period],
+            fn ($part) => $part !== null && trim((string) $part) !== ''
+        );
+
+        $name = str_replace([':', '*', '?', '"', '<', '>', '|', '/', '\\', '—', '–'], ' ', implode(' ', $parts));
+        $name = preg_replace('/\s+/u', '-', $name);
+        $name = preg_replace('/-+/u', '-', $name);
+
+        return trim((string) $name, '-') ?: 'تقرير';
+    }
+
+    /**
+     * Human-readable period slug: the explicit date range when available,
+     * otherwise the supplied label.
+     */
+    protected function periodSlug($fromDate, $toDate, ?string $fallback = null): string
+    {
+        if ($fromDate && $toDate) {
+            return $fromDate->format('Y-m-d') . '_' . $toDate->format('Y-m-d');
+        }
+
+        return $fallback ?: 'كل الفترات';
+    }
+
+    /**
+     * Arabic label for a resolved period code.
+     */
+    protected function periodLabel(?string $period): string
+    {
+        return match ($period) {
+            'today'   => 'اليوم',
+            'week'    => 'هذا الأسبوع',
+            'month'   => 'هذا الشهر',
+            'quarter' => 'هذا الربع',
+            'half'    => 'هذا النصف',
+            'year'    => 'هذه السنة',
+            'custom'  => 'فترة مخصصة',
+            default   => 'كل الفترات',
+        };
+    }
+
+    /**
+     * The subject (student name) for a report: the single student the rows
+     * belong to, or the fallback label for multi-student reports.
+     */
+    protected function reportSubject($records, string $fallback = 'جميع الطلاب'): string
+    {
+        if ($records instanceof \Illuminate\Support\Collection && $records->isNotEmpty()) {
+            $name = $records->first()->student->user->name ?? null;
+
+            if ($name && $records->pluck('student_id')->unique()->count() === 1) {
+                return $name;
+            }
+        }
+
+        return $fallback;
     }
 
     protected function printView(string $title, array $headers, array $rows, array $stats, ?string $subtitle, array $breakdown = [])
@@ -358,7 +446,7 @@ class ReportExporter
         return response()->view('admin.reports.print', compact('title', 'headers', 'rows', 'stats', 'subtitle', 'breakdown'));
     }
 
-    protected function recitationPdf($sessions, $stats, $fromDate, $toDate)
+    protected function recitationPdf($sessions, $stats, $fromDate, $toDate, ?string $period = null)
     {
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -419,13 +507,16 @@ class ReportExporter
             $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' سجل من أصل ' . $sessions->count() . '. استخدم تصدير Excel لعرض كل السجلات.', 0, true, 'C', 0);
         }
 
-        $filename = $fromDate
-            ? 'تقرير-التسميع-' . $fromDate->format('Y-m-d') . '.pdf'
-            : 'تقرير-التسميع-الكل.pdf';
-        return $pdf->Output($filename, 'D');
+        $filename = $this->pdfFilename(
+            'تقرير التسميع',
+            $this->reportSubject($sessions),
+            $this->periodSlug($fromDate, $toDate, $this->periodLabel($period))
+        );
+
+        return $this->pdfDownload($pdf, $filename);
     }
 
-    protected function attendancePdf($attendances, $stats, $fromDate, $toDate)
+    protected function attendancePdf($attendances, $stats, $fromDate, $toDate, ?string $period = null)
     {
         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -480,10 +571,13 @@ class ReportExporter
             $pdf->Cell(0, 8, 'ملاحظة: تم عرض أول ' . $pdfRowLimit . ' سجل من أصل ' . $attendances->count() . '. استخدم تصدير Excel لعرض كل السجلات.', 0, true, 'C', 0);
         }
 
-        $filename = $fromDate
-            ? 'تقرير-الحضور-' . $fromDate->format('Y-m-d') . '.pdf'
-            : 'تقرير-الحضور-الكل.pdf';
-        return $pdf->Output($filename, 'D');
+        $filename = $this->pdfFilename(
+            'تقرير الحضور',
+            $this->reportSubject($attendances),
+            $this->periodSlug($fromDate, $toDate, $this->periodLabel($period))
+        );
+
+        return $this->pdfDownload($pdf, $filename);
     }
 
     protected function aggregatePdf(array $payload, array $meta)
@@ -596,7 +690,7 @@ class ReportExporter
             }
         }
 
-        return $pdf->Output($meta['filename'] . '.pdf', 'D');
+        return $this->pdfDownload($pdf, $this->pdfFilename($meta['title'], 'جميع الطلاب', null));
     }
 
     /**
