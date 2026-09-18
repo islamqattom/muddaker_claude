@@ -41,12 +41,12 @@ class MissedRecitationServiceTest extends TestCase
         return $this->service->run(Carbon::parse($now));
     }
 
-    public function test_creates_session_for_present_student_on_required_day_after_grace(): void
+    public function test_creates_session_for_present_student_after_the_required_day_ends(): void
     {
-        // 2026-01-03 is a Saturday; created 26h before "now".
+        // 2026-01-03 is a Saturday; the following day has begun.
         $attendance = $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
 
-        $result = $this->runAt('2026-01-03 12:00:00');
+        $result = $this->runAt('2026-01-04 00:05:00');
 
         $this->assertSame(1, $result['created']);
         $this->assertDatabaseHas('recitation_sessions', [
@@ -65,7 +65,7 @@ class MissedRecitationServiceTest extends TestCase
         // 2026-01-06 is a Tuesday.
         $this->attendance('2026-01-06', 'present', '2026-01-05 10:00:00');
 
-        $result = $this->runAt('2026-01-06 12:00:00');
+        $result = $this->runAt('2026-01-07 00:05:00');
 
         $this->assertSame(1, $result['created']);
     }
@@ -75,21 +75,24 @@ class MissedRecitationServiceTest extends TestCase
         // 2026-01-02 is a Friday.
         $this->attendance('2026-01-02', 'present', '2026-01-01 10:00:00');
 
-        $result = $this->runAt('2026-01-04 12:00:00');
+        $result = $this->runAt('2026-01-03 00:05:00');
 
         $this->assertSame(0, $result['created']);
         $this->assertSame(0, RecitationSession::count());
     }
 
-    public function test_does_not_create_before_grace_period_elapses(): void
+    public function test_does_not_create_before_the_recitation_day_ends(): void
     {
-        // Saturday, but attendance was registered only 5 hours ago.
+        // Saturday, still the same day.
         $this->attendance('2026-01-03', 'present', '2026-01-03 07:00:00');
 
-        $result = $this->runAt('2026-01-03 12:00:00');
-
-        $this->assertSame(0, $result['created']);
+        $sameDay = $this->runAt('2026-01-03 23:59:00');
+        $this->assertSame(0, $sameDay['created']);
         $this->assertSame(0, RecitationSession::count());
+
+        // At the start of the following day the rule fires.
+        $nextDay = $this->runAt('2026-01-04 00:01:00');
+        $this->assertSame(1, $nextDay['created']);
     }
 
     public function test_does_not_create_when_a_session_already_exists_for_the_day(): void
@@ -104,7 +107,7 @@ class MissedRecitationServiceTest extends TestCase
             'status'       => 'passed',
         ]);
 
-        $result = $this->runAt('2026-01-03 12:00:00');
+        $result = $this->runAt('2026-01-04 00:05:00');
 
         $this->assertSame(0, $result['created']);
         $this->assertSame(1, RecitationSession::where('student_id', $student->id)->count());
@@ -114,9 +117,9 @@ class MissedRecitationServiceTest extends TestCase
     {
         $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
 
-        $this->runAt('2026-01-03 12:00:00');
-        $this->runAt('2026-01-03 13:00:00');
-        $this->runAt('2026-01-03 14:00:00');
+        $this->runAt('2026-01-04 00:05:00');
+        $this->runAt('2026-01-04 01:00:00');
+        $this->runAt('2026-01-04 02:00:00');
 
         $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
     }
@@ -125,7 +128,7 @@ class MissedRecitationServiceTest extends TestCase
     {
         $this->attendance('2026-01-03', 'excused', '2026-01-02 10:00:00');
 
-        $result = $this->runAt('2026-01-03 12:00:00');
+        $result = $this->runAt('2026-01-04 00:05:00');
 
         $this->assertSame(0, $result['created']);
         $this->assertSame(0, RecitationSession::count());
@@ -135,7 +138,7 @@ class MissedRecitationServiceTest extends TestCase
     {
         $this->attendance('2026-01-03', 'late', '2026-01-02 10:00:00');
 
-        $result = $this->runAt('2026-01-03 12:00:00');
+        $result = $this->runAt('2026-01-04 00:05:00');
 
         $this->assertSame(1, $result['created']);
     }
@@ -145,22 +148,32 @@ class MissedRecitationServiceTest extends TestCase
         // 2026-01-01 is a Thursday.
         $this->attendance('2026-01-01', 'present', '2025-12-31 10:00:00');
 
-        $result = $this->runAt('2026-01-01 12:00:00');
+        $result = $this->runAt('2026-01-02 00:05:00');
 
         $this->assertSame(0, $result['created']);
+    }
+
+    public function test_backdated_attendance_still_triggers_after_the_day_ends(): void
+    {
+        // Attendance for a past Saturday that was only entered days later.
+        $this->attendance('2026-01-03', 'present', '2026-01-10 09:00:00');
+
+        $result = $this->runAt('2026-01-11 00:05:00');
+
+        $this->assertSame(1, $result['created']);
     }
 
     public function test_auto_session_is_removed_when_attendance_becomes_excused(): void
     {
         $attendance = $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
 
-        $this->runAt('2026-01-03 12:00:00');
+        $this->runAt('2026-01-04 00:05:00');
         $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
 
         // The supervisor later excuses the student.
         $attendance->update(['status' => 'excused']);
 
-        $result = $this->runAt('2026-01-03 13:00:00');
+        $result = $this->runAt('2026-01-04 01:00:00');
 
         $this->assertSame(1, $result['cleaned']);
         $this->assertSame(0, RecitationSession::where('auto_generated', true)->count());
@@ -170,7 +183,7 @@ class MissedRecitationServiceTest extends TestCase
     {
         $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
 
-        $this->runAt('2026-01-03 12:00:00');
+        $this->runAt('2026-01-04 00:05:00');
 
         $this->assertDatabaseHas('audit_logs', [
             'role'       => 'system',
@@ -181,13 +194,62 @@ class MissedRecitationServiceTest extends TestCase
 
     public function test_command_runs_and_reports_created_sessions(): void
     {
-        Carbon::setTestNow(Carbon::parse('2026-01-03 12:00:00'));
+        Carbon::setTestNow(Carbon::parse('2026-01-04 00:30:00'));
 
         try {
             $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
 
             $this->artisan('recitation:register-missed')
                 ->assertSuccessful();
+
+            $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_run_once_per_day_scans_at_most_once_per_calendar_day(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-04 00:05:00'));
+
+        try {
+            $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
+
+            $first = $this->service->runOncePerDay();
+            $this->assertFalse($first['already_ran']);
+            $this->assertSame(1, $first['created']);
+            $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
+
+            // Another eligible record (a past Saturday) appears later the same day.
+            $this->attendance('2025-12-27', 'present', '2025-12-27 10:00:00');
+
+            $second = $this->service->runOncePerDay();
+            $this->assertTrue($second['already_ran']);
+            $this->assertSame(0, $second['created']);
+            // Not processed until the next calendar day.
+            $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
+
+            Carbon::setTestNow(Carbon::parse('2026-01-05 00:05:00'));
+
+            $third = $this->service->runOncePerDay();
+            $this->assertFalse($third['already_ran']);
+            $this->assertSame(1, $third['created']);
+            $this->assertSame(2, RecitationSession::where('auto_generated', true)->count());
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_visit_trigger_middleware_runs_the_scan(): void
+    {
+        config(['recitation.scan_on_visits' => true]);
+        Carbon::setTestNow(Carbon::parse('2026-01-04 00:05:00'));
+
+        try {
+            $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00');
+
+            $middleware = app(\App\Http\Middleware\TriggerMissedRecitationScan::class);
+            $middleware->terminate(request(), response(''));
 
             $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
         } finally {

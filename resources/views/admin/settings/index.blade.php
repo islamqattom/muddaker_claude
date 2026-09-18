@@ -46,6 +46,11 @@
                 @csrf
                 @method('PUT')
 
+                {{-- Marker so an empty work-days selection is saved as empty
+                     instead of falling back to the default list. --}}
+                <input type="hidden" name="work_days_submitted" value="1">
+                <input type="hidden" name="recitation_days_submitted" value="1">
+
                 {{-- Center Info Section --}}
                 <div class="settings-section">
                     <div class="section-header">
@@ -167,6 +172,41 @@
                                 </label>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {{-- Recitation Days Section --}}
+                <div class="settings-section">
+                    <div class="section-header">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span>أيام التسميع</span>
+                    </div>
+                    <div class="section-body">
+                        <label class="form-label">اختر الأيام التي يكون فيها تسميع</label>
+                        <div class="days-grid">
+                            @php
+                                $recitationDays = explode(',', config('app.recitation_days', 'saturday,tuesday'));
+                                $recitationDayOptions = [
+                                    'saturday'  => 'السبت',
+                                    'sunday'    => 'الأحد',
+                                    'monday'    => 'الاثنين',
+                                    'tuesday'   => 'الثلاثاء',
+                                    'wednesday' => 'الأربعاء',
+                                    'thursday'  => 'الخميس',
+                                    'friday'    => 'الجمعة',
+                                ];
+                            @endphp
+                            @foreach($recitationDayOptions as $value => $label)
+                                <div class="day-checkbox">
+                                    <input type="checkbox" name="recitation_days[]" value="{{ $value }}" id="recitation_{{ $value }}" {{ in_array($value, $recitationDays) ? 'checked' : '' }}>
+                                    <label for="recitation_{{ $value }}">
+                                        <i class="fas fa-calendar-day"></i>
+                                        <span>{{ $label }}</span>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+                        <small class="text-muted d-block mt-2">في هذه الأيام يُسجَّل الطالب الحاضر الذي لم يسمّع ضمن تقرير "لم يسمع".</small>
                     </div>
                 </div>
 

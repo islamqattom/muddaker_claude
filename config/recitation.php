@@ -9,8 +9,9 @@ use Carbon\Carbon;
 |
 | Configuration for the automated "لم يسمع" (missed recitation) rule:
 | when a student is marked present on a day that requires a recitation
-| session and the supervisor does not record one within the grace period,
-| the system registers a "not recited" session automatically.
+| session and the supervisor does not record one before that day ends, the
+| system registers a "not recited" session automatically at the start of the
+| following day.
 |
 | Day numbers use Carbon constants (0 = Sunday ... 6 = Saturday), so the
 | rule can be extended later without changing code.
@@ -31,11 +32,12 @@ return [
         ? array_map('intval', explode(',', (string) $excludedDays))
         : [Carbon::FRIDAY],
 
-    // Hours that must pass after the attendance was registered.
-    'grace_hours' => (int) env('RECITATION_GRACE_HOURS', 24),
-
     // How many recent days of attendance the scheduled job scans.
     'lookback_days' => (int) env('RECITATION_LOOKBACK_DAYS', 30),
+
+    // Run the scan on ordinary web visits (at most once per calendar day) so
+    // the rule works even when no cron runs "schedule:run".
+    'scan_on_visits' => (bool) env('RECITATION_SCAN_ON_VISITS', true),
 
     // Attendance statuses that count as the student having attended.
     'attendance_statuses' => ['present', 'late'],

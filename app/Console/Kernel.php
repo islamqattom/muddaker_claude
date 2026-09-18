@@ -16,8 +16,8 @@ class Kernel extends ConsoleKernel {
         $schedule->command('notifications:daily-reminder')
             ->dailyAt('08:00');
 
-        // Auto-register "لم يسمع" sessions for present students who were not
-        // recited within the grace period (Saturday/Tuesday by default).
+        // Auto-register "لم يسمع" sessions for present students once the day
+        // that requires a recitation has ended without a recorded session.
         $schedule->command('recitation:register-missed')
             ->hourly()
             ->withoutOverlapping();

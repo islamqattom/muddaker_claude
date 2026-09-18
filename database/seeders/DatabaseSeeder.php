@@ -178,6 +178,8 @@ class DatabaseSeeder extends Seeder
             $parent->students()->attach($student->id);
         }
 
+        $this->call(SettingsSeeder::class);
+        $this->call(BillingSettingsSeeder::class);
         $this->call(AzkarSeeder::class);
         $this->call(TajweedRulesSeeder::class);
         $this->command->info('✅ تم إنشاء البيانات الأولية بنجاح!');

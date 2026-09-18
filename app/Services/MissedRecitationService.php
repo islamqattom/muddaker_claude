@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Automated business rule: a student who is present on a day that requires a
- * recitation session must have a session recorded by their supervisor within
- * the configured grace period (24 hours by default). Otherwise the system
- * registers a "لم يسمع" (not recited) session automatically.
+ * recitation session must have a session recorded by their supervisor before
+ * that day ends. Once the recitation day is over and no session exists, the
+ * system registers a "لم يسمع" (not recited) session automatically.
  *
- * Friday is always excluded, and the set of required/excluded days and the
- * grace period are configurable via config/recitation.php.
+ * The set of required/excluded days is configurable via config/recitation.php
+ * (and, in turn, by the "recitation_days" setting).
  */
 class MissedRecitationService
 {
@@ -29,7 +29,6 @@ class MissedRecitationService
     {
         $now = $now ?? now();
 
-        $graceHours       = (int) config('recitation.grace_hours', 24);
         $lookbackDays     = (int) config('recitation.lookback_days', 30);
         $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
 
@@ -38,12 +37,14 @@ class MissedRecitationService
         // removed so the report stays truthful.
         $cleaned = $this->cleanupInvalid($attendedStatuses);
 
-        $deadline = $now->copy()->subHours($graceHours);
-
+        // Scan attendance by its date (not its creation time) so backdated
+        // records are handled too. Records from the last lookback window are
+        // considered; whether a given day has actually ended is checked per
+        // record below.
         $candidates = Attendance::query()
             ->whereIn('status', $attendedStatuses)
-            ->where('created_at', '<=', $deadline)
-            ->where('created_at', '>=', $now->copy()->subDays($lookbackDays))
+            ->where('date', '>=', $now->copy()->subDays($lookbackDays)->toDateString())
+            ->where('date', '<=', $now->copy()->toDateString())
             ->get();
 
         $created = 0;
@@ -66,6 +67,66 @@ class MissedRecitationService
     }
 
     /**
+     * Run the scan at most once per calendar day. This lets the site trigger
+     * the rule on ordinary web visits, so it works even without a cron entry
+     * for "schedule:run". Returns the run statistics, or a zeroed result with
+     * "already_ran" = true when today's scan already happened.
+     *
+     * The "last run" marker is stored in the settings table (rather than the
+     * cache) so it works regardless of the cache store configuration.
+     *
+     * @return array{created:int, skipped:int, cleaned:int, already_ran:bool}
+     */
+    public function runOncePerDay(?CarbonInterface $now = null): array
+    {
+        $now = $now ?? now();
+        $today = $now->toDateString();
+        $key = 'recitation_last_scan_date';
+
+        if (DB::table('settings')->where('key', $key)->value('value') === $today) {
+            return $this->alreadyRanResult();
+        }
+
+        // Reserve today's run atomically: only one request can flip the value
+        // from a different value to today's date.
+        $reserved = DB::table('settings')
+            ->where('key', $key)
+            ->where(fn ($query) => $query->whereNull('value')->orWhere('value', '!=', $today))
+            ->update(['value' => $today, 'updated_at' => $now]);
+
+        if ($reserved === 0) {
+            // No marker row yet: create one (the unique key guards the race).
+            try {
+                DB::table('settings')->insert([
+                    'key'        => $key,
+                    'value'      => $today,
+                    'group'      => 'recitation',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            } catch (UniqueConstraintViolationException $e) {
+                return $this->alreadyRanResult();
+            }
+        }
+
+        try {
+            return $this->run($now) + ['already_ran' => false];
+        } catch (\Throwable $e) {
+            // Release the marker so the next visit can retry.
+            DB::table('settings')->where('key', $key)->update(['value' => null, 'updated_at' => $now]);
+            throw $e;
+        }
+    }
+
+    /**
+     * @return array{created:int, skipped:int, cleaned:int, already_ran:bool}
+     */
+    private function alreadyRanResult(): array
+    {
+        return ['created' => 0, 'skipped' => 0, 'cleaned' => 0, 'already_ran' => true];
+    }
+
+    /**
      * Whether the attendance record satisfies all rule conditions.
      */
     public function shouldCreateForAttendance(Attendance $attendance, CarbonInterface $now): bool
@@ -74,7 +135,7 @@ class MissedRecitationService
             return false;
         }
 
-        if (! $this->hasGraceElapsed($attendance, $now)) {
+        if (! $this->hasAttendanceDayEnded($attendance, $now)) {
             return false;
         }
 
@@ -103,17 +164,16 @@ class MissedRecitationService
     }
 
     /**
-     * Whether the grace period has elapsed since the attendance was registered.
+     * Whether the day the student was required to recite has already ended.
+     * The rule fires at the start of the following calendar day.
      */
-    public function hasGraceElapsed(Attendance $attendance, CarbonInterface $now): bool
+    public function hasAttendanceDayEnded(Attendance $attendance, CarbonInterface $now): bool
     {
-        if (! $attendance->created_at) {
+        if (! $attendance->date) {
             return false;
         }
 
-        $graceHours = (int) config('recitation.grace_hours', 24);
-
-        return $now->greaterThanOrEqualTo($attendance->created_at->copy()->addHours($graceHours));
+        return $now->greaterThanOrEqualTo($attendance->date->copy()->addDay()->startOfDay());
     }
 
     /**
@@ -145,7 +205,7 @@ class MissedRecitationService
         try {
             DB::transaction(function () use ($attendance): void {
                 // Re-check inside the transaction to avoid a race with a
-                // supervisor saving a session just before the deadline.
+                // supervisor saving a session just before the day ends.
                 if ($this->hasExistingSession($attendance)) {
                     return;
                 }
@@ -158,8 +218,7 @@ class MissedRecitationService
                     'session_date'    => $attendance->date,
                     'attendance_id'   => $attendance->id,
                     'auto_generated'  => true,
-                    'notes'           => 'تسميع تلقائي - لم يتم تسجيل تسميع خلال '
-                        . (int) config('recitation.grace_hours', 24) . ' ساعة',
+                    'notes'           => 'تسميع تلقائي - انتهى يوم التسميع دون تسجيل تسميع',
                 ]);
             });
         } catch (UniqueConstraintViolationException $e) {

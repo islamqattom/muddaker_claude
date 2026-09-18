@@ -15,7 +15,21 @@ class SettingsController extends Controller {
             'center_phone' => 'nullable|string|max:20',
             'work_start_time' => 'nullable',
             'work_end_time' => 'nullable',
+            'work_days' => 'nullable|array',
+            'work_days.*' => 'nullable|string|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'recitation_days' => 'nullable|array',
+            'recitation_days.*' => 'nullable|string|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
         ]);
+
+        $defaultWorkDays = ['saturday', 'sunday', 'monday', 'tuesday', 'thursday'];
+        $defaultRecitationDays = ['saturday', 'tuesday'];
+
+        // A checkbox group sends nothing when every day is unchecked. The
+        // hidden "<group>_submitted" markers let us distinguish "all
+        // unchecked" (save an empty list) from "field not sent" (keep the
+        // default), so a deliberate empty selection is preserved.
+        $selectedWorkDays = $this->selectedDays($request, 'work_days', $defaultWorkDays);
+        $selectedRecitationDays = $this->selectedDays($request, 'recitation_days', $defaultRecitationDays);
 
         // Define settings to save
         $settings = [
@@ -24,7 +38,8 @@ class SettingsController extends Controller {
             'center_phone' => $request->center_phone ?? '',
             'work_start_time' => $request->work_start_time ?? '08:00',
             'work_end_time' => $request->work_end_time ?? '20:00',
-            'work_days' => implode(',', $request->work_days ?? ['saturday', 'sunday', 'monday', 'tuesday', 'thursday']),
+            'work_days' => implode(',', $selectedWorkDays),
+            'recitation_days' => implode(',', $selectedRecitationDays),
             'enable_notifications' => $request->has('enable_notifications') ? 'true' : 'false',
         ];
 
@@ -54,5 +69,19 @@ class SettingsController extends Controller {
         }
 
         return redirect()->route('admin.settings.index')->with('success', 'تم حفظ الإعدادات بنجاح');
+    }
+
+    /**
+     * Resolve the selected days for a checkbox group. When the form's hidden
+     * marker is present, an absent field means "all unchecked" (empty list);
+     * otherwise (programmatic calls) fall back to the provided defaults.
+     */
+    private function selectedDays(Request $request, string $field, array $defaults): array
+    {
+        if ($request->has($field . '_submitted')) {
+            return $request->input($field) ?? [];
+        }
+
+        return $request->input($field) ?? $defaults;
     }
 }
