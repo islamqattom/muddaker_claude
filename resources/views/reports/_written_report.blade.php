@@ -120,6 +120,9 @@
                         <i class="fas fa-list-ol"></i> إجمالي جلسات {{ $periodLabel ?? 'الربع' }}:
                         <strong style="color:#182B48;">{{ $row['total_sessions'] }}</strong>
                         جلسة
+                        @if(($row['not_recite_days'] ?? 0) > 0)
+                            <span style="font-size:12px;">(تشمل {{ $row['not_recite_days'] }} يوماً لم يسمع بها)</span>
+                        @endif
                     </div>
                 </div>
             </div>

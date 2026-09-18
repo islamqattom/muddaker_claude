@@ -280,6 +280,26 @@ class ReportServiceTest extends TestCase
         $this->assertSame(1, $row['unmastered_failed_pages']);
     }
 
+    public function test_student_breakdown_includes_not_recited_days_in_total_sessions(): void
+    {
+        $sessions = collect([
+            $this->session(['student_id' => 1, 'type' => 'new_memorization', 'status' => 'passed', 'part_id' => 1, 'total_pages' => 3]),
+            $this->session(['student_id' => 1, 'type' => 'not_recitate', 'status' => 'not_recitate', 'session_date' => Carbon::create(2026, 1, 5)]),
+            $this->session(['student_id' => 1, 'type' => 'not_recitate', 'status' => 'not_recitate', 'session_date' => Carbon::create(2026, 1, 6)]),
+        ]);
+
+        $breakdown = $this->svc->studentBreakdown($sessions);
+
+        $this->assertCount(1, $breakdown);
+        $row = $breakdown[0];
+
+        $this->assertSame(2, $row['not_recite_days']);
+        // The grand total counts the decided session plus the two days the
+        // student did not recite.
+        $this->assertSame(3, $row['total_sessions']);
+        $this->assertSame(1, $row['sessions_without_not_recite']);
+    }
+
     private function session(array $attrs = []): object
     {
         return (object) array_merge([

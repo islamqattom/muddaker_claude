@@ -417,11 +417,18 @@ class ReportService
 
                 // Days the student did not recite (لم يسمع). These are not
                 // "decided" sessions, so they are reported separately as a
-                // distinct day count.
+                // distinct day count. They are still counted in the period's
+                // grand total of sessions so days the student did not recite
+                // are not silently dropped from إجمالي الجلسات.
                 $notRecite = $group->filter(
                     fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
                         || $s->status === RecitationSession::STATUS_NOT_RECITE
                 );
+                $notReciteDays = $notRecite
+                    ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                    ->filter()
+                    ->unique()
+                    ->count();
 
                 $recitationPassed  = $passed->where('type', 'recitation');
                 $mafsilPassed      = $passed->where('type', 'mafsil');
@@ -429,12 +436,9 @@ class ReportService
                 return array_merge([
                     'student_id'                  => $student?->id,
                     'name'                        => $student?->user?->name ?? '—',
-                    'total_sessions'              => $decided->count(),
-                    'not_recite_days'             => $notRecite
-                        ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
-                        ->filter()
-                        ->unique()
-                        ->count(),
+                    'total_sessions'              => $decided->count() + $notReciteDays,
+                    'sessions_without_not_recite' => $decided->count(),
+                    'not_recite_days'             => $notReciteDays,
                     'review_sessions'             => $review->count(),
                     'review_passed'               => $review->where('status', RecitationSession::STATUS_PASSED)->count(),
                     'review_failed'               => $review->whereIn('status', $failedStatuses)->count(),
@@ -648,8 +652,9 @@ class ReportService
     /**
      * Count the parts a student has fully memorized and then passed a
      * recitation (سرد) for. A part qualifies only when:
-     *  - every page in the part has at least one successful page record
-     *    (from a new-memorization or recitation session), and
+     *  - every page in the part has at least one successful page record in a
+     *    new-memorization session (a page passed only during سرد does not
+     *    prove memorization), and
      *  - a passed recitation (سرد) session for that same part happened on or
      *    after the day the last of those pages was passed. A سرد that was
      *    passed before the part's pages were completed does NOT qualify.
@@ -693,7 +698,10 @@ class ReportService
                 $partId = (int) $partId;
                 $coveredParts[$partId] = true;
 
-                if (!$page->is_passed) {
+                // Memorization mastery must come from a new-memorization
+                // session specifically: a page passed during سرد (recitation)
+                // does not prove the page was memorized.
+                if ($type !== RecitationSession::TYPE_NEW_MEMORIZATION || !$page->is_passed) {
                     continue;
                 }
 
@@ -749,8 +757,22 @@ class ReportService
     }
 
     /**
-     * Count the parts a student has reviewed: every page in the part has at
-     * least one review page record. Passing is NOT required — a part counts
+     * Count, against the student's full history, the parts they have
+     * completely memorized and then successfully recited (سرد). Uses the same
+     * rule as the written report's "عدد الأجزاء المحفوظة": every page of the
+     * part must be passed in a new-memorization session and a passed سرد for
+     * the part must follow. Used by the student dashboard/report stat cards.
+     */
+    public function memorizedPartsCountForStudent(int $studentId): int
+    {
+        $history = $this->loadAllTimeMemorizationHistory(collect([$studentId]))[$studentId] ?? collect();
+
+        return $this->countFullyMemorizedParts($history, $history);
+    }
+
+    /**
+     * Count the parts a student has reviewed: every page in the part has
+     * at least one review page record. Passing is NOT required — a part counts
      * once all its pages have been reviewed, regardless of the session or
      * page result (no سرد condition).
      */
