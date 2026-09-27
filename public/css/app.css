@@ -475,7 +475,7 @@
         }
 
         .nav-section-title::before {
-            content: 'âœ¦';
+            content: '✦';
             font-size: 8px;
             color: #d4a030;
             margin-left: 5px;
