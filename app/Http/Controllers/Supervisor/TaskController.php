@@ -74,6 +74,7 @@ class TaskController extends Controller
 
         $students = Student::with('user')
             ->where('supervisor_id', $supervisorId)
+            ->orderedByName()
             ->get();
 
         $supervisors = \App\Models\User::whereIn('role', ['admin', 'supervisor'])

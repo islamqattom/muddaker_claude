@@ -541,6 +541,8 @@ $sessionTypes = [
                                     </select>
                                 </div>
                             </div>
+                            <div class="small text-muted mt-1" id="suggestion-new"></div>
+                            <div class="small mt-1" id="repeated-new"></div>
                             <div class="d-flex gap-2 mt-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('new_memorization')">
                                     <i class="fas fa-plus me-1"></i>إضافة
@@ -581,6 +583,8 @@ $sessionTypes = [
                                     </select>
                                 </div>
                             </div>
+                            <div class="small text-muted mt-1" id="suggestion-review"></div>
+                            <div class="small mt-1" id="repeated-review"></div>
                             <div class="d-flex gap-2 mt-3">
                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('review')">
                                     <i class="fas fa-plus me-1"></i>إضافة صفحات
@@ -619,6 +623,8 @@ $sessionTypes = [
                                     @endforeach
                                 </div>
                             </div>
+                            <div class="small text-muted mt-1" id="suggestion-unmastered"></div>
+                            <div class="small mt-1" id="repeated-unmastered"></div>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAddPagesModal('unmastered')">
                                     <i class="fas fa-plus me-1"></i>إضافة صفحات
@@ -639,6 +645,7 @@ $sessionTypes = [
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="small text-muted" id="suggestion-recitation"></div>
                         </div>
 
                         <div id="options-mafsil" class="options-panel session-options d-none">
@@ -883,11 +890,254 @@ $sessionTypes = [
         </div>
     </div>
 </div>
+
+<!-- Session Alerts Modal -->
+<div class="modal fade" id="sessionAlertsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); border: none;">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-bell me-2" style="color: #d4a030;"></i>
+                    تنبيهات الجلسة
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="acknowledgeMemorizationAlerts()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="memorizationAlertSection" class="d-none"></div>
+                <div id="failedPagesAlertSection" class="d-none"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal" onclick="acknowledgeMemorizationAlerts()">
+                    <i class="fas fa-check me-1"></i>تم
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
+let pendingMemorizationAlertIds = [];
+let sessionAlertsModal = null;
+
+function acknowledgeMemorizationAlerts() {
+    if (!pendingMemorizationAlertIds.length) return;
+    const ids = pendingMemorizationAlertIds;
+    pendingMemorizationAlertIds = [];
+    fetch('{{ route('supervisor.alerts.acknowledge') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ ids: ids }),
+    }).catch(() => {});
+}
+
+function selectedSessionType() {
+    const el = document.querySelector('input[name="type"]:checked');
+    return el ? el.value : '';
+}
+
+function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
+    return div.innerHTML;
+}
+
+function renderMemorizationSection(studentName, alerts) {
+    const section = document.getElementById('memorizationAlertSection');
+    if (!alerts || !alerts.length) {
+        section.classList.add('d-none');
+        section.innerHTML = '';
+        return false;
+    }
+
+    pendingMemorizationAlertIds = alerts.map(a => a.id);
+    section.innerHTML = alerts.map(function(alert) {
+        const part = alert.part_number ? ('الجزء ' + alert.part_number) : '';
+        return '<div class="d-flex align-items-center gap-3 p-3 mb-2 rounded" style="background: rgba(24,43,72,0.04); border: 1px solid rgba(24,43,72,0.08);">' +
+            '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#d4a030,#e6b84d);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">' +
+            '<i class="fas fa-book-open"></i></div>' +
+            '<div><div class="fw-bold" style="color:#182B48;">' + escapeHtml(studentName) + '</div>' +
+            '<small class="text-muted">أتمّ حفظ ' + escapeHtml(part) + ' كاملاً ويجب أن يقوم بسرده</small></div></div>';
+    }).join('');
+    section.classList.remove('d-none');
+    return true;
+}
+
+function renderFailedPagesSection(payload) {
+    const section = document.getElementById('failedPagesAlertSection');
+    const data = payload && payload.data ? payload.data : null;
+
+    if (!data || !data.pages || !data.pages.length) {
+        section.classList.add('d-none');
+        section.innerHTML = '';
+        return false;
+    }
+
+    const studentName = payload.student_name || '';
+    const date = data.session_date || '';
+    const typeLabel = data.type_label || data.type || '';
+    const pages = data.pages.map(function(page) {
+        const tags = [];
+        if (page.surah_name) tags.push(page.surah_name);
+        if (page.is_completed === false) tags.push('لم يكمل');
+        const suffix = tags.length ? (' (' + tags.join(' - ') + ')') : '';
+        return 'صفحة ' + page.page_number + suffix;
+    }).join('، ');
+
+    section.innerHTML =
+        '<div class="p-3 rounded" style="background: rgba(192,57,43,0.06); border: 1px solid rgba(192,57,43,0.18);">' +
+        '<div class="d-flex align-items-center gap-2 mb-2">' +
+        '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#e74c3c,#c0392b);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">' +
+        '<i class="fas fa-exclamation-triangle"></i></div>' +
+        '<div class="fw-bold" style="color:#182B48;">الطالب ' + escapeHtml(studentName) + '</div>' +
+        '</div>' +
+        '<div class="text-muted small mb-1">لديه صفحات راسبة في آخر جلسة ' + escapeHtml(typeLabel) + ' بتاريخ ' + escapeHtml(date) + ':</div>' +
+        '<div class="fw-bold" style="color:#c0392b;">' + escapeHtml(pages) + '</div>' +
+        '</div>';
+    section.classList.remove('d-none');
+    return true;
+}
+
+function loadSessionAlerts() {
+    const select = document.getElementById('studentSelect');
+    if (!select || !select.value) return;
+
+    const studentId = select.value;
+    const type = selectedSessionType();
+
+    const partUrl = '{{ route('supervisor.alerts.student', ['student' => '__ID__']) }}'.replace('__ID__', studentId);
+    const partPromise = fetch(partUrl, {
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+    }).then(response => response.ok ? response.json() : null).catch(() => null);
+
+    let failedPromise = Promise.resolve(null);
+    let suggestionPromise = Promise.resolve(null);
+    if (type) {
+        const failedUrl = '{{ route('supervisor.alerts.failed-pages', ['student' => '__ID__']) }}'.replace('__ID__', studentId) + '?type=' + encodeURIComponent(type);
+        failedPromise = fetch(failedUrl, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        }).then(response => response.ok ? response.json() : null).catch(() => null);
+
+        const suggestionUrl = '{{ route('supervisor.alerts.suggestion', ['student' => '__ID__']) }}'.replace('__ID__', studentId) + '?type=' + encodeURIComponent(type);
+        suggestionPromise = fetch(suggestionUrl, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        }).then(response => response.ok ? response.json() : null).catch(() => null);
+    }
+
+    Promise.all([partPromise, failedPromise, suggestionPromise]).then(function(results) {
+        const partData = results[0];
+        const failedData = results[1];
+        const suggestionData = results[2];
+
+        applyStartSuggestion(type, suggestionData);
+        applyFailedPagesToRepeated(type, failedData);
+
+        pendingMemorizationAlertIds = [];
+        const hasMemorization = renderMemorizationSection(partData ? partData.student_name : '', partData ? partData.alerts : []);
+        const hasFailedPages = renderFailedPagesSection(failedData);
+
+        if (hasMemorization || hasFailedPages) {
+            if (!sessionAlertsModal) {
+                sessionAlertsModal = new bootstrap.Modal(document.getElementById('sessionAlertsModal'));
+            }
+            sessionAlertsModal.show();
+        }
+    });
+}
+
+function repeatedTypeKey(type) {
+    return type === 'new_memorization' ? 'new' : type;
+}
+
+function applyFailedPagesToRepeated(type, payload) {
+    if (!['new_memorization', 'review', 'unmastered'].includes(type)) {
+        return;
+    }
+
+    const data = payload && payload.data ? payload.data : null;
+    const pages = data && data.pages ? data.pages : [];
+
+    // The failed / not-completed pages of the last session are added to the
+    // "معادة" list so the session starts from the end of the previous session.
+    repeatedPagesData = pages.map(function(page) {
+        return { part_id: page.part_id || null, page_number: page.page_number, not_completed: page.is_completed === false };
+    });
+
+    renderRepeatedChips(type);
+}
+
+function renderRepeatedChips(type) {
+    const el = document.getElementById('repeated-' + repeatedTypeKey(type));
+    if (!el) return;
+
+    if (!repeatedPagesData.length) {
+        el.innerHTML = '';
+        return;
+    }
+
+    const chips = repeatedPagesData.map(function(item) {
+        const label = 'صفحة ' + item.page_number + (item.not_completed ? ' (لم يكمل)' : '');
+        return '<span class="badge bg-success bg-opacity-10 text-success me-1 mb-1" style="font-size:11px;">' + label + '</span>';
+    }).join('');
+
+    el.innerHTML = '<i class="fas fa-redo me-1"></i>معادة: ' + chips;
+}
+
+function applyStartSuggestion(type, payload) {
+    const key = type === 'new_memorization' ? 'new' : type;
+    const reasonEl = document.getElementById('suggestion-' + key);
+    if (!reasonEl) return;
+
+    const data = payload && payload.data ? payload.data : null;
+    if (!data) {
+        reasonEl.textContent = '';
+        return;
+    }
+
+    reasonEl.textContent = data.reason || '';
+
+    if (data.completed) {
+        return;
+    }
+
+    if (type === 'recitation') {
+        const partSelect = document.querySelector('select[name="part_id_recitation"]');
+        if (partSelect && data.part_id) {
+            partSelect.value = data.part_id;
+        }
+        return;
+    }
+
+    const partSelect = document.querySelector('select[name="part_id_' + key + '"]');
+    const pageSelect = document.getElementById('page_number_' + key);
+
+    if (partSelect && data.part_id) {
+        partSelect.value = data.part_id;
+        if (typeof updatePartInfo === 'function') {
+            updatePartInfo(key, data.part_id);
+        }
+    }
+
+    if (pageSelect && data.page_number) {
+        pageSelect.value = data.page_number;
+        if (typeof checkRemainingPages === 'function') {
+            checkRemainingPages(key);
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const studentSelect = document.getElementById('studentSelect');
+    if (studentSelect) {
+        $(studentSelect).on('change', loadSessionAlerts);
+    }
+    $('input[name="type"]').on('change', loadSessionAlerts);
+
     ['new', 'review', 'unmastered'].forEach(function(type) {
         const select = document.querySelector(`select[name="part_id_${type}"]`);
         if (select) updatePartInfo(type, select.value);
@@ -1065,24 +1315,32 @@ function applyAdditionalPages() {
 
 function openRepeatedPagesModal(type) {
     currentSessionType = type;
-    repeatedPagesData = [];
     const container = document.getElementById('repeatedPagesContainer');
     container.innerHTML = '';
+
+    // Pre-fill with the pages already in the "معادة" list (e.g. the failed
+    // pages of the last session) so the supervisor can review/remove them.
+    repeatedPagesData.slice().forEach(function(item) {
+        addRepeatedPageRow(type, item.part_id, item.page_number);
+    });
     addRepeatedPageRow(type);
+
     new bootstrap.Modal(document.getElementById('repeatedPagesModal')).show();
 }
 
-function addRepeatedPageRow(type) {
+function addRepeatedPageRow(type, preselectedPartId, preselectedPage) {
     const container = document.getElementById('repeatedPagesContainer');
     const rowId = 'repeated-page-row-' + container.children.length;
     const row = document.createElement('div');
     row.className = 'row g-2 mb-2 align-items-end repeated-page-row';
     row.id = rowId;
 
-    let currentPartId = '';
-    if (type === 'review') currentPartId = document.querySelector('select[name="part_id_review"]')?.value || '';
-    else if (type === 'new_memorization') currentPartId = document.querySelector('select[name="part_id_new"]')?.value || '';
-    else if (type === 'unmastered') currentPartId = document.querySelector('select[name="part_id_unmastered"]')?.value || '';
+    let currentPartId = preselectedPartId || '';
+    if (!currentPartId) {
+        if (type === 'review') currentPartId = document.querySelector('select[name="part_id_review"]')?.value || '';
+        else if (type === 'new_memorization') currentPartId = document.querySelector('select[name="part_id_new"]')?.value || '';
+        else if (type === 'unmastered') currentPartId = document.querySelector('select[name="part_id_unmastered"]')?.value || '';
+    }
 
     let partOptions = '<option value="">-- اختر الجزء --</option>';
     partsData.forEach(part => {
@@ -1110,6 +1368,11 @@ function addRepeatedPageRow(type) {
     container.appendChild(row);
 
     if (currentPartId) updateRepeatedPageOptions(rowId, currentPartId);
+
+    if (preselectedPage) {
+        const pageSelect = document.getElementById('page_repeat_' + rowId);
+        if (pageSelect) pageSelect.value = preselectedPage;
+    }
 }
 
 function updateRepeatedPageOptions(rowId, partId) {
@@ -1155,6 +1418,7 @@ function applyRepeatedPages() {
     }
 
     bootstrap.Modal.getInstance(document.getElementById('repeatedPagesModal')).hide();
+    renderRepeatedChips(currentSessionType);
     toastr.success('تمت إضافة ' + repeatedPagesData.length + ' صفحة معادة');
 }
 

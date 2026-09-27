@@ -145,20 +145,21 @@ class MissedRecitationServiceTest extends TestCase
 
     public function test_non_required_day_is_skipped(): void
     {
-        // 2026-01-01 is a Thursday.
-        $this->attendance('2026-01-01', 'present', '2025-12-31 10:00:00');
+        // 2026-01-05 is a Monday (not a recitation day).
+        $this->attendance('2026-01-05', 'present', '2026-01-04 10:00:00');
 
-        $result = $this->runAt('2026-01-02 00:05:00');
+        $result = $this->runAt('2026-01-06 00:05:00');
 
         $this->assertSame(0, $result['created']);
     }
 
     public function test_backdated_attendance_still_triggers_after_the_day_ends(): void
     {
-        // Attendance for a past Saturday that was only entered days later.
-        $this->attendance('2026-01-03', 'present', '2026-01-10 09:00:00');
+        // Attendance for a required day entered a few days later, still inside
+        // the automatic 7-day window.
+        $this->attendance('2026-01-03', 'present', '2026-01-07 09:00:00');
 
-        $result = $this->runAt('2026-01-11 00:05:00');
+        $result = $this->runAt('2026-01-08 00:05:00');
 
         $this->assertSame(1, $result['created']);
     }
@@ -220,8 +221,8 @@ class MissedRecitationServiceTest extends TestCase
             $this->assertSame(1, $first['created']);
             $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
 
-            // Another eligible record (a past Saturday) appears later the same day.
-            $this->attendance('2025-12-27', 'present', '2025-12-27 10:00:00');
+            // Another eligible record (a required day) appears later the same day.
+            $this->attendance('2026-01-01', 'present', '2026-01-01 10:00:00');
 
             $second = $this->service->runOncePerDay();
             $this->assertTrue($second['already_ran']);

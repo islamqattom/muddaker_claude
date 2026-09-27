@@ -263,27 +263,16 @@
                                 </span>
                             </td>
                             <td>
-                                @if($session->type === 'mafsil')
-                                    @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
-                                    @if(count($partNumbers) > 0)
-                                        <span class="part-info">أجزاء {{ implode(', ', $partNumbers) }}</span>
-                                    @elseif($session->part)
-                                        <span class="part-info">جزء {{ $session->part->part_number }}</span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
+                                @if($session->parts_label !== '-')
+                                    <span class="part-info">{{ $session->parts_label }}</span>
+                                @elseif($session->start_page && $session->end_page)
                                     @if($session->start_page === $session->end_page)
                                         <span class="part-info">صفحة {{ $session->start_page }}</span>
                                     @else
                                         <span class="part-info">{{ $session->start_page }} - {{ $session->end_page }}</span>
                                     @endif
                                 @else
-                                    @if($session->part)
-                                        <span class="part-info">جزء {{ $session->part->part_number }}</span>
-                                    @else
-                                        <span class="part-info">{{ $session->start_page }} - {{ $session->end_page }}</span>
-                                    @endif
+                                    <span class="text-muted">—</span>
                                 @endif
                             </td>
                             <td>

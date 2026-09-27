@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\RecitationSession;
+use App\Services\Concerns\ReservesDailyRun;
 use Carbon\CarbonInterface;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Log;
  */
 class MissedRecitationService
 {
+    use ReservesDailyRun;
+
     /**
      * Process all eligible attendance records and return run statistics.
      *
@@ -29,7 +32,31 @@ class MissedRecitationService
     {
         $now = $now ?? now();
 
-        $lookbackDays     = (int) config('recitation.lookback_days', 30);
+        // The automatic scan only covers a short, recent window so a first
+        // successful run after a long outage cannot backfill the whole
+        // history at once. Older periods are created explicitly via
+        // runRange() from the admin diagnostics page.
+        $lookbackDays = (int) config('recitation.auto_lookback_days', 7);
+
+        return $this->runWindow($now, $now->copy()->subDays($lookbackDays), $now);
+    }
+
+    /**
+     * Process eligible attendance records within an explicit date range.
+     * Used by the admin backfill (preview + confirm) for older periods.
+     *
+     * @return array{created:int, skipped:int, cleaned:int}
+     */
+    public function runRange(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): array
+    {
+        return $this->runWindow($now, $from, $to);
+    }
+
+    /**
+     * @return array{created:int, skipped:int, cleaned:int}
+     */
+    private function runWindow(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): array
+    {
         $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
 
         // Auto sessions whose attendance is no longer "attended" (for example
@@ -37,14 +64,17 @@ class MissedRecitationService
         // removed so the report stays truthful.
         $cleaned = $this->cleanupInvalid($attendedStatuses);
 
+        // Also remove stale auto sessions once a real session exists for the
+        // same student and day (e.g. a backdated real session was saved).
+        $cleaned += $this->cleanupSuperseded();
+
         // Scan attendance by its date (not its creation time) so backdated
-        // records are handled too. Records from the last lookback window are
-        // considered; whether a given day has actually ended is checked per
-        // record below.
+        // records are handled too. Whether a given day has actually ended is
+        // checked per record below.
         $candidates = Attendance::query()
             ->whereIn('status', $attendedStatuses)
-            ->where('date', '>=', $now->copy()->subDays($lookbackDays)->toDateString())
-            ->where('date', '<=', $now->copy()->toDateString())
+            ->where('date', '>=', $from->toDateString())
+            ->where('date', '<=', $to->toDateString())
             ->get();
 
         $created = 0;
@@ -67,6 +97,23 @@ class MissedRecitationService
     }
 
     /**
+     * Count how many sessions the given range would create without creating
+     * any (used for the admin backfill preview).
+     */
+    public function previewRange(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): int
+    {
+        $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
+
+        return Attendance::query()
+            ->whereIn('status', $attendedStatuses)
+            ->where('date', '>=', $from->toDateString())
+            ->where('date', '<=', $to->toDateString())
+            ->get()
+            ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now))
+            ->count();
+    }
+
+    /**
      * Run the scan at most once per calendar day. This lets the site trigger
      * the rule on ordinary web visits, so it works even without a cron entry
      * for "schedule:run". Returns the run statistics, or a zeroed result with
@@ -80,40 +127,16 @@ class MissedRecitationService
     public function runOncePerDay(?CarbonInterface $now = null): array
     {
         $now = $now ?? now();
-        $today = $now->toDateString();
         $key = 'recitation_last_scan_date';
 
-        if (DB::table('settings')->where('key', $key)->value('value') === $today) {
+        if (! $this->reserveDailyRun($key, $now)) {
             return $this->alreadyRanResult();
-        }
-
-        // Reserve today's run atomically: only one request can flip the value
-        // from a different value to today's date.
-        $reserved = DB::table('settings')
-            ->where('key', $key)
-            ->where(fn ($query) => $query->whereNull('value')->orWhere('value', '!=', $today))
-            ->update(['value' => $today, 'updated_at' => $now]);
-
-        if ($reserved === 0) {
-            // No marker row yet: create one (the unique key guards the race).
-            try {
-                DB::table('settings')->insert([
-                    'key'        => $key,
-                    'value'      => $today,
-                    'group'      => 'recitation',
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            } catch (UniqueConstraintViolationException $e) {
-                return $this->alreadyRanResult();
-            }
         }
 
         try {
             return $this->run($now) + ['already_ran' => false];
         } catch (\Throwable $e) {
-            // Release the marker so the next visit can retry.
-            DB::table('settings')->where('key', $key)->update(['value' => null, 'updated_at' => $now]);
+            $this->releaseDailyRun($key, $now);
             throw $e;
         }
     }
@@ -237,13 +260,56 @@ class MissedRecitationService
     }
 
     /**
-     * Remove auto-generated sessions whose attendance is no longer attended.
+     * Remove auto sessions whose attendance is no longer attended.
      */
     protected function cleanupInvalid(array $attendedStatuses): int
     {
         return RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
             ->where('auto_generated', true)
             ->whereHas('attendance', fn ($query) => $query->whereNotIn('status', $attendedStatuses))
+            ->delete();
+    }
+
+    /**
+     * Remove auto-generated "لم يسمع" sessions when a real (non not_recitate)
+     * session exists for the same student and date. Manual sessions are never
+     * touched.
+     */
+    protected function cleanupSuperseded(): int
+    {
+        $autoSessions = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->where('auto_generated', true)
+            ->where('type', RecitationSession::TYPE_NOT_RECITE)
+            ->get();
+
+        if ($autoSessions->isEmpty()) {
+            return 0;
+        }
+
+        $studentIds = $autoSessions->pluck('student_id')->unique()->all();
+
+        $realSessions = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->whereIn('student_id', $studentIds)
+            ->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
+            ->get(['student_id', 'session_date'])
+            ->map(fn ($s) => $s->student_id . '|' . (optional($s->session_date)->toDateString() ?? $s->session_date))
+            ->flip();
+
+        $idsToDelete = $autoSessions
+            ->filter(function ($s) use ($realSessions) {
+                $key = $s->student_id . '|' . (optional($s->session_date)->toDateString() ?? $s->session_date);
+
+                return $realSessions->has($key);
+            })
+            ->pluck('id')
+            ->all();
+
+        if (empty($idsToDelete)) {
+            return 0;
+        }
+
+        return RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->whereIn('id', $idsToDelete)
             ->delete();
     }
 }

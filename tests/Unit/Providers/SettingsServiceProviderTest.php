@@ -38,11 +38,16 @@ class SettingsServiceProviderTest extends TestCase
     {
         $now = now();
 
-        DB::table('settings')->insert([
-            ['key' => 'center_name', 'value' => 'مركز الاختبار', 'group' => 'general', 'created_at' => $now, 'updated_at' => $now],
-            ['key' => 'enable_notifications', 'value' => 'false', 'group' => 'general', 'created_at' => $now, 'updated_at' => $now],
-            ['key' => 'recitation_days', 'value' => 'sunday,tuesday', 'group' => 'general', 'created_at' => $now, 'updated_at' => $now],
-        ]);
+        foreach ([
+            ['key' => 'center_name', 'value' => 'مركز الاختبار'],
+            ['key' => 'enable_notifications', 'value' => 'false'],
+            ['key' => 'recitation_days', 'value' => 'sunday,tuesday'],
+        ] as $row) {
+            DB::table('settings')->updateOrInsert(
+                ['key' => $row['key']],
+                ['value' => $row['value'], 'group' => 'general', 'updated_at' => $now, 'created_at' => $now]
+            );
+        }
 
         SettingsServiceProvider::applySettingsToConfig();
 

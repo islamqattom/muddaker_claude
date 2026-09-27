@@ -22,6 +22,8 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
+        \App\Support\MissedRecitationSync::run();
+
         // Cumulative headline numbers (not tied to the selected period).
         $totals = [
             'total_students' => Student::count(),
@@ -41,7 +43,7 @@ class ReportController extends Controller
         $trend       = $this->reports->recitationDailyTrend($sessions);
         $topStudents = $this->reports->topStudents($sessions, 5);
 
-        $students = Student::with('user')->orderBy('id')->limit(500)->get()
+        $students = Student::with('user')->orderedByName()->limit(500)->get()
             ->sortBy(fn ($s) => $s->user->name ?? '')
             ->values();
 

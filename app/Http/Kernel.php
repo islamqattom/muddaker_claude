@@ -24,6 +24,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\TriggerMissedRecitationScan::class,
+            \App\Http\Middleware\TriggerAttendanceReminder::class,
         ],
         'api' => [
             \Illuminate\Http\Middleware\HandleCors::class,

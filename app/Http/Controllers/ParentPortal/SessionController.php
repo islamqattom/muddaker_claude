@@ -46,7 +46,7 @@ class SessionController extends Controller {
         }
 
         $query = RecitationSession::whereIn('student_id', $studentIds)
-            ->with('student.user', 'part', 'pages');
+            ->with('student.user', 'part', 'pages.mafsilPosition');
 
         // Filter by student
         if ($studentId && $parent->students->contains('id', $studentId)) {
@@ -64,13 +64,13 @@ class SessionController extends Controller {
         }
 
         $sessions = $query->latest()->paginate(20);
-        $students = $parent->students()->with('user')->get();
+        $students = $parent->students()->with('user')->get()->sortBy(fn ($s) => $s->user->name ?? '')->values();
 
         return view('parent.sessions.index', compact('sessions', 'students'));
     }
 
     public function show(RecitationSession $session) {
-        $session->load(['student.user', 'part', 'pages', 'supervisor']);
+        $session->load(['student.user', 'part', 'pages.mafsilPosition', 'supervisor']);
 
         return view('parent.sessions.show', compact('session'));
     }

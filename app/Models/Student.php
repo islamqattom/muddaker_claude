@@ -72,6 +72,11 @@ class Student extends Model
         return $this->hasMany(RecitationSession::class);
     }
 
+    public function supervisorAlerts()
+    {
+        return $this->hasMany(SupervisorAlert::class);
+    }
+
     public function warnings()
     {
         return $this->hasMany(Warning::class);
@@ -155,6 +160,18 @@ class Student extends Model
     public function getNameAttribute(): string
     {
         return $this->user->name;
+    }
+
+    /**
+     * Order students alphabetically by their user's name. Useful for filter
+     * dropdowns and listing pages.
+     */
+    public function scopeOrderedByName($query)
+    {
+        return $query
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->orderBy('users.name')
+            ->select('students.*');
     }
 
     public function getAttendanceRateAttribute(): float

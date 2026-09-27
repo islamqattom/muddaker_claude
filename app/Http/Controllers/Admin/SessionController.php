@@ -38,7 +38,7 @@ class SessionController extends Controller {
                 break;
         }
 
-        $query = RecitationSession::with('student.user', 'part', 'pages', 'supervisor');
+        $query = RecitationSession::with('student.user', 'part', 'pages.mafsilPosition', 'supervisor');
 
         // Filter by supervisor (supervisor_id is now the user_id of the supervisor)
         if ($request->supervisor_id) {
@@ -63,14 +63,14 @@ class SessionController extends Controller {
         $sessions = $query->latest()->paginate(20);
 
         // Get data for dropdowns
-        $students = Student::with('user')->get();
+        $students = Student::with('user')->orderedByName()->get();
         $supervisors = Supervisor::with('user')->get();
 
         return view('admin.sessions.index', compact('sessions', 'students', 'supervisors'));
     }
 
     public function show(RecitationSession $session) {
-        $session->load(['student.user', 'part', 'pages', 'supervisor']);
+        $session->load(['student.user', 'part', 'pages.mafsilPosition', 'supervisor']);
 
         return view('admin.sessions.show', compact('session'));
     }
@@ -98,7 +98,7 @@ class SessionController extends Controller {
         }
 
         $query = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
-            ->with(['student.user', 'pages', 'supervisor'])
+            ->with(['student.user', 'pages.mafsilPosition', 'supervisor'])
             ->where('type', RecitationSession::TYPE_MAFSIL);
 
         if ($source === 'public') {
@@ -146,7 +146,7 @@ class SessionController extends Controller {
 
     public function mafsilShow(int $sessionId) {
         $session = RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
-            ->with(['student.user', 'pages', 'supervisor'])
+            ->with(['student.user', 'pages.mafsilPosition', 'supervisor'])
             ->findOrFail($sessionId);
 
         abort_unless($session->type === RecitationSession::TYPE_MAFSIL, 404);

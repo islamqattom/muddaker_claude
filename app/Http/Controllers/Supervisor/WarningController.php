@@ -26,7 +26,11 @@ class WarningController extends Controller
             ->latest()
             ->paginate(20);
 
-        $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
+        $students = Student::where('supervisor_id', $supervisorId)->with('user')
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->orderBy('users.name')
+            ->select('students.*')
+            ->get();
 
         return view('supervisor.warnings.index', compact('warnings', 'students'));
     }

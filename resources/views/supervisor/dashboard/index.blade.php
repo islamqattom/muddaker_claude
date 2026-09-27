@@ -314,6 +314,40 @@
             @endforelse
         </div>
     </div>
+
+    @if($isRequiredDay)
+    <div class="dashboard-card table-card mt-3">
+        <div class="card-header-custom">
+            <div class="card-title">
+                <i class="fas fa-user-clock"></i>
+                <span>حضروا ولم يسمّعوا اليوم ({{ $presentNotRecited->count() }})</span>
+            </div>
+            <a href="{{ route('supervisor.recitation.index') }}" class="view-all-btn">
+                التسميع <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="card-body-custom p-0">
+            @forelse($presentNotRecited as $attendance)
+            <div class="warning-item">
+                <div class="warning-content">
+                    <div class="fw-bold warning-title">{{ $attendance->student->user->name ?? '-' }}</div>
+                    <div class="text-muted warning-desc">
+                        {{ $attendance->status === 'late' ? 'متأخر' : 'حاضر' }}
+                    </div>
+                </div>
+                <a class="btn btn-sm btn-primary" href="{{ route('supervisor.recitation.start') }}?student_id={{ $attendance->student_id }}">
+                    <i class="fas fa-play me-1"></i>بدء جلسة
+                </a>
+            </div>
+            @empty
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>تم تسميع جميع الحاضرين</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+    @endif
 </div>
 
 <style>

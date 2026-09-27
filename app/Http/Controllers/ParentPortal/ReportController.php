@@ -57,7 +57,7 @@ class ReportController extends Controller {
 
         // Get sessions statistics
         $sessionsQuery = RecitationSession::whereIn('student_id', $filteredStudentIds)
-            ->with(['student.user', 'part', 'pages']);
+            ->with(['student.user', 'part', 'pages.mafsilPosition']);
         if ($fromDate && $toDate) {
             $sessionsQuery->whereBetween('session_date', [$fromDate, $toDate]);
         }

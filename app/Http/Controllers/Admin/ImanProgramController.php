@@ -38,7 +38,7 @@ class ImanProgramController extends Controller
         $weekEnd = $weekStart->copy()->addDays(6);
 
         $students = Student::with('user')
-            ->orderBy('id')
+            ->orderedByName()
             ->get();
 
         $programs = collect();
@@ -178,7 +178,7 @@ class ImanProgramController extends Controller
             'criteria' => collect(),
             'owner' => $owner,
             'student' => $student,
-            'students' => Student::with('user')->orderBy('id')->get(),
+            'students' => Student::with('user')->orderedByName()->get(),
             'scope' => $student ? 'student' : 'self',
         ]);
     }
@@ -217,7 +217,7 @@ class ImanProgramController extends Controller
             'criteria' => $program->criteria,
             'owner' => $owner,
             'student' => $student,
-            'students' => Student::with('user')->orderBy('id')->get(),
+            'students' => Student::with('user')->orderedByName()->get(),
             'scope' => $student ? 'student' : 'self',
         ]);
     }
@@ -343,7 +343,7 @@ class ImanProgramController extends Controller
             ? collect($oldCriteria)
             : collect([['name' => '', 'type' => 'check', 'target_value' => null]]);
 
-        $students = Student::with('user')->orderBy('id')->get();
+        $students = Student::with('user')->orderedByName()->get();
         $supervisors = User::where('role', 'supervisor')->orderBy('id')->get();
 
         $existingPrograms = ImanProgram::query()

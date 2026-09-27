@@ -941,6 +941,71 @@
             vertical-align: middle;
         }
 
+        /* ===== Auto sortable listing tables ===== */
+        table[data-sortable] thead th {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-left: 26px;
+        }
+        table[data-sortable] thead th.no-sort {
+            cursor: default;
+            padding-left: inherit;
+        }
+        table[data-sortable] thead th[data-sort-handle]::after {
+            content: "\f0dc"; /* fa-sort */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            opacity: 0.35;
+            transition: opacity 0.15s;
+        }
+        table[data-sortable] thead th[data-sort-handle]:hover::after { opacity: 0.7; }
+        table[data-sortable] thead th.sorted-asc::after { content: "\f0de"; opacity: 1; color: var(--gold); }
+        table[data-sortable] thead th.sorted-desc::after { content: "\f0dd"; opacity: 1; color: var(--gold); }
+
+        /* Prevent column overflow (RTL text direction is handled by the RTL
+           layout + Bootstrap, tables keep their own alignment).
+           Use break-word (not anywhere) so short values like "40.0%" stay on
+           one line and only genuinely long tokens wrap. */
+        .table-responsive > table {
+            margin-bottom: 0;
+        }
+        main.page-content table td {
+            overflow-wrap: break-word;
+            word-break: normal;
+        }
+        main.page-content table thead th {
+            white-space: nowrap;
+        }
+        /* Action buttons column stays compact and nowrap */
+        main.page-content table td .action-buttons,
+        main.page-content table td .action-btn {
+            white-space: nowrap;
+        }
+        /* Keep short inline badges/values on a single line in every table so
+           values like "40.0%" or "95.0%" never wrap onto two lines. */
+        main.page-content table td .badge,
+        main.page-content table td .score-badge,
+        main.page-content table td .score-val,
+        main.page-content table td .score-value,
+        main.page-content table td .rpt-score,
+        main.page-content table td .rpt-badge,
+        main.page-content table td .status-badge,
+        main.page-content table td .type-badge,
+        main.page-content table td .part-badge,
+        main.page-content table td .pages-badge,
+        main.page-content table td .day-badge,
+        main.page-content table td .date-badge,
+        main.page-content table td .errors-val,
+        main.page-content table td .hesitations-val {
+            white-space: nowrap;
+        }
+
         /* Badges */
         .badge {
             font-size: 11px;

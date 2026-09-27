@@ -11,6 +11,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        \App\Support\MissedRecitationSync::run();
+
         try {
             $supervisorId = Auth::id();
 
@@ -40,8 +42,22 @@ class DashboardController extends Controller
 
             $recentWarnings = Warning::where('issued_by', $supervisorId)->latest()->take(5)->get();
 
+            // Present but not recited today (only on required recitation days).
+            $today = Carbon::today();
+            $isRequiredDay = in_array($today->dayOfWeek, array_map('intval', (array) config('recitation.required_days', [])), true);
+            $presentNotRecited = collect();
+
+            if ($isRequiredDay) {
+                $presentNotRecited = Attendance::where('supervisor_id', $supervisorId)
+                    ->where('date', $today->toDateString())
+                    ->whereIn('status', ['present', 'late'])
+                    ->whereDoesntHave('student.recitationSessions', fn ($q) => $q->whereDate('session_date', $today->toDateString()))
+                    ->with('student.user')
+                    ->get();
+            }
+
             return view('supervisor.dashboard.index', compact(
-                'stats', 'students', 'recentSessions', 'recentWarnings'
+                'stats', 'students', 'recentSessions', 'recentWarnings', 'isRequiredDay', 'presentNotRecited'
             ));
         } catch (\Exception $e) {
             \Log::error('Dashboard load failed: ' . $e->getMessage());
@@ -50,6 +66,8 @@ class DashboardController extends Controller
                 'students' => collect(),
                 'recentSessions' => collect(),
                 'recentWarnings' => collect(),
+                'isRequiredDay' => false,
+                'presentNotRecited' => collect(),
             ])->with('error', 'حدث خطأ أثناء تحميل البيانات');
         }
     }

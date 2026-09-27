@@ -107,6 +107,26 @@ class RecitationSession extends Model
         if ($this->type === self::TYPE_MAFSIL) {
             $pages = $this->relationLoaded('pages') ? $this->pages : $this->pages()->get();
 
+            // Mafsil pages store the Mushaf page number in `page_number`, so
+            // the real juz must come from the linked mafsil position. Fall
+            // back to the session's part, then to small page numbers (legacy
+            // rows that stored the juz in page_number).
+            $fromPositions = $pages
+                ->map(fn ($page) => optional($page->mafsilPosition)->juz_number)
+                ->filter(fn ($juz) => is_numeric($juz) && (int) $juz >= 1 && (int) $juz <= 30)
+                ->map(fn ($juz) => (int) $juz)
+                ->unique()
+                ->sort()
+                ->values();
+
+            if ($fromPositions->isNotEmpty()) {
+                return $fromPositions;
+            }
+
+            if ($this->part) {
+                return collect([(int) $this->part->part_number]);
+            }
+
             return $pages->pluck('page_number')
                 ->filter(fn ($number) => is_numeric($number) && (int) $number >= 1 && (int) $number <= 30)
                 ->map(fn ($number) => (int) $number)

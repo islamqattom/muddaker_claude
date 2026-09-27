@@ -317,12 +317,18 @@
                         <small class="text-muted">{{ $index + 1 }} / {{ count($pages) }}</small>
                     </div>
                 </div>
-                <div class="color-badge" id="color-badge-{{ $index }}">
-                    <span class="badge bg-secondary" style="font-size: 11px; padding: 5px 12px; border-radius: 8px;">في الانتظار</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="not-completed-btn-{{ $index }}" onclick="toggleNotCompleted({{ $index }})" title="لم يكمل الطالب هذه الصفحة">
+                        <i class="fas fa-times-circle me-1"></i>لم يكمل
+                    </button>
+                    <div class="color-badge" id="color-badge-{{ $index }}">
+                        <span class="badge bg-secondary" style="font-size: 11px; padding: 5px 12px; border-radius: 8px;">في الانتظار</span>
+                    </div>
                 </div>
             </div>
             <div class="page-card-body">
                 <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
+                <input type="hidden" name="pages[{{ $index }}][is_completed]" id="is-completed-{{ $index }}" value="1">
 
                 <div class="row g-4 align-items-end">
                     <div class="col-4">
@@ -441,15 +447,66 @@
 const pageCount = {{ count($pages) }};
 
 function adjustValue(id, delta) {
+    const idx = id.split('-').pop();
+    if (document.getElementById('is-completed-' + idx)?.value === '0') return;
+
     const input = document.getElementById(id);
     let val = parseInt(input.value) + delta;
     val = Math.max(parseInt(input.min), Math.min(parseInt(input.max || 999), val));
     input.value = val;
-    const idx = id.split('-').pop();
     updatePageColor(idx);
 }
 
+function setPageVisual(index, colorClass, label, icon, bgColor) {
+    const indicator = document.getElementById('color-indicator-' + index);
+    indicator.className = 'result-indicator ' + colorClass;
+    indicator.innerHTML = '<i class="fas ' + icon + '"></i>';
+
+    const badge = document.getElementById('color-badge-' + index);
+    badge.innerHTML = '<span class="badge" style="background:' + bgColor + '; color: white; font-size: 11px; padding: 5px 12px; border-radius: 8px;">' + label + '</span>';
+
+    const resultBox = document.getElementById('result-box-' + index);
+    resultBox.className = 'result-indicator ' + colorClass + ' mx-auto';
+    resultBox.style.width = '48px';
+    resultBox.style.height = '48px';
+    resultBox.style.fontSize = '18px';
+    resultBox.innerHTML = '<i class="fas ' + icon + '"></i>';
+
+    document.getElementById('result-text-' + index).textContent = label;
+    document.getElementById('result-text-' + index).style.color = bgColor;
+}
+
+function toggleNotCompleted(index) {
+    const hidden = document.getElementById('is-completed-' + index);
+    if (!hidden) return;
+
+    const marking = hidden.value === '1';
+    hidden.value = marking ? '0' : '1';
+
+    const btn = document.getElementById('not-completed-btn-' + index);
+    const errorsInput = document.getElementById('errors-' + index);
+    const hesitationsInput = document.getElementById('hesitations-' + index);
+
+    if (marking) {
+        if (errorsInput) { errorsInput.value = 0; errorsInput.readOnly = true; errorsInput.classList.add('bg-light'); }
+        if (hesitationsInput) { hesitationsInput.value = 0; hesitationsInput.readOnly = true; hesitationsInput.classList.add('bg-light'); }
+        if (btn) { btn.classList.remove('btn-outline-secondary'); btn.classList.add('btn-secondary'); }
+    } else {
+        if (errorsInput) { errorsInput.readOnly = false; errorsInput.classList.remove('bg-light'); }
+        if (hesitationsInput) { hesitationsInput.readOnly = false; hesitationsInput.classList.remove('bg-light'); }
+        if (btn) { btn.classList.remove('btn-secondary'); btn.classList.add('btn-outline-secondary'); }
+    }
+
+    updatePageColor(index);
+}
+
 function updatePageColor(index) {
+    if (document.getElementById('is-completed-' + index)?.value === '0') {
+        setPageVisual(index, 'color-gray', 'لم يكمل', 'fa-times-circle', '#7f8c8d');
+        updateSummary();
+        return;
+    }
+
     const errors = parseInt(document.getElementById('errors-' + index).value) || 0;
     const hesitations = parseInt(document.getElementById('hesitations-' + index).value) || 0;
     const totalEquivalent = errors + Math.floor(hesitations / 3);
@@ -494,6 +551,11 @@ function updateSummary() {
     let totalErrors = 0, totalHesitations = 0, passed = 0, failed = 0;
 
     for (let i = 0; i < pageCount; i++) {
+        if (document.getElementById('is-completed-' + i)?.value === '0') {
+            failed++;
+            continue;
+        }
+
         const errors = parseInt(document.getElementById('errors-' + i)?.value) || 0;
         const hesitations = parseInt(document.getElementById('hesitations-' + i)?.value) || 0;
         totalErrors += errors;
@@ -538,6 +600,7 @@ function submitSession() {
 
     let allFilled = true;
     for (let i = 0; i < pageCount; i++) {
+        if (document.getElementById('is-completed-' + i)?.value === '0') continue;
         if (!document.getElementById('errors-' + i)?.value) { allFilled = false; break; }
     }
 

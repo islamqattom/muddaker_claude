@@ -15,7 +15,7 @@ class SupervisorController extends Controller
 
     public function index()
     {
-        $supervisors = User::where('role', 'supervisor')->with('supervisor')->paginate(20);
+        $supervisors = User::where('role', 'supervisor')->with('supervisor')->latest()->paginate(20);
         return view('admin.supervisors.index', compact('supervisors'));
     }
 

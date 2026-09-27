@@ -24,7 +24,7 @@ class ReportController extends Controller {
         $memorizedParts = $this->reports->memorizedPartsCountForStudent($student->id);
 
         $recentSessions = RecitationSession::where('student_id', $student->id)
-            ->with(['part', 'pages'])
+            ->with(['part', 'pages.mafsilPosition'])
             ->latest()
             ->limit(5)
             ->get();
@@ -39,7 +39,7 @@ class ReportController extends Controller {
         [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
 
         $sessionsQuery = RecitationSession::where('student_id', $student->id)
-            ->with(['student.user', 'part', 'pages']);
+            ->with(['student.user', 'part', 'pages.mafsilPosition']);
         $attendanceQuery = Attendance::where('student_id', $student->id);
 
         if ($fromDate && $toDate) {

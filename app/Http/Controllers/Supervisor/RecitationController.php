@@ -11,8 +11,10 @@ use App\Models\RecitationPage;
 use App\Models\RecitationSession;
 use App\Models\RecitationTajweedError;
 use App\Models\Student;
+use App\Models\SupervisorAlert;
 use App\Models\TajweedRuleDefinition;
 use App\Services\NotificationService;
+use App\Services\RecitationAlertService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +31,7 @@ class RecitationController extends Controller
         'pages.*.page_number' => 'required|integer|exists:quran_pages,page_number',
         'pages.*.errors' => 'required|integer|min:0',
         'pages.*.hesitations' => 'required|integer|min:0',
+        'pages.*.is_completed' => 'nullable|boolean',
         'pages.*.mafsil_position_id' => 'nullable|exists:mafsil_positions,id',
         'pages.*.position_range' => 'nullable|string|max:100',
         'pages.*.page_number_in_mushaf' => 'nullable|integer|min:1',
@@ -79,7 +82,7 @@ class RecitationController extends Controller
     public function index()
     {
         $supervisorId = Auth::id();
-        $students = Student::where('supervisor_id', $supervisorId)->with('user', 'level')->get();
+        $students = Student::where('supervisor_id', $supervisorId)->with('user', 'level')->orderedByName()->get();
         $parts = QuranPart::orderBy('part_number')->get();
 
         return view('supervisor.recitation.index', compact('students', 'parts'));
@@ -593,7 +596,14 @@ class RecitationController extends Controller
                 }
 
                 $failedPages = 0;
+                $notCompletedPages = 0;
                 foreach ($pages as $page) {
+                    if (! $this->isPageCompleted($page)) {
+                        $notCompletedPages++;
+                        $failedPages++;
+                        continue;
+                    }
+
                     $colorResult = RecitationSession::calculatePageColor($page['errors'], $page['hesitations'], $request->type);
                     if (! $colorResult['passed']) {
                         $failedPages++;
@@ -616,17 +626,36 @@ class RecitationController extends Controller
                     $sessionStatus = RecitationSession::STATUS_FAILED;
                 }
 
+                // A session with any not-completed page is "لم يكمل".
+                if ($notCompletedPages > 0) {
+                    $sessionStatus = RecitationSession::STATUS_INCOMPLETE;
+                }
+
                 return $this->createSessionWithPages($request, $sessionStatus, $totalErrors, $totalHesitations, $maxScore, $finalScore);
             });
 
             $this->notifyParentOnSession($session);
             $this->notifyStudentOnSession($session);
 
+            $this->removeAutoNotRecite($session);
+
+            $alertService = app(RecitationAlertService::class);
+            $alertService->alertCompletedMemorization($session);
+            $mafsilAlerts = $alertService->alertMafsilStations($session);
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'تم حفظ جلسة التسميع بنجاح',
                     'session_id' => $session->id,
+                    'mafsil_alerts' => $mafsilAlerts->map(fn ($alert) => [
+                        'id' => $alert->id,
+                        'station' => $alert->station,
+                    ])->values(),
+                    'mafsil_alerts_count' => $mafsilAlerts->isNotEmpty()
+                        ? $alertService->recitedPartsCount($session->student)
+                        : 0,
+                    'mafsil_alerts_student' => $session->student->name ?? '',
                 ]);
             }
 
@@ -669,7 +698,7 @@ class RecitationController extends Controller
                 $maxScore = $request->type === RecitationSession::TYPE_MAFSIL ? 100 : null;
                 $finalScore = $maxScore ? $this->calculateMafsilFinalScore($pages, $maxScore) : null;
 
-                return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore);
+                return $this->createSessionWithPages($request, RecitationSession::STATUS_INCOMPLETE, $totalErrors, $totalHesitations, $maxScore, $finalScore, true);
             });
 
             if ($request->expectsJson()) {
@@ -703,7 +732,7 @@ class RecitationController extends Controller
     /**
      * Create a recitation session with its pages
      */
-    private function createSessionWithPages(Request $request, string $status, int $totalErrors, int $totalHesitations, ?float $maxScore, ?float $finalScore): RecitationSession
+    private function createSessionWithPages(Request $request, string $status, int $totalErrors, int $totalHesitations, ?float $maxScore, ?float $finalScore, bool $allPagesIncomplete = false): RecitationSession
     {
         $pages = $request->input('pages');
 
@@ -727,11 +756,16 @@ class RecitationController extends Controller
         ]);
 
         foreach ($pages as $pageData) {
-            $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
+            $isCompleted = $allPagesIncomplete ? false : $this->isPageCompleted($pageData);
+
+            $errors = $isCompleted ? (int) $pageData['errors'] : 0;
+            $hesitations = $isCompleted ? (int) $pageData['hesitations'] : 0;
+
+            $colorResult = RecitationSession::calculatePageColor($errors, $hesitations, $request->type);
 
             $pageScore = null;
             if ($request->type === RecitationSession::TYPE_MAFSIL) {
-                $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                $pageScore = RecitationSession::calculateMafsilScore($maxScore, $errors, $hesitations);
             }
 
             $page = RecitationPage::create([
@@ -741,10 +775,11 @@ class RecitationController extends Controller
                 'position' => $pageData['position'] ?? null,
                 'position_range' => $pageData['position_range'] ?? null,
                 'page_number_in_mushaf' => $pageData['page_number_in_mushaf'] ?? null,
-                'errors' => $pageData['errors'],
-                'hesitations' => $pageData['hesitations'],
-                'color_status' => $colorResult['color'],
-                'is_passed' => $colorResult['passed'],
+                'errors' => $errors,
+                'hesitations' => $hesitations,
+                'color_status' => $isCompleted ? $colorResult['color'] : 'black',
+                'is_passed' => $isCompleted ? $colorResult['passed'] : false,
+                'is_completed' => $isCompleted,
                 'page_score' => $pageScore,
             ]);
 
@@ -752,6 +787,19 @@ class RecitationController extends Controller
         }
 
         return $session;
+    }
+
+    /**
+     * Whether a submitted page record counts as completed. Missing values
+     * default to completed (backwards compatible).
+     */
+    private function isPageCompleted(array $pageData): bool
+    {
+        if (! array_key_exists('is_completed', $pageData) || $pageData['is_completed'] === null) {
+            return true;
+        }
+
+        return filter_var($pageData['is_completed'], FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
@@ -808,6 +856,7 @@ class RecitationController extends Controller
             'pages.*.page_number' => 'required|integer',
             'pages.*.errors' => 'required|integer|min:0',
             'pages.*.hesitations' => 'required|integer|min:0',
+            'pages.*.is_completed' => 'nullable|boolean',
             'failed_continued' => 'nullable|boolean',
             'is_final_submission' => 'nullable|boolean',
         ];
@@ -876,11 +925,15 @@ class RecitationController extends Controller
 
                 // Save each page
                 foreach ($pages as $pageData) {
-                    $colorResult = RecitationSession::calculatePageColor($pageData['errors'], $pageData['hesitations'], $request->type);
+                    $isCompleted = $this->isPageCompleted($pageData);
+                    $errors = $isCompleted ? (int) $pageData['errors'] : 0;
+                    $hesitations = $isCompleted ? (int) $pageData['hesitations'] : 0;
+
+                    $colorResult = RecitationSession::calculatePageColor($errors, $hesitations, $request->type);
 
                     $pageScore = null;
                     if ($request->type === RecitationSession::TYPE_MAFSIL) {
-                        $pageScore = RecitationSession::calculateMafsilScore($maxScore, $pageData['errors'], $pageData['hesitations']);
+                        $pageScore = RecitationSession::calculateMafsilScore($maxScore, $errors, $hesitations);
                     }
 
                     RecitationPage::create([
@@ -890,10 +943,11 @@ class RecitationController extends Controller
                         'position' => $pageData['position'] ?? null,
                         'position_range' => $pageData['position_range'] ?? null,
                         'page_number_in_mushaf' => $pageData['page_number_in_mushaf'] ?? null,
-                        'errors' => $pageData['errors'],
-                        'hesitations' => $pageData['hesitations'],
-                        'color_status' => $colorResult['color'],
-                        'is_passed' => $colorResult['passed'],
+                        'errors' => $errors,
+                        'hesitations' => $hesitations,
+                        'color_status' => $isCompleted ? $colorResult['color'] : 'black',
+                        'is_passed' => $isCompleted ? $colorResult['passed'] : false,
+                        'is_completed' => $isCompleted,
                         'page_score' => $pageScore,
                     ]);
                 }
@@ -903,6 +957,8 @@ class RecitationController extends Controller
 
             $this->notifyParentOnSession($session);
             $this->notifyStudentOnSession($session);
+
+            $this->removeAutoNotRecite($session);
 
             return response()->json(['success' => true, 'message' => 'تم حفظ سجل الرسوب والإكمال بنجاح']);
         } catch (\Exception $e) {
@@ -935,27 +991,29 @@ class RecitationController extends Controller
             }
         }
 
-        // Handle repeated pages (replace last N pages from ORIGINAL pages only)
+        // Handle repeated pages: the repeated pages appear first, followed by
+        // the remaining session pages (keeping the same total count), then any
+        // additional pages.
         if ($request->repeated_pages) {
             $repeatedPages = json_decode($request->repeated_pages, true);
             if (is_array($repeatedPages) && count($repeatedPages) > 0) {
-                $repeatedCount = count($repeatedPages);
-                $keepCount = max(0, $originalPagesCount - $repeatedCount);
-                $originalPages = array_slice($pages, 0, $keepCount);
-
+                $repeatedPageNumbers = [];
                 foreach ($repeatedPages as $repeatedPage) {
                     if (isset($repeatedPage['page_number'])) {
-                        $originalPages[] = $repeatedPage['page_number'];
+                        $repeatedPageNumbers[] = $repeatedPage['page_number'];
                     }
                 }
 
-                // Append additional pages at the end
-                $additionalCount = count($pages) - $originalPagesCount;
-                if ($additionalCount > 0) {
-                    $additionalOnly = array_slice($pages, $originalPagesCount);
-                    $originalPages = array_merge($originalPages, $additionalOnly);
+                if (! empty($repeatedPageNumbers)) {
+                    $keepCount = max(0, $originalPagesCount - count($repeatedPageNumbers));
+                    $keptOriginals = array_slice($pages, 0, $keepCount);
+
+                    // Additional pages were appended after the original pages.
+                    $additionalCount = count($pages) - $originalPagesCount;
+                    $additionalOnly = $additionalCount > 0 ? array_slice($pages, $originalPagesCount) : [];
+
+                    $pages = array_merge($repeatedPageNumbers, $keptOriginals, $additionalOnly);
                 }
-                $pages = $originalPages;
             }
         }
     }
@@ -971,15 +1029,17 @@ class RecitationController extends Controller
         $toDate = $request->to_date ? Carbon::parse($request->to_date) : Carbon::now();
 
         $query = RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
-            ->with(['student.user', 'part', 'pages'])
+            ->with(['student.user', 'part', 'pages.mafsilPosition'])
             ->whereBetween('session_date', [$fromDate, $toDate]);
 
         if ($studentId) {
             $query->where('student_id', $studentId);
         }
 
-        $sessions = $query->orderBy('session_date', 'desc')->paginate(30);
-        $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
+        $sessions = $query->orderByDesc('session_date')
+            ->orderByDesc('id')
+            ->paginate(30);
+        $students = Student::where('supervisor_id', $supervisorId)->with('user')->orderedByName()->get();
 
         return view('supervisor.recitation.history', compact('sessions', 'students', 'fromDate', 'toDate', 'studentId'));
     }
@@ -991,10 +1051,30 @@ class RecitationController extends Controller
             abort(403);
         }
 
+        SupervisorAlert::where('recitation_session_id', $recitation->id)->delete();
+
         $recitation->delete();
 
         return redirect()->back()
             ->with('success', 'تم حذف جلسة التسميع بنجاح');
+    }
+
+    /**
+     * Remove an automatic "لم يسمع" session once a real session has been
+     * recorded for the same student and day. Manual sessions are never touched.
+     */
+    private function removeAutoNotRecite(RecitationSession $session): void
+    {
+        if ($session->type === RecitationSession::TYPE_NOT_RECITE) {
+            return;
+        }
+
+        RecitationSession::withoutGlobalScope('exclude_visitor_mafsil')
+            ->where('student_id', $session->student_id)
+            ->whereDate('session_date', $session->session_date)
+            ->where('type', RecitationSession::TYPE_NOT_RECITE)
+            ->where('auto_generated', true)
+            ->delete();
     }
 
     protected function notifyParentOnSession(RecitationSession $session): void

@@ -30,7 +30,7 @@ class TaskController extends Controller
         $tasks = $query->orderBy('created_at', 'desc')->paginate(15);
 
         $supervisors = \App\Models\User::whereIn('role', ['admin', 'supervisor'])->get();
-        $students = Student::with('user')->get();
+        $students = Student::with('user')->orderedByName()->get();
 
         return view('admin.tasks.index', compact('tasks', 'supervisors', 'students'));
     }
@@ -237,9 +237,10 @@ class TaskController extends Controller
         if (auth()->user()->role === 'supervisor') {
             $students = Student::with('user')
                 ->where('supervisor_id', auth()->id())
+                ->orderedByName()
                 ->get();
         } else {
-            $students = Student::with('user')->get();
+            $students = Student::with('user')->orderedByName()->get();
         }
 
         return view('admin.tasks.calendar', compact('tasksJson', 'supervisors', 'students', 'studentFilter', 'selectedStudent'));

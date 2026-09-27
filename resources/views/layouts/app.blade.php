@@ -589,5 +589,140 @@
     </script>
 
     @stack('scripts')
+
+    <script>
+    // ===== Global sortable listing tables =====
+    // Auto-enhances every data table (a <table> that has a <thead> and a
+    // <tbody> with at least one row body) with click-to-sort headers.
+    // Columns are excluded from sorting when their header text is empty,
+    // a single "#", or an action/button column.
+    (function () {
+        var EXCLUDE_HEADERS = ['#', 'الإجراءات', 'إجراء', 'إجراءات', 'عرض', 'العمليات', 'خيارات'];
+
+        function isSortableTable(table) {
+            if (table.dataset.noSort === '1' || table.classList.contains('rpt-table')) return false;
+            if (table.dataset.sortableBound === '1') return false;
+            var thead = table.tHead;
+            var tbody = table.tBodies[0];
+            if (!thead || !tbody) return false;
+            if (thead.rows.length !== 1) return false;
+            var headerCount = thead.rows[0].cells.length;
+            // Require at least one data row whose cell count matches the
+            // header (empty-state rows use colspan and are ignored).
+            var hasDataRow = Array.prototype.some.call(tbody.rows, function (r) {
+                return r.cells.length === headerCount;
+            });
+            return hasDataRow;
+        }
+
+        function textOf(el) {
+            if (!el) return '';
+            var t = (el.innerText !== undefined ? el.innerText : el.textContent) || '';
+            return t.trim();
+        }
+
+        function cellValue(row, idx) {
+            var cell = row.cells[idx];
+            if (!cell) return '';
+            var raw = cell.getAttribute('data-sort-value');
+            if (raw !== null) return raw;
+            return textOf(cell);
+        }
+
+        function toNumber(v) {
+            // Strip Arabic-Indic digits, percentages, commas, and any
+            // non-numeric decorations before parsing (e.g. "٩٠٪", "1 - 3").
+            var ascii = String(v).replace(/[٠-٩]/g, function (d) {
+                return String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48);
+            }).replace(/[۰-۹]/g, function (d) {
+                return String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48);
+            }).replace(/[٪%]/g, '').replace(/,/g, '').trim();
+            var m = ascii.match(/-?\d+(\.\d+)?/);
+            return m ? parseFloat(m[0]) : NaN;
+        }
+
+        function enhance(table) {
+            if (!isSortableTable(table)) return;
+            var thead = table.tHead;
+            var tbody = table.tBodies[0];
+            var ths = Array.prototype.slice.call(thead.rows[0].cells);
+
+            table.dataset.sortableBound = '1';
+            table.setAttribute('data-sortable', '');
+
+            // Decide which columns are sortable.
+            var sortableIdx = [];
+            ths.forEach(function (th, idx) {
+                var text = textOf(th);
+                var excluded = EXCLUDE_HEADERS.indexOf(text) !== -1 || text === '';
+                if (excluded) {
+                    th.classList.add('no-sort');
+                    return;
+                }
+                sortableIdx.push(idx);
+                th.setAttribute('data-sort-handle', '');
+                th.setAttribute('role', 'button');
+                th.setAttribute('tabindex', '0');
+                th.setAttribute('aria-label', 'ترتيب حسب ' + text);
+            });
+
+            function compare(idx, dir) {
+                var rows = Array.prototype.slice.call(tbody.rows);
+                var numericCol = rows.every(function (r) {
+                    var v = cellValue(r, idx);
+                    return v === '' || !isNaN(toNumber(v));
+                }) && rows.some(function (r) { return cellValue(r, idx) !== ''; });
+
+                rows.sort(function (a, b) {
+                    var av = cellValue(a, idx);
+                    var bv = cellValue(b, idx);
+                    if (numericCol) {
+                        var an = toNumber(av), bn = toNumber(bv);
+                        if (isNaN(an)) an = -Infinity;
+                        if (isNaN(bn)) bn = -Infinity;
+                        return an - bn;
+                    }
+                    return String(av).localeCompare(String(bv), 'ar', { numeric: true, sensitivity: 'base' });
+                });
+                if (dir === 'desc') rows.reverse();
+                rows.forEach(function (r) { tbody.appendChild(r); });
+            }
+
+            function activate(th, idx) {
+                var dir = th.classList.contains('sorted-asc') ? 'desc' : 'asc';
+                ths.forEach(function (other) {
+                    other.classList.remove('sorted-asc', 'sorted-desc');
+                    other.removeAttribute('aria-sort');
+                });
+                th.classList.add(dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');
+                compare(idx, dir);
+            }
+
+            sortableIdx.forEach(function (idx) {
+                var th = ths[idx];
+                th.addEventListener('click', function () { activate(th, idx); });
+                th.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(th, idx); }
+                });
+            });
+        }
+
+        function init() {
+            // Enhance every listing table inside the page content, regardless
+            // of its CSS class. Non-listing tables (multi-row headers, JS
+            // tables, PDF/exports, the report tables handled separately) are
+            // filtered out by isSortableTable().
+            document.querySelectorAll('main.page-content table').forEach(enhance);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        window.SortableTables = { init: init };
+    })();
+    </script>
 </body>
 </html>

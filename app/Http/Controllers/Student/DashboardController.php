@@ -17,11 +17,13 @@ class DashboardController extends Controller
 
     public function index()
     {
+        \App\Support\MissedRecitationSync::run();
+
         $user = Auth::user();
         $student = $user->student()->with(['level', 'supervisor'])->firstOrFail();
 
         $recentSessions = RecitationSession::where('student_id', $student->id)
-            ->with(['part', 'pages'])
+            ->with(['part', 'pages.mafsilPosition'])
             ->latest('session_date')
             ->take(10)
             ->get();

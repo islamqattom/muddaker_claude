@@ -75,7 +75,7 @@ class AttendanceController extends Controller {
         // Paginate for display
         $attendances = $query->latest('date')->paginate(30);
 
-        $students = $parent->students()->with('user')->get();
+        $students = $parent->students()->with('user')->get()->sortBy(fn ($s) => $s->user->name ?? '')->values();
 
         return view('parent.attendance.index', compact('attendances', 'stats', 'students', 'studentId', 'period'));
     }

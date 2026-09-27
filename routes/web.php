@@ -20,12 +20,17 @@ Route::get('/', function () {
 });
 
 // Auth Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');Route::post('/login', [LoginController::class, 'login'])
     ->middleware('throttle:20,1')
     ->name('login.post');
 Route::get('/logout', [LoginController::class, 'logout']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// ============================
+// CRON FALLBACK (external scheduler, e.g. cron-job.org)
+// ============================
+Route::get('/cron/missed-recitation', [\App\Http\Controllers\Cron\MissedRecitationController::class, 'run'])
+    ->name('cron.missed-recitation');
 
 // ============================
 // GUEST: Yawm Al-Himma (يوم الهمة)
@@ -130,6 +135,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Settings
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+
+    // Recitation diagnostics (missed-recitation automation)
+    Route::prefix('recitation-diagnostics')->name('recitation-diagnostics.')->group(function () {
+        Route::get('/', [Admin\RecitationDiagnosticsController::class, 'index'])->name('index');
+        Route::get('/preview', [Admin\RecitationDiagnosticsController::class, 'preview'])->name('preview');
+        Route::post('/backfill', [Admin\RecitationDiagnosticsController::class, 'backfill'])->name('backfill');
+        Route::post('/run-migrations', [Admin\RecitationDiagnosticsController::class, 'runMigrations'])->name('run-migrations');
+        Route::post('/clear-config', [Admin\RecitationDiagnosticsController::class, 'clearConfig'])->name('clear-config');
+    });
 
     // Notifications
     Route::get('/notifications/mark-read', [Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
@@ -270,6 +284,12 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/history', [Supervisor\RecitationController::class, 'history'])->name('history');
         Route::delete('/{recitation}', [Supervisor\RecitationController::class, 'destroy'])->name('destroy');
     });
+
+    // Recitation alerts (popups)
+    Route::get('/alerts/student/{student}', [Supervisor\RecitationAlertController::class, 'studentAlerts'])->name('alerts.student');
+    Route::get('/alerts/student/{student}/failed-pages', [Supervisor\RecitationAlertController::class, 'failedPages'])->name('alerts.failed-pages');
+    Route::get('/alerts/student/{student}/suggestion', [Supervisor\RecitationAlertController::class, 'startSuggestion'])->name('alerts.suggestion');
+    Route::post('/alerts/acknowledge', [Supervisor\RecitationAlertController::class, 'acknowledge'])->name('alerts.acknowledge');
 
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {

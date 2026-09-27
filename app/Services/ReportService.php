@@ -115,7 +115,7 @@ class ReportService
     {
         [$fromDate, $toDate, $period] = $this->resolvePeriod($request);
 
-        $query = RecitationSession::with(['student.user', 'student.supervisor', 'supervisor', 'part', 'pages']);
+        $query = RecitationSession::with(['student.user', 'student.supervisor', 'supervisor', 'part', 'pages.mafsilPosition']);
 
         if ($supervisorScopeUserId) {
             $query->whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorScopeUserId));
@@ -1039,9 +1039,13 @@ class ReportService
 
     public function dropdownData(Request $request, ?int $supervisorScopeUserId = null): array
     {
-        $supervisors = Supervisor::with('user')->orderBy('employee_number')->get();
+        $supervisors = Supervisor::with('user')
+            ->join('users', 'supervisors.user_id', '=', 'users.id')
+            ->orderBy('users.name')
+            ->select('supervisors.*')
+            ->get();
 
-        $studentsQuery = Student::with('user')->orderBy('id');
+        $studentsQuery = Student::with('user')->orderedByName();
         if ($supervisorScopeUserId) {
             $studentsQuery->where('supervisor_id', $supervisorScopeUserId);
         } elseif ($request->supervisor_id) {

@@ -47,7 +47,7 @@ class WarningController extends Controller
 
     public function create(Request $request)
     {
-        $students = Student::with(['user', 'level'])->get();
+        $students = Student::with(['user', 'level'])->orderedByName()->get();
 
         $selectedStudent = null;
         $attendanceStats = null;
@@ -156,7 +156,8 @@ class WarningController extends Controller
     public function edit(Warning $warning)
     {
         $warning->load(['student.user', 'issuedBy']);
-        $students = Student::with(['user', 'level'])->get();
+        $students = Student::with(['user', 'level'])->orderedByName()->get();
+
         return view('admin.warnings.edit', compact('warning', 'students'));
     }
 

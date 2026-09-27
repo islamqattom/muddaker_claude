@@ -250,6 +250,21 @@
     font-size: 12px; font-weight: 600;
 }
 
+/* Keep every badge/value on a single line so short numbers like "40.0%"
+   never wrap across two lines inside the cell. */
+.session-history .sessions-table .type-badge,
+.session-history .sessions-table .part-badge,
+.session-history .sessions-table .pages-badge,
+.session-history .sessions-table .score-badge,
+.session-history .sessions-table .status-badge,
+.session-history .sessions-table .day-badge,
+.session-history .sessions-table .date-badge,
+.session-history .sessions-table .errors-val,
+.session-history .sessions-table .hesitations-val {
+    white-space: nowrap;
+    display: inline-block;
+}
+
 .session-history .type-badge.new_memorization { background: rgba(39,174,96,0.15); color: var(--success); }
 .session-history .type-badge.review { background: rgba(52,152,219,0.15); color: var(--info); }
 .session-history .type-badge.unmastered { background: rgba(243,156,18,0.15); color: var(--warning); }
@@ -280,12 +295,16 @@
     padding: 6px 14px;
     border-radius: 10px;
     font-size: 13px; font-weight: 700;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .session-history .status-badge {
     padding: 6px 14px;
     border-radius: 10px;
     font-size: 12px; font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .session-history .day-badge {
@@ -505,31 +524,20 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if($session->type === 'mafsil')
-                                        @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
-                                        @if(count($partNumbers) > 0)
-                                            <span class="part-badge">أجزاء {{ implode(', ', $partNumbers) }}</span>
-                                        @elseif($session->part)
-                                            <span class="part-badge">جزء {{ $session->part->part_number }}</span>
-                                        @else
-                                            <span class="text-muted">—</span>
-                                        @endif
-                                    @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
-                                        @if($session->start_page === $session->end_page)
-                                            <span class="part-badge">صفحة {{ $session->start_page }}</span>
-                                        @else
-                                            <span class="part-badge">{{ $session->start_page }} - {{ $session->end_page }}</span>
-                                        @endif
+                                    @if($session->type === 'not_recitate')
+                                        <span class="text-muted">—</span>
+                                    @elseif($session->parts_label !== '-')
+                                        <span class="part-badge">{{ $session->parts_label }}</span>
                                     @else
-                                        @if($session->part)
-                                            <span class="part-badge">الجزء {{ $session->part->part_number }}</span>
-                                        @else
-                                            <span class="part-badge">{{ $session->start_page }} - {{ $session->end_page }}</span>
-                                        @endif
+                                        <span class="text-muted">—</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($session->total_pages)
+                                    @if($session->type === 'not_recitate')
+                                        <span class="text-muted">—</span>
+                                    @elseif($session->start_page && $session->end_page)
+                                        <span class="pages-badge">{{ $session->start_page }} - {{ $session->end_page }}</span>
+                                    @elseif($session->total_pages)
                                         <span class="pages-badge">{{ $session->total_pages }}</span>
                                     @else
                                         <span class="text-muted">—</span>
@@ -560,7 +568,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="status-badge bg-{{ $session->status_color }}">{{ $session->status_label }}</span>
+                                    <span class="badge bg-{{ $session->status_color }} status-badge text-nowrap">{{ $session->status_label }}</span>
                                 </td>
                                 <td>
                                     <span class="date-badge">{{ $session->session_date->format('Y/m/d') }}</span>

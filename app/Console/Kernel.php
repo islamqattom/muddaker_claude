@@ -21,6 +21,12 @@ class Kernel extends ConsoleKernel {
         $schedule->command('recitation:register-missed')
             ->hourly()
             ->withoutOverlapping();
+
+        // Remind supervisors to record attendance/absence at the end of each
+        // work day when it is still missing.
+        $schedule->command('attendance:send-reminders')
+            ->hourly()
+            ->withoutOverlapping();
     }
     protected function commands(): void { $this->load(__DIR__.'/Commands'); require base_path('routes/console.php'); }
 }

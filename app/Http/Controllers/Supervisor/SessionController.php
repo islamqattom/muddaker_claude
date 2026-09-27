@@ -9,7 +9,7 @@ class SessionController extends Controller {
         $supervisor = Auth::user()->supervisor;
 
         $sessions = RecitationSession::where('supervisor_id', $supervisor->id)
-            ->with('student.user', 'part', 'pages', 'supervisor')
+            ->with('student.user', 'part', 'pages.mafsilPosition', 'supervisor')
             ->latest()
             ->paginate(20);
 

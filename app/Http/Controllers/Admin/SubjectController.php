@@ -124,7 +124,7 @@ class SubjectController extends Controller
             $query->whereDate('lesson_date', '<=', $request->to_date);
         }
 
-        $lessons = $query->paginate(15)->withQueryString();
+        $lessons = $query->orderByDesc('lesson_date')->orderByDesc('id')->paginate(15)->withQueryString();
 
         return view('admin.subjects.show', compact('subject', 'lessons'));
     }

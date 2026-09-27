@@ -12,6 +12,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        \App\Support\MissedRecitationSync::run();
+
         $stats = [
             'total_students' => Student::count(),
             'total_supervisors' => User::where('role', 'supervisor')->count(),

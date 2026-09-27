@@ -10,11 +10,12 @@ class RecitationPage extends Model
 
     protected $fillable = [
         'session_id', 'page_id', 'mafsil_position_id', 'page_number', 'position', 'position_range',
-        'page_number_in_mushaf', 'errors', 'hesitations', 'color_status', 'is_passed', 'page_score'
+        'page_number_in_mushaf', 'errors', 'hesitations', 'color_status', 'is_passed', 'is_completed', 'page_score'
     ];
 
     protected $casts = [
         'is_passed' => 'boolean',
+        'is_completed' => 'boolean',
         'page_score' => 'float',
         'page_number_in_mushaf' => 'integer',
     ];
@@ -55,6 +56,10 @@ class RecitationPage extends Model
 
     public function getColorLabelAttribute(): string
     {
+        if (! $this->is_completed) {
+            return 'لم يكمل';
+        }
+
         return match($this->color_status) {
             'green' => 'ممتاز',
             'orange' => 'جيد',
@@ -66,6 +71,10 @@ class RecitationPage extends Model
 
     public function getColorClassAttribute(): string
     {
+        if (! $this->is_completed) {
+            return 'bg-secondary text-white';
+        }
+
         return match($this->color_status) {
             'green' => 'bg-success text-white',
             'orange' => 'bg-warning text-dark',

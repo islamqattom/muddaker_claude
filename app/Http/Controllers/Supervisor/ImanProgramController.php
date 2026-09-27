@@ -45,7 +45,7 @@ class ImanProgramController extends Controller
 
         $students = Student::with('user')
             ->where('supervisor_id', $supervisorId)
-            ->orderBy('id')
+            ->orderedByName()
             ->get();
 
         $programs = collect();
@@ -148,7 +148,7 @@ class ImanProgramController extends Controller
 
         $students = Student::with('user')
             ->where('supervisor_id', $supervisorId)
-            ->orderBy('id')
+            ->orderedByName()
             ->get();
 
         $selectedStudentId = $request->get('student_id');
@@ -549,7 +549,7 @@ class ImanProgramController extends Controller
     {
         return Student::with('user')
             ->where('supervisor_id', auth()->id())
-            ->orderBy('id')
+            ->orderedByName()
             ->get();
     }
 

@@ -13,11 +13,14 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
+        \App\Support\MissedRecitationSync::run();
+
         $date = $request->date ? Carbon::parse($request->date) : Carbon::today();
         $supervisorId = Auth::id();
 
         $students = Student::where('supervisor_id', $supervisorId)
             ->with(['user', 'attendances' => fn($q) => $q->where('date', $date->toDateString())])
+            ->orderedByName()
             ->get();
 
         $existingAttendances = Attendance::where('supervisor_id', $supervisorId)
@@ -138,7 +141,7 @@ class AttendanceController extends Controller
 
         $attendances = $query->orderBy('date', 'desc')->paginate(30);
 
-        $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
+        $students = Student::where('supervisor_id', $supervisorId)->with('user')->orderedByName()->get();
 
         return view('supervisor.attendance.history', compact('attendances', 'students', 'fromDate', 'toDate', 'studentId'));
     }

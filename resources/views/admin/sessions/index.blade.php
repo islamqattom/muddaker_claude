@@ -415,13 +415,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <span class="pages-cell">
                                 @if($session->type === 'not_recitate')
                                     —
-                                @elseif($session->type === 'mafsil')
-                                    @php $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values()->toArray(); @endphp
-                                    {{ count($partNumbers) > 0 ? 'أجزاء ' . implode(', ', $partNumbers) : ($session->part ? 'جزء ' . $session->part->part_number : '—') }}
-                                @elseif(in_array($session->type, ['unmastered', 'review', 'new_memorization']))
+                                @elseif($session->parts_label !== '-')
+                                    {{ $session->parts_label }}
+                                @elseif($session->start_page && $session->end_page)
                                     {{ $session->start_page === $session->end_page ? 'صفحة ' . $session->start_page : 'صفحات ' . $session->start_page . '-' . $session->end_page }}
                                 @else
-                                    {{ $session->part ? 'جزء ' . $session->part->part_number : 'صفحات ' . $session->start_page . '-' . $session->end_page }}
+                                    —
                                 @endif
                             </span>
                         </td>

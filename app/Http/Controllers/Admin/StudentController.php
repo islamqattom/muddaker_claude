@@ -48,6 +48,7 @@ class StudentController extends Controller
     public function listForBilling()
     {
         $students = Student::with('user')
+            ->orderedByName()
             ->whereNotNull('fee_category_id')
             ->whereHas('feeCategory', fn($q) => $q->where('amount', '>', 0))
             ->get()

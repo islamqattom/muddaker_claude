@@ -23,8 +23,10 @@ class ReportController extends Controller
 
     public function index()
     {
+        \App\Support\MissedRecitationSync::run();
+
         $supervisorId = Auth::id();
-        $students = Student::where('supervisor_id', $supervisorId)->with('user')->get();
+        $students = Student::where('supervisor_id', $supervisorId)->with('user')->orderedByName()->get();
 
         $monthStart = Carbon::now()->startOfMonth();
         $monthEnd = Carbon::now()->endOfMonth();

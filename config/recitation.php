@@ -35,9 +35,19 @@ return [
     // How many recent days of attendance the scheduled job scans.
     'lookback_days' => (int) env('RECITATION_LOOKBACK_DAYS', 30),
 
+    // Window used by the automatic scan (synchronous page triggers and the
+    // secret cron URL). Kept short so the first successful run after a long
+    // outage does not backfill a large number of old sessions at once.
+    // Older periods are only created explicitly from the diagnostics page.
+    'auto_lookback_days' => (int) env('RECITATION_AUTO_LOOKBACK_DAYS', 7),
+
     // Run the scan on ordinary web visits (at most once per calendar day) so
     // the rule works even when no cron runs "schedule:run".
     'scan_on_visits' => (bool) env('RECITATION_SCAN_ON_VISITS', true),
+
+    // Shared secret for the /cron/missed-recitation?key=... fallback URL,
+    // meant to be called by an external scheduler (e.g. cron-job.org).
+    'cron_key' => env('RECITATION_CRON_KEY'),
 
     // Attendance statuses that count as the student having attended.
     'attendance_statuses' => ['present', 'late'],

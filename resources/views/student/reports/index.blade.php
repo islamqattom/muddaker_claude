@@ -255,15 +255,12 @@
                                         <td class="fw-semibold">{{ $session->type_label }}</td>
                                         <td>
                                             <small class="text-muted">
-                                                @if($session->type === 'mafsil')
-                                                    @php
-                                                        $partNumbers = $session->pages->pluck('page_number')->unique()->sort()->values();
-                                                    @endphp
-                                                    {{ $partNumbers->isNotEmpty() ? $partNumbers->map(fn($num) => 'الجزء '.$num)->join('، ') : '-' }}
-                                                @elseif($session->part)
-                                                    جزء {{ $session->part->part_number }}
-                                                @else
+                                                @if($session->parts_label !== '-')
+                                                    {{ $session->parts_label }}
+                                                @elseif($session->start_page && $session->end_page)
                                                     ص {{ $session->start_page }} - {{ $session->end_page }}
+                                                @else
+                                                    -
                                                 @endif
                                             </small>
                                         </td>

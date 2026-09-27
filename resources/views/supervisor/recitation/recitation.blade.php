@@ -355,12 +355,18 @@
                         <small class="text-muted">{{ $index + 1 }} / {{ count($pages) }}</small>
                     </div>
                 </div>
-                <div class="color-badge" id="color-badge-{{ $index }}">
-                    <span class="badge bg-secondary" style="font-size: 11px; padding: 5px 12px; border-radius: 8px;">—</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="not-completed-btn-{{ $index }}" onclick="toggleNotCompleted({{ $index }})" title="لم يكمل الطالب هذه الصفحة">
+                        <i class="fas fa-times-circle me-1"></i>لم يكمل
+                    </button>
+                    <div class="color-badge" id="color-badge-{{ $index }}">
+                        <span class="badge bg-secondary" style="font-size: 11px; padding: 5px 12px; border-radius: 8px;">—</span>
+                    </div>
                 </div>
             </div>
             <div class="page-card-body">
                 <input type="hidden" name="pages[{{ $index }}][page_number]" value="{{ $pageNum }}">
+                <input type="hidden" name="pages[{{ $index }}][is_completed]" id="is-completed-{{ $index }}" value="1">
 
                 <div class="row g-4 align-items-end">
                     <div class="col-4">
@@ -465,6 +471,26 @@
         </div>
     </div>
 </div>
+
+<!-- Mafsil Required Modal -->
+<div class="modal fade" id="mafsilRequiredModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; overflow: hidden; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); border: none;">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-star me-2" style="color: #d4a030;"></i>
+                    تنبيه المفصل
+                </h5>
+            </div>
+            <div class="modal-body text-center p-4" id="mafsilRequiredBody"></div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-primary px-4" onclick="finishMafsilAlert()">
+                    <i class="fas fa-check me-1"></i>تم
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -475,6 +501,8 @@ const pageCount = {{ count($pages) }};
 const colors = { green:'#27ae60', orange:'#f39c12', red:'#e74c3c', black:'#2c3e50', gray:'#6c757d' };
 
 function adjustSardValue(id, delta, index) {
+    if (document.getElementById('is-completed-' + index)?.value === '0') return;
+
     const input = document.getElementById(id);
     let val = parseInt(input.value) + delta;
     val = Math.max(parseInt(input.min), Math.min(999, val));
@@ -482,7 +510,46 @@ function adjustSardValue(id, delta, index) {
     updateSardColor(index);
 }
 
+function toggleNotCompleted(index) {
+    const hidden = document.getElementById('is-completed-' + index);
+    if (!hidden) return;
+
+    const marking = hidden.value === '1';
+    hidden.value = marking ? '0' : '1';
+
+    const btn = document.getElementById('not-completed-btn-' + index);
+    const errorsInput = document.getElementById('e-' + index);
+    const hesitationsInput = document.getElementById('h-' + index);
+
+    if (marking) {
+        if (errorsInput) { errorsInput.value = 0; errorsInput.readOnly = true; errorsInput.classList.add('bg-light'); }
+        if (hesitationsInput) { hesitationsInput.value = 0; hesitationsInput.readOnly = true; hesitationsInput.classList.add('bg-light'); }
+        if (btn) { btn.classList.remove('btn-outline-secondary'); btn.classList.add('btn-secondary'); }
+    } else {
+        if (errorsInput) { errorsInput.readOnly = false; errorsInput.classList.remove('bg-light'); }
+        if (hesitationsInput) { hesitationsInput.readOnly = false; hesitationsInput.classList.remove('bg-light'); }
+        if (btn) { btn.classList.remove('btn-secondary'); btn.classList.add('btn-outline-secondary'); }
+    }
+
+    updateSardColor(index);
+}
+
 function updateSardColor(index) {
+    if (document.getElementById('is-completed-' + index)?.value === '0') {
+        const gray = colors.gray;
+        document.getElementById('color-indicator-' + index).className = 'result-indicator color-gray';
+        document.getElementById('color-indicator-' + index).innerHTML = '<i class="fas fa-times-circle"></i>';
+        document.getElementById('color-badge-' + index).innerHTML = '<span class="badge" style="background:' + gray + '; color: white; font-size: 11px; padding: 5px 12px; border-radius: 8px;">لم يكمل</span>';
+        document.getElementById('result-box-' + index).className = 'result-indicator color-gray mx-auto';
+        document.getElementById('result-box-' + index).innerHTML = '<i class="fas fa-times-circle"></i>';
+        document.getElementById('result-text-' + index).textContent = 'لم يكمل';
+        document.getElementById('result-text-' + index).style.color = gray;
+        document.getElementById('page-card-' + index).style.borderColor = gray;
+        document.getElementById('page-card-' + index).style.background = gray + '11';
+        updateTotalErrors();
+        return;
+    }
+
     const errors = parseInt(document.getElementById('e-'+index).value)||0;
     const hesitations = parseInt(document.getElementById('h-'+index).value)||0;
     const totalEquivalent = errors + Math.floor(hesitations / 3);
@@ -529,6 +596,7 @@ function updateSardColor(index) {
 function updateTotalErrors() {
     let total = 0;
     for(let i=0;i<pageCount;i++) {
+        if (document.getElementById('is-completed-'+i)?.value === '0') continue;
         const errors = parseInt(document.getElementById('e-'+i)?.value)||0;
         const hesitations = parseInt(document.getElementById('h-'+i)?.value)||0;
         total += errors + Math.floor(hesitations / 3);
@@ -540,6 +608,49 @@ function updateTotalErrors() {
 }
 
 let isSubmittingSard = false;
+let pendingMafsilAlertIds = [];
+
+function showMafsilAlert(response) {
+    pendingMafsilAlertIds = (response.mafsil_alerts || []).map(a => a.id);
+    const stations = (response.mafsil_alerts || [])
+        .map(a => a.station)
+        .filter(Boolean)
+        .sort((a, b) => a - b);
+    const count = response.mafsil_alerts_count || 0;
+    const student = response.mafsil_alerts_student || '';
+    const stationsText = stations.map(s => 'مفصل ' + s).join('، ');
+
+    document.getElementById('mafsilRequiredBody').innerHTML =
+        '<div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#d4a030,#e6b84d);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#fff;font-size:26px;">' +
+        '<i class="fas fa-star"></i></div>' +
+        '<p class="fs-5 mb-2" style="color:#182B48;font-weight:700;">الطالب ' + student + ' يجب أن يكون لديه مفصّل</p>' +
+        '<p class="text-muted mb-2">أتمّ سرد ' + count + ' أجزاء من الحفظ الجديد</p>' +
+        (stationsText ? '<span class="badge bg-danger">' + stationsText + '</span>' : '');
+
+    new bootstrap.Modal(document.getElementById('mafsilRequiredModal')).show();
+}
+
+function finishMafsilAlert() {
+    const modalEl = document.getElementById('mafsilRequiredModal');
+    const instance = bootstrap.Modal.getInstance(modalEl);
+    if (instance) instance.hide();
+
+    const goToIndex = () => { window.location.href = '{{ route('supervisor.recitation.index') }}'; };
+
+    if (pendingMafsilAlertIds.length) {
+        fetch('{{ route('supervisor.alerts.acknowledge') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ ids: pendingMafsilAlertIds }),
+        }).catch(() => {}).then(goToIndex);
+    } else {
+        goToIndex();
+    }
+}
 
 function stopSard() {
     if (isSubmittingSard) return;
@@ -570,9 +681,14 @@ function submitSard() {
         data:data,
         processData:false,
         contentType:false,
-        success:()=>{
+        success:(response)=>{
             toastr.success('تم حفظ نتيجة السرد');
-            setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500);
+            const alerts = response && response.mafsil_alerts ? response.mafsil_alerts : [];
+            if (alerts.length) {
+                showMafsilAlert(response);
+            } else {
+                setTimeout(()=>window.location.href='{{ route('supervisor.recitation.index') }}',1500);
+            }
         },
         error:(xhr)=>{
             isSubmittingSard = false;

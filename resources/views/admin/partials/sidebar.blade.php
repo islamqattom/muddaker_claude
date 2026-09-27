@@ -71,6 +71,10 @@
     <div class="icon-wrapper"><i class="fas fa-cog"></i></div>
     <span>إعدادات النظام</span>
 </a>
+<a href="{{ route('admin.recitation-diagnostics.index') }}" class="nav-link {{ request()->routeIs('admin.recitation-diagnostics.*') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-stethoscope"></i></div>
+    <span>تشخيص التسميع</span>
+</a>
 <a href="{{ route('admin.billing.index') }}" class="nav-link {{ request()->routeIs('admin.billing.index') || request()->routeIs('admin.billing.history') || request()->routeIs('admin.billing.settings') || request()->routeIs('admin.billing.createBulkUnpaid') || request()->routeIs('admin.billing.markPaid') || request()->routeIs('admin.billing.markPaidBulk') || request()->routeIs('admin.billing.recordPayment') || request()->routeIs('admin.billing.deleteFee') || request()->routeIs('admin.billing.studentsForParent') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-money-bill"></i></div>
     <span>إدارة الرسوم</span>

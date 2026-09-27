@@ -12,6 +12,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        \App\Support\MissedRecitationSync::run();
+
         $user = Auth::user();
         $parentProfile = $user->parentProfile()->with('students.user', 'students.level')->firstOrFail();
         $students = $parentProfile->students;
@@ -61,7 +63,7 @@ class DashboardController extends Controller
         $toDate = request('to_date') ? Carbon::parse(request('to_date')) : Carbon::now();
 
         $sessions = RecitationSession::where('student_id', $student->id)
-            ->with('part', 'pages')
+            ->with('part', 'pages.mafsilPosition')
             ->whereBetween('session_date', [$fromDate, $toDate])
             ->orderBy('session_date', 'desc')
             ->get();
