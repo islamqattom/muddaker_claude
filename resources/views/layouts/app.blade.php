@@ -30,6 +30,12 @@
     <!-- App-wide styles extracted to public/css/app.css -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 
+    <!-- Shared dashboard styles -->
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}?v={{ filemtime(public_path('css/dashboard.css')) }}">
+
+    <!-- Shared listing-page styles -->
+    <link rel="stylesheet" href="{{ asset('css/page.css') }}?v={{ filemtime(public_path('css/page.css')) }}">
+
     @stack('styles')
 
 </head>
