@@ -312,37 +312,11 @@ function formatAuditValue($value, $modelType = null) {
 </div>
 
 <style>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
-.header-icon {
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-
-.header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .back-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 25px;
+    padding: 12px 16px;
     background: transparent;
     color: #7f8c8d;
     border: 1.5px solid #dee2e6;
@@ -352,38 +326,34 @@ function formatAuditValue($value, $modelType = null) {
     font-size: 14px;
     transition: all 0.3s ease;
 }
-
 .back-btn:hover {
     background: #f8f9fa;
     color: #182B48;
 }
-
 .details-layout {
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 25px;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
-@media (max-width: 992px) { .details-layout { grid-template-columns: 1fr; } }
-
+@media (max-width: 992px) {
+.details-layout { grid-template-columns: 1fr; }
+}
 .info-card, .tech-card {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
 }
-
 .info-card-header {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 30px;
+    padding: 16px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
     position: relative;
 }
-
 .info-card-header::after {
     content: '';
     position: absolute;
@@ -393,12 +363,11 @@ function formatAuditValue($value, $modelType = null) {
     height: 4px;
     background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
 }
-
 .log-icon {
     width: 70px;
     height: 70px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
-    border-radius: 16px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -406,37 +375,32 @@ function formatAuditValue($value, $modelType = null) {
     color: #fff;
     box-shadow: 0 8px 25px rgba(212,160,48,0.4);
 }
-
-.log-title h4 { color: #fff; font-size: 22px; font-weight: 700; margin: 0 0 8px 0; }
-
+.log-title h4 { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 8px 0; }
 .log-date {
     display: inline-block;
     background: rgba(255,255,255,0.15);
     padding: 5px 15px;
-    border-radius: 20px;
+    border-radius: 13px;
     color: rgba(255,255,255,0.9);
     font-size: 13px;
 }
-
-.info-card-body { padding: 30px; }
-
+.info-card-body { padding: 16px; }
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
-
-@media (max-width: 576px) { .info-grid { grid-template-columns: 1fr; } }
-
+@media (max-width: 576px) {
+.info-grid { grid-template-columns: 1fr; }
+}
 .info-item {
     display: flex;
     align-items: flex-start;
     gap: 15px;
-    padding: 20px;
+    padding: 16px;
     background: #f8f9fa;
     border-radius: 12px;
 }
-
 .info-icon {
     width: 45px;
     height: 45px;
@@ -449,13 +413,10 @@ function formatAuditValue($value, $modelType = null) {
     font-size: 18px;
     flex-shrink: 0;
 }
-
 .info-content { display: flex; flex-direction: column; gap: 3px; }
 .info-content label { font-size: 12px; color: #7f8c8d; }
-
 .user-name-lg { font-size: 16px; font-weight: 700; color: #182B48; }
 .user-email-lg { font-size: 12px; color: #7f8c8d; }
-
 .role-badge {
     display: inline-block;
     padding: 6px 14px;
@@ -463,13 +424,11 @@ function formatAuditValue($value, $modelType = null) {
     font-size: 13px;
     font-weight: 600;
 }
-
 .role-badge.admin { background: rgba(192,57,43,0.15); color: #c0392b; }
 .role-badge.supervisor { background: rgba(52,152,219,0.15); color: #3498db; }
 .role-badge.student { background: rgba(39,174,96,0.15); color: #27ae60; }
 .role-badge.parent { background: rgba(243,156,18,0.15); color: #f39c12; }
 .role-badge.default { background: rgba(127,140,141,0.15); color: #7f8c8d; }
-
 .action-badge {
     display: inline-flex;
     align-items: center;
@@ -478,7 +437,6 @@ function formatAuditValue($value, $modelType = null) {
     font-size: 13px;
     font-weight: 600;
 }
-
 .action-badge.created { background: rgba(39,174,96,0.15); color: #27ae60; }
 .action-badge.updated { background: rgba(243,156,18,0.15); color: #f39c12; }
 .action-badge.deleted { background: rgba(192,57,43,0.15); color: #c0392b; }
@@ -486,7 +444,6 @@ function formatAuditValue($value, $modelType = null) {
 .action-badge.logout { background: rgba(127,140,141,0.15); color: #7f8c8d; }
 .action-badge.failed { background: rgba(24,43,72,0.15); color: #182B48; }
 .action-badge.default { background: rgba(127,140,141,0.15); color: #7f8c8d; }
-
 .model-info { font-weight: 600; color: #182B48; font-size: 14px; }
 .model-id-badge {
     background: #f0f4f8;
@@ -497,19 +454,17 @@ function formatAuditValue($value, $modelType = null) {
     margin-top: 5px;
     display: inline-block;
 }
-
 .tech-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 20px 25px;
+    padding: 16px 16px;
     border-bottom: 1px solid #f0f4f8;
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
     color: #182B48;
     font-weight: 700;
     font-size: 16px;
 }
-
 .tech-card-header i {
     width: 40px;
     height: 40px;
@@ -521,16 +476,12 @@ function formatAuditValue($value, $modelType = null) {
     color: #d4a030;
     font-size: 16px;
 }
-
-.tech-card-body { padding: 25px; }
-
+.tech-card-body { padding: 16px; }
 .tech-item {
     padding: 15px 0;
     border-bottom: 1px solid #f0f4f8;
 }
-
 .tech-item:last-child { border-bottom: none; }
-
 .tech-item label {
     display: flex;
     align-items: center;
@@ -539,55 +490,45 @@ function formatAuditValue($value, $modelType = null) {
     color: #7f8c8d;
     margin-bottom: 5px;
 }
-
 .tech-item label i { color: #d4a030; }
 .tech-item span { font-weight: 600; color: #182B48; font-family: monospace; }
 .tech-item small { color: #7f8c8d; font-size: 12px; word-break: break-all; }
-
-.changes-section { margin-bottom: 25px; }
-
+.changes-section { margin-bottom: 16px; }
 .changes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 25px;
 }
-
-@media (max-width: 768px) { .changes-grid { grid-template-columns: 1fr; } }
-
+@media (max-width: 768px) {
+.changes-grid { grid-template-columns: 1fr; }
+}
 .change-card {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
 }
-
 .change-card.full { grid-column: 1 / -1; }
-
 .change-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 15px 20px;
+    padding: 15px 16px;
     font-weight: 700;
     font-size: 15px;
     color: #182B48;
 }
-
 .change-card-header.danger { background: rgba(192,57,43,0.1); color: #c0392b; }
-
 .change-card.old .change-card-header { background: rgba(243,156,18,0.1); color: #f39c12; }
 .change-card.new .change-card-header { background: rgba(39,174,96,0.1); color: #27ae60; }
-
 .change-card-header i { font-size: 16px; }
-
 .change-card-body {
-    padding: 20px;
+    padding: 16px;
     background: #f8f9fa;
     max-height: 350px;
     overflow: auto;
 }
-
 .json-data {
     margin: 0;
     font-size: 12px;
@@ -596,17 +537,15 @@ function formatAuditValue($value, $modelType = null) {
     white-space: pre-wrap;
     word-break: break-all;
 }
-
 .back-section {
     display: flex;
     justify-content: center;
 }
-
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 25px;
+    padding: 12px 16px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 14px;
@@ -615,13 +554,11 @@ function formatAuditValue($value, $modelType = null) {
     border: none;
     cursor: pointer;
 }
-
 .btn-outline-secondary {
     background: transparent;
     color: #7f8c8d;
     border: 1.5px solid #dee2e6;
 }
-
 .btn-outline-secondary:hover {
     background: #f8f9fa;
     color: #182B48;

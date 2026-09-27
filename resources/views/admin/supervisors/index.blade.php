@@ -116,52 +116,45 @@
 
 <style>
 /* Shared listing styles live in public/css/page.css */
-
 .header-icon.supervisors {
     background: linear-gradient(135deg, #8e44ad, #9b59b6);
     box-shadow: 0 6px 18px rgba(142, 68, 173, 0.25);
 }
-
 .header-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 10px 16px;
     border-radius: 10px;
     font-weight: 600;
 }
-
 .supervisors-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 }
-
 .supervisor-card {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(24, 43, 72, 0.04);
     border: 1px solid #eef2f7;
     transition: all .25s ease;
 }
-
 .supervisor-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 30px rgba(24, 43, 72, 0.1);
     border-color: rgba(212, 160, 48, 0.3);
 }
-
 .supervisor-header-card {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 16px 18px;
+    padding: 16px 16px;
     background: #fbfcfe;
     border-bottom: 1px solid #f0f4f8;
 }
-
 .supervisor-avatar-card {
     width: 48px; height: 48px;
     background: linear-gradient(135deg, #8e44ad, #9b59b6);
@@ -173,10 +166,8 @@
     font-size: 20px;
     flex-shrink: 0;
 }
-
 .supervisor-info-card { flex: 1; min-width: 0; }
 .supervisor-info-card h5 { color: #182B48; font-size: 15.5px; font-weight: 700; margin: 0 0 5px; }
-
 .role-tag {
     background: rgba(142, 68, 173, 0.1);
     color: #8e44ad;
@@ -185,7 +176,6 @@
     font-size: 11px;
     font-weight: 600;
 }
-
 .student-count-badge {
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
@@ -197,11 +187,8 @@
     font-size: 13px;
     font-weight: 700;
 }
-
 .student-count-badge i { color: #d4a030; }
-
-.supervisor-details { padding: 14px 18px; }
-
+.supervisor-details { padding: 14px 16px; }
 .detail-row {
     display: flex;
     align-items: center;
@@ -213,9 +200,7 @@
 .detail-row i { width: 18px; color: #d4a030; font-size: 12px; }
 .detail-row span { color: #7f8c8d; font-size: 12.5px; width: 78px; }
 .detail-row strong { color: #182B48; font-size: 12.5px; flex: 1; }
-
-.supervisor-actions { display: flex; gap: 8px; padding: 14px 18px; background: #f8f9fa; }
-
+.supervisor-actions { display: flex; gap: 8px; padding: 14px 16px; background: #f8f9fa; }
 .action-btn-card {
     flex: 1;
     display: inline-flex;
@@ -237,10 +222,7 @@
 .action-btn-card.edit:hover { background: #f39c12; color: #fff; }
 .action-btn-card.delete { background: rgba(192, 57, 43, 0.12); color: #c0392b; }
 .action-btn-card.delete:hover { background: #c0392b; color: #fff; }
-
 .pagination-container { display: flex; justify-content: center; }
-
-.empty-state .empty-icon { background: rgba(142, 68, 173, 0.1); color: #8e44ad; }
 </style>
 
 @endsection

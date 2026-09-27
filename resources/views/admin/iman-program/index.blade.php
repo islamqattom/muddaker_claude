@@ -10,42 +10,42 @@
 
 @push('styles')
 <style>
-    .check-cell {
+.check-cell {
         background: #fff !important;
         border-color: #d6dbe5 !important;
         color: transparent !important;
     }
-    .check-cell:hover { border-color: #d4a030 !important; }
-    .check-cell.is-checked {
+.check-cell:hover { border-color: #d4a030 !important; }
+.check-cell.is-checked {
         background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
         border-color: #27ae60 !important;
         color: #fff !important;
     }
-    .check-cell.is-saving { opacity: 0.6; pointer-events: none; }
-    .check-cell-static {
+.check-cell.is-saving { opacity: 0.6; pointer-events: none; }
+.check-cell-static {
         background: #f0f4f8 !important;
         color: transparent !important;
     }
-    .check-cell-static.is-checked {
+.check-cell-static.is-checked {
         background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
         color: #fff !important;
     }
-    .number-cell {
+.number-cell {
         background: #fff !important;
         border-color: #d6dbe5 !important;
         color: #182B48 !important;
     }
-    .number-cell:focus { border-color: #d4a030 !important; outline: none; }
-    .number-cell.is-done {
+.number-cell:focus { border-color: #d4a030 !important; outline: none; }
+.number-cell.is-done {
         background: rgba(39,174,96,0.1) !important;
         border-color: #27ae60 !important;
         color: #27ae60 !important;
     }
-    .number-cell-static {
+.number-cell-static {
         background: #f0f4f8 !important;
         color: #6b7a90 !important;
     }
-    .number-cell-static.is-done {
+.number-cell-static.is-done {
         background: rgba(39,174,96,0.1) !important;
         color: #27ae60 !important;
     }
@@ -55,73 +55,73 @@
 @section('content')
 @php $today = \Carbon\Carbon::today()->toDateString(); @endphp
 
-<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:16px;padding:24px 30px;margin-bottom:24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <div style="width:60px;height:60px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;">
+<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:14px;padding:16px 22px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">
         <i class="fas fa-star-and-crescent"></i>
     </div>
     <div>
-        <h1 style="margin:0;font-size:22px;font-weight:700;">{{ $scope === 'self' ? 'برنامجي الإيماني' : 'إدارة البرامج الإيمانية' }}</h1>
-        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'إنشاء ومتابعة البرامج الإيمانية للطلاب' }}</p>
+        <h1 style="margin:0;font-size:22px;font-weight:700">{{ $scope === 'self' ? 'برنامجي الإيماني' : 'إدارة البرامج الإيمانية' }}</h1>
+        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'إنشاء ومتابعة البرامج الإيمانية للطلاب' }}</p>
     </div>
     @if($scope === 'self' || $student)
-        <div style="margin-right:auto;display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="margin-right:auto;display:flex;gap:10px;flex-wrap:wrap">
             <a href="{{ route('admin.iman-program.bulk-assign') }}"
-               style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 18px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+               style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 16px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px">
                 <i class="fas fa-bullhorn"></i> تعيين جماعي
             </a>
             <a href="{{ $scope === 'self' ? route('admin.iman-program.create', ['scope' => 'self']) : route('admin.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
-               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 16px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px">
                 <i class="fas fa-plus-circle"></i> برنامج جديد
             </a>
         </div>
     @else
-        <div style="margin-right:auto;">
+        <div style="margin-right:auto">
             <a href="{{ route('admin.iman-program.bulk-assign') }}"
-               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 16px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px">
                 <i class="fas fa-bullhorn"></i> تعيين جماعي
             </a>
         </div>
     @endif
 </div>
 
-<div style="background:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;">
+<div style="background:#fff;border-radius:13px;padding:14px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
     <a href="{{ route('admin.iman-program.index', ['scope' => 'self']) }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'self' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+       style="padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'self' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;':'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user"></i> برنامجي الشخصي
     </a>
     <a href="{{ route('admin.iman-program.index', ['scope' => 'student']) }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+       style="padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;':'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user-graduate"></i> برامج الطلاب
     </a>
     <a href="{{ route('admin.iman-program.index', ['scope' => 'reports']) }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'reports' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+       style="padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'reports' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;':'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-chart-pie"></i> تقارير الطلاب
     </a>
 </div>
 
 @if($scope === 'student')
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-bookmark"></i></div>
-            <div><div style="font-size:12px;color:#6b7a90;">إجمالي البرامج</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['total_programs'] }}</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px">
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-bookmark"></i></div>
+            <div><div style="font-size:12px;color:#6b7a90">إجمالي البرامج</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $stats['total_programs'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-list-check"></i></div>
-            <div><div style="font-size:12px;color:#6b7a90;">إجمالي المعايير</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['total_criteria'] }}</div></div>
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-list-check"></i></div>
+            <div><div style="font-size:12px;color:#6b7a90">إجمالي المعايير</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $stats['total_criteria'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-circle-check"></i></div>
-            <div><div style="font-size:12px;color:#6b7a90;">إجمالي الإدخالات</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['total_entries'] }}</div></div>
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-circle-check"></i></div>
+            <div><div style="font-size:12px;color:#6b7a90">إجمالي الإدخالات</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $stats['total_entries'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-user-graduate"></i></div>
-            <div><div style="font-size:12px;color:#6b7a90;">طلاب لديهم برامج</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['students_with_programs'] }}</div></div>
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-user-graduate"></i></div>
+            <div><div style="font-size:12px;color:#6b7a90">طلاب لديهم برامج</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $stats['students_with_programs'] }}</div></div>
         </div>
     </div>
 @endif
 
 @if($scope === 'student')
-    <div style="background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+    <div style="background:#fff;border-radius:13px;padding:16px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px">
         <form method="GET" action="{{ route('admin.iman-program.index') }}" class="row g-3 align-items-end">
             <input type="hidden" name="scope" value="student">
             <div class="col-md-7">
@@ -145,7 +145,7 @@
         </form>
     </div>
 @else
-    <div style="background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+    <div style="background:#fff;border-radius:13px;padding:16px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px">
         <form method="GET" action="{{ route('admin.iman-program.index') }}" class="row g-3 align-items-end">
             <input type="hidden" name="scope" value="self">
             <div class="col-md-9">
@@ -163,87 +163,87 @@
 @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
 @if($scope === 'student' && !$student)
-    <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-        <i class="fas fa-user-graduate" style="font-size:50px;opacity:0.3;"></i>
-        <h5 style="color:#182B48;margin-top:14px;">اختر طالباً لعرض/إنشاء برنامجه الإيماني</h5>
+    <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05)">
+        <i class="fas fa-user-graduate" style="font-size:50px;opacity:0.3"></i>
+        <h5 style="color:#182B48;margin-top:14px">اختر طالباً لعرض/إنشاء برنامجه الإيماني</h5>
     </div>
 @elseif($scope === 'reports')
     @if($studentReports->isEmpty())
-        <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-            <i class="fas fa-chart-pie" style="font-size:50px;opacity:0.3;"></i>
-            <h5 style="color:#182B48;margin-top:14px;">لا يوجد طلاب لديهم برامج إيمانية بعد</h5>
+        <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05)">
+            <i class="fas fa-chart-pie" style="font-size:50px;opacity:0.3"></i>
+            <h5 style="color:#182B48;margin-top:14px">لا يوجد طلاب لديهم برامج إيمانية بعد</h5>
         </div>
     @else
-        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
-                <h5 style="color:#182B48;font-weight:700;margin:0;display:flex;align-items:center;gap:10px;">
-                    <i class="fas fa-chart-area" style="color:#d4a030;"></i> إجمالي نقاط الطلاب خلال آخر 30 يوم
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+                <h5 style="color:#182B48;font-weight:700;margin:0;display:flex;align-items:center;gap:10px">
+                    <i class="fas fa-chart-area" style="color:#d4a030"></i> إجمالي نقاط الطلاب خلال آخر 30 يوم
                 </h5>
-                <div id="listChartToggle" style="display:inline-flex;background:#f0f4f8;border-radius:10px;padding:4px;gap:4px;">
+                <div id="listChartToggle" style="display:inline-flex;background:#f0f4f8;border-radius:10px;padding:4px;gap:4px">
                     <button type="button" data-range="week"
-                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
+                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff">
                         أسبوعي
                     </button>
                     <button type="button" data-range="month"
-                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:transparent;color:#182B48;">
+                            style="padding:7px 16px;border:none;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;background:transparent;color:#182B48">
                         شهري
                     </button>
                 </div>
             </div>
-            <div style="position:relative;height:220px;">
+            <div style="position:relative;height:220px">
                 <canvas id="aggregateAreaChart"></canvas>
             </div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);overflow-x:auto;">
-            <table style="width:100%;border-collapse:collapse;">
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse">
                 <thead>
-                    <tr style="background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
-                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px;border-top-right-radius:10px;">الطالب</th>
-                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px;">المشرف</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">البرامج</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">المعايير</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">الإدخالات</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">آخر إدخال</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;">نسبة الإنجاز</th>
-                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;border-top-left-radius:10px;">إجراء</th>
+                    <tr style="background:linear-gradient(135deg,#182B48,#2A4570);color:#fff">
+                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px;border-top-right-radius:10px">الطالب</th>
+                        <th style="padding:14px 16px;text-align:right;font-weight:700;font-size:13px">المشرف</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px">البرامج</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px">المعايير</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px">الإدخالات</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px">آخر إدخال</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px">نسبة الإنجاز</th>
+                        <th style="padding:14px 16px;text-align:center;font-weight:700;font-size:13px;border-top-left-radius:10px">إجراء</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($studentReports as $report)
-                        <tr style="border-bottom:1px solid #f0f4f8;transition:background 0.2s;" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='#fff'">
-                            <td style="padding:14px 16px;">
-                                <div style="display:flex;align-items:center;gap:10px;">
-                                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">
+                        <tr style="border-bottom:1px solid #f0f4f8;transition:background 0.2s" onmouseover="this.style.background='#fafbfc'" onmouseout="this.style.background='#fff'">
+                            <td style="padding:14px 16px">
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0">
                                         {{ mb_substr($report->student->user->name ?? '؟', 0, 1) }}
                                     </div>
                                     <div>
-                                        <div style="font-weight:700;color:#182B48;font-size:14px;">{{ $report->student->user->name ?? '—' }}</div>
+                                        <div style="font-weight:700;color:#182B48;font-size:14px">{{ $report->student->user->name ?? '—' }}</div>
                                         @if($report->student->student_number)
-                                            <div style="font-size:11px;color:#6b7a90;">#{{ $report->student->student_number }}</div>
+                                            <div style="font-size:11px;color:#6b7a90">#{{ $report->student->student_number }}</div>
                                         @endif
                                     </div>
                                 </div>
                             </td>
-                            <td style="padding:14px 16px;color:#2c3e50;font-size:13px;">{{ $report->student->supervisor->name ?? '—' }}</td>
-                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->programs_count }}</td>
-                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->criteria_count }}</td>
-                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48;">{{ $report->entries_count }}</td>
-                            <td style="padding:14px 16px;text-align:center;font-size:12px;color:#6b7a90;">{{ $report->last_entry_date ? \Carbon\Carbon::parse($report->last_entry_date)->format('Y/m/d') : 'لا يوجد' }}</td>
-                            <td style="padding:14px 16px;text-align:center;">
+                            <td style="padding:14px 16px;color:#2c3e50;font-size:13px">{{ $report->student->supervisor->name ?? '—' }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48">{{ $report->programs_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48">{{ $report->criteria_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-weight:700;color:#182B48">{{ $report->entries_count }}</td>
+                            <td style="padding:14px 16px;text-align:center;font-size:12px;color:#6b7a90">{{ $report->last_entry_date ? \Carbon\Carbon::parse($report->last_entry_date)->format('Y/m/d') : 'لا يوجد' }}</td>
+                            <td style="padding:14px 16px;text-align:center">
                                 @php
                                     $c = $report->completion;
                                     $color = $c >= 70 ? '#27ae60' : ($c >= 40 ? '#f39c12' : '#c0392b');
                                 @endphp
-                                <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                                    <div style="flex:1;max-width:100px;height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
-                                        <div style="height:100%;background:{{ $color }};width:{{ $c }}%;"></div>
+                                <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+                                    <div style="flex:1;max-width:100px;height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden">
+                                        <div style="height:100%;background:{{ $color }};width:{{ $c }}%"></div>
                                     </div>
-                                    <span style="font-weight:700;color:{{ $color }};font-size:13px;min-width:40px;">{{ $c }}%</span>
+                                    <span style="font-weight:700;color:{{ $color }};font-size:13px;min-width:40px">{{ $c }}%</span>
                                 </div>
                             </td>
-                            <td style="padding:14px 16px;text-align:center;">
+                            <td style="padding:14px 16px;text-align:center">
                                 <a href="{{ route('admin.iman-program.student-report', $report->student->id) }}"
-                                   style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none;">
+                                   style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;padding:8px 14px;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none">
                                     <i class="fas fa-chart-line"></i> عرض التقرير
                                 </a>
                             </td>
@@ -266,11 +266,11 @@
             :can-manage="true"
             :can-edit="true" />
     @empty
-        <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-            <i class="fas fa-star-and-crescent" style="font-size:50px;opacity:0.3;"></i>
-            <h5 style="color:#182B48;margin-top:14px;">{{ $scope === 'self' ? 'لا توجد برامج شخصية بعد' : 'لا توجد برامج إيمانية لهذا الطالب' }}</h5>
+        <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05)">
+            <i class="fas fa-star-and-crescent" style="font-size:50px;opacity:0.3"></i>
+            <h5 style="color:#182B48;margin-top:14px">{{ $scope === 'self' ? 'لا توجد برامج شخصية بعد' : 'لا توجد برامج إيمانية لهذا الطالب' }}</h5>
             <a href="{{ $scope === 'self' ? route('admin.iman-program.create', ['scope' => 'self']) : route('admin.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
-               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;text-decoration:none;">
+               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;text-decoration:none">
                 <i class="fas fa-plus-circle"></i> {{ $scope === 'self' ? 'أنشئ برنامجك الشخصي' : 'أنشئ أول برنامج للطالب' }}
             </a>
         </div>

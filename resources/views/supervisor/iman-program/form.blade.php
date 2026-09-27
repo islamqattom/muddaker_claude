@@ -17,16 +17,12 @@
 
 @push('styles')
 <style>
-.iman-form-page { --gold:#d4a030; --gold-light:#e6b84d; --navy:#182B48; --navy-light:#2A4570; --success:#27ae60; --danger:#c0392b; --radius:16px; --shadow-sm:0 2px 10px rgba(24,43,72,0.05); }
-.iman-form-page .page-hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%); border-radius:var(--radius); padding:24px 30px; margin-bottom:24px; color:#fff; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-.iman-form-page .page-hero h1 { margin:0; font-size:22px; font-weight:700; }
-.iman-form-page .page-hero p { color:rgba(255,255,255,0.8); margin:0; font-size:13px; }
-.iman-form-page .hero-icon { width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; }
-.iman-form-page .form-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:26px; margin-bottom:22px; border:1px solid rgba(24,43,72,0.05); }
-.iman-form-page .form-card h5 { color:var(--navy); font-weight:800; margin-bottom:16px; }
+.iman-form-page { --gold:#d4a030; --gold-light:#e6b84d; --navy:#182B48; --navy-light:#2A4570; --success:#27ae60; --danger:#c0392b; --radius:13px; --shadow-sm:0 2px 10px rgba(24,43,72,0.05); }
+.iman-form-page .form-card { background:#fff; border-radius:13px; box-shadow:var(--shadow-sm); padding:16px; margin-bottom:16px; border:1px solid rgba(24,43,72,0.05); }
+.iman-form-page .form-card h5 { color:var(--navy); font-weight:700; font-size:15px; margin-bottom:14px; }
 .iman-form-page .form-card h5 i { color:var(--gold); margin-inline-end:8px; }
-.iman-form-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:18px; }
-.iman-form-page .criterion-row { display:grid; grid-template-columns:1fr 180px 200px 50px; gap:10px; align-items:center; margin-bottom:10px; padding:10px; border-radius:12px; background:#f8f9fc; }
+.iman-form-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:16px; }
+.iman-form-page .criterion-row { display:grid; grid-template-columns:1fr 180px 200px 50px; gap:10px; align-items:center; margin-bottom:10px; padding:12px; border-radius:13px; background:#f8f9fc; }
 .iman-form-page .criterion-row .form-control { min-width:0; }
 @media (max-width: 768px) {
     .iman-form-page .criterion-row { grid-template-columns:1fr auto; gap:10px; padding:12px; }
@@ -36,33 +32,33 @@
     .iman-form-page .criterion-row .type-select label { flex:1 1 0; justify-content:center; padding:10px 8px; }
     .iman-form-page .criterion-row .remove-btn { grid-column:2 / 3; height:42px; align-self:center; }
 }
-.iman-form-page .criterion-row .remove-btn { background:rgba(192,57,43,0.1); color:var(--danger); border:none; width:40px; height:40px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.iman-form-page .criterion-row .remove-btn { background:rgba(192,57,43,0.1); color:var(--danger); border:none; width:34px; height:34px; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .iman-form-page .criterion-row .remove-btn:hover { background:var(--danger); color:#fff; }
 .iman-form-page .type-select { display:flex; gap:8px; align-items:center; }
-.iman-form-page .type-select label { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid #d6dbe5; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; color:var(--navy); }
+.iman-form-page .type-select label { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid #d6dbe5; border-radius:9px; cursor:pointer; font-size:13px; font-weight:600; color:var(--navy); }
 .iman-form-page .type-select input { display:none; }
 .iman-form-page .type-select label:has(input:checked) { background:rgba(212,160,48,0.1); border-color:var(--gold); }
-.iman-form-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:12px 20px; border-radius:12px; font-weight:700; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+.iman-form-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:10px 16px; border-radius:9px; font-weight:700; font-size:13px; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
 .iman-form-page .add-criterion-btn:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
 .iman-form-page .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
-.iman-form-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer; }
+.iman-form-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; cursor:pointer; }
 .iman-form-page .btn-gold:hover { transform:translateY(-1px); }
-.iman-form-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:12px 22px; border-radius:12px; font-weight:700; text-decoration:none; }
+.iman-form-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; text-decoration:none; }
 .iman-form-page .btn-cancel:hover { background:#dee5ed; }
 </style>
 @endpush
 
 @section('content')
 <div class="iman-form-page">
-    <div class="page-hero">
-        <div class="hero-icon"><i class="fas fa-seedling"></i></div>
-        <div>
-            <h1>{{ $program ? 'تعديل البرنامج الإيماني' : 'برنامج إيماني جديد' }}</h1>
-            <p>{{ $student ? 'للطالب: ' . $student->user->name : 'البرنامج الإيماني الخاص بك' }}</p>
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-icon"><i class="fas fa-seedling"></i></div>
+            <div class="header-text">
+                <h4>{{ $program ? 'تعديل البرنامج الإيماني' : 'برنامج إيماني جديد' }}</h4>
+                <p>{{ $student ? 'للطالب: ' . $student->user->name : 'البرنامج الإيماني الخاص بك' }}</p>
+            </div>
         </div>
-        <div style="margin-right: auto;">
-            <a href="{{ $student ? route('supervisor.iman-program.index', ['scope' => 'student', 'student_id' => $student->id]) : route('supervisor.iman-program.index', ['scope' => 'self']) }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
+        <a href="{{ $student ? route('supervisor.iman-program.index', ['scope' => 'student', 'student_id' => $student->id]) : route('supervisor.iman-program.index', ['scope' => 'self']) }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
     </div>
 
     @if($errors->any())

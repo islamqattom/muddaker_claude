@@ -30,33 +30,12 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
 .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
 .btn-action {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 22px; border-radius: 12px;
+    padding: 12px 16px; border-radius: 12px;
     font-weight: 600; font-size: 14px;
     transition: all 0.3s ease;
     border: none; cursor: pointer;
@@ -70,16 +49,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .btn-back { background: #fff; color: var(--primary); border: 2px solid #e9ecef; }
 .btn-back:hover { border-color: var(--primary); }
 .btn-back i { color: var(--gold); }
-
 .info-card {
-    background: #fff; border-radius: 20px;
+    background: #fff; border-radius: 13px;
     box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 .info-header {
     display: flex; align-items: center; gap: 22px;
-    padding: 28px;
+    padding: 16px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     position: relative;
 }
@@ -92,60 +70,53 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .info-icon {
     width: 65px; height: 65px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    border-radius: 13px; display: flex; align-items: center; justify-content: center;
     font-size: 28px; color: #fff;
     box-shadow: 0 4px 15px rgba(212,160,48,0.35);
 }
-.info-content h5 { color: #fff; font-size: 20px; font-weight: 700; margin: 0 0 12px 0; }
+.info-content h5 { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 12px 0; }
 .meeting-meta { display: flex; gap: 12px; flex-wrap: wrap; }
 .meta-badge {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 16px; border-radius: 20px;
+    padding: 8px 16px; border-radius: 13px;
     font-size: 14px; font-weight: 500;
     background: rgba(255,255,255,0.15);
     color: #fff;
     backdrop-filter: blur(5px);
 }
 .meta-badge i { color: var(--gold); }
-.status-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 18px; border-radius: 20px;
-    font-size: 13px; font-weight: 600;
-}
 .status-badge.draft { background: rgba(243,156,18,0.25); color: #f1c40f; border: 1px solid rgba(243,156,18,0.3); }
 .status-badge.approved { background: rgba(39,174,96,0.25); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
 .status-badge.archived { background: rgba(149,165,166,0.25); color: #bdc3c7; border: 1px solid rgba(149,165,166,0.3); }
 .status-badge i { font-size: 12px; }
-
 .section-card {
-    background: #fff; border-radius: 20px;
+    background: #fff; border-radius: 13px;
     box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
-    overflow: hidden; margin-bottom: 25px;
+    overflow: hidden; margin-bottom: 16px;
     transition: all 0.3s ease;
 }
 .section-card:hover { transform: translateY(-3px); box-shadow: 0 8px 35px rgba(24,43,72,0.1); }
 .section-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 20px 28px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(26,51,86,0.05) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; font-size: 17px; color: var(--primary);
 }
-.section-header i { color: var(--gold); font-size: 20px; }
-.section-body { padding: 25px 28px; }
-
+.section-header i { color: var(--gold); font-size: 18px; }
+.section-body { padding: 16px 16px; }
 .attendance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
 .attendee-item {
     display: flex; align-items: center; gap: 14px;
-    padding: 18px; background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    border-radius: 14px; border: 1px solid rgba(24,43,72,0.05);
+    padding: 16px; background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
+    border-radius: 13px; border: 1px solid rgba(24,43,72,0.05);
     transition: all 0.3s ease;
 }
 .attendee-item:hover { transform: translateX(-4px); border-color: var(--gold); }
 .attendee-avatar {
     width: 50px; height: 50px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    border-radius: 13px; display: flex; align-items: center; justify-content: center;
     color: var(--gold); font-size: 20px;
     flex-shrink: 0;
 }
@@ -154,13 +125,11 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .attendee-name { font-weight: 700; color: var(--primary); display: block; font-size: 15px; }
 .attendee-role { font-size: 12px; color: #95a5a6; margin-top: 2px; }
 .present-icon { color: var(--success); font-size: 20px; }
-
 .empty-section { text-align: center; padding: 40px; color: #95a5a6; }
 .empty-section i { font-size: 50px; margin-bottom: 15px; color: var(--gold); opacity: 0.4; }
-
 .agenda-list { margin: 0; padding-right: 0; list-style: none; }
 .agenda-item {
-    padding: 16px 20px; margin-bottom: 12px;
+    padding: 16px 16px; margin-bottom: 12px;
     background: linear-gradient(135deg, rgba(212,160,48,0.06) 0%, rgba(180,128,44,0.08) 100%);
     border-radius: 12px; color: var(--primary);
     font-weight: 600; font-size: 15px;
@@ -168,42 +137,39 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     transition: all 0.3s ease;
 }
 .agenda-item:hover { transform: translateX(-3px); background: linear-gradient(135deg, rgba(212,160,48,0.1) 0%, rgba(180,128,44,0.12) 100%); }
-
 .note-card {
-    background: #fff; border-radius: 14px;
+    background: #fff; border-radius: 13px;
     border: 2px solid rgba(212,160,48,0.1);
     overflow: hidden; margin-bottom: 15px;
 }
 .note-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 16px 22px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(212,160,48,0.1) 0%, rgba(180,128,44,0.12) 100%);
     border-bottom: 1px solid rgba(212,160,48,0.1);
     font-weight: 700; color: var(--primary);
 }
 .note-header i { color: var(--gold); font-size: 18px; }
-.note-body { padding: 18px 22px; color: #5a6c7d; line-height: 1.8; font-size: 15px; }
-
+.note-body { padding: 16px 16px; color: #5a6c7d; line-height: 1.8; font-size: 15px; }
 .program-table { width: 100%; border-collapse: collapse; }
-.program-table td { padding: 16px 22px; border-bottom: 1px solid rgba(24,43,72,0.05); vertical-align: middle; }
+.program-table td { padding: 16px 16px; border-bottom: 1px solid rgba(24,43,72,0.05); vertical-align: middle; }
 .axis-name {
     width: 160px; background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
     font-weight: 700; color: var(--primary);
     font-size: 15px;
 }
 .axis-details { color: #5a6c7d; font-size: 14px; line-height: 1.7; }
-
 .tasks-table { width: 100%; border-collapse: collapse; }
 .tasks-table thead { background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%); }
 .tasks-table th {
-    padding: 16px 22px;
+    padding: 16px 16px;
     font-size: 12px; font-weight: 700;
     color: var(--primary);
     text-transform: uppercase; letter-spacing: 0.5px;
     border-bottom: 2px solid rgba(24,43,72,0.08);
 }
 .tasks-table td {
-    padding: 16px 22px;
+    padding: 16px 16px;
     font-size: 14px; color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.05);
     vertical-align: middle;
@@ -211,19 +177,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .tasks-table tbody tr { transition: all 0.3s ease; }
 .tasks-table tbody tr:hover { background: linear-gradient(135deg, rgba(212,160,48,0.04) 0%, rgba(180,128,44,0.06) 100%); }
 .index-cell { color: var(--gold); font-weight: 700; }
-
 .status-badge-task {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 14px; border-radius: 20px;
+    padding: 6px 14px; border-radius: 13px;
     font-size: 12px; font-weight: 600;
 }
 .status-badge-task.pending { background: rgba(243,156,18,0.15); color: var(--warning); }
 .status-badge-task.in_progress { background: rgba(52,152,219,0.15); color: var(--info); }
 .status-badge-task.completed { background: rgba(39,174,96,0.15); color: var(--success); }
 .status-badge-task.cancelled { background: rgba(192,57,43,0.15); color: var(--danger); }
-
 .sidebar-card {
-    background: #fff; border-radius: 20px;
+    background: #fff; border-radius: 13px;
     box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
     position: sticky;
@@ -231,13 +195,13 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .sidebar-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.05) 0%, rgba(26,51,86,0.08) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; font-size: 17px; color: var(--primary);
 }
 .sidebar-header i { color: var(--gold); font-size: 18px; }
-.sidebar-body { padding: 22px 25px; }
+.sidebar-body { padding: 16px 16px; }
 .info-row {
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 0; border-bottom: 1px solid rgba(24,43,72,0.05);
@@ -246,11 +210,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .info-label { font-size: 13px; color: #95a5a6; }
 .info-value { font-size: 14px; font-weight: 700; color: var(--primary); }
 .info-value i { color: var(--gold); margin-left: 5px; }
-
-@media (max-width: 992px) {
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-content { margin-bottom: 15px; }
-}
 </style>
 
 <div class="page-header">
@@ -383,7 +342,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <span>جدول الأعمال</span>
             </div>
             <div class="section-body">
-                <ol class="agenda-list" style="counter-reset: agenda;">
+                <ol class="agenda-list" style="counter-reset:agenda">
                     @foreach($agendaData as $item)
                     <li class="agenda-item">{{ is_array($item) ? ($item['text'] ?? '') : $item }}</li>
                     @endforeach
@@ -440,7 +399,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <i class="fas fa-calendar-week"></i>
                 <span>برنامج الدّوام</span>
             </div>
-            <div class="section-body" style="padding: 0;">
+            <div class="section-body" style="padding:0">
                 <table class="program-table">
                     <tbody>
                         @foreach($axes as $axisName => $axisDetails)
@@ -466,7 +425,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <i class="fas fa-tasks"></i>
                 <span>التكليفات ({{ $meetingMinute->tasks->count() }})</span>
             </div>
-            <div class="section-body" style="padding: 0;">
+            <div class="section-body" style="padding:0">
                 <table class="tasks-table">
                     <thead>
                         <tr>

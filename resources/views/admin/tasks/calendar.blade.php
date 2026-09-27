@@ -23,31 +23,17 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 <style>
 .calendar-page { font-family: 'Tajawal', sans-serif; }
-.page-header {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 20px; margin-bottom: 30px; flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
 .calendar-container {
-    background: #fff; border-radius: 18px;
+    background: #fff; border-radius: 13px;
     box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
-    padding: 25px; border: 1px solid rgba(24,43,72,0.05);
+    padding: 16px; border: 1px solid rgba(24,43,72,0.05);
 }
 .fc { font-family: 'Tajawal', sans-serif; }
 .fc .fc-toolbar-title { font-size: 1.4em; color: #182B48; font-weight: 700; }
 .fc .fc-button {
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
     border: none; border-radius: 10px;
-    padding: 10px 20px; font-family: 'Tajawal', sans-serif; font-weight: 600;
+    padding: 10px 16px; font-family: 'Tajawal', sans-serif; font-weight: 600;
 }
 .fc .fc-button:hover { background: linear-gradient(135deg, #2A4570 0%, #182B48 100%); }
 .fc .fc-button-primary:not(:disabled).fc-button-active {
@@ -95,19 +81,18 @@
     box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
 }
 .legend-container {
-    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
-    padding: 15px 20px;
+    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;
+    padding: 15px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border-radius: 12px;
 }
-
 /* ============== CALENDAR TABS ============== */
 .calendar-tabs {
     display: flex;
     gap: 8px;
     background: #fff;
     padding: 8px;
-    border-radius: 14px;
+    border-radius: 13px;
     box-shadow: 0 2px 12px rgba(24,43,72,0.05);
     margin-bottom: 16px;
     flex-wrap: wrap;
@@ -119,7 +104,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 12px 22px;
+    padding: 12px 16px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 700;
@@ -141,11 +126,10 @@
     box-shadow: 0 6px 18px rgba(24,43,72,0.18);
 }
 .calendar-tab.active i { color: #d4a030; }
-
 .student-picker-bar {
     background: #fff;
-    border-radius: 14px;
-    padding: 16px 20px;
+    border-radius: 13px;
+    padding: 16px 16px;
     box-shadow: 0 2px 12px rgba(24,43,72,0.05);
     margin-bottom: 16px;
 }
@@ -198,12 +182,11 @@
 }
 .selected-student-chip i { color: #d4a030; }
 .selected-student-chip strong { color: #182B48; font-weight: 700; }
-
 @media (max-width: 768px) {
-    .calendar-tab { font-size: 13px; padding: 10px 14px; min-width: 0; }
-    .student-picker-form { flex-direction: column; align-items: stretch; }
-    .picker-controls { width: 100%; }
-    .picker-select { max-width: 100%; }
+.calendar-tab { font-size: 13px; padding: 10px 14px; min-width: 0; }
+.student-picker-form { flex-direction: column; align-items: stretch; }
+.picker-controls { width: 100%; }
+.picker-select { max-width: 100%; }
 }
 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #5a6c7d; }
 .legend-color { width: 20px; height: 20px; border-radius: 6px; }
@@ -212,11 +195,6 @@
 .legend-partially_done { background: linear-gradient(135deg, #8e44ad 0%, #732d91 100%); }
 .legend-completed { background: linear-gradient(135deg, #27ae60 0%, #219a52 100%); }
 .legend-overdue { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
-.status-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-}
 .status-badge.pending { background: rgba(243,156,18,0.15); color: #f39c12; }
 .status-badge.in_progress { background: rgba(52,152,219,0.15); color: #3498db; }
 .status-badge.partially_done { background: rgba(142,68,173,0.15); color: #8e44ad; }
@@ -245,139 +223,100 @@
 }
 .assignee-self-info i { color: #d4a030; font-size: 16px; }
 .assignee-self-info strong { color: #182B48; font-weight: 700; }
-
 /* ============== RESPONSIVE STYLES ============== */
-
 /* Tablets and small desktops */
 @media (max-width: 992px) {
-    .page-header { gap: 15px; margin-bottom: 20px; }
-    .header-icon { width: 60px; height: 60px; font-size: 26px; border-radius: 16px; }
-    .header-text h4 { font-size: 20px; }
-    .calendar-container { padding: 15px; border-radius: 14px; }
-    .legend-container { gap: 15px; padding: 12px 15px; }
-    .legend-item { font-size: 12px; }
-    .legend-color { width: 18px; height: 18px; }
+.calendar-container { padding: 15px; border-radius: 13px; }
+.legend-container { gap: 15px; padding: 12px 15px; }
+.legend-item { font-size: 12px; }
+.legend-color { width: 18px; height: 18px; }
 }
-
 /* Tablets portrait and large phones */
 @media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-    .page-header .btn { width: 100%; }
-    .header-content { gap: 15px; }
-    .header-icon { width: 55px; height: 55px; font-size: 24px; border-radius: 14px; }
-    .header-text h4 { font-size: 18px; }
-    .header-text p { font-size: 13px; }
-    .legend-container {
+.page-header .btn { width: 100%; }
+.legend-container {
         gap: 10px;
         padding: 10px 12px;
         justify-content: center;
     }
-    .legend-item { font-size: 11px; }
-    .legend-color { width: 16px; height: 16px; border-radius: 5px; }
-    .calendar-container { padding: 10px; border-radius: 12px; }
-
-    /* FullCalendar mobile adjustments */
-    .fc .fc-toolbar.fc-header-toolbar {
+.legend-item { font-size: 11px; }
+.legend-color { width: 16px; height: 16px; border-radius: 5px; }
+.calendar-container { padding: 10px; border-radius: 12px; }
+/* FullCalendar mobile adjustments */
+.fc .fc-toolbar.fc-header-toolbar {
         flex-direction: column;
         gap: 10px;
     }
-    .fc .fc-toolbar-chunk { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
-    .fc .fc-toolbar-title { font-size: 1.1em !important; }
-    .fc .fc-button { padding: 6px 10px !important; font-size: 12px !important; }
-    .fc .fc-button-group { flex-wrap: wrap; }
-    .fc .fc-toolbar.fc-footer-toolbar { margin-top: 10px; }
-
-    .fc .fc-daygrid-day-number { font-size: 11px; padding: 4px; }
-    .fc-col-header-cell-cushion { font-size: 11px; padding: 6px 4px; }
-
-    .fc-event { font-size: 10px !important; padding: 2px 4px !important; }
-
-    /* Form checkbox touch-friendly on mobile */
-    .form-check { padding-right: 1.75em; padding-left: 0; }
-    .form-check-input { margin-right: -1.75em; width: 1.25em; height: 1.25em; cursor: pointer; }
-
-    /* Modal mobile */
-    .modal-dialog { margin: 0.5rem; max-width: calc(100% - 1rem); }
-    .modal-content { border-radius: 12px; }
-    .task-modal .modal-header { padding: 12px 15px; }
-    .task-modal .modal-title { font-size: 15px; }
-    .modal-body { padding: 15px; }
-    .modal-footer { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
-    .modal-footer .btn { flex: 1; min-width: 100px; }
-
-    .assignee-type-tab { padding: 8px 6px; font-size: 13px; }
-    .assignee-type-tab i { display: block; margin-bottom: 4px; }
-
-    .time-hint { font-size: 11px; }
-
-    /* Form fields stack on mobile */
-    .modal-body .row > [class*="col-"] { margin-bottom: 0; }
+.fc .fc-toolbar-chunk { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
+.fc .fc-toolbar-title { font-size: 1.1em !important; }
+.fc .fc-button { padding: 6px 10px !important; font-size: 12px !important; }
+.fc .fc-button-group { flex-wrap: wrap; }
+.fc .fc-toolbar.fc-footer-toolbar { margin-top: 10px; }
+.fc .fc-daygrid-day-number { font-size: 11px; padding: 4px; }
+.fc-col-header-cell-cushion { font-size: 11px; padding: 6px 4px; }
+.fc-event { font-size: 10px !important; padding: 2px 4px !important; }
+/* Form checkbox touch-friendly on mobile */
+.form-check { padding-right: 1.75em; padding-left: 0; }
+.form-check-input { margin-right: -1.75em; width: 1.25em; height: 1.25em; cursor: pointer; }
+/* Modal mobile */
+.modal-dialog { margin: 0.5rem; max-width: calc(100% - 1rem); }
+.modal-content { border-radius: 12px; }
+.task-modal .modal-header { padding: 12px 15px; }
+.task-modal .modal-title { font-size: 15px; }
+.modal-body { padding: 15px; }
+.modal-footer { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+.modal-footer .btn { flex: 1; min-width: 100px; }
+.assignee-type-tab { padding: 8px 6px; font-size: 13px; }
+.assignee-type-tab i { display: block; margin-bottom: 4px; }
+.time-hint { font-size: 11px; }
+/* Form fields stack on mobile */
+.modal-body .row > [class*="col-"] { margin-bottom: 0; }
 }
-
 /* Small phones */
 @media (max-width: 480px) {
-    .header-text h4 { font-size: 16px; }
-    .header-text p { font-size: 12px; }
-    .header-icon { width: 50px; height: 50px; font-size: 22px; }
-
-    .legend-container { gap: 8px; padding: 8px 10px; }
-    .legend-item { font-size: 10px; gap: 5px; }
-    .legend-color { width: 14px; height: 14px; }
-
-    .calendar-page, .calendar-container, #calendar, .fc, .fc-view-harness, .fc-view-harness-active { min-height: 0 !important; height: auto !important; }
-    .fc-view-harness { min-height: 0 !important; }
-    .fc-list { margin-bottom: 0 !important; }
-    .fc-list-day:not(.has-events) { display: none; }
-
-    .calendar-page, .calendar-container, #calendar, .fc { max-width: 100% !important; width: 100% !important; overflow-x: hidden !important; }
-    .fc-list, .fc-list-day, .fc-list-event { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
-    .fc-list-event { min-width: 0 !important; }
-    .fc-list-event-time { min-width: 0 !important; padding: 8px 10px !important; }
-    .fc-list-event-title { padding: 10px 12px !important; word-break: break-word !important; }
-    .list-task-title, .list-task-desc, .list-task-meta { max-width: 100% !important; word-break: break-word !important; }
-    .list-task-content { gap: 8px !important; }
-
-    .calendar-container { padding: 8px; }
-    .fc .fc-toolbar-title { font-size: 1em !important; }
-    .fc .fc-button { padding: 5px 8px !important; font-size: 11px !important; }
-
-    .modal-dialog { margin: 0.25rem; max-width: calc(100% - 0.5rem); }
-    .modal-body { padding: 12px; }
-    .modal-header, .modal-footer { padding: 10px 12px; }
-    .task-modal .modal-title { font-size: 14px; }
-
-    .form-control, .form-select { padding: 10px 12px; font-size: 14px; }
-    .form-label { font-size: 13px; }
-    .assignee-type-tab { font-size: 12px; padding: 8px 4px; }
-    .assignee-type-tab i { font-size: 14px; }
-
-    .status-badge { font-size: 11px; padding: 4px 10px; }
-    .detail-label { font-size: 12px; }
-
-    #taskStatusForm { flex-direction: column; align-items: stretch; }
-    #taskStatusForm .form-select { width: 100% !important; }
-    #taskStatusForm .btn { width: 100%; }
-    .status-actions { flex-direction: column; }
-    .status-actions .btn { width: 100%; }
+.legend-container { gap: 8px; padding: 8px 10px; }
+.legend-item { font-size: 10px; gap: 5px; }
+.legend-color { width: 14px; height: 14px; }
+.calendar-page, .calendar-container, #calendar, .fc, .fc-view-harness, .fc-view-harness-active { min-height: 0 !important; height: auto !important; }
+.fc-view-harness { min-height: 0 !important; }
+.fc-list { margin-bottom: 0 !important; }
+.fc-list-day:not(.has-events) { display: none; }
+.calendar-page, .calendar-container, #calendar, .fc { max-width: 100% !important; width: 100% !important; overflow-x: hidden !important; }
+.fc-list, .fc-list-day, .fc-list-event { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+.fc-list-event { min-width: 0 !important; }
+.fc-list-event-time { min-width: 0 !important; padding: 8px 10px !important; }
+.fc-list-event-title { padding: 10px 12px !important; word-break: break-word !important; }
+.list-task-title, .list-task-desc, .list-task-meta { max-width: 100% !important; word-break: break-word !important; }
+.list-task-content { gap: 8px !important; }
+.calendar-container { padding: 8px; }
+.fc .fc-toolbar-title { font-size: 1em !important; }
+.fc .fc-button { padding: 5px 8px !important; font-size: 11px !important; }
+.modal-dialog { margin: 0.25rem; max-width: calc(100% - 0.5rem); }
+.modal-body { padding: 12px; }
+.modal-header, .modal-footer { padding: 10px 12px; }
+.task-modal .modal-title { font-size: 14px; }
+.form-control, .form-select { padding: 10px 12px; font-size: 14px; }
+.form-label { font-size: 13px; }
+.assignee-type-tab { font-size: 12px; padding: 8px 4px; }
+.assignee-type-tab i { font-size: 14px; }
+.detail-label { font-size: 12px; }
+#taskStatusForm { flex-direction: column; align-items: stretch; }
+#taskStatusForm .form-select { width: 100% !important; }
+#taskStatusForm .btn { width: 100%; }
+.status-actions { flex-direction: column; }
+.status-actions .btn { width: 100%; }
 }
-
 /* Landscape phone / very small heights */
 @media (max-height: 500px) and (orientation: landscape) {
-    .modal-dialog { max-height: 95vh; }
-    .modal-body { max-height: 60vh; overflow-y: auto; }
+.modal-dialog { max-height: 95vh; }
+.modal-body { max-height: 60vh; overflow-y: auto; }
 }
-
 /* ============== LIST VIEW STYLES (REDESIGNED) ============== */
 .fc-list { background: transparent !important; border: none !important; }
-
 /* Day header */
 .fc-list-day {
     background: transparent !important;
-    border-radius: 16px !important;
+    border-radius: 13px !important;
     box-shadow: none !important;
     margin-bottom: 18px !important;
     overflow: visible !important;
@@ -386,8 +325,8 @@
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%) !important;
     color: #fff !important;
     font-weight: 700;
-    padding: 14px 20px !important;
-    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    border-radius: 13px !important;
     font-size: 15px;
     box-shadow: 0 8px 20px rgba(24,43,72,0.15);
     display: flex !important;
@@ -437,7 +376,6 @@
     font-weight: 500;
     order: 3;
 }
-
 /* Hide the default FC empty day row, we use a custom one */
 .fc-list-day:not(.has-events) .fc-list-day-cushion {
     background: #f8f9fa !important;
@@ -454,14 +392,13 @@
     background: #dee2e6 !important;
     color: #7f8c8d !important;
 }
-
 /* Task card */
 .fc-list-event {
     background: #fff !important;
     border: 1px solid #f0f4f8 !important;
     padding: 0 !important;
     margin: 10px 0 0 0 !important;
-    border-radius: 14px !important;
+    border-radius: 13px !important;
     box-shadow: 0 2px 12px rgba(24,43,72,0.05) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
@@ -489,13 +426,12 @@
 .fc-list-event:hover::before { width: 6px; }
 .fc-list-event.fc-event-task-completed { opacity: 0.85; }
 .fc-list-event.fc-event-task-completed .list-task-title { text-decoration: line-through; color: #7f8c8d; }
-
 /* Time column */
 .fc-list-event-time {
     font-weight: 600;
     color: #182B48;
     font-size: 13px;
-    padding: 18px 16px 18px 12px !important;
+    padding: 16px 16px 16px 12px !important;
     min-width: 130px;
     display: flex !important;
     align-items: center;
@@ -523,13 +459,11 @@
     color: #27ae60;
 }
 .list-time-chip.all-day i { color: #27ae60; }
-
 /* Hide the default graphic (we use a CSS border) */
 .fc-list-event-graphic { display: none !important; }
-
 /* Title/content */
 .fc-list-event-title {
-    padding: 16px 18px !important;
+    padding: 16px 16px !important;
     font-size: 14px;
     font-weight: 500;
     color: #2c3e50;
@@ -540,7 +474,6 @@
     flex-wrap: wrap;
 }
 .fc-list-event-title a { display: none !important; }
-
 .list-task-content {
     display: flex;
     align-items: center;
@@ -585,7 +518,7 @@
     background: rgba(24,43,72,0.05);
     color: #182B48;
     padding: 5px 10px;
-    border-radius: 20px;
+    border-radius: 13px;
     font-size: 12px;
     font-weight: 600;
     max-width: 160px;
@@ -599,7 +532,7 @@
     align-items: center;
     gap: 5px;
     padding: 5px 12px;
-    border-radius: 20px;
+    border-radius: 13px;
     font-size: 11px;
     font-weight: 700;
     line-height: 1.2;
@@ -643,41 +576,26 @@
     margin-right: 4px;
 }
 .fc-list-event:hover .list-arrow { color: #182B48; transform: translateX(-3px); }
-
 @keyframes pulseBadge {
     0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); }
     50% { box-shadow: 0 0 0 6px rgba(192,57,43,0); }
 }
-
 /* Empty list state */
 .fc-list-empty {
     background: #fff;
-    padding: 60px 20px;
+    padding: 40px 16px;
     text-align: center;
     color: #7f8c8d;
-    border-radius: 16px;
+    border-radius: 13px;
     box-shadow: 0 2px 12px rgba(24,43,72,0.05);
     border: 2px dashed #e9ecef;
 }
 .fc-list-empty-cushion { font-size: 15px; font-weight: 500; }
-.fc-list-empty-cushion .empty-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 16px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    color: #d4a030;
-}
-
 /* RTL */
 .fc[dir="rtl"] .fc-list-event-time {
     border-left: 1px solid #f0f4f8;
     border-right: none;
-    padding: 18px 12px 18px 16px !important;
+    padding: 16px 12px 16px 16px !important;
 }
 .fc[dir="rtl"] .fc-list-event::before {
     right: auto;
@@ -687,14 +605,13 @@
 .fc[dir="rtl"] .fc-list-event:hover { transform: translateY(-2px); }
 .fc[dir="rtl"] .list-arrow { transform: scaleX(-1); }
 .fc[dir="rtl"] .fc-list-event:hover .list-arrow { transform: scaleX(-1) translateX(-3px); }
-
 /* Mobile list view */
 @media (max-width: 768px) {
-    .fc-list-day-cushion { padding: 12px 14px !important; gap: 10px; }
-    .fc-list-day-cushion .fc-list-day-number { width: 36px; height: 36px; font-size: 14px; }
-    .fc-list-day-cushion .fc-list-day-text { font-size: 13px; }
-    .fc-list-event { flex-direction: column !important; }
-    .fc-list-event-time {
+.fc-list-day-cushion { padding: 12px 14px !important; gap: 10px; }
+.fc-list-day-cushion .fc-list-day-number { width: 36px; height: 36px; font-size: 14px; }
+.fc-list-day-cushion .fc-list-day-text { font-size: 13px; }
+.fc-list-event { flex-direction: column !important; }
+.fc-list-event-time {
         border-left: none !important;
         border-bottom: 1px solid #f0f4f8;
         padding: 10px 14px !important;
@@ -702,17 +619,17 @@
         justify-content: flex-start;
         background: #f8f9fa;
     }
-    .list-task-content { flex-direction: column; align-items: flex-start; }
-    .list-task-meta { width: 100%; }
-    .list-arrow { display: none; }
-    .fc-list-event-title { padding: 12px 14px !important; }
+.list-task-content { flex-direction: column; align-items: flex-start; }
+.list-task-meta { width: 100%; }
+.list-arrow { display: none; }
+.fc-list-event-title { padding: 12px 14px !important; }
 }
 @media (max-width: 480px) {
-    .fc-list-day-cushion { font-size: 13px; }
-    .fc-list-day-cushion .fc-list-day-number { width: 32px; height: 32px; font-size: 13px; }
-    .list-task-title { font-size: 14px; }
-    .list-status-badge { font-size: 10px; padding: 4px 10px; }
-    .list-assignee-chip { font-size: 11px; padding: 4px 8px; }
+.fc-list-day-cushion { font-size: 13px; }
+.fc-list-day-cushion .fc-list-day-number { width: 32px; height: 32px; font-size: 13px; }
+.list-task-title { font-size: 14px; }
+.list-status-badge { font-size: 10px; padding: 4px 10px; }
+.list-assignee-chip { font-size: 11px; padding: 4px 8px; }
 }
 </style>
 @endpush
@@ -822,7 +739,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createTaskModalLabel">
-                    <i class="fas fa-calendar-plus" id="createTaskModalIcon" style="color: #d4a030;"></i>
+                    <i class="fas fa-calendar-plus" id="createTaskModalIcon" style="color:#d4a030"></i>
                     <span id="createTaskModalTitle">إضافة مهمة جديدة</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -857,11 +774,11 @@
                             </div>
                             @endif
                         </div>
-                        <select name="assignee_id" class="form-select" id="taskAssigneeSelect"{{ $role === 'supervisor' ? ' disabled style="display:none;"' : ' required' }}>
+                        <select name="assignee_id" class="form-select" id="taskAssigneeSelect"{{ $role === 'supervisor' ? ' disabled style="display:none"' : ' required' }}>
                             <option value="">-- اختر المستلم --</option>
                         </select>
                         <input type="hidden" name="assignee_id" id="assigneeIdSelfInput" value="{{ auth()->id() }}"{{ $role === 'supervisor' ? '' : ' disabled' }}>
-                        <div class="assignee-self-info" id="assigneeSelfInfo" style="display: {{ $role === 'supervisor' ? 'flex' : 'none' }};">
+                        <div class="assignee-self-info" id="assigneeSelfInfo" style="display:{{ $role === 'supervisor' ? 'flex' : 'none' }}">
                             <i class="fas fa-user-check"></i>
                             <span>سيتم إسناد المهمة إلى <strong>{{ auth()->user()->name }}</strong></span>
                         </div>
@@ -895,7 +812,7 @@
                         </div>
                     </div>
 
-                    <div class="row" id="repeatRangeRow" style="display: none;">
+                    <div class="row" id="repeatRangeRow" style="display:none">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">من تاريخ</label>
                             <input type="date" name="repeat_start_date" class="form-control" id="repeatStartDate">
@@ -909,7 +826,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn" id="createTaskSubmitBtn" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); color: #fff;">
+                    <button type="submit" class="btn" id="createTaskSubmitBtn" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);color:#fff">
                         <i class="fas fa-save"></i> <span id="createTaskSubmitText">حفظ المهمة</span>
                     </button>
                 </div>
@@ -923,7 +840,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="taskDetailModalLabel">
-                    <i class="fas fa-tasks" style="color: #d4a030;"></i>
+                    <i class="fas fa-tasks" style="color:#d4a030"></i>
                     تفاصيل المهمة
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -963,37 +880,37 @@
                         <p id="taskDetailDue" class="text-muted"></p>
                     </div>
                 </div>
-                <div class="row" id="taskDetailTimeRow" style="display: none;">
+                <div class="row" id="taskDetailTimeRow" style="display:none">
                     <div class="col-6 mb-3">
                         <span class="detail-label">من الساعة</span>
                         <p id="taskDetailTime" class="text-muted"></p>
                     </div>
-                    <div class="col-6 mb-3" id="taskDetailEndTimeCol" style="display: none;">
+                    <div class="col-6 mb-3" id="taskDetailEndTimeCol" style="display:none">
                         <span class="detail-label">إلى الساعة</span>
                         <p id="taskDetailEndTime" class="text-muted"></p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <form id="taskStatusForm" method="POST" style="display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <form id="taskStatusForm" method="POST" style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap">
                     @csrf
                     @method('PUT')
-                    <select name="status" id="taskStatusSelect" class="form-select" style="width: auto; min-width: 160px;">
+                    <select name="status" id="taskStatusSelect" class="form-select" style="width:auto;min-width:160px">
                         <option value="pending">لم تتم</option>
                         <option value="in_progress">قيد التنفيذ</option>
                         <option value="partially_done">منجزة جزئياً</option>
                         <option value="completed">منجزة</option>
                         <option value="cancelled">ملغاة</option>
                     </select>
-                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #d4a030 0%, #B4802C 100%); color: #fff;">
+                    <button type="submit" class="btn" style="background:linear-gradient(135deg, #d4a030 0%, #B4802C 100%);color:#fff">
                         <i class="fas fa-save"></i> تحديث الحالة
                     </button>
                 </form>
-                <button type="button" class="btn btn-info" id="editTaskBtn" style="background: linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%); color: #fff; border: none;">
+                <button type="button" class="btn btn-info" id="editTaskBtn" style="background:linear-gradient(135deg, #2980b9 0%, #1f5e8e 100%);color:#fff;border:none">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
                 <div class="dropdown d-inline-block">
-                    <button type="button" id="deleteTaskBtn" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                    <button type="button" id="deleteTaskBtn" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background:linear-gradient(135deg, #c0392b 0%, #a93226 100%);color:#fff;border:none">
                         <i class="fas fa-trash"></i> حذف
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" id="deleteScopeMenu">
@@ -1094,18 +1011,18 @@ document.addEventListener('DOMContentLoaded', function() {
             var timeStr = '';
             if (arg.event.start && !arg.event.allDay) {
                 var startTime = formatTime12(arg.event.start);
-                timeStr = '<span style="font-weight:700; margin-left:4px;">' + startTime + '</span>';
+                timeStr = '<span style="font-weight:700;margin-left:4px">' + startTime + '</span>';
                 if (arg.event.end) {
                     var endTime = formatTime12(arg.event.end);
                     if (endTime !== startTime) {
-                        timeStr += '<span style="font-weight:500; margin-left:2px;"> - ' + endTime + '</span>';
+                        timeStr += '<span style="font-weight:500;margin-left:2px"> - ' + endTime + '</span>';
                     }
                 }
             }
             var countBadge = '';
             var occ = arg.event.extendedProps && arg.event.extendedProps.occurrenceCount;
             if (occ && occ > 1) {
-                countBadge = '<span style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:4px;">×' + occ + '</span>';
+                countBadge = '<span style="background:rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:4px">×' + occ + '</span>';
             }
             return { html: '<div class="fc-event-title">' + countBadge + timeStr + ' ' + escapeHtml(arg.event.title) + '</div>' };
         },
@@ -1724,8 +1641,8 @@ function customizeListDayHeaders() {
         if (cushion) {
             cushion.innerHTML =
                 '<div class="empty-icon"><i class="fas fa-calendar-check"></i></div>' +
-                '<div style="font-size:16px; font-weight:700; color:#182B48; margin-bottom:6px;">لا توجد مهام</div>' +
-                '<div style="font-size:13px; color:#7f8c8d;">استمتع بوقتك، لا توجد مهام مجدولة في هذه الفترة</div>';
+                '<div style="font-size:16px;font-weight:700;color:#182B48;margin-bottom:6px">لا توجد مهام</div>' +
+                '<div style="font-size:13px;color:#7f8c8d">استمتع بوقتك، لا توجد مهام مجدولة في هذه الفترة</div>';
         }
     }
 }

@@ -6,8 +6,8 @@
     @include('student.partials.sidebar')
 @endsection
 @section('content')
-<div class="card mb-4" style="background: linear-gradient(135deg, #182B48 0%, #0D1829 100%); color: #fff;">
-    <div class="card-body p-4 text-center">
+<div class="card mb-4" style="background: linear-gradient(135deg, #182B48 0%, #0D1829 100%); color: #fff; border-radius: 14px; overflow: hidden;">
+    <div class="card-body text-center" style="padding:16px 22px;">
         <i class="fas fa-book-open fa-3x mb-3" style="opacity:0.7;"></i>
         <h4 class="mb-2">طريقة الحفظ للوصول إلى الإتقان</h4>
         <p class="mb-0" style="opacity:0.8; font-size:16px;">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِنْ مُدَّكِرٍ ﴾</p>

@@ -60,65 +60,25 @@
 </div>
 
 <style>
-.portal-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
-.header-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 10px 30px rgba(24,43,72,0.2);
-}
-
-.header-icon.primary {
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    color: #d4a030;
-}
-
-.header-text h4 {
-    color: #182B48;
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-}
-
-.header-text p { color: #95a5a6; font-size: 14px; margin: 0; }
-
 .student-selector-card {
     background: linear-gradient(135deg, #182B48 0%, #1a3356 100%);
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 25px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
 }
 
 .selector-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 12px;
 }
 
 .selector-icon {
     width: 48px;
     height: 48px;
     background: rgba(212,160,48,0.2);
-    border-radius: 12px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,9 +95,9 @@
 
 .student-selector-card .form-select {
     max-width: 450px;
-    padding: 14px 18px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    font-size: 13px;
     border: 2px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.1);
     color: #fff;
@@ -150,41 +110,41 @@
 
 .student-info-card {
     background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+    border-radius: 13px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(24,43,72,0.04);
     border: 1px solid #f0f4f8;
 }
 
 .student-info-header {
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 22px;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
 .student-avatar-lg {
-    width: 70px;
-    height: 70px;
+    width: 48px;
+    height: 48px;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 16px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #d4a030;
-    font-size: 28px;
+    font-size: 20px;
 }
 
 .student-info-details h5 {
     color: #182B48;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    margin: 0 0 6px 0;
+    margin: 0 0 3px 0;
 }
 
 .student-info-details p {
     color: #95a5a6;
-    font-size: 14px;
+    font-size: 12.5px;
     margin: 0;
 }
 
@@ -194,7 +154,9 @@
 }
 
 .student-info-actions .btn {
-    padding: 12px 24px;
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 13px;
 }
 </style>
 

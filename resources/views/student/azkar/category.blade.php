@@ -24,9 +24,9 @@
 
 .azkar-category .page-hero {
     background: linear-gradient(135deg, {{ $category->color }} 0%, {{ $category->color }}99 100%);
-    border-radius: 20px;
-    padding: 28px 32px;
-    margin-bottom: 28px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -40,29 +40,30 @@
 }
 
 .azkar-category .hero-icon {
-    width: 70px; height: 70px;
+    width: 48px; height: 48px;
     background: rgba(255,255,255,0.2);
-    border-radius: 20px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 32px; color: white;
+    font-size: 20px; color: white;
     position: relative; z-index: 1;
+    flex-shrink: 0;
 }
 
-.azkar-category .hero-title { color: white; font-size: 24px; font-weight: 700; margin-bottom: 4px; position: relative; z-index: 1; }
-.azkar-category .hero-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin: 0; position: relative; z-index: 1; }
+.azkar-category .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; position: relative; z-index: 1; }
+.azkar-category .hero-sub { color: rgba(255,255,255,0.8); font-size: 12.5px; margin: 0; position: relative; z-index: 1; }
 
 .azkar-category .adhkar-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .azkar-category .dhikr-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
-    padding: 24px;
+    padding: 16px;
     transition: all 0.3s ease;
 }
 
@@ -72,15 +73,15 @@
 }
 
 .azkar-category .dhikr-content {
-    font-size: 18px;
+    font-size: 15px;
     line-height: 2;
     color: var(--navy);
     font-weight: 500;
     text-align: center;
-    padding: 20px;
+    padding: 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.02) 0%, rgba(42,69,112,0.04) 100%);
-    border-radius: 16px;
-    margin-bottom: 20px;
+    border-radius: 13px;
+    margin-bottom: 16px;
     border: 1px solid rgba(24,43,72,0.04);
 }
 
@@ -95,10 +96,10 @@
 .azkar-category .dhikr-count-badge {
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
     color: var(--gold);
-    padding: 10px 20px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 9px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 12.5px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -111,13 +112,13 @@
 }
 
 .azkar-category .counter-btn {
-    width: 48px; height: 48px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .azkar-category .counter-btn:active { transform: scale(0.9); }
@@ -138,7 +139,7 @@
 .azkar-category .counter-display {
     min-width: 60px;
     text-align: center;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--navy);
 }
@@ -159,10 +160,10 @@
 }
 
 @media (max-width: 768px) {
-    .azkar-category .page-hero { padding: 20px 24px; }
-    .azkar-category .hero-icon { width: 56px; height: 56px; font-size: 26px; }
-    .azkar-category .hero-title { font-size: 20px; }
-    .azkar-category .dhikr-content { font-size: 16px; padding: 16px; }
+    .azkar-category .page-hero { padding: 14px 16px; }
+    .azkar-category .hero-icon { width: 48px; height: 48px; font-size: 20px; }
+    .azkar-category .hero-title { font-size: 18px; }
+    .azkar-category .dhikr-content { font-size: 15px; padding: 14px; }
     .azkar-category .dhikr-footer { flex-direction: column; align-items: stretch; }
     .azkar-category .dhikr-count-badge { justify-content: center; }
     .azkar-category .counter-section { justify-content: center; }
@@ -184,7 +185,7 @@
         </div>
     </div>
 
-    <a href="{{ route('student.azkar') }}" class="btn btn-sm mb-4" style="background: #f8f9fa; color: #6c7a89; border-radius: 10px;">
+    <a href="{{ route('student.azkar') }}" class="btn btn-sm mb-4" style="background: #f8f9fa; color: #6c7a89; border-radius: 9px;">
         <i class="fas fa-arrow-right me-1"></i> رجوع للأقسام
     </a>
 

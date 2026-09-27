@@ -24,9 +24,9 @@
 
 .achievements-page .page-hero {
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -40,38 +40,39 @@
 }
 
 .achievements-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: rgba(255,255,255,0.25);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     backdrop-filter: blur(5px);
+    flex-shrink: 0;
 }
 
-.achievements-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.achievements-page .hero-sub { color: rgba(255,255,255,0.85); font-size: 13px; margin: 0; }
-.achievements-page .hero-value { color: white; font-size: 48px; font-weight: 800; line-height: 1; }
+.achievements-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.achievements-page .hero-sub { color: rgba(255,255,255,0.85); font-size: 12.5px; margin: 0; }
+.achievements-page .hero-value { color: white; font-size: 34px; font-weight: 800; line-height: 1; }
 
 .achievements-page .stats-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
 }
 
 .achievements-page .stats-card-body {
-    padding: 24px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .achievements-page .stats-icon {
-    width: 60px; height: 60px;
-    border-radius: 14px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
@@ -79,56 +80,56 @@
 .achievements-page .stats-icon.gray { background: linear-gradient(135deg, #6c757d, #495057); color: white; }
 
 .achievements-page .stats-label { font-size: 12px; color: #6c7a89; margin-bottom: 4px; font-weight: 500; }
-.achievements-page .stats-value { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1; }
+.achievements-page .stats-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
 
 .achievements-page .badge-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .achievements-page .badge-card-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
-    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
 }
 
 .achievements-page .badge-card-header.gold-header { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
-.achievements-page .badge-card-header i { color: white; font-size: 20px; }
-.achievements-page .badge-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.achievements-page .badge-card-header i { color: white; font-size: 16px; }
+.achievements-page .badge-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
 .achievements-page .badge-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-    padding: 24px;
+    gap: 14px;
+    padding: 16px;
 }
 
 .achievements-page .badge-item {
     text-align: center;
-    padding: 24px 16px;
+    padding: 16px 14px;
     background: linear-gradient(135deg, rgba(24,43,72,0.04), rgba(42,69,112,0.06));
-    border-radius: 16px;
+    border-radius: 13px;
     transition: all 0.3s ease;
 }
 
 .achievements-page .badge-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
 
 .achievements-page .badge-icon {
-    width: 80px; height: 80px;
+    width: 66px; height: 66px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 32px;
-    margin: 0 auto 16px;
+    font-size: 26px;
+    margin: 0 auto 14px;
 }
 
 .achievements-page .badge-name { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
 .achievements-page .badge-desc { font-size: 11px; color: #6c7a89; margin-bottom: 0; }
 
-.achievements-page .progress-table-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(24,43,72,0.06); }
+.achievements-page .progress-table-wrap { border-radius: 13px; overflow: hidden; border: 1px solid rgba(24,43,72,0.06); }
 
 .achievements-page .progress-table {
     width: 100%; border-collapse: collapse; margin: 0;
@@ -140,7 +141,7 @@
 }
 
 .achievements-page .progress-table th {
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-size: 11px; font-weight: 700;
     text-align: center;
     border: none;
@@ -153,18 +154,18 @@
 .achievements-page .progress-table tbody tr:last-child td { border-bottom: none; }
 
 .achievements-page .progress-table td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
 }
 
 .achievements-page .badge-icon-sm {
-    width: 40px; height: 40px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .achievements-page .badge-mini-name { font-weight: 700; color: var(--navy); }
@@ -183,18 +184,18 @@
     transition: width 0.4s ease;
 }
 
-.achievements-page .empty-state { text-align: center; padding: 60px 20px; }
+.achievements-page .empty-state { text-align: center; padding: 40px 16px; }
 .achievements-page .empty-icon {
-    width: 90px; height: 90px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(212,160,48,0.15), rgba(212,160,48,0.2));
-    border-radius: 22px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 14px;
 }
-.achievements-page .empty-icon i { font-size: 36px; color: var(--gold); }
+.achievements-page .empty-icon i { font-size: 26px; color: var(--gold); }
 
 @media (max-width: 992px) {
-    .achievements-page .page-hero { padding: 20px 24px; }
+    .achievements-page .page-hero { padding: 14px 16px; }
     .achievements-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .achievements-page .hero-title { font-size: 18px; }
     .achievements-page .badge-grid { grid-template-columns: repeat(2, 1fr); }
@@ -305,7 +306,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="type-badge" style="background: rgba(108,117,125,0.15); color: #6c757d; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 600;">
+                                    <span class="type-badge" style="background: rgba(108,117,125,0.15); color: #6c757d; padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600;">
                                         {{ $badge['type'] }}
                                     </span>
                                 </td>
@@ -316,7 +317,7 @@
                                     <small class="text-muted mt-1 d-block">{{ $badge['progress']['current'] }} / {{ $badge['progress']['required'] }}</small>
                                 </td>
                                 <td>
-                                    <span class="remaining-badge" style="background: rgba(243,156,18,0.15); color: var(--warning); padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 600;">
+                                    <span class="remaining-badge" style="background: rgba(243,156,18,0.15); color: var(--warning); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600;">
                                         {{ $badge['progress']['required'] - $badge['progress']['current'] }} متبقي
                                     </span>
                                 </td>

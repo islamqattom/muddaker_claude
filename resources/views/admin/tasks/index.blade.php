@@ -31,26 +31,8 @@
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
     --card-shadow-hover: 0 12px 40px rgba(24, 43, 72, 0.15);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-    position: relative; overflow: hidden;
-}
+.header-icon { position: relative; overflow: hidden; }
 .header-icon::before {
     content: '';
     position: absolute;
@@ -59,24 +41,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     background: radial-gradient(circle, rgba(212,160,48,0.15) 0%, transparent 70%);
 }
 .header-icon i { position: relative; z-index: 1; }
-.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
-.stat-card {
-    position: relative; padding: 25px;
-    border-radius: 18px; overflow: hidden;
-    display: flex; align-items: flex-start; gap: 18px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
-}
-.stat-card:hover { transform: translateY(-8px) scale(1.02); }
 .stat-card::before {
     content: '';
     position: absolute;
@@ -95,33 +60,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .stat-card.in_progress { background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%); }
 .stat-card.completed { background: linear-gradient(135deg, var(--success) 0%, #219a52 100%); }
 .stat-card.cancelled { background: linear-gradient(135deg, var(--danger) 0%, #a93226 100%); }
-.stat-icon {
-    width: 60px; height: 60px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 16px; display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: #fff; backdrop-filter: blur(5px);
-    flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);
-}
 .stat-icon i { color: #fff; }
 .stat-content { flex: 1; position: relative; z-index: 1; }
-.stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 6px; }
-.stat-label { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; letter-spacing: 0.5px; }
-
-.filter-card {
-    background: #fff; border-radius: 18px;
-    box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
-    overflow: hidden; margin-bottom: 30px;
-}
 .filter-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 18px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; color: var(--primary);
 }
 .filter-header i { color: var(--gold); font-size: 18px; }
 .filter-header span::before { content: '◆'; color: var(--gold); margin-left: 8px; font-size: 10px; }
-.filter-form { padding: 25px; }
 .filter-form .form-control, .filter-form .form-select {
     border-radius: 12px; border: 2px solid #e9ecef;
     padding: 12px 16px; transition: all 0.3s ease;
@@ -133,7 +82,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .btn-search {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 24px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color: #fff; border: none; border-radius: 12px;
     font-weight: 600; font-size: 14px;
@@ -142,7 +91,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .btn-search:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
 .btn-reset {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 18px;
+    padding: 12px 16px;
     background: transparent; color: #7f8c8d;
     border: 2px solid #e9ecef; border-radius: 12px;
     font-weight: 600; font-size: 14px;
@@ -150,33 +99,24 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-family: 'Tajawal', sans-serif;
 }
 .btn-reset:hover { border-color: var(--primary); color: var(--primary); }
-
 .tasks-table-card {
-    background: #fff; border-radius: 18px;
+    background: #fff; border-radius: 13px;
     box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
 }
-.table-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 20px 25px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    border-bottom: 1px solid rgba(24,43,72,0.05);
-    font-weight: 700; font-size: 17px; color: var(--primary);
-}
 .table-header i { color: var(--gold); font-size: 20px; }
-
 .tasks-table { width: 100%; border-collapse: collapse; }
 .tasks-table thead {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
 }
 .tasks-table th {
-    padding: 16px 20px;
+    padding: 16px 16px;
     font-size: 12px; font-weight: 700;
     color: #fff; text-transform: uppercase; letter-spacing: 0.5px;
     border: none;
 }
 .tasks-table td {
-    padding: 18px 20px;
+    padding: 16px 16px;
     font-size: 14px; color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.05);
     vertical-align: middle;
@@ -189,31 +129,22 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .task-title { font-weight: 700; color: var(--primary); font-size: 15px; }
 .task-desc { color: #95a5a6; font-size: 13px; margin-top: 4px; }
-
-.status-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
-}
 .status-badge.pending { background: rgba(243,156,18,0.15); color: var(--warning); border: 1px solid rgba(243,156,18,0.2); }
 .status-badge.in_progress { background: rgba(52,152,219,0.15); color: var(--info); border: 1px solid rgba(52,152,219,0.2); }
 .status-badge.completed { background: rgba(39,174,96,0.15); color: var(--success); border: 1px solid rgba(39,174,96,0.2); }
 .status-badge.cancelled { background: rgba(192,57,43,0.15); color: var(--danger); border: 1px solid rgba(192,57,43,0.2); }
 .status-badge i { font-size: 11px; }
-
 .overdue-badge {
     background: linear-gradient(135deg, var(--danger) 0%, #a93226 100%);
     color: #fff; padding: 4px 10px; border-radius: 12px;
     font-size: 11px; font-weight: 600; margin-right: 8px;
 }
-
 .meeting-link {
     color: var(--primary); text-decoration: none; font-weight: 600;
     transition: all 0.3s ease;
 }
 .meeting-link:hover { color: var(--gold); }
 .meeting-link i { color: var(--gold); margin-left: 5px; }
-
 .status-select {
     border-radius: 10px; border: 2px solid #e9ecef;
     padding: 8px 12px; font-size: 13px;
@@ -221,42 +152,32 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-family: 'Tajawal', sans-serif;
 }
 .status-select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,160,48,0.1); }
-
-.pagination-section { display: flex; justify-content: center; margin-top: 30px; }
-.pagination-section .pagination { gap: 8px; }
+.pagination-section { display: flex; justify-content: center; margin-top: 16px; }
+.pagination-section .pagination { gap: 4px; }
 .pagination-section .page-link {
-    padding: 10px 18px; border-radius: 12px; font-size: 14px;
+    padding: 6px 11px; border-radius: 7px; font-size: 12.5px;
     border: 2px solid #e9ecef; color: var(--primary);
     transition: all 0.3s ease;
 }
-.pagination-section .page-link:hover { border-color: var(--gold); color: var(--gold); }
+.pagination-section .page-link:hover { border-color: var(--gold); color: var(--gold); padding: 6px 11px; border-radius: 7px; font-size: 12.5px;}
 .pagination-section .page-item.active .page-link {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     border-color: var(--primary); color: #fff;
     box-shadow: 0 4px 15px rgba(24,43,72,0.25);
 }
-
 .empty-state-card {
-    text-align: center; padding: 70px 30px;
-    background: #fff; border-radius: 18px;
+    text-align: center; padding: 40px 16px;
+    background: #fff; border-radius: 13px;
     box-shadow: var(--card-shadow); border: 1px solid rgba(24,43,72,0.05);
 }
-.empty-icon {
-    width: 100px; height: 100px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.08) 0%, rgba(42,69,112,0.12) 100%);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 25px; font-size: 42px; color: var(--gold);
-    border: 3px solid rgba(212,160,48,0.15);
-}
-.empty-state-card h5 { color: var(--primary); font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-.empty-state-card p { color: #95a5a6; margin-bottom: 25px; font-size: 15px; }
-
+.empty-state-card h5 { color: var(--primary); font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-card p { color: #95a5a6; margin-bottom: 16px; font-size: 15px; }
 .btn-add {
     background: transparent;
     border: 2px dashed var(--gold);
     border-radius: 12px;
     color: var(--gold);
-    padding: 12px 24px;
+    padding: 12px 16px;
     font-weight: 600;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
@@ -264,10 +185,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .btn-add:hover { background: rgba(212,160,48,0.08); border-style: solid; }
 .btn-add i { font-size: 14px; }
-
 .assignment-row {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    border-radius: 14px; padding: 16px;
+    border-radius: 13px; padding: 16px;
     margin-bottom: 12px; border: 2px solid rgba(24,43,72,0.06);
 }
 .assignment-row .form-label {
@@ -276,12 +196,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-size: 14px;
 }
 .assignment-row .form-label i { color: var(--gold); margin-left: 6px; }
-
-@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .page-header { flex-direction: column; align-items: flex-start; }
-}
 </style>
 
 <div class="page-header">
@@ -410,7 +324,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     @foreach($tasks as $task)
                     <tr>
                         <td>
-                            <span class="badge" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--gold); width: 35px; height: 35px; line-height: 35px; border-radius: 10px; font-size: 14px; font-weight: 700;">
+                            <span class="badge" style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);color:var(--gold);width:35px;height:35px;line-height:35px;border-radius:10px;font-size:14px;font-weight:700">
                                 {{ $loop->iteration + ($tasks->currentPage() - 1) * $tasks->perPage() }}
                             </span>
                         </td>
@@ -422,10 +336,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle" style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 14px;">
+                                <div class="avatar-circle" style="width:38px;height:38px;background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px">
                                     <i class="fas fa-user-tie"></i>
                                 </div>
-                                <span style="font-weight: 600; color: var(--primary);">{{ $task->assignee->name ?? '-' }}</span>
+                                <span style="font-weight:600;color:var(--primary)">{{ $task->assignee->name ?? '-' }}</span>
                             </div>
                         </td>
                         <td>
@@ -456,8 +370,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             @endif
                         </td>
                         <td>
-                            <span style="color: #7f8c8d; font-size: 13px;">
-                                <i class="fas fa-calendar-plus" style="color: var(--gold); margin-left: 5px;"></i>
+                            <span style="color:#7f8c8d;font-size:13px">
+                                <i class="fas fa-calendar-plus" style="color:var(--gold);margin-left:5px"></i>
                                 {{ $task->created_at->format('Y/m/d') }}
                             </span>
                         </td>
@@ -494,9 +408,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
-                <h5 class="modal-title" id="createTaskModalLabel" style="color: #fff;">
-                    <i class="fas fa-tasks" style="color: var(--gold);"></i>
+            <div class="modal-header" style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)">
+                <h5 class="modal-title" id="createTaskModalLabel" style="color:#fff">
+                    <i class="fas fa-tasks" style="color:var(--gold)"></i>
                     إضافة تكليف جديد
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -508,7 +422,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <div class="assignment-row" data-index="0">
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-4">
-                                    <label class="form-label"><i class="fas fa-user-tie" style="color: var(--gold);"></i> المشرف</label>
+                                    <label class="form-label"><i class="fas fa-user-tie" style="color:var(--gold)"></i> المشرف</label>
                                     <select name="assignments[0][supervisor_id]" class="form-select">
                                         <option value="">-- المشرف --</option>
                                         @foreach($supervisors as $supervisor)
@@ -517,11 +431,11 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label"><i class="fas fa-tasks" style="color: var(--gold);"></i> وصف التكليف</label>
+                                    <label class="form-label"><i class="fas fa-tasks" style="color:var(--gold)"></i> وصف التكليف</label>
                                     <input type="text" name="assignments[0][task]" class="form-control" placeholder="وصف التكليف">
                                 </div>
                                 <div class="col-md-2">
-                                    <button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius: 10px;" disabled>
+                                    <button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius:10px" disabled>
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </div>
@@ -534,7 +448,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff;">
+                    <button type="submit" class="btn" style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);color:#fff">
                         <i class="fas fa-save"></i> إضافة التكليف
                     </button>
                 </div>
@@ -590,15 +504,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const html = '<div class="assignment-row" data-index="' + count + '">' +
             '<div class="row g-3 align-items-end">' +
             '<div class="col-md-4">' +
-            '<label class="form-label"><i class="fas fa-user-tie" style="color: var(--gold);"></i> المشرف</label>' +
+            '<label class="form-label"><i class="fas fa-user-tie" style="color:var(--gold)"></i> المشرف</label>' +
             '<select name="assignments[' + count + '][supervisor_id]" class="form-select">' + options + '</select>' +
             '</div>' +
             '<div class="col-md-6">' +
-            '<label class="form-label"><i class="fas fa-tasks" style="color: var(--gold);"></i> وصف التكليف</label>' +
+            '<label class="form-label"><i class="fas fa-tasks" style="color:var(--gold)"></i> وصف التكليف</label>' +
             '<input type="text" name="assignments[' + count + '][task]" class="form-control" placeholder="وصف التكليف">' +
             '</div>' +
             '<div class="col-md-2">' +
-            '<button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius: 10px;">' +
+            '<button type="button" class="btn btn-outline-danger w-100 remove-task-assignment" style="border-radius:10px">' +
             '<i class="fas fa-trash-alt"></i>' +
             '</button>' +
             '</div>' +

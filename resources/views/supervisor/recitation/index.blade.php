@@ -31,8 +31,8 @@ $sessionTypes = [
 .recitation-index .hero-section {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 20px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -59,7 +59,7 @@ $sessionTypes = [
 
 .recitation-index .hero-content > .hero-icon {
     position: absolute;
-    right: 24px;
+    right: 22px;
 }
 
 .recitation-index .hero-content > div:not(.hero-icon) {
@@ -68,14 +68,14 @@ $sessionTypes = [
 }
 
 .recitation-index .hero-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 20px;
     color: white;
     box-shadow: 0 6px 18px rgba(212, 160, 48, 0.35);
     flex-shrink: 0;
@@ -83,20 +83,20 @@ $sessionTypes = [
 
 .recitation-index .hero-title {
     color: white;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     margin-bottom: 4px;
 }
 
 .recitation-index .hero-subtitle {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 13px;
+    font-size: 12.5px;
     margin: 0;
 }
 
 .recitation-index .session-type-card {
     border: 1px solid rgba(24, 43, 72, 0.06);
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 16px 12px;
     text-align: center;
     cursor: pointer;
@@ -123,7 +123,7 @@ $sessionTypes = [
 .recitation-index .session-type-card .type-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -144,7 +144,7 @@ $sessionTypes = [
 }
 
 .recitation-index .session-type-card .type-desc {
-    font-size: 11px;
+    font-size: 11.5px;
     color: #7f8c8d;
     margin: 0;
     line-height: 1.3;
@@ -152,14 +152,14 @@ $sessionTypes = [
 
 .recitation-index .form-card {
     background: white;
-    border-radius: 14px;
+    border-radius: 13px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
 }
 
 .recitation-index .form-card .card-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 20px;
+    padding: 12px 16px;
     border: none;
 }
 
@@ -167,13 +167,13 @@ $sessionTypes = [
     color: white;
     font-weight: 700;
     margin: 0;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .recitation-index .student-card {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
     border: 1px solid rgba(24, 43, 72, 0.06);
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 14px;
     margin-bottom: 16px;
 }
@@ -189,14 +189,14 @@ $sessionTypes = [
 }
 
 .recitation-index .student-stat .stat-value {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1;
     margin-bottom: 2px;
 }
 
 .recitation-index .student-stat .stat-label {
-    font-size: 10px;
+    font-size: 12px;
     color: #7f8c8d;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -205,28 +205,28 @@ $sessionTypes = [
 .recitation-index .options-panel {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.03) 100%);
     border: 1px solid rgba(24, 43, 72, 0.06);
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 16px;
     margin-top: 14px;
 }
 
 .recitation-index .color-guide-card {
     background: white;
-    border-radius: 14px;
+    border-radius: 13px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
 }
 
 .recitation-index .color-guide-card .card-header {
     background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-    padding: 14px 18px;
+    padding: 12px 16px;
 }
 
 .recitation-index .color-item {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
+    padding: 10px 12px;
     border-bottom: 1px solid #f0f4f8;
     transition: background 0.2s;
 }
@@ -240,34 +240,34 @@ $sessionTypes = [
 }
 
 .recitation-index .color-dot {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 13px;
     color: white;
     flex-shrink: 0;
 }
 
 .recitation-index .sessions-list {
     background: white;
-    border-radius: 14px;
+    border-radius: 13px;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
 }
 
 .recitation-index .sessions-list .card-header {
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    padding: 14px 18px;
+    padding: 12px 16px;
 }
 
 .recitation-index .session-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid #f0f4f8;
     transition: all 0.2s;
 }
@@ -281,15 +281,15 @@ $sessionTypes = [
 }
 
 .recitation-index .session-avatar {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--gold);
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .recitation-index .session-info h6 {
@@ -301,12 +301,12 @@ $sessionTypes = [
 
 .recitation-index .session-info small {
     color: #7f8c8d;
-    font-size: 11px;
+    font-size: 11.5px;
 }
 
 .recitation-index .quran-verse {
     font-family: 'Amiri', serif;
-    font-size: 13px;
+    font-size: 12.5px;
     color: rgba(255, 255, 255, 0.8);
     margin-top: 8px;
     text-align: center;
@@ -315,9 +315,9 @@ $sessionTypes = [
 .recitation-index .start-btn {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border: none;
-    border-radius: 10px;
-    padding: 12px 28px;
-    font-size: 14px;
+    border-radius: 9px;
+    padding: 8px 16px;
+    font-size: 13px;
     font-weight: 700;
     color: white;
     transition: all 0.3s ease;
@@ -330,14 +330,14 @@ $sessionTypes = [
 }
 
 .recitation-index .compact-badge {
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 5px;
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: 7px;
 }
 
 @media (max-width: 768px) {
     .recitation-index .hero-section {
-        padding: 18px;
+        padding: 14px 16px;
     }
 
     .recitation-index .hero-title {
@@ -345,9 +345,9 @@ $sessionTypes = [
     }
 
     .recitation-index .hero-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 20px;
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
     }
 
     .recitation-index .student-stats {

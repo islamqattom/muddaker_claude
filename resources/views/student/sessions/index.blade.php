@@ -23,9 +23,9 @@
 
 .student-sessions .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -47,32 +47,33 @@
 }
 
 .student-sessions .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(212,160,48,0.35);
+    flex-shrink: 0;
 }
 
-.student-sessions .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.student-sessions .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.student-sessions .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.student-sessions .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .student-sessions .quran-verse {
     font-family: 'Amiri', serif;
-    font-size: 13px;
+    font-size: 12.5px;
     color: rgba(255,255,255,0.6);
     text-align: center;
-    padding: 8px 20px;
+    padding: 8px 16px;
     background: rgba(0,0,0,0.1);
     border-top: 1px solid rgba(212,160,48,0.2);
-    margin-top: 16px;
+    margin-top: 12px;
     position: relative; z-index: 1;
 }
 
 .student-sessions .sessions-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -80,18 +81,18 @@
 
 .student-sessions .sessions-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between;
 }
 
-.student-sessions .sessions-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.student-sessions .sessions-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .student-sessions .sessions-header h5 i { color: var(--gold); }
 
 .student-sessions .sessions-header .count-badge {
     background: rgba(255,255,255,0.2);
     color: white;
-    font-size: 12px; padding: 6px 14px;
-    border-radius: 20px;
+    font-size: 11.5px; padding: 3px 10px;
+    border-radius: 999px;
     font-weight: 600;
 }
 
@@ -99,7 +100,7 @@
 
 .student-sessions .sessions-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -110,10 +111,10 @@
 }
 
 .student-sessions .sessions-table tbody td {
-    padding: 16px;
+    padding: 11px 14px;
     vertical-align: middle;
     border-color: rgba(24,43,72,0.04);
-    font-size: 14px;
+    font-size: 13px;
     text-align: center;
 }
 
@@ -122,8 +123,8 @@
 .student-sessions .sessions-table tbody tr:hover td:first-child { border-right: 3px solid var(--gold); }
 
 .student-sessions .type-badge {
-    padding: 6px 14px; border-radius: 10px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
 .student-sessions .type-badge.new_memorization { background: rgba(39,174,96,0.15); color: var(--success); }
@@ -133,7 +134,7 @@
 .student-sessions .type-badge.mafsil { background: rgba(231,76,60,0.15); color: var(--danger); }
 
 .student-sessions .part-info {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--navy);
     font-weight: 500;
 }
@@ -145,22 +146,22 @@
 .student-sessions .score-max { color: #95a5a6; font-size: 12px; }
 
 .student-sessions .status-badge {
-    padding: 6px 14px; border-radius: 10px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
     color: white;
 }
 
 .student-sessions .day-badge {
     background: rgba(24,43,72,0.06); color: var(--navy);
-    padding: 4px 12px; border-radius: 8px;
-    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
-.student-sessions .date-val { font-size: 12px; color: #6c7a89; }
+.student-sessions .date-val { font-size: 12.5px; color: #6c7a89; }
 
 .student-sessions .view-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(24,43,72,0.1);
     background: white;
@@ -176,23 +177,23 @@
 }
 
 .student-sessions .pagination-wrapper {
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-top: 1px solid rgba(24,43,72,0.04);
     display: flex; justify-content: center;
 }
 
-.student-sessions .empty-state { text-align: center; padding: 60px 20px; }
+.student-sessions .empty-state { text-align: center; padding: 40px 16px; }
 .student-sessions .empty-icon {
-    width: 90px; height: 90px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.06), rgba(42,69,112,0.08));
-    border-radius: 22px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 14px;
 }
-.student-sessions .empty-icon i { font-size: 36px; color: var(--navy); opacity: 0.4; }
+.student-sessions .empty-icon i { font-size: 26px; color: var(--navy); opacity: 0.4; }
 
 @media (max-width: 992px) {
-    .student-sessions .page-hero { padding: 20px 24px; }
+    .student-sessions .page-hero { padding: 14px 16px; }
     .student-sessions .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .student-sessions .hero-title { font-size: 18px; }
     .student-sessions .sessions-table { font-size: 12px; }

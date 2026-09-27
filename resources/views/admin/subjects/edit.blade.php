@@ -23,11 +23,7 @@
 @push('styles')
 <style>
 .form-page { font-family: 'Tajawal', sans-serif; }
-.page-header { display: flex; gap: 20px; align-items: center; margin-bottom: 30px; flex-wrap: wrap; }
-.header-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #d4a030; box-shadow: 0 8px 25px rgba(24,43,72,0.25); }
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-.form-card { background: #fff; border-radius: 18px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 30px; border: 1px solid rgba(24,43,72,0.05); }
+.form-card { background: #fff; border-radius: 13px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 16px; border: 1px solid rgba(24,43,72,0.05); }
 .form-label { color: #182B48; font-weight: 700; margin-bottom: 8px; display: block; }
 .form-label .required { color: #c0392b; }
 .form-control, .form-select { border-radius: 12px; border: 2px solid #e9ecef; padding: 12px 16px; font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; width: 100%; }
@@ -38,7 +34,7 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 .color-swatch:hover { transform: scale(1.1); }
 .color-swatch.active { border-color: #182B48; box-shadow: 0 0 0 3px rgba(212,160,48,0.2); }
 .form-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; margin-top: 24px; border-top: 1px dashed #e9ecef; }
-.btn { border-radius: 12px; padding: 12px 28px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
+.btn { border-radius: 12px; padding: 12px 16px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
 .btn-primary { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); color: #fff; }
 .btn-primary:hover { color: #fff; }
 .btn-secondary { background: #f0f4f8; color: #182B48; }
@@ -78,15 +74,15 @@ textarea.form-control { min-height: 100px; resize: vertical; }
                     <input type="hidden" name="color" id="colorInput" value="{{ old('color', $subject->color) }}">
                     <div class="color-picker">
                         @foreach(\App\Models\Subject::PALETTE as $c)
-                            <div class="color-swatch {{ old('color', $subject->color) === $c ? 'active' : '' }}" data-color="{{ $c }}" style="background: {{ $c }};"></div>
+                            <div class="color-swatch {{ old('color', $subject->color) === $c ? 'active' : '' }}" data-color="{{ $c }}" style="background:{{ $c }}"></div>
                         @endforeach
                     </div>
                 </div>
 
                 <div class="col-md-12">
-                    <div class="form-check form-switch" style="padding-right: 2.5em;">
+                    <div class="form-check form-switch" style="padding-right:2.5em">
                         <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $subject->is_active) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="is_active" style="color: #182B48; font-weight: 600;">المادة نشطة</label>
+                        <label class="form-check-label" for="is_active" style="color:#182B48;font-weight:600">المادة نشطة</label>
                     </div>
                 </div>
             </div>

@@ -22,8 +22,8 @@
 </div>
 
 {{-- Page Header --}}
-<div class="page-header-form">
-    <div class="header-icon-form">
+<div class="page-header">
+    <div class="header-icon">
         <i class="fas fa-user-plus"></i>
     </div>
     <div class="header-text">
@@ -188,22 +188,21 @@
 .islamic-header-banner {
     position: relative;
     height: 70px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    padding: 16px 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
 }
-
 .banner-pattern {
     position: absolute;
     inset: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     opacity: 0.5;
 }
-
 .bismillah-banner {
     font-family: 'Amiri', serif;
     font-size: 22px;
@@ -213,45 +212,15 @@
     z-index: 1;
     letter-spacing: 2px;
 }
-
-.page-header-form {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding: 25px 30px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 25px rgba(24,43,72,0.08);
-    border: 1px solid rgba(212,160,48,0.1);
-}
-
-.header-icon-form {
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.2);
-}
-
-.header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .form-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
 .form-header-islamic {
-    padding: 25px 30px;
+    padding: 16px 16px;
     border-bottom: 2px solid rgba(212,160,48,0.1);
     display: flex;
     align-items: center;
@@ -259,25 +228,22 @@
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
     position: relative;
 }
-
 .form-title-icon {
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #d4a030;
-    font-size: 20px;
+    font-size: 18px;
 }
-
 .form-header-islamic span {
     font-size: 18px;
     font-weight: 700;
     color: #182B48;
 }
-
 .form-header-decoration {
     position: absolute;
     left: 30px;
@@ -285,53 +251,45 @@
     color: #d4a030;
     opacity: 0.15;
 }
-
-.form-body-islamic { padding: 30px; }
-
+.form-body-islamic { padding: 16px; }
 .alert-success-islamic {
     background: linear-gradient(135deg, rgba(39,174,96,0.1), rgba(46,204,113,0.1));
     border: 1px solid rgba(39,174,96,0.2);
     color: #27ae60;
-    padding: 18px 20px;
-    border-radius: 14px;
-    margin-bottom: 25px;
+    padding: 16px 16px;
+    border-radius: 13px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-weight: 600;
 }
-
 .alert-success-islamic i { font-size: 20px; }
-
 .alert-danger-islamic {
     background: linear-gradient(135deg, rgba(192,57,43,0.1), rgba(192,57,43,0.1));
     border: 1px solid rgba(192,57,43,0.2);
     color: #c0392b;
-    padding: 18px 20px;
-    border-radius: 14px;
-    margin-bottom: 25px;
+    padding: 16px 16px;
+    border-radius: 13px;
+    margin-bottom: 16px;
 }
-
 .alert-danger-islamic i { margin-left: 10px; }
 .alert-danger-islamic ul { padding-right: 20px; }
-
 .avatar-upload-section {
     display: flex;
     align-items: center;
     gap: 25px;
-    padding: 25px;
+    padding: 16px;
     background: linear-gradient(135deg, #f8f9fa, #f0f4f8);
-    border-radius: 16px;
-    margin-bottom: 30px;
+    border-radius: 13px;
+    margin-bottom: 16px;
 }
-
 .avatar-upload-wrapper { display: flex; align-items: center; gap: 25px; }
-
 .avatar-preview {
     width: 100px;
     height: 100px;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 20px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -339,15 +297,13 @@
     font-size: 40px;
     border: 3px solid #d4a030;
 }
-
 .avatar-upload-info h5 { color: #182B48; font-weight: 700; margin: 0 0 5px 0; font-size: 16px; }
 .avatar-upload-info p { color: #7f8c8d; font-size: 13px; margin: 0 0 12px 0; }
-
 .upload-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
     color: #fff;
     border-radius: 10px;
@@ -357,14 +313,10 @@
     transition: all 0.3s;
     margin-bottom: 8px;
 }
-
 .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(212,160,48,0.3); }
 .upload-btn input { display: none; }
-
 .text-muted { color: #7f8c8d; font-size: 12px; }
-
-.form-group-islamic { margin-bottom: 25px; }
-
+.form-group-islamic { margin-bottom: 16px; }
 .form-label-islamic {
     display: flex;
     align-items: center;
@@ -374,28 +326,23 @@
     margin-bottom: 10px;
     font-size: 15px;
 }
-
 .form-label-islamic i { color: #d4a030; font-size: 16px; }
 .required { color: #c0392b; }
-
 .form-control-islamic, .form-select-islamic {
     width: 100%;
-    padding: 14px 18px;
-    border-radius: 14px;
+    padding: 14px 16px;
+    border-radius: 13px;
     border: 2px solid #e9ecef;
     font-size: 14px;
     transition: all 0.3s ease;
     background: #fff;
 }
-
 .form-control-islamic:focus, .form-select-islamic:focus {
     border-color: #d4a030;
     box-shadow: 0 0 0 4px rgba(212,160,48,0.15);
     outline: none;
 }
-
 .form-control-islamic::placeholder { color: #bdc3c7; }
-
 .form-actions-islamic {
     display: flex;
     gap: 15px;
@@ -403,7 +350,6 @@
     border-top: 2px solid rgba(212,160,48,0.1);
     margin-top: 30px;
 }
-
 .btn-save-islamic {
     display: flex;
     align-items: center;
@@ -412,20 +358,18 @@
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
     border: none;
-    border-radius: 14px;
+    border-radius: 13px;
     font-weight: 700;
     font-size: 15px;
     transition: all 0.3s ease;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(24,43,72,0.25);
 }
-
 .btn-save-islamic:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(24,43,72,0.35);
     color: #fff;
 }
-
 .btn-back-islamic {
     display: flex;
     align-items: center;
@@ -434,13 +378,12 @@
     background: #f8f9fa;
     color: #182B48;
     border: 2px solid #e9ecef;
-    border-radius: 14px;
+    border-radius: 13px;
     font-weight: 600;
     font-size: 15px;
     transition: all 0.3s ease;
     text-decoration: none;
 }
-
 .btn-back-islamic:hover { border-color: #d4a030; color: #d4a030; background: #fff; }
 </style>
 

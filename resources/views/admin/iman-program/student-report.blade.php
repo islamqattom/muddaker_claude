@@ -10,25 +10,25 @@
 
 @section('content')
 
-<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:16px;padding:24px 30px;margin-bottom:24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <div style="width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">
+<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:14px;padding:16px 22px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div style="width:48px;height:48px;border-radius:13px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
         <i class="fas fa-user-graduate"></i>
     </div>
-    <div style="flex:1;min-width:200px;">
-        <h1 style="margin:0;font-size:22px;font-weight:700;">{{ $student->user->name }}</h1>
-        <p class="student-header-meta" style="margin:6px 0 0 0;color:rgba(255,255,255,0.8);font-size:13px;">
+    <div style="flex:1;min-width:200px">
+        <h1 style="margin:0;font-size:22px;font-weight:700">{{ $student->user->name }}</h1>
+        <p class="student-header-meta" style="margin:6px 0 0 0;color:rgba(255,255,255,0.8);font-size:13px">
             @if($student->student_number) رقم الطالب: #{{ $student->student_number }} @endif
             @if($student->level) • المستوى: {{ $student->level->name }} @endif
             @if($student->supervisor) • المشرف: {{ $student->supervisor->name }} @endif
         </p>
     </div>
     <a href="{{ route('admin.iman-program.index', ['scope' => 'reports']) }}"
-       style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+       style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px">
         <i class="fas fa-arrow-right"></i> العودة للقائمة
     </a>
 </div>
 
-<div style="background:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+<div style="background:#fff;border-radius:13px;padding:16px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px">
     <form method="GET" action="{{ route('admin.iman-program.student-report', $student->id) }}" class="row g-3 align-items-end">
         <div class="col-md-4">
             <label class="form-label">من تاريخ</label>
@@ -44,69 +44,69 @@
     </form>
 </div>
 
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
-    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-        <div style="width:50px;height:50px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#d4a030;font-size:22px;"><i class="fas fa-bookmark"></i></div>
-        <div><div style="font-size:12px;color:#6b7a90;">إجمالي البرامج</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $overallStats['programs_count'] }}</div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px">
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#d4a030;font-size:16px"><i class="fas fa-bookmark"></i></div>
+        <div><div style="font-size:12px;color:#6b7a90">إجمالي البرامج</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $overallStats['programs_count'] }}</div></div>
     </div>
-    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-        <div style="width:50px;height:50px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-check-circle"></i></div>
-        <div><div style="font-size:12px;color:#6b7a90;">برامج نشطة</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $overallStats['active_programs'] }}</div></div>
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-check-circle"></i></div>
+        <div><div style="font-size:12px;color:#6b7a90">برامج نشطة</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $overallStats['active_programs'] }}</div></div>
     </div>
-    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-        <div style="width:50px;height:50px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-list-check"></i></div>
-        <div><div style="font-size:12px;color:#6b7a90;">إجمالي المعايير</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $overallStats['total_criteria'] }}</div></div>
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-list-check"></i></div>
+        <div><div style="font-size:12px;color:#6b7a90">إجمالي المعايير</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $overallStats['total_criteria'] }}</div></div>
     </div>
-    <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-        <div style="width:50px;height:50px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-calendar-check"></i></div>
-        <div><div style="font-size:12px;color:#6b7a90;">إدخالات الفترة</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $overallStats['total_entries'] }}</div></div>
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px">
+        <div style="width:38px;height:38px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px"><i class="fas fa-calendar-check"></i></div>
+        <div><div style="font-size:12px;color:#6b7a90">إدخالات الفترة</div><div style="font-size:22px;font-weight:800;color:#182B48">{{ $overallStats['total_entries'] }}</div></div>
     </div>
 </div>
 
 @if($programs->isEmpty())
-    <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-        <i class="fas fa-star-and-crescent" style="font-size:50px;opacity:0.3;"></i>
-        <h5 style="color:#182B48;margin-top:14px;">لا توجد برامج إيمانية لهذا الطالب</h5>
+    <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05)">
+        <i class="fas fa-star-and-crescent" style="font-size:50px;opacity:0.3"></i>
+        <h5 style="color:#182B48;margin-top:14px">لا توجد برامج إيمانية لهذا الطالب</h5>
         <a href="{{ route('admin.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
-           style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;text-decoration:none;">
+           style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 16px;border-radius:12px;font-weight:700;text-decoration:none">
             <i class="fas fa-plus-circle"></i> أنشئ أول برنامج للطالب
         </a>
     </div>
 @else
     @foreach($programs as $program)
         @php $programEntries = $entriesByProgram[$program->id] ?? collect(); @endphp
-        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:18px;">
-            <div class="program-card-header" style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f0f4f8;">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0;">
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px">
+            <div class="program-card-header" style="display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f0f4f8">
+                <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0">
                     <i class="fas fa-star-and-crescent"></i>
                 </div>
-                <div style="flex:1;">
-                    <h5 style="margin:0;color:#182B48;font-weight:700;font-size:17px;">{{ $program->name }}</h5>
+                <div style="flex:1">
+                    <h5 style="margin:0;color:#182B48;font-weight:700;font-size:17px">{{ $program->name }}</h5>
                     @if($program->description)
-                        <p style="margin:4px 0 0 0;color:#6b7a90;font-size:13px;">{{ $program->description }}</p>
+                        <p style="margin:4px 0 0 0;color:#6b7a90;font-size:13px">{{ $program->description }}</p>
                     @endif
                 </div>
                 <div>
                     @if($program->is_active)
-                        <span style="background:rgba(39,174,96,0.15);color:#27ae60;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">نشط</span>
+                        <span style="background:rgba(39,174,96,0.15);color:#27ae60;padding:6px 14px;border-radius:13px;font-size:12px;font-weight:700">نشط</span>
                     @else
-                        <span style="background:rgba(108,122,139,0.15);color:#6b7a90;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">غير نشط</span>
+                        <span style="background:rgba(108,122,139,0.15);color:#6b7a90;padding:6px 14px;border-radius:13px;font-size:12px;font-weight:700">غير نشط</span>
                     @endif
                 </div>
             </div>
 
             @if($program->criteria->isEmpty())
-                <div style="text-align:center;color:#6b7a90;padding:20px;">لا توجد معايير لهذا البرنامج</div>
+                <div style="text-align:center;color:#6b7a90;padding:16px">لا توجد معايير لهذا البرنامج</div>
             @else
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;">
+                <div style="overflow-x:auto">
+                    <table style="width:100%;border-collapse:collapse">
                         <thead>
-                            <tr style="background:#f8f9fa;">
-                                <th style="padding:12px 14px;text-align:right;font-weight:700;font-size:12px;color:#182B48;">المعيار</th>
-                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48;">النوع</th>
-                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48;">الهدف</th>
-                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48;">المنجز</th>
-                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48;">نسبة الإنجاز</th>
+                            <tr style="background:#f8f9fa">
+                                <th style="padding:12px 14px;text-align:right;font-weight:700;font-size:12px;color:#182B48">المعيار</th>
+                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48">النوع</th>
+                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48">الهدف</th>
+                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48">المنجز</th>
+                                <th style="padding:12px 14px;text-align:center;font-weight:700;font-size:12px;color:#182B48">نسبة الإنجاز</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,35 +116,35 @@
                                     $c = $stat['completion'] ?? 0;
                                     $color = $c >= 70 ? '#27ae60' : ($c >= 40 ? '#f39c12' : '#c0392b');
                                 @endphp
-                                <tr style="border-bottom:1px solid #f0f4f8;">
-                                    <td style="padding:12px 14px;color:#182B48;font-weight:600;font-size:13px;">{{ $criterion->name }}</td>
-                                    <td style="padding:12px 14px;text-align:center;">
+                                <tr style="border-bottom:1px solid #f0f4f8">
+                                    <td style="padding:12px 14px;color:#182B48;font-weight:600;font-size:13px">{{ $criterion->name }}</td>
+                                    <td style="padding:12px 14px;text-align:center">
                                         @if($criterion->isCheckType())
-                                            <span style="background:rgba(24,43,72,0.1);color:#182B48;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">تأشير</span>
+                                            <span style="background:rgba(24,43,72,0.1);color:#182B48;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600">تأشير</span>
                                         @else
-                                            <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;">عدد</span>
+                                            <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600">عدد</span>
                                         @endif
                                     </td>
-                                    <td style="padding:12px 14px;text-align:center;color:#6b7a90;font-size:13px;">
+                                    <td style="padding:12px 14px;text-align:center;color:#6b7a90;font-size:13px">
                                         @if($criterion->isCheckType())
                                             —
                                         @else
                                             {{ $criterion->target_value ?? '—' }}
                                         @endif
                                     </td>
-                                    <td style="padding:12px 14px;text-align:center;font-weight:700;color:#182B48;font-size:13px;">
+                                    <td style="padding:12px 14px;text-align:center;font-weight:700;color:#182B48;font-size:13px">
                                         @if($criterion->isCheckType())
                                             {{ $stat['checked'] ?? 0 }}
                                         @else
                                             {{ $stat['value_sum'] ?? 0 }}
                                         @endif
                                     </td>
-                                    <td style="padding:12px 14px;text-align:center;">
-                                        <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                                            <div style="flex:1;max-width:120px;height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
-                                                <div style="height:100%;background:{{ $color }};width:{{ $c }}%;"></div>
+                                    <td style="padding:12px 14px;text-align:center">
+                                        <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+                                            <div style="flex:1;max-width:120px;height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden">
+                                                <div style="height:100%;background:{{ $color }};width:{{ $c }}%"></div>
                                             </div>
-                                            <span style="font-weight:700;color:{{ $color }};font-size:13px;min-width:40px;">{{ $c }}%</span>
+                                            <span style="font-weight:700;color:{{ $color }};font-size:13px;min-width:40px">{{ $c }}%</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -157,35 +157,35 @@
     @endforeach
 
     @if(!empty($dailyCompletion) && count($dailyCompletion) > 1)
-        <div style="background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
-                <h5 style="color:#182B48;font-weight:700;margin:0;display:flex;align-items:center;gap:10px;">
-                    <i class="fas fa-chart-area" style="color:#d4a030;"></i>
+        <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+                <h5 style="color:#182B48;font-weight:700;margin:0;display:flex;align-items:center;gap:10px">
+                    <i class="fas fa-chart-area" style="color:#d4a030"></i>
                     <span id="chartTitle">نقاط الإنجاز خلال الفترة</span>
                 </h5>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                    <div id="chartToggleGroup" style="display:inline-flex;background:#f0f4f8;border-radius:10px;padding:4px;gap:4px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                    <div id="chartToggleGroup" style="display:inline-flex;background:#f0f4f8;border-radius:10px;padding:4px;gap:4px">
                         <button type="button" data-range="week"
-                                style="padding:8px 18px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;background:transparent;color:#182B48;">
+                                style="padding:8px 16px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;background:transparent;color:#182B48">
                             <i class="fas fa-calendar-week"></i> أسبوعي
                         </button>
                         <button type="button" data-range="month"
-                                style="padding:8px 18px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;">
+                                style="padding:8px 16px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff">
                             <i class="fas fa-calendar"></i> شهري
                         </button>
                     </div>
                     <button type="button" id="compareToggleBtn"
-                            style="padding:8px 18px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;background:#f0f4f8;color:#182B48;display:inline-flex;align-items:center;gap:6px;">
+                            style="padding:8px 16px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;background:#f0f4f8;color:#182B48;display:inline-flex;align-items:center;gap:6px">
                         <i class="fas fa-code-compare"></i> مقارنة الأسابيع
                     </button>
                     <button type="button" id="criteriaToggleBtn"
-                            style="padding:8px 18px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;background:#f0f4f8;color:#182B48;display:inline-flex;align-items:center;gap:6px;">
+                            style="padding:8px 16px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;background:#f0f4f8;color:#182B48;display:inline-flex;align-items:center;gap:6px">
                         <i class="fas fa-tasks"></i> مقارنة المعايير
                     </button>
                 </div>
             </div>
 
-            <div id="comparePanel" style="display:none;background:#f8f9fc;border:1px solid rgba(24,43,72,0.08);border-radius:12px;padding:16px;margin-bottom:18px;">
+            <div id="comparePanel" style="display:none;background:#f8f9fc;border:1px solid rgba(24,43,72,0.08);border-radius:12px;padding:16px;margin-bottom:16px">
                 <form method="GET" action="{{ route('admin.iman-program.student-report', $student->id) }}" id="compareForm">
                     @if($fromDate)
                         <input type="hidden" name="from_date" value="{{ $fromDate->toDateString() }}">
@@ -193,47 +193,47 @@
                     @if($toDate)
                         <input type="hidden" name="to_date" value="{{ $toDate->toDateString() }}">
                     @endif
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-                        <div style="font-weight:700;color:#182B48;font-size:14px;">
-                            <i class="fas fa-calendar-alt" style="color:#d4a030;"></i> اختر الأسابيع للمقارنة (حتى 4 أسابيع)
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                        <div style="font-weight:700;color:#182B48;font-size:14px">
+                            <i class="fas fa-calendar-alt" style="color:#d4a030"></i> اختر الأسابيع للمقارنة (حتى 4 أسابيع)
                         </div>
-                        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:#182B48;font-weight:600;">
-                            <input type="checkbox" name="compare_last_4" value="1" form="compareForm" style="accent-color:#d4a030;">
+                        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:#182B48;font-weight:600">
+                            <input type="checkbox" name="compare_last_4" value="1" form="compareForm" style="accent-color:#d4a030">
                             آخر 4 أسابيع
                         </label>
                     </div>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px">
                         @foreach($availableWeeks as $wk)
-                            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid rgba(24,43,72,0.08);border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:12px;color:#182B48;"
+                            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid rgba(24,43,72,0.08);border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:12px;color:#182B48"
                                    onmouseover="this.style.borderColor='#d4a030'" onmouseout="this.style.borderColor='rgba(24,43,72,0.08)'">
                                 <input type="checkbox" name="compare_weeks[]" value="{{ $wk['start'] }}" form="compareForm"
                                        {{ in_array($wk['start'], $requestedWeeks, true) ? 'checked' : '' }}
-                                       style="accent-color:#d4a030;">
-                                <span style="font-weight:600;">{{ $wk['short'] }}</span>
+                                       style="accent-color:#d4a030">
+                                <span style="font-weight:600">{{ $wk['short'] }}</span>
                             </label>
                         @endforeach
                     </div>
-                    <div class="compare-panel-actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+                    <div class="compare-panel-actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
                         <a href="{{ route('admin.iman-program.student-report', $student->id) }}{{ $fromDate && $toDate ? '?from_date='.$fromDate->toDateString().'&to_date='.$toDate->toDateString() : '' }}"
-                           style="padding:8px 16px;background:transparent;color:#6b7a90;border:1px solid #d6dbe5;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none;">
+                           style="padding:8px 16px;background:transparent;color:#6b7a90;border:1px solid #d6dbe5;border-radius:10px;font-weight:700;font-size:12px;text-decoration:none">
                             إعادة تعيين
                         </a>
                         <button type="submit" form="compareForm"
-                                style="padding:8px 18px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;">
+                                style="padding:8px 16px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer">
                             <i class="fas fa-sync"></i> تطبيق المقارنة
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div id="singleChartWrap" style="position:relative;height:280px;">
+            <div id="singleChartWrap" style="position:relative;height:280px">
                 <canvas id="pointsAreaChart"></canvas>
             </div>
-            <div id="compareChartWrap" style="display:none;position:relative;height:340px;">
+            <div id="compareChartWrap" style="display:none;position:relative;height:340px">
                 <canvas id="weekCompareChart"></canvas>
             </div>
-            <div id="criteriaChartWrap" style="display:none;margin-top:24px;">
-                <div style="background:#f8f9fc;border:1px solid rgba(24,43,72,0.08);border-radius:12px;padding:16px;margin-bottom:18px;">
+            <div id="criteriaChartWrap" style="display:none;margin-top:24px">
+                <div style="background:#f8f9fc;border:1px solid rgba(24,43,72,0.08);border-radius:12px;padding:16px;margin-bottom:16px">
                     <form method="GET" action="{{ route('admin.iman-program.student-report', $student->id) }}" id="criteriaForm">
                         @if($fromDate)
                             <input type="hidden" name="from_date" value="{{ $fromDate->toDateString() }}">
@@ -244,52 +244,52 @@
                         @foreach($requestedWeeks as $wk)
                             <input type="hidden" name="compare_weeks[]" value="{{ $wk }}">
                         @endforeach
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-                            <div style="font-weight:700;color:#182B48;font-size:14px;">
-                                <i class="fas fa-tasks" style="color:#d4a030;"></i> اختر المعايير للمقارنة اليومية (حتى 8)
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                            <div style="font-weight:700;color:#182B48;font-size:14px">
+                                <i class="fas fa-tasks" style="color:#d4a030"></i> اختر المعايير للمقارنة اليومية (حتى 8)
                             </div>
                             <button type="button" id="selectAllCriteria"
-                                    style="padding:6px 14px;background:transparent;color:#182B48;border:1px solid #d6dbe5;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer;">
+                                    style="padding:6px 14px;background:transparent;color:#182B48;border:1px solid #d6dbe5;border-radius:8px;font-weight:600;font-size:11px;cursor:pointer">
                                 تحديد/إلغاء الكل
                             </button>
                         </div>
-                        <div style="background:#fff;border:1px dashed rgba(24,43,72,0.12);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:#182B48;">
-                            <i class="fas fa-calendar-alt" style="color:#d4a030;"></i>
-                            <span style="font-weight:700;">نطاق البيانات اليومية:</span>
-                            <span style="color:#182B48;font-weight:600;">{{ $criteriaFrom->format('Y/m/d') }} - {{ $criteriaTo->format('Y/m/d') }}</span>
-                            <span style="color:#6b7a90;">({{ $criteriaTo->diffInDays($criteriaFrom) + 1 }} يوم)</span>
+                        <div style="background:#fff;border:1px dashed rgba(24,43,72,0.12);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:#182B48">
+                            <i class="fas fa-calendar-alt" style="color:#d4a030"></i>
+                            <span style="font-weight:700">نطاق البيانات اليومية:</span>
+                            <span style="color:#182B48;font-weight:600">{{ $criteriaFrom->format('Y/m/d') }} - {{ $criteriaTo->format('Y/m/d') }}</span>
+                            <span style="color:#6b7a90">({{ $criteriaTo->diffInDays($criteriaFrom) + 1 }} يوم)</span>
                             @if($criteriaRangeSource === 'weeks')
-                                <span style="background:rgba(39,174,96,0.15);color:#27ae60;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;">
+                                <span style="background:rgba(39,174,96,0.15);color:#27ae60;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700">
                                     <i class="fas fa-link"></i> مربوط بأسابيع المقارنة
                                 </span>
                             @else
-                                <span style="background:rgba(24,43,72,0.08);color:#182B48;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700;">
+                                <span style="background:rgba(24,43,72,0.08);color:#182B48;padding:3px 10px;border-radius:10px;font-size:10px;font-weight:700">
                                     <i class="fas fa-calendar"></i> نطاق الفترة المحدد
                                 </span>
                             @endif
                         </div>
                         @if($allCriteria->isEmpty())
-                            <div style="text-align:center;color:#6b7a90;padding:20px;font-size:13px;">لا توجد معايير متاحة</div>
+                            <div style="text-align:center;color:#6b7a90;padding:16px;font-size:13px">لا توجد معايير متاحة</div>
                         @else
                             @foreach($programs as $program)
-                                <div style="margin-bottom:14px;">
-                                    <div style="font-weight:700;color:#182B48;font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                                        <i class="fas fa-bookmark" style="color:#d4a030;font-size:11px;"></i>
+                                <div style="margin-bottom:14px">
+                                    <div style="font-weight:700;color:#182B48;font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                                        <i class="fas fa-bookmark" style="color:#d4a030;font-size:11px"></i>
                                         {{ $program->name }}
-                                        <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:2px 8px;border-radius:10px;font-size:10px;">{{ $program->criteria->count() }} معيار</span>
+                                        <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:2px 8px;border-radius:10px;font-size:10px">{{ $program->criteria->count() }} معيار</span>
                                     </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;">
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px">
                                         @foreach($program->criteria as $criterion)
-                                            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid rgba(24,43,72,0.08);border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:12px;color:#182B48;"
+                                            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border:1px solid rgba(24,43,72,0.08);border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:12px;color:#182B48"
                                                    onmouseover="this.style.borderColor='#d4a030'" onmouseout="this.style.borderColor='rgba(24,43,72,0.08)'">
                                                 <input type="checkbox" name="criteria_ids[]" value="{{ $criterion->id }}" form="criteriaForm" class="criteria-cb"
                                                        {{ in_array($criterion->id, $requestedCriteria, true) ? 'checked' : '' }}
-                                                       style="accent-color:#d4a030;">
-                                                <span style="font-weight:600;flex:1;">{{ $criterion->name }}</span>
+                                                       style="accent-color:#d4a030">
+                                                <span style="font-weight:600;flex:1">{{ $criterion->name }}</span>
                                                 @if($criterion->isCheckType())
-                                                    <span style="background:rgba(24,43,72,0.08);color:#182B48;padding:2px 8px;border-radius:10px;font-size:9px;">تأشير</span>
+                                                    <span style="background:rgba(24,43,72,0.08);color:#182B48;padding:2px 8px;border-radius:10px;font-size:9px">تأشير</span>
                                                 @else
-                                                    <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:2px 8px;border-radius:10px;font-size:9px;">{{ $criterion->target_value ?? '—' }}</span>
+                                                    <span style="background:rgba(212,160,48,0.15);color:#B4802C;padding:2px 8px;border-radius:10px;font-size:9px">{{ $criterion->target_value ?? '—' }}</span>
                                                 @endif
                                             </label>
                                         @endforeach
@@ -297,60 +297,60 @@
                                 </div>
                             @endforeach
                         @endif
-                        <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+                        <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
                             <button type="submit" form="criteriaForm"
-                                    style="padding:8px 18px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;">
+                                    style="padding:8px 16px;background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer">
                                 <i class="fas fa-sync"></i> تطبيق
                             </button>
                         </div>
                     </form>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-                    <h6 style="color:#182B48;font-weight:700;margin:0;font-size:14px;">
-                        <i class="fas fa-calendar-day" style="color:#d4a030;"></i>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                    <h6 style="color:#182B48;font-weight:700;margin:0;font-size:14px">
+                        <i class="fas fa-calendar-day" style="color:#d4a030"></i>
                         الأداء اليومي للمعايير خلال الفترة
-                        <span style="color:#6b7a90;font-weight:500;font-size:12px;">({{ $criteriaFrom->format('Y/m/d') }} - {{ $criteriaTo->format('Y/m/d') }})</span>
+                        <span style="color:#6b7a90;font-weight:500;font-size:12px">({{ $criteriaFrom->format('Y/m/d') }} - {{ $criteriaTo->format('Y/m/d') }})</span>
                     </h6>
                 </div>
-                <div class="criteria-canvas-wrap" style="position:relative;height:340px;">
+                <div class="criteria-canvas-wrap" style="position:relative;height:340px">
                     <canvas id="criteriaCompareChart"></canvas>
                 </div>
-                <div id="criteriaSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid #f0f4f8;">
+                <div id="criteriaSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid #f0f4f8">
                     <div>
-                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">عدد المعايير</div>
-                        <div id="critCount" style="font-size:20px;font-weight:800;color:#182B48;">—</div>
+                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">عدد المعايير</div>
+                        <div id="critCount" style="font-size:20px;font-weight:800;color:#182B48">—</div>
                     </div>
                     <div>
-                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">أعلى مجموع</div>
-                        <div id="critMax" style="font-size:20px;font-weight:800;color:#27ae60;">—</div>
+                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">أعلى مجموع</div>
+                        <div id="critMax" style="font-size:20px;font-weight:800;color:#27ae60">—</div>
                     </div>
                     <div>
-                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">متوسط يومي</div>
-                        <div id="critAvg" style="font-size:20px;font-weight:800;color:#d4a030;">—</div>
+                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">متوسط يومي</div>
+                        <div id="critAvg" style="font-size:20px;font-weight:800;color:#d4a030">—</div>
                     </div>
                     <div>
-                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">أيام النشاط</div>
-                        <div id="critActive" style="font-size:20px;font-weight:800;color:#182B48;">—</div>
+                        <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">أيام النشاط</div>
+                        <div id="critActive" style="font-size:20px;font-weight:800;color:#182B48">—</div>
                     </div>
                 </div>
             </div>
 
-            <div id="chartSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid #f0f4f8;">
+            <div id="chartSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid #f0f4f8">
                 <div>
-                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">إجمالي النقاط</div>
-                    <div id="sumPoints" style="font-size:20px;font-weight:800;color:#182B48;">—</div>
+                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">إجمالي النقاط</div>
+                    <div id="sumPoints" style="font-size:20px;font-weight:800;color:#182B48">—</div>
                 </div>
                 <div>
-                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">المتوسط اليومي</div>
-                    <div id="sumAvg" style="font-size:20px;font-weight:800;color:#182B48;">—</div>
+                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">المتوسط اليومي</div>
+                    <div id="sumAvg" style="font-size:20px;font-weight:800;color:#182B48">—</div>
                 </div>
                 <div>
-                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">أعلى يوم</div>
-                    <div id="sumMax" style="font-size:20px;font-weight:800;color:#27ae60;">—</div>
+                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">أعلى يوم</div>
+                    <div id="sumMax" style="font-size:20px;font-weight:800;color:#27ae60">—</div>
                 </div>
                 <div>
-                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px;">نسبة الإنجاز</div>
-                    <div id="sumCompletion" style="font-size:20px;font-weight:800;color:#d4a030;">—</div>
+                    <div style="font-size:11px;color:#6b7a90;margin-bottom:4px">نسبة الإنجاز</div>
+                    <div id="sumCompletion" style="font-size:20px;font-weight:800;color:#d4a030">—</div>
                 </div>
             </div>
         </div>
@@ -361,56 +361,48 @@
 
 @push('styles')
 <style>
-    .student-header-meta {
+.student-header-meta {
         word-break: break-word;
         overflow-wrap: anywhere;
     }
-    .program-card-header { flex-wrap: wrap; }
-    .program-card-header > div:last-child { flex-shrink: 0; }
-
-    .compare-panel-actions { flex-wrap: wrap; }
-    .compare-panel-actions > * { flex: 1 1 140px; text-align: center; }
-
-    @media (max-width: 768px) {
-        #singleChartWrap { height: 260px !important; }
-        #compareChartWrap { height: 300px !important; }
-        .criteria-canvas-wrap { height: 300px !important; }
-    }
-    @media (max-width: 480px) {
-        #singleChartWrap { height: 220px !important; }
-        #compareChartWrap { height: 260px !important; }
-        .criteria-canvas-wrap { height: 260px !important; }
-    }
-
-    @media (max-width: 768px) {
-        #chartSummary, #criteriaSummary {
+.program-card-header { flex-wrap: wrap; }
+.program-card-header > div:last-child { flex-shrink: 0; }
+.compare-panel-actions { flex-wrap: wrap; }
+.compare-panel-actions > * { flex: 1 1 140px; text-align: center; }
+@media (max-width: 768px) {
+#singleChartWrap { height: 260px !important; }
+#compareChartWrap { height: 300px !important; }
+.criteria-canvas-wrap { height: 300px !important; }
+}
+@media (max-width: 480px) {
+#singleChartWrap { height: 220px !important; }
+#compareChartWrap { height: 260px !important; }
+.criteria-canvas-wrap { height: 260px !important; }
+}
+@media (max-width: 768px) {
+#chartSummary, #criteriaSummary {
             grid-template-columns: repeat(2, 1fr) !important;
         }
-    }
-    @media (max-width: 380px) {
-        #chartSummary, #criteriaSummary {
+}
+@media (max-width: 380px) {
+#chartSummary, #criteriaSummary {
             grid-template-columns: 1fr 1fr !important;
             gap: 8px !important;
         }
-        #chartSummary > div > div:last-child,
-        #criteriaSummary > div > div:last-child {
+#chartSummary > div > div:last-child, #criteriaSummary > div > div:last-child {
             font-size: 17px !important;
         }
-    }
-
-    @media (max-width: 480px) {
-        #chartToggleGroup button,
-        #compareToggleBtn,
-        #criteriaToggleBtn {
+}
+@media (max-width: 480px) {
+#chartToggleGroup button, #compareToggleBtn, #criteriaToggleBtn {
             padding: 6px 10px !important;
             font-size: 11px !important;
             gap: 4px !important;
         }
-    }
-
-    @media (max-width: 576px) {
-        .program-card-header h5 { font-size: 15px !important; }
-    }
+}
+@media (max-width: 576px) {
+.program-card-header h5 { font-size: 15px !important; }
+}
 </style>
 @endpush
 

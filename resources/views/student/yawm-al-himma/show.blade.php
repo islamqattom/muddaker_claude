@@ -14,33 +14,33 @@
     --gold-light: #e6b84d;
     --navy: #182B48;
     --navy-light: #2A4570;
-    --radius: 16px;
-    --radius-sm: 12px;
+    --radius: 14px;
+    --radius-sm: 10px;
     --shadow-sm: 0 2px 10px rgba(24,43,72,0.05);
 }
 .yawm-page .hero-section {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 24px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative; overflow: hidden;
 }
 .yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .yawm-page .hero-icon {
-    width: 60px; height: 60px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(212,160,48,0.35);
     flex-shrink: 0;
 }
-.yawm-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.yawm-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+.yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .yawm-page .info-card {
-    background: white; border-radius: var(--radius); padding: 22px;
-    box-shadow: var(--shadow-sm); margin-bottom: 18px;
+    background: white; border-radius: var(--radius); padding: 16px;
+    box-shadow: var(--shadow-sm); margin-bottom: 16px;
 }
 .yawm-page .info-card h2 {
     color: var(--navy); font-size: 18px; font-weight: 700; margin-bottom: 14px;
@@ -66,11 +66,11 @@
 }
 .yawm-page .part-block-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    color: white; padding: 12px 20px; font-weight: 700; font-size: 15px;
+    color: white; padding: 12px 16px; font-weight: 700; font-size: 14px;
 }
 .yawm-page .part-block-body { padding: 0; }
 .yawm-page .page-row {
-    padding: 10px 18px; border-bottom: 1px solid #eef1f6;
+    padding: 11px 14px; border-bottom: 1px solid #eef1f6;
     display: grid; grid-template-columns: 100px 1fr 1fr; gap: 14px;
     align-items: center; justify-items: center; font-size: 13px;
 }
@@ -78,8 +78,8 @@
 .yawm-page .page-row.header { background: #f8f9fc; font-weight: 700; color: var(--navy); }
 .yawm-page .page-num-badge { background: #fef5e7; color: var(--navy); font-weight: 700; padding: 4px 10px; border-radius: 6px; }
 .yawm-page .stat-pill {
-    display: inline-block; padding: 3px 10px; border-radius: 6px;
-    font-weight: 700; font-size: 13px;
+    display: inline-block; padding: 3px 10px; border-radius: 7px;
+    font-weight: 700; font-size: 11.5px;
 }
 .yawm-page .stat-pill.err { background: #fde8e6; color: #c0392b; }
 .yawm-page .stat-pill.hes { background: #fef5e7; color: #b36b00; }

@@ -21,9 +21,9 @@
 }
 .tafseer-controls {
     background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 16px;
     color: white;
 }
 .tafseer-controls .form-label {
@@ -53,8 +53,8 @@
 .tafseer-controls .btn-load {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     border: none;
-    border-radius: 10px;
-    padding: 12px 24px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
     color: white;
     transition: all 0.3s ease;
@@ -65,15 +65,15 @@
 }
 .tafseer-verse-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 .tafseer-verse-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 20px 24px;
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -90,8 +90,8 @@
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     transition: all 0.2s;
 }
@@ -99,7 +99,7 @@
     background: rgba(255,255,255,0.3);
 }
 .tafseer-verse-body {
-    padding: 32px;
+    padding: 24px;
     text-align: center;
     background: linear-gradient(180deg, #faf9ff 0%, white 100%);
 }
@@ -112,14 +112,14 @@
 }
 .tafseer-content-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     overflow: hidden;
 }
 .tafseer-content-header {
     background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
     color: white;
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -130,12 +130,12 @@
 }
 .tafseer-badge {
     background: rgba(255,255,255,0.2);
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 3px 10px;
+    border-radius: 7px;
     font-size: 0.8rem;
 }
 .tafseer-content-body {
-    padding: 24px;
+    padding: 16px;
 }
 .tafseer-text {
     font-size: 1.1rem;
@@ -145,7 +145,7 @@
 }
 .tafseer-empty {
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 16px;
     color: #999;
 }
 .tafseer-empty i {
@@ -155,7 +155,7 @@
 }
 .tafseer-loading {
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 16px;
 }
 .loading-spinner {
     width: 50px;

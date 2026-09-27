@@ -23,7 +23,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 </div>
 
 {{-- Page Header --}}
-<div class="page-header-modern">
+<div class="page-header">
     <div class="header-content">
         <div class="header-icon-wrapper">
             <div class="header-icon">
@@ -199,7 +199,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
                                 </div>
                             </td>
                             <td class="phone-cell">
-                                <i class="fas fa-phone me-1" style="color: #d4a030;"></i>
+                                <i class="fas fa-phone me-1" style="color:#d4a030"></i>
                                 {{ $parent->phone ?? '-' }}
                             </td>
                             <td class="email-cell">{{ $parent->email ?? '-' }}</td>
@@ -262,22 +262,20 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 .islamic-pattern-header {
     position: relative;
     height: 80px;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 13px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
 }
-
 .pattern-overlay {
     position: absolute;
     inset: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     opacity: 0.5;
 }
-
 .bismillah-text {
     font-family: 'Amiri', serif;
     font-size: 24px;
@@ -287,41 +285,9 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     z-index: 1;
     letter-spacing: 2px;
 }
-
-.page-header-modern {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding: 25px 30px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 25px rgba(24,43,72,0.08);
-    border: 1px solid rgba(212,160,48,0.1);
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
 .header-icon-wrapper {
     position: relative;
 }
-
-.header-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: #d4a030;
-    box-shadow: 0 8px 30px rgba(24,43,72,0.25);
-    position: relative;
-    z-index: 1;
-}
-
 .header-icon-glow {
     position: absolute;
     top: 50%;
@@ -333,18 +299,14 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     border-radius: 50%;
     z-index: 0;
 }
-
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .add-btnIslamic {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 28px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
     color: #fff;
-    border-radius: 14px;
+    border-radius: 13px;
     text-decoration: none;
     font-weight: 700;
     font-size: 14px;
@@ -352,39 +314,36 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     box-shadow: 0 4px 20px rgba(212,160,48,0.3);
     border: none;
 }
-
 .add-btnIslamic:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 30px rgba(212,160,48,0.4);
     color: #fff;
 }
-
 .stats-grid-islamic {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
-
-@media (max-width: 992px) { .stats-grid-islamic { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 576px) { .stats-grid-islamic { grid-template-columns: 1fr; } }
-
+@media (max-width: 992px) {
+.stats-grid-islamic { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 576px) {
+.stats-grid-islamic { grid-template-columns: 1fr; }
+}
 .stat-card-islamic {
     position: relative;
-    padding: 25px;
-    border-radius: 20px;
+    padding: 16px;
+    border-radius: 13px;
     overflow: hidden;
     transition: all 0.4s ease;
 }
-
 .stat-card-islamic:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
-
 .stat-card-islamic.primary { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); }
 .stat-card-islamic.gold { background: linear-gradient(135deg, #d4a030 0%, #B4802C 100%); }
 .stat-card-islamic.emerald { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
-
 .stat-card-bg-pattern {
     position: absolute;
     top: -40px;
@@ -394,7 +353,6 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
 }
-
 .stat-content-wrapper {
     display: flex;
     align-items: flex-start;
@@ -402,25 +360,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     position: relative;
     z-index: 1;
 }
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    color: #fff;
-    backdrop-filter: blur(5px);
-    flex-shrink: 0;
-}
-
 .stat-content { flex: 1; }
-.stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
-.stat-label { font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 500; }
-.stat-decoration { position: absolute; bottom: 15px; left: 20px; font-size: 50px; opacity: 0.12; color: #fff; }
 .stat-corner-decoration {
     position: absolute;
     bottom: 0;
@@ -430,25 +370,22 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     background: radial-gradient(circle at bottom right, rgba(255,255,255,0.1) 0%, transparent 70%);
     border-radius: 50% 0 0 0;
 }
-
 .filter-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .filter-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.03));
     border-bottom: 2px solid rgba(212,160,48,0.1);
 }
-
 .filter-title {
     display: flex;
     align-items: center;
@@ -457,9 +394,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     color: #182B48;
     font-size: 16px;
 }
-
 .filter-title i { color: #d4a030; font-size: 18px; }
-
 .filter-icon-decoration {
     width: 45px;
     height: 45px;
@@ -471,13 +406,9 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     color: #d4a030;
     font-size: 18px;
 }
-
-.filter-form { padding: 25px; }
-
 .input-group-islamic, .select-group-islamic {
     position: relative;
 }
-
 .input-group-islamic i, .select-group-islamic i {
     position: absolute;
     right: 15px;
@@ -486,7 +417,6 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     color: #d4a030;
     z-index: 1;
 }
-
 .input-group-islamic .form-control, .select-group-islamic .form-select {
     padding-right: 45px;
     border-radius: 12px;
@@ -494,18 +424,16 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     padding: 12px 16px;
     transition: all 0.3s;
 }
-
 .input-group-islamic .form-control:focus, .select-group-islamic .form-select:focus {
     border-color: #d4a030;
     box-shadow: 0 0 0 4px rgba(212,160,48,0.15);
 }
-
 .btn-primary-islamic {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 25px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
     border: none;
@@ -516,18 +444,16 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     cursor: pointer;
     width: 100%;
 }
-
 .btn-primary-islamic:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 20px rgba(24,43,72,0.3);
     color: #fff;
 }
-
 .btn-outline-islamic {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 20px;
+    padding: 12px 16px;
     background: transparent;
     color: #7f8c8d;
     border: 2px solid #e9ecef;
@@ -538,35 +464,14 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     cursor: pointer;
     width: 100%;
 }
-
 .btn-outline-islamic:hover { border-color: #d4a030; color: #d4a030; }
-
 .table-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 25px;
-    border-bottom: 2px solid rgba(212,160,48,0.1);
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #182B48;
-}
-
 .table-icon {
     width: 45px;
     height: 45px;
@@ -578,7 +483,6 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     color: #d4a030;
     font-size: 18px;
 }
-
 .records-count-islamic {
     display: flex;
     align-items: center;
@@ -590,13 +494,11 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     font-weight: 600;
     color: #B4802C;
 }
-
 .records-count-islamic i { color: #d4a030; }
-
 .data-table-islamic { width: 100%; border-collapse: collapse; }
 .data-table-islamic thead { background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.03)); }
 .data-table-islamic th {
-    padding: 16px 20px;
+    padding: 16px 16px;
     font-size: 12px;
     font-weight: 700;
     color: #182B48;
@@ -605,7 +507,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     border-bottom: 2px solid rgba(212,160,48,0.15);
 }
 .data-table-islamic td {
-    padding: 18px 20px;
+    padding: 16px 16px;
     font-size: 14px;
     color: #2c3e50;
     border-bottom: 1px solid #f0f4f8;
@@ -613,14 +515,13 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 }
 .data-table-islamic tbody tr { transition: all 0.3s; }
 .data-table-islamic tbody tr:hover { background: linear-gradient(135deg, rgba(212,160,48,0.03), rgba(180,128,44,0.03)); }
-
 .index-cell { color: #7f8c8d; font-weight: 700; }
 .user-cell { display: flex; align-items: center; gap: 15px; }
 .user-avatar {
     width: 48px;
     height: 48px;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -628,11 +529,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     font-size: 20px;
 }
 .user-info { display: flex; flex-direction: column; }
-.user-name { font-weight: 700; color: #182B48; font-size: 15px; }
-.user-username { font-size: 12px; color: #7f8c8d; }
-.phone-cell { direction: ltr; text-align: right; font-family: monospace; }
 .email-cell { color: #7f8c8d; }
-
 .badge-islamic {
     padding: 7px 14px;
     border-radius: 10px;
@@ -644,21 +541,18 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 .badge-islamic.primary { background: rgba(24,43,72,0.1); color: #182B48; }
 .badge-islamic.emerald { background: rgba(39,174,96,0.1); color: #27ae60; }
 .badge-islamic.info { background: rgba(52,152,219,0.1); color: #3498db; }
-
 .student-count-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background: linear-gradient(135deg, rgba(212,160,48,0.1), rgba(180,128,44,0.1));
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 13px;
     font-size: 13px;
     font-weight: 600;
     color: #B4802C;
 }
 .student-count-badge i { color: #d4a030; }
-
-.action-buttons { display: flex; gap: 10px; }
 .action-btn-islamic {
     width: 40px;
     height: 40px;
@@ -677,13 +571,11 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 .action-btn-islamic.edit:hover { background: #d4a030; color: #fff; transform: scale(1.05); }
 .action-btn-islamic.delete { background: rgba(192,57,43,0.1); color: #c0392b; }
 .action-btn-islamic.delete:hover { background: #c0392b; color: #fff; transform: scale(1.05); }
-
-.table-footer { padding: 20px 25px; border-top: 1px solid #f0f4f8; }
-.table-footer .pagination { margin: 0; gap: 8px; }
+.table-footer .pagination { margin: 0; gap: 4px; }
 .table-footer .page-link {
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 12.5px;
     border: 2px solid #e9ecef;
     color: #182B48;
     transition: all 0.3s;
@@ -693,28 +585,14 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     border-color: #182B48;
     color: #fff;
 }
-
 .empty-state-islamic {
     text-align: center;
-    padding: 70px 20px;
+    padding: 40px 16px;
 }
 .empty-icon-wrapper {
     position: relative;
     display: inline-block;
-    margin-bottom: 25px;
-}
-.empty-icon {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.1), rgba(42,69,112,0.1));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: #d4a030;
-    position: relative;
-    z-index: 1;
+    margin-bottom: 16px;
 }
 .empty-icon-glow {
     position: absolute;
@@ -727,7 +605,7 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
     border-radius: 50%;
     z-index: 0;
 }
-.empty-state-islamic h5 { color: #182B48; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-.empty-state-islamic p { color: #7f8c8d; margin-bottom: 25px; font-size: 15px; }
+.empty-state-islamic h5 { color: #182B48; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-islamic p { color: #7f8c8d; margin-bottom: 16px; font-size: 15px; }
 </style>
 @endsection

@@ -24,9 +24,9 @@
 
 .azkar-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 28px 32px;
-    margin-bottom: 28px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -48,67 +48,68 @@
 }
 
 .azkar-page .hero-icon {
-    width: 70px; height: 70px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 20px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 32px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 8px 24px rgba(212,160,48,0.4);
     position: relative; z-index: 1;
+    flex-shrink: 0;
 }
 
-.azkar-page .hero-title { color: white; font-size: 26px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; }
-.azkar-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin: 0; position: relative; z-index: 1; }
+.azkar-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; }
+.azkar-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 12.5px; margin: 0; position: relative; z-index: 1; }
 
 .azkar-page .stats-row {
     display: flex;
-    gap: 16px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 16px;
     position: relative; z-index: 1;
 }
 
 .azkar-page .stat-item {
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
-    padding: 12px 20px;
+    border-radius: 10px;
+    padding: 12px 16px;
     text-align: center;
     min-width: 100px;
 }
 
-.azkar-page .stat-value { color: white; font-size: 24px; font-weight: 800; }
-.azkar-page .stat-label { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 2px; }
+.azkar-page .stat-value { color: white; font-size: 22px; font-weight: 800; }
+.azkar-page .stat-label { color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 2px; }
 
 .azkar-page .tasbeeh-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 13px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.08);
     border: 1px solid rgba(24,43,72,0.04);
-    padding: 32px;
-    margin-bottom: 28px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 
 .azkar-page .tasbeeh-header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .azkar-page .tasbeeh-header h4 {
     color: var(--navy);
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 4px;
 }
 
-.azkar-page .tasbeeh-header p { color: #6c7a89; font-size: 13px; margin: 0; }
+.azkar-page .tasbeeh-header p { color: #6c7a89; font-size: 12.5px; margin: 0; }
 
 .azkar-page .tasbeeh-display {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .azkar-page .tasbeeh-count {
-    font-size: 96px;
+    font-size: 72px;
     font-weight: 800;
     color: var(--navy);
     line-height: 1;
@@ -116,22 +117,22 @@
 }
 
 .azkar-page .tasbeeh-target {
-    font-size: 16px;
+    font-size: 13px;
     color: #6c7a89;
     margin-top: 8px;
 }
 
 .azkar-page .tasbeeh-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .azkar-page .tasbeeh-btn {
-    padding: 16px 32px;
-    border-radius: 16px;
-    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 9px;
+    font-size: 13px;
     font-weight: 700;
     border: none;
     cursor: pointer;
@@ -174,15 +175,15 @@
 .azkar-page .categories-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    gap: 14px;
 }
 
 .azkar-page .category-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
-    padding: 24px;
+    padding: 16px;
     transition: all 0.3s ease;
     text-decoration: none;
     display: block;
@@ -194,32 +195,32 @@
 }
 
 .azkar-page .category-icon {
-    width: 56px; height: 56px;
-    border-radius: 16px;
+    width: 48px; height: 48px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    margin-bottom: 16px;
+    font-size: 20px;
+    margin-bottom: 14px;
 }
 
 .azkar-page .category-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--navy);
     margin-bottom: 6px;
 }
 
 .azkar-page .category-count {
-    font-size: 13px;
+    font-size: 12.5px;
     color: #6c7a89;
 }
 
 .azkar-page .category-arrow {
-    width: 36px; height: 36px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     background: rgba(24,43,72,0.06);
     display: flex; align-items: center; justify-content: center;
     color: var(--navy);
-    margin-top: 16px;
+    margin-top: 12px;
     transition: all 0.2s ease;
 }
 
@@ -229,11 +230,11 @@
 }
 
 @media (max-width: 768px) {
-    .azkar-page .page-hero { padding: 20px 24px; }
-    .azkar-page .hero-icon { width: 56px; height: 56px; font-size: 26px; }
-    .azkar-page .hero-title { font-size: 20px; }
-    .azkar-page .tasbeeh-count { font-size: 72px; }
-    .azkar-page .tasbeeh-btn { padding: 14px 24px; font-size: 14px; }
+    .azkar-page .page-hero { padding: 14px 16px; }
+    .azkar-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
+    .azkar-page .hero-title { font-size: 18px; }
+    .azkar-page .tasbeeh-count { font-size: 56px; }
+    .azkar-page .tasbeeh-btn { padding: 10px 20px; font-size: 13px; }
     .azkar-page .stats-row { flex-wrap: wrap; }
     .azkar-page .stat-item { min-width: 80px; padding: 10px 14px; }
     .azkar-page .stat-value { font-size: 20px; }

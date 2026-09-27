@@ -24,9 +24,9 @@
 
 .session-detail .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -42,16 +42,16 @@
 .session-detail .hero-content { position: relative; z-index: 1; }
 
 .session-detail .hero-icon {
-    width: 60px; height: 60px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 16px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(212, 160, 48, 0.35);
 }
 
-.session-detail .hero-title { color: white; font-size: 22px; font-weight: 700; }
-.session-detail .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; }
+.session-detail .hero-title { color: white; font-size: 18px; font-weight: 700; }
+.session-detail .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; }
 
 .session-detail .quran-verse {
     font-family: 'Amiri', serif;
@@ -67,11 +67,11 @@
 
 .session-detail .info-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(24, 43, 72, 0.04);
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     transition: all 0.3s ease;
     position: relative;
 }
@@ -87,43 +87,43 @@
 
 .session-detail .info-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
-    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
 }
 
-.session-detail .info-header i { color: var(--gold); font-size: 20px; }
-.session-detail .info-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.session-detail .info-header i { color: var(--gold); font-size: 16px; }
+.session-detail .info-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
-.session-detail .info-body { padding: 24px; }
+.session-detail .info-body { padding: 16px; }
 
 .session-detail .student-info-box {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.04) 0%, rgba(42, 69, 112, 0.06) 100%);
     border: 2px solid rgba(24, 43, 72, 0.08);
-    border-radius: 16px;
-    padding: 22px;
+    border-radius: 13px;
+    padding: 16px;
     text-align: center;
 }
 
 .session-detail .student-avatar {
-    width: 76px; height: 76px;
+    width: 60px; height: 60px;
     background: linear-gradient(135deg, var(--purple) 0%, #7d3c98 100%);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 14px;
-    font-size: 30px; color: #fff;
+    margin: 0 auto 12px;
+    font-size: 24px; color: #fff;
     box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);
 }
 
-.session-detail .student-name { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
-.session-detail .student-number { font-size: 13px; color: #95a5a6; }
+.session-detail .student-name { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.session-detail .student-number { font-size: 12.5px; color: #95a5a6; }
 
 .session-detail .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 
 .session-detail .stat-box {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.04) 0%, rgba(42, 69, 112, 0.06) 100%);
     border: 1px solid rgba(24, 43, 72, 0.06);
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 13px;
+    padding: 14px;
     text-align: center;
     transition: all 0.3s ease;
 }
@@ -131,8 +131,8 @@
 .session-detail .stat-box:hover { transform: translateY(-2px); border-color: var(--gold); }
 
 .session-detail .stat-box .stat-value {
-    font-size: 28px; font-weight: 800; line-height: 1;
-    margin-bottom: 6px;
+    font-size: 22px; font-weight: 800; line-height: 1;
+    margin-bottom: 3px;
 }
 
 .session-detail .stat-box .stat-value.primary { color: var(--navy); }
@@ -149,13 +149,13 @@
 .session-detail .part-item {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.04) 0%, rgba(42, 69, 112, 0.06) 100%);
     border: 1px solid rgba(24, 43, 72, 0.06);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 13px;
+    padding: 14px;
     text-align: center;
 }
 
 .session-detail .part-item .part-label { font-size: 11px; color: #6c7a89; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.session-detail .part-item .part-value { font-size: 17px; font-weight: 700; color: var(--navy); }
+.session-detail .part-item .part-value { font-size: 16px; font-weight: 700; color: var(--navy); }
 
 .session-detail .pages-table {
     width: 100%; border-collapse: collapse;
@@ -168,7 +168,7 @@
 }
 
 .session-detail .pages-table th {
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-size: 11px; font-weight: 700;
     text-align: center;
     border: none;
@@ -181,17 +181,17 @@
 .session-detail .pages-table tbody tr:last-child td { border-bottom: none; }
 
 .session-detail .pages-table td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24, 43, 72, 0.04);
     text-align: center;
 }
 
 .session-detail .color-indicator {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
 .session-detail .color-indicator.excellent { background: rgba(39,174,96,0.15); color: var(--success); }
@@ -203,16 +203,16 @@
 .session-detail .notes-box {
     background: linear-gradient(135deg, rgba(212, 160, 48, 0.08) 0%, rgba(180, 128, 44, 0.12) 100%);
     border: 2px solid rgba(212, 160, 48, 0.15);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 13px;
+    padding: 16px;
 }
 
-.session-detail .notes-box p { font-size: 15px; color: #5a6c7d; line-height: 1.7; margin: 0; }
+.session-detail .notes-box p { font-size: 13px; color: #5a6c7d; line-height: 1.7; margin: 0; }
 
 .session-detail .type-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 12px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
 .session-detail .type-badge.new_memorization { background: rgba(39,174,96,0.15); color: var(--success); }
@@ -223,21 +223,21 @@
 
 .session-detail .meta-date {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 16px; border-radius: 20px;
+    padding: 6px 12px; border-radius: 999px;
     background: rgba(255,255,255,0.15);
     color: #fff;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 500;
 }
 
 .session-detail .meta-date i { color: var(--gold); }
 
-.session-detail .empty-state { text-align: center; padding: 40px 20px; }
-.session-detail .empty-state i { font-size: 36px; color: rgba(24, 43, 72, 0.3); }
+.session-detail .empty-state { text-align: center; padding: 40px 16px; }
+.session-detail .empty-state i { font-size: 26px; color: rgba(24, 43, 72, 0.3); }
 
 @media (max-width: 992px) {
     .session-detail .stat-grid { grid-template-columns: repeat(2, 1fr); }
-    .session-detail .hero-icon { width: 52px; height: 52px; font-size: 22px; }
+    .session-detail .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .session-detail .hero-title { font-size: 18px; }
 }
 </style>
@@ -431,7 +431,7 @@
                     @if($session->supervisor)
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(24,43,72,0.06);">
                         <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                            <div style="width: 44px; height: 44px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gold);">
+                            <div style="width: 38px; height: 38px; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--gold);">
                                 <i class="fas fa-user-tie"></i>
                             </div>
                             <div style="text-align: right;">

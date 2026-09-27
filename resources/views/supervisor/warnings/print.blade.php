@@ -76,8 +76,8 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         .stat-box {
             text-align: center;
@@ -85,7 +85,7 @@
             border-radius: 6px;
             border: 1px solid #dee2e6;
         }
-        .stat-box .num { font-size: 24px; font-weight: bold; color: #182B48; }
+        .stat-box .num { font-size: 22px; font-weight: bold; color: #182B48; }
         .stat-box .lbl { font-size: 11px; color: #666; }
 
         .signature-section {

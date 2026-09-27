@@ -22,59 +22,43 @@
 }
 .yawm-page .hero-section {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative; overflow: hidden;
 }
-.yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .yawm-page .hero-icon {
-    width: 60px; height: 60px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(212,160,48,0.35);
     flex-shrink: 0;
 }
-.yawm-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+.yawm-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
 .yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
 .yawm-page .hero-actions { margin-right: auto; display: flex; gap: 10px; }
 .yawm-page .btn-gold {
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    color: white; border: none; padding: 9px 18px; border-radius: 10px;
+    color: white; border: none; padding: 9px 16px; border-radius: 10px;
     font-weight: 700; font-size: 13px; text-decoration: none;
     display: inline-flex; align-items: center; gap: 6px;
     box-shadow: 0 4px 14px rgba(212,160,48,0.35);
 }
 .yawm-page .btn-gold:hover { color: white; transform: translateY(-1px); }
-
-.yawm-page .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px; margin-bottom: 22px;
-}
-.yawm-page .stat-card {
-    background: white; border-radius: var(--radius); padding: 18px 20px;
-    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px;
-    border: 1px solid rgba(24,43,72,0.05);
-}
-.yawm-page .stat-icon {
-    width: 50px; height: 50px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-}
 .yawm-page .stat-icon.navy { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white; }
 .yawm-page .stat-icon.gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); color: white; }
 .yawm-page .stat-icon.danger { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); color: white; }
 .yawm-page .stat-icon.warning { background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%); color: white; }
-.yawm-page .stat-label { font-size: 12px; color: #6b7a90; margin-bottom: 4px; }
 .yawm-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); }
-
 .yawm-page .days-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 16px;
 }
 .yawm-page .day-card {
-    background: white; border-radius: var(--radius); padding: 22px;
+    background: white; border-radius: var(--radius); padding: 16px;
     box-shadow: var(--shadow-sm); border: 1px solid rgba(24,43,72,0.05);
     text-decoration: none; color: inherit; transition: all 0.2s;
     position: relative; overflow: hidden;
@@ -112,12 +96,7 @@
     text-align: left; color: var(--gold); font-size: 14px; font-weight: 700;
 }
 .yawm-page .day-arrow i { margin-right: 4px; }
-
-.yawm-page .empty-state {
-    text-align: center; padding: 60px 20px; color: #6b7a90;
-    background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-}
-.yawm-page .empty-state i { font-size: 60px; margin-bottom: 18px; opacity: 0.3; }
+.yawm-page .empty-state i { font-size: 22px; margin-bottom: 16px; opacity: 0.3; }
 </style>
 @endpush
 

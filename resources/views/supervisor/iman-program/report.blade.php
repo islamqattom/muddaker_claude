@@ -12,17 +12,17 @@
 <style>
     .report-tabs {
         background: #fff;
-        border-radius: 16px;
-        padding: 14px 22px;
+        border-radius: 13px;
+        padding: 12px 16px;
         box-shadow: 0 2px 10px rgba(24, 43, 72, 0.05);
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
     }
     .report-tab {
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 8px 16px;
+        border-radius: 9px;
         font-weight: 700;
         text-decoration: none;
         display: inline-flex;
@@ -39,13 +39,13 @@
     }
     .report-card {
         background: #fff;
-        border-radius: 16px;
+        border-radius: 13px;
         box-shadow: 0 2px 10px rgba(24, 43, 72, 0.05);
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         overflow: hidden;
     }
     .report-card-header {
-        padding: 18px 22px;
+        padding: 12px 16px;
         border-bottom: 1px solid #eef1f6;
         display: flex;
         align-items: center;
@@ -53,20 +53,20 @@
         gap: 12px;
         flex-wrap: wrap;
     }
-    .report-card-header h3 { margin: 0; font-size: 18px; color: #182B48; }
+    .report-card-header h3 { margin: 0; font-size: 15px; color: #182B48; }
     .report-card-body { padding: 0; }
     .report-table { width: 100%; border-collapse: collapse; }
     .report-table th, .report-table td {
-        padding: 12px 16px;
+        padding: 11px 14px;
         text-align: right;
         border-bottom: 1px solid #eef1f6;
-        font-size: 14px;
+        font-size: 13px;
     }
     .report-table thead th {
         background: rgba(24, 43, 72, 0.04);
         color: #182B48;
         font-weight: 700;
-        font-size: 13px;
+        font-size: 11px;
     }
     .report-table tbody tr:last-child td { border-bottom: none; }
     .criterion-name { color: #182B48; font-weight: 700; }
@@ -117,41 +117,41 @@
     }
     .summary-card {
         background: #fff;
-        border-radius: 16px;
-        padding: 18px;
+        border-radius: 13px;
+        padding: 14px 16px;
         box-shadow: 0 2px 10px rgba(24, 43, 72, 0.05);
         display: flex;
         align-items: center;
         gap: 14px;
     }
     .summary-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-size: 22px;
+        font-size: 16px;
     }
     .summary-label { font-size: 12px; color: #6b7a90; }
     .summary-value { font-size: 22px; font-weight: 800; color: #182B48; }
     .empty-state {
         background: #fff;
-        border-radius: 16px;
-        padding: 60px 20px;
+        border-radius: 13px;
+        padding: 40px 16px;
         text-align: center;
         color: #6b7a90;
         box-shadow: 0 2px 10px rgba(24, 43, 72, 0.05);
     }
-    .empty-state i { font-size: 50px; opacity: 0.3; color: #182B48; }
+    .empty-state i { font-size: 40px; opacity: 0.3; color: #182B48; }
     .empty-state h5 { color: #182B48; margin-top: 14px; }
     .week-picker {
         background: #fff;
-        border-radius: 16px;
-        padding: 18px 22px;
+        border-radius: 13px;
+        padding: 16px;
         box-shadow: 0 2px 10px rgba(24, 43, 72, 0.05);
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
 </style>
 @endpush
@@ -170,13 +170,13 @@
     };
 @endphp
 
-<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:16px;padding:24px 30px;margin-bottom:24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <div style="width:60px;height:60px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;">
+<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:14px;padding:16px 22px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;">
         <i class="fas fa-chart-column"></i>
     </div>
     <div>
-        <h1 style="margin:0;font-size:22px;font-weight:700;">{{ $title }}</h1>
-        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">{{ $subtitle }}</p>
+        <h1 style="margin:0;font-size:18px;font-weight:700;">{{ $title }}</h1>
+        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:12.5px;">{{ $subtitle }}</p>
     </div>
 </div>
 
@@ -223,7 +223,7 @@
 </div>
 
 @if(!$selectedStudent)
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;">
     <div class="summary-card">
         <div class="summary-icon" style="background:linear-gradient(135deg,#182B48,#2A4570);"><i class="fas fa-bullseye"></i></div>
         <div>
@@ -273,7 +273,7 @@
                 </h3>
                 <small style="color:#6b7a90;">{{ $weekStart->format('Y/m/d') }} - {{ $weekEnd->format('Y/m/d') }}</small>
             </div>
-            <div style="padding:18px 22px;position:relative;height:320px;">
+            <div style="padding:16px;position:relative;height:320px;">
                 <canvas id="studentsCompletionChart"></canvas>
             </div>
         </div>
@@ -303,7 +303,7 @@
                 </h3>
                 <small style="color:#6b7a90;">{{ $weekStart->format('Y/m/d') }} - {{ $weekEnd->format('Y/m/d') }}</small>
             </div>
-            <div style="padding:18px 22px;position:relative;height:320px;">
+            <div style="padding:16px;position:relative;height:320px;">
                 <canvas id="studentsCompletionChart"></canvas>
             </div>
         </div>
@@ -354,13 +354,13 @@
                 </div>
                 <div class="report-card-body">
                     @if($reportCollection->isEmpty())
-                        <div style="padding:24px 22px;text-align:center;color:#6b7a90;">
+                        <div style="padding:16px;text-align:center;color:#6b7a90;">
                             <i class="fas fa-info-circle"></i> لا توجد برامج إيمانية لهذا الطالب.
                         </div>
                     @else
                         @foreach($reportCollection as $programRow)
-                            <div style="padding:18px 22px;border-bottom:1px solid #eef1f6;">
-                                <h4 style="margin:0 0 6px;font-size:16px;color:#182B48;">
+                            <div style="padding:16px;border-bottom:1px solid #eef1f6;">
+                                <h4 style="margin:0 0 6px;font-size:15px;color:#182B48;">
                                     <i class="fas fa-seedling" style="color:#27ae60;margin-left:6px;"></i>
                                     {{ $programRow['program']->name }}
                                 </h4>
@@ -531,7 +531,7 @@
             <h5>لا توجد برامج شخصية</h5>
             <p>ابدأ بإنشاء برنامجك الإيماني الشخصي لمتابعة التزامك اليومي.</p>
             <a href="{{ route('supervisor.iman-program.create', ['scope' => 'self']) }}"
-               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;text-decoration:none;">
+               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;">
                 <i class="fas fa-plus-circle"></i> أنشئ برنامجك الشخصي
             </a>
         </div>

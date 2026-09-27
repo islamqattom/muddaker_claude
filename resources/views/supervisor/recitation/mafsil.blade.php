@@ -26,9 +26,9 @@
     --info-soft: #e0f2fe;
     --purple: #8b5cf6;
     --purple-soft: #ede9fe;
-    --radius: 20px;
-    --radius-sm: 14px;
-    --radius-xs: 10px;
+    --radius: 13px;
+    --radius-sm: 13px;
+    --radius-xs: 9px;
     --shadow-sm: 0 1px 3px rgba(15, 28, 51, 0.04), 0 2px 8px rgba(15, 28, 51, 0.04);
     --shadow: 0 4px 12px rgba(15, 28, 51, 0.06), 0 12px 28px rgba(15, 28, 51, 0.08);
     --shadow-lg: 0 12px 32px rgba(15, 28, 51, 0.12);
@@ -47,7 +47,7 @@
         linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: var(--radius);
     padding: 0;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-lg);
@@ -62,7 +62,7 @@
 }
 
 .rec-session .hero-top {
-    padding: 22px 26px;
+    padding: 16px 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -80,14 +80,14 @@
 }
 
 .rec-session .student-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 18px;
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
     background: linear-gradient(135deg, #f1c40f 0%, var(--gold) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 20px;
     color: var(--navy-deep);
     box-shadow: 0 8px 20px rgba(212, 160, 48, 0.4);
     flex-shrink: 0;
@@ -98,13 +98,13 @@
     content: '';
     position: absolute;
     inset: -3px;
-    border-radius: 20px;
+    border-radius: 16px;
     border: 2px solid rgba(255,255,255,0.25);
     pointer-events: none;
 }
 
 .rec-session .student-name {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 800;
     color: white;
     margin: 0 0 6px 0;
@@ -179,10 +179,10 @@
 
 .rec-session .quran-verse {
     font-family: 'Amiri', serif;
-    font-size: 14px;
+    font-size: 12.5px;
     color: rgba(255,255,255,0.85);
     text-align: center;
-    padding: 14px 24px 18px;
+    padding: 12px 16px 14px;
     border-top: 1px solid rgba(255,255,255,0.1);
     margin: 0;
     position: relative;
@@ -207,7 +207,7 @@
 }
 
 .rec-session .card-header-modern {
-    padding: 16px 22px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -224,7 +224,7 @@
 
 .rec-session .section-title {
     color: var(--navy);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -235,20 +235,20 @@
 .rec-session .card-header-modern.solid .section-title { color: white; }
 
 .rec-session .section-title .title-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
     color: white;
-    font-size: 14px;
+    font-size: 13px;
     flex-shrink: 0;
     box-shadow: 0 4px 10px rgba(212, 160, 48, 0.3);
 }
 
-.rec-session .card-body-modern { padding: 22px; }
+.rec-session .card-body-modern { padding: 16px; }
 
 /* =========================
    INFO ALERT
@@ -256,7 +256,7 @@
 .rec-session .info-alert {
     border-radius: var(--radius-sm);
     border: 1px solid rgba(14, 165, 233, 0.15);
-    padding: 14px 18px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, var(--info-soft) 0%, #f0f9ff 100%);
     color: var(--navy);
     display: flex;
@@ -281,10 +281,10 @@
 .rec-session .progress-card {
     background: white;
     border-radius: var(--radius);
-    padding: 18px 22px;
+    padding: 14px 16px;
     box-shadow: var(--shadow-sm);
     border: 1px solid rgba(15, 28, 51, 0.05);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -294,7 +294,7 @@
 .rec-session .progress-card .progress-icon {
     width: 48px;
     height: 48px;
-    border-radius: 14px;
+    border-radius: 13px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
     color: white;
     display: flex;
@@ -353,7 +353,7 @@
 }
 
 .rec-session .progress-card .progress-percent {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--gold);
     min-width: 50px;
@@ -368,7 +368,7 @@
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     padding: 14px;
     background: #f8fafc;
     border-radius: var(--radius-sm);
@@ -396,7 +396,7 @@
     border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-sm);
     background: white;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--navy);
     transition: all 0.2s ease;
 }
@@ -418,7 +418,7 @@
     border: 1.5px solid #e2e8f0;
     background: white;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--navy);
     cursor: pointer;
@@ -454,7 +454,7 @@
     position: relative;
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 12px 12px 10px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1016,8 +1016,8 @@
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border: none;
     border-radius: var(--radius-sm);
-    padding: 12px 28px;
-    font-size: 14px;
+    padding: 8px 16px;
+    font-size: 13px;
     font-weight: 700;
     color: white;
     transition: all 0.25s ease;
@@ -1039,7 +1039,7 @@
 .rec-session .btn-outline-modern {
     border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    padding: 11px 22px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 600;
     color: var(--navy);
@@ -1066,14 +1066,14 @@
     border: 1px solid rgba(15, 28, 51, 0.06);
     border-radius: var(--radius);
     overflow: hidden;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
     box-shadow: var(--shadow-sm);
 }
 
 .rec-session .part-section-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     color: white;
-    padding: 16px 22px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1094,7 +1094,7 @@
 .rec-session .part-section-header > * { position: relative; z-index: 1; }
 
 .rec-session .part-section-header .part-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -1103,9 +1103,9 @@
 }
 
 .rec-session .part-section-header .part-title .title-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     background: rgba(255,255,255,0.18);
     display: flex;
     align-items: center;
@@ -1139,7 +1139,7 @@
 .rec-session .position-card {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 13px;
     margin-bottom: 8px;
     transition: all 0.2s ease;
     overflow: hidden;
@@ -1508,14 +1508,14 @@
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
     border: 1px solid rgba(15, 28, 51, 0.06);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     overflow: hidden;
 }
 
 .rec-session .score-dashboard-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     color: white;
-    padding: 14px 22px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1524,7 +1524,7 @@
 }
 
 .rec-session .score-dashboard-header .summary-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -1533,14 +1533,14 @@
 }
 
 .rec-session .score-dashboard-header .summary-title .title-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     background: rgba(255,255,255,0.18);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .rec-session .auto-update-chip {
@@ -1570,10 +1570,10 @@
 }
 
 .rec-session .score-dashboard-body {
-    padding: 22px;
+    padding: 16px;
     display: grid;
     grid-template-columns: 1.4fr 2fr;
-    gap: 22px;
+    gap: 16px;
     align-items: center;
 }
 
@@ -1674,7 +1674,7 @@
 .rec-session .score-stat {
     background: #f8fafc;
     border: 1.5px solid transparent;
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 12px;
     display: flex;
     align-items: center;
@@ -1715,13 +1715,13 @@
 /* =========================
    NOTES
    ========================= */
-.rec-session .notes-card { background: white; border-radius: var(--radius); border: 1px solid rgba(15, 28, 51, 0.06); padding: 18px 22px; box-shadow: var(--shadow-sm); }
+.rec-session .notes-card { background: white; border-radius: var(--radius); border: 1px solid rgba(15, 28, 51, 0.06); padding: 14px 16px; box-shadow: var(--shadow-sm); }
 
 .rec-session .notes-textarea {
     border: 1.5px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    font-size: 14px;
+    padding: 10px 14px;
+    font-size: 13px;
     transition: all 0.2s ease;
     width: 100%;
     resize: vertical;
@@ -1740,7 +1740,7 @@
    ========================= */
 .rec-session .state-empty {
     text-align: center;
-    padding: 40px 20px;
+    padding: 40px 16px;
     color: #94a3b8;
 }
 
@@ -1751,18 +1751,18 @@
    ========================= */
 .rec-session .modal-content { border-radius: var(--radius); overflow: hidden; border: none; }
 
-.rec-session .modal-header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white; border-bottom: none; padding: 18px 22px; }
-.rec-session .modal-header .modal-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.rec-session .modal-header { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white; border-bottom: none; padding: 12px 16px; }
+.rec-session .modal-header .modal-title { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
 .rec-session .modal-header.bg-danger { background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important; }
-.rec-session .modal-body { padding: 24px; }
+.rec-session .modal-body { padding: 16px; }
 
-.rec-session .failure-modal-body { text-align: center; padding: 30px 20px; }
+.rec-session .failure-modal-body { text-align: center; padding: 24px 16px; }
 .rec-session .failure-modal-body .failure-icon { font-size: 64px; color: var(--danger); margin-bottom: 16px; }
 .rec-session .failure-modal-body h5 { color: var(--navy); font-weight: 800; margin-bottom: 8px; }
 .rec-session .failure-modal-body p { color: #64748b; margin-bottom: 0; }
 
 .rec-session .ayahs-modal-body { padding: 0; }
-.rec-session .ayahs-content { min-height: 200px; padding: 24px; }
+.rec-session .ayahs-content { min-height: 200px; padding: 16px; }
 .rec-session .ayahs-content .amiri-text { font-family: 'Amiri', serif; font-size: 22px; line-height: 2.2; text-align: justify; color: var(--navy); }
 .rec-session .ayahs-content .amiri-text .ayah-marker { color: var(--gold); font-weight: bold; margin: 0 4px; }
 .rec-session .ayahs-content .surah-header { text-align: center; font-family: 'Amiri', serif; font-size: 20px; font-weight: 800; color: var(--navy); margin: 16px 0; padding: 10px; background: var(--gold-soft); border-radius: 8px; }
@@ -1792,7 +1792,7 @@
     .rec-session .hero-stats { justify-content: center; }
     .rec-session .student-block { justify-content: center; text-align: center; flex-direction: column; }
     .rec-session .student-meta { justify-content: center; }
-    .rec-session .quran-verse { font-size: 13px; }
+    .rec-session .quran-verse { font-size: 12.5px; }
     .rec-session .part-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
     .rec-session .card-body-modern { padding: 16px; }
     .rec-session .action-bar-sticky { margin: 16px -16px -16px; padding: 12px 16px; }
@@ -1824,11 +1824,11 @@
     .rec-session .position-stat.deduction, .rec-session .position-stat.score { grid-column: span 1; }
     .rec-session .position-score-box { min-width: 64px; }
     .rec-session .hero-top { padding: 16px; }
-    .rec-session .student-avatar { width: 56px; height: 56px; font-size: 22px; }
-    .rec-session .student-name { font-size: 18px; }
+    .rec-session .student-avatar { width: 44px; height: 44px; font-size: 18px; }
+    .rec-session .student-name { font-size: 17px; }
     .rec-session .stat-pill { padding: 8px 12px; }
     .rec-session .stat-pill .stat-text .val { font-size: 14px; }
-    .rec-session .btn-primary-modern, .rec-session .btn-outline-modern { padding: 10px 18px; font-size: 13px; }
+    .rec-session .btn-primary-modern, .rec-session .btn-outline-modern { padding: 8px 16px; font-size: 13px; }
 }
 
 /* =========================

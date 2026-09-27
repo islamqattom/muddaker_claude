@@ -243,54 +243,25 @@
 </div>
 
 <style>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
-.header-icon {
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-
-.header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .settings-layout { max-width: 800px; margin: 0 auto; }
-
 .settings-card {
     background: #fff;
-    border-radius: 16px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
 }
-
 .settings-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 20px 25px;
+    padding: 16px 16px;
     border-bottom: 1px solid #f0f4f8;
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
     color: #182B48;
     font-weight: 700;
     font-size: 16px;
 }
-
 .settings-card-header i {
     width: 40px;
     height: 40px;
@@ -302,42 +273,34 @@
     color: #d4a030;
     font-size: 16px;
 }
-
-.settings-card-body { padding: 25px; }
-
+.settings-card-body { padding: 16px; }
 .settings-section {
-    margin-bottom: 30px;
+    margin-bottom: 16px;
     padding-bottom: 30px;
     border-bottom: 1px solid #f0f4f8;
 }
-
 .settings-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
 .section-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     color: #182B48;
     font-weight: 700;
     font-size: 15px;
 }
-
 .section-header i { color: #d4a030; font-size: 18px; }
-
 .section-body { padding-right: 30px; }
-
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
-
-@media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
-
-.form-group { margin-bottom: 20px; }
-
+@media (max-width: 768px) {
+.form-grid { grid-template-columns: 1fr; }
+}
+.form-group { margin-bottom: 16px; }
 .form-label {
     display: block;
     color: #495057;
@@ -345,7 +308,6 @@
     font-weight: 600;
     margin-bottom: 8px;
 }
-
 .form-control {
     width: 100%;
     padding: 14px 16px;
@@ -354,15 +316,12 @@
     font-size: 14px;
     transition: all 0.3s ease;
 }
-
 .form-control:focus {
     border-color: #182B48;
     box-shadow: 0 0 0 0.2rem rgba(24,43,72,0.15);
     outline: none;
 }
-
 .input-icon { position: relative; }
-
 .input-icon i {
     position: absolute;
     right: 14px;
@@ -371,17 +330,13 @@
     color: #d4a030;
     font-size: 16px;
 }
-
 .input-icon .form-control { padding-right: 45px; }
-
 .days-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 15px;
 }
-
 .day-checkbox input { display: none; }
-
 .day-checkbox label {
     display: flex;
     flex-direction: column;
@@ -394,43 +349,34 @@
     transition: all 0.3s ease;
     border: 2px solid transparent;
 }
-
 .day-checkbox label i { font-size: 20px; color: #7f8c8d; transition: all 0.3s ease; }
 .day-checkbox label span { font-size: 13px; font-weight: 600; color: #7f8c8d; transition: all 0.3s ease; }
-
 .day-checkbox input:checked + label {
     background: linear-gradient(135deg, rgba(24,43,72,0.1), rgba(42,69,112,0.1));
     border-color: #182B48;
 }
-
 .day-checkbox input:checked + label i { color: #d4a030; }
 .day-checkbox input:checked + label span { color: #182B48; }
-
 .day-checkbox label:hover {
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-
 .toggle-setting { display: flex; align-items: center; }
-
 .toggle-setting input { display: none; }
-
 .toggle-setting label {
     display: flex;
     align-items: center;
     gap: 15px;
     cursor: pointer;
 }
-
 .toggle-slider {
     width: 55px;
     height: 28px;
     background: #e9ecef;
-    border-radius: 14px;
+    border-radius: 13px;
     position: relative;
     transition: all 0.3s ease;
 }
-
 .toggle-slider::before {
     content: '';
     position: absolute;
@@ -443,21 +389,17 @@
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-
 .toggle-setting input:checked + label .toggle-slider {
     background: linear-gradient(135deg, #182B48, #2A4570);
 }
-
 .toggle-setting input:checked + label .toggle-slider::before {
     right: 30px;
 }
-
 .toggle-label {
     font-size: 14px;
     font-weight: 600;
     color: #182B48;
 }
-
 .form-actions {
     display: flex;
     gap: 15px;
@@ -465,12 +407,11 @@
     padding-top: 20px;
     border-top: 1px solid #f0f4f8;
 }
-
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 25px;
+    padding: 12px 16px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 14px;
@@ -479,23 +420,19 @@
     border: none;
     cursor: pointer;
 }
-
 .btn-primary {
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
 }
-
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(24,43,72,0.3);
 }
-
 .btn-outline-secondary {
     background: transparent;
     color: #7f8c8d;
     border: 1.5px solid #dee2e6;
 }
-
 .btn-outline-secondary:hover {
     background: #f8f9fa;
     color: #182B48;

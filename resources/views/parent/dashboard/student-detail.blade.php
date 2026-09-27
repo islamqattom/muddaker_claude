@@ -77,13 +77,11 @@
     <div class="table-card mb-4">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon">
-                    <i class="fas fa-microphone"></i>
-                </div>
+                <i class="fas fa-microphone"></i>
                 <span>سجل جلسات التسميع ({{ $sessions->count() }})</span>
             </div>
         </div>
-        <div class="card-body-custom">
+        <div class="card-body-custom p-0">
             @if($sessions->isEmpty())
                 <div class="empty-state">
                     <div class="empty-illustration">
@@ -159,13 +157,11 @@
     <div class="table-card mb-4">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
+                <i class="fas fa-calendar-check"></i>
                 <span>سجل الحضور ({{ $attendances->count() }})</span>
             </div>
         </div>
-        <div class="card-body-custom">
+        <div class="card-body-custom p-0">
             @if($attendances->isEmpty())
                 <div class="empty-state">
                     <div class="empty-illustration">
@@ -219,13 +215,11 @@
     <div class="table-card">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
+                <i class="fas fa-exclamation-triangle"></i>
                 <span>الإنذارات ({{ $warnings->count() }})</span>
             </div>
         </div>
-        <div class="card-body-custom">
+        <div class="card-body-custom p-0">
             @if($warnings->isEmpty())
                 <div class="empty-state success">
                     <div class="empty-illustration success">
@@ -278,15 +272,10 @@
 </div>
 
 <style>
-.portal-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
 .student-header-card {
     background: linear-gradient(135deg, #182B48 0%, #1a3356 100%);
-    border-radius: 20px;
-    padding: 35px;
+    border-radius: 14px;
+    padding: 16px 22px;
     position: relative;
     overflow: hidden;
 }
@@ -315,50 +304,51 @@
 .student-header-content {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 16px;
     position: relative;
     z-index: 1;
 }
 
 .student-avatar-xl {
-    width: 90px;
-    height: 90px;
+    width: 48px;
+    height: 48px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
-    border-radius: 20px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 20px;
     color: #fff;
     box-shadow: 0 10px 30px rgba(212,160,48,0.35);
+    flex-shrink: 0;
 }
 
 .student-info h4 {
     color: #fff;
-    font-size: 26px;
+    font-size: 18px;
     font-weight: 700;
-    margin: 0 0 8px 0;
+    margin: 0 0 3px 0;
 }
 
 .student-meta {
     color: rgba(255,255,255,0.7);
-    font-size: 14px;
-    margin: 0 0 12px 0;
+    font-size: 12.5px;
+    margin: 0 0 8px 0;
 }
 
 .student-badges {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .badge-custom {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 13px;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
@@ -372,94 +362,18 @@
     color: #fff;
 }
 
-.filter-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
-    border: 1px solid #f0f4f8;
-}
-
-.filter-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 18px;
-    align-items: end;
-}
-
-@media (max-width: 768px) { .filter-grid { grid-template-columns: 1fr; } }
-
 .filter-field { display: flex; flex-direction: column; }
 
-.filter-label {
-    color: #182B48;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.filter-actions { display: flex; gap: 10px; }
-
-.table-card {
-    background: #fff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
-    border: 1px solid #f0f4f8;
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 28px;
-    border-bottom: 1px solid #f0f4f8;
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #182B48;
-}
-
-.table-icon {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 18px;
-}
-
-.table-icon.warning {
-    background: linear-gradient(135deg, #d48806, #f39c12);
-    color: #fff;
-}
-
-.card-body-custom { padding: 0; }
-
-.empty-state {
-    text-align: center;
-    padding: 50px 20px;
-}
-
 .empty-illustration {
-    width: 80px;
-    height: 80px;
+    width: 66px;
+    height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 15px;
-    font-size: 32px;
+    margin: 0 auto 14px;
+    font-size: 26px;
     color: #d4a030;
 }
 
@@ -468,40 +382,11 @@
     color: #fff;
 }
 
-.empty-state p { color: #95a5a6; font-size: 14px; }
-
-.table-responsive { overflow-x: auto; }
-
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table thead { background: #f8f9fa; }
-
-.modern-table th {
-    padding: 18px 22px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #182B48;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
-}
-
-.modern-table td {
-    padding: 16px 22px;
-    font-size: 14px;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f4f8;
-    vertical-align: middle;
-}
-
-.modern-table tbody tr { transition: all 0.2s; }
-.modern-table tbody tr:hover { background: #fafbfc; }
-
 .type-badge-sm {
     display: inline-block;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
@@ -515,9 +400,9 @@
 
 .status-badge-sm {
     display: inline-block;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
@@ -539,13 +424,13 @@
 
 .warning-code {
     background: #f0f4f8;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     color: #182B48;
 }
 
-.time-value { color: #7f8c8d; font-size: 13px; }
-.notes-value { color: #7f8c8d; font-size: 13px; }
+.time-value { color: #7f8c8d; font-size: 12.5px; }
+.notes-value { color: #7f8c8d; font-size: 12.5px; }
 </style>
 @endsection

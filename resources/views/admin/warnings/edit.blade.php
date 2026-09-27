@@ -30,49 +30,26 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 18px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
 .form-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 .form-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 22px 28px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(26,51,86,0.05) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; font-size: 17px; color: var(--primary);
 }
 .form-header i { color: var(--gold); font-size: 20px; }
-.form-body { padding: 25px 28px; }
-
-.form-group { margin-bottom: 20px; }
+.form-body { padding: 16px 16px; }
+.form-group { margin-bottom: 16px; }
 .form-label {
     font-weight: 600; color: #5a6c7d;
     margin-bottom: 10px; display: block;
@@ -94,19 +71,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .form-control.is-invalid, .form-select.is-invalid { border-color: var(--danger); }
 .invalid-feedback { color: var(--danger); font-size: 13px; margin-top: 5px; }
-
 .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(24,43,72,0.1), transparent);
     margin: 25px 0;
 }
-
 .fields-section {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border: 1px solid rgba(24,43,72,0.08);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 .fields-section-header {
     display: flex; align-items: center; gap: 10px;
@@ -114,10 +89,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-weight: 700; font-size: 15px;
 }
 .fields-section-header i { color: var(--gold); }
-
 .action-btn {
     display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 28px;
+    padding: 14px 16px;
     border-radius: 12px;
     font-weight: 600; font-size: 14px;
     transition: all 0.3s ease;
@@ -137,11 +111,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .action-btn.cancel:hover { border-color: var(--danger); color: var(--danger); }
 .action-btn i { color: var(--gold); }
-
-@media (max-width: 992px) {
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-content { margin-bottom: 15px; }
-}
 </style>
 
 <div class="page-header">
@@ -157,12 +126,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 </div>
 
 @if(session('success'))
-    <div class="alert alert-success" style="border-radius: 12px; margin-bottom: 20px;">{{ session('success') }}</div>
+    <div class="alert alert-success" style="border-radius:12px;margin-bottom:16px">{{ session('success') }}</div>
 @endif
 
 @if($errors->any())
-    <div class="alert alert-danger" style="border-radius: 12px; margin-bottom: 20px;">
-        <ul style="margin: 0; padding-right: 20px;">
+    <div class="alert alert-danger" style="border-radius:12px;margin-bottom:16px">
+        <ul style="margin:0;padding-right:16px">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -260,9 +229,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 </div>
             </div>
 
-            <div class="form-card" id="attendanceFields" style="display: {{ $warning->type === 'attendance' ? 'block' : 'none' }};">
+            <div class="form-card" id="attendanceFields" style="display:{{ $warning->type === 'attendance' ? 'block' : 'none' }}">
                 <div class="form-header">
-                    <i class="fas fa-calendar-times" style="color: var(--warning);"></i>
+                    <i class="fas fa-calendar-times" style="color:var(--warning)"></i>
                     <span>تفاصيل غياب الحضور</span>
                 </div>
                 <div class="form-body">
@@ -293,9 +262,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 </div>
             </div>
 
-            <div class="form-card" id="recitationFields" style="display: {{ $warning->type === 'recitation' ? 'block' : 'none' }};">
+            <div class="form-card" id="recitationFields" style="display:{{ $warning->type === 'recitation' ? 'block' : 'none' }}">
                 <div class="form-header">
-                    <i class="fas fa-microphone" style="color: var(--info);"></i>
+                    <i class="fas fa-microphone" style="color:var(--info)"></i>
                     <span>تفاصيل فشل التسميع</span>
                 </div>
                 <div class="form-body">

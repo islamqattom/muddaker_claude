@@ -24,9 +24,9 @@
 
 .challenges-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -48,20 +48,20 @@
 }
 
 .challenges-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--purple) 0%, #8e44ad 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(155,89,182,0.35);
 }
 
-.challenges-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.challenges-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.challenges-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.challenges-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .challenges-page .stat-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -70,14 +70,14 @@
 
 .challenges-page .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
-.challenges-page .stat-card-body { padding: 20px; text-align: center; }
+.challenges-page .stat-card-body { padding: 14px 16px; text-align: center; }
 
 .challenges-page .stat-icon {
-    width: 50px; height: 50px;
-    border-radius: 12px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin: 0 auto 12px;
+    font-size: 16px;
+    margin: 0 auto 8px;
 }
 
 .challenges-page .stat-icon.success { background: linear-gradient(135deg, var(--success), #2ecc71); color: white; }
@@ -85,29 +85,29 @@
 .challenges-page .stat-icon.primary { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); }
 .challenges-page .stat-icon.warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: white; }
 
-.challenges-page .stat-value { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; }
-.challenges-page .stat-label { font-size: 11px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
+.challenges-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
+.challenges-page .stat-label { font-size: 12px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
 
 .challenges-page .toolbar-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
-    padding: 16px 24px;
-    margin-bottom: 24px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
 }
 
-.challenges-page .toolbar-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+.challenges-page .toolbar-title { font-size: 14px; font-weight: 700; color: var(--navy); }
 
 .challenges-page .btn-new {
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
     font-size: 13px;
     transition: all 0.2s ease;
@@ -118,11 +118,11 @@
 
 .challenges-page .challenge-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .challenges-page .challenge-card.accent-warning { border-right: 4px solid var(--warning); }
@@ -130,19 +130,19 @@
 
 .challenges-page .challenge-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; gap: 12px;
 }
 
 .challenges-page .challenge-header.warning { background: linear-gradient(135deg, var(--warning), #e67e22); }
-.challenges-page .challenge-header i { color: var(--gold); font-size: 20px; }
+.challenges-page .challenge-header i { color: var(--gold); font-size: 16px; }
 .challenges-page .challenge-header.warning i { color: white; }
-.challenges-page .challenge-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.challenges-page .challenge-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
 .challenges-page .challenges-table { width: 100%; border-collapse: collapse; margin: 0; }
 .challenges-page .challenges-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -151,8 +151,8 @@
     letter-spacing: 0.5px;
 }
 .challenges-page .challenges-table tbody td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
@@ -161,24 +161,24 @@
 .challenges-page .challenges-table tbody tr:hover { background: linear-gradient(90deg, rgba(155,89,182,0.04) 0%, rgba(24,43,72,0.02) 100%); }
 
 .challenges-page .status-badge {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
 .challenges-page .vs-badge {
     background: rgba(155,89,182,0.15);
     color: var(--purple);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
 .challenges-page .action-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(24,43,72,0.1);
     background: white;
@@ -192,10 +192,10 @@
     background: linear-gradient(135deg, var(--success), #2ecc71);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 8px 16px;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.2s ease;
 }
 
@@ -205,27 +205,27 @@
     background: white;
     color: var(--danger);
     border: 1px solid rgba(192,57,43,0.3);
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 8px 16px;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.2s ease;
 }
 
 .challenges-page .decline-btn:hover { background: var(--danger); color: white; }
 
-.challenges-page .empty-state { text-align: center; padding: 80px 20px; }
+.challenges-page .empty-state { text-align: center; padding: 40px 16px; }
 .challenges-page .empty-icon {
-    width: 100px; height: 100px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(155,89,182,0.15), rgba(142,68,173,0.15));
-    border-radius: 24px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
+    margin: 0 auto 14px;
 }
-.challenges-page .empty-icon i { font-size: 40px; color: var(--purple); }
+.challenges-page .empty-icon i { font-size: 26px; color: var(--purple); }
 
 @media (max-width: 992px) {
-    .challenges-page .page-hero { padding: 20px 24px; }
+    .challenges-page .page-hero { padding: 14px 16px; }
     .challenges-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .challenges-page .hero-title { font-size: 18px; }
 }
@@ -364,7 +364,7 @@
                             {{ $challenge->challenged->name }}
                         </td>
                         <td>
-                            <span class="surah-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">
+                            <span class="surah-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">
                                 سورة {{ $challenge->surah }} ({{ $challenge->verse_start }}-{{ $challenge->verse_end }})
                             </span>
                         </td>
@@ -425,7 +425,7 @@
                         </td>
                         <td>
                             @if($challenge->winner)
-                                <span class="winner-badge" style="background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: white; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 600;">
+                                <span class="winner-badge" style="background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: white; padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600;">
                                     {{ $challenge->winner->name }}
                                 </span>
                             @else

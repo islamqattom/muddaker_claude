@@ -16,18 +16,9 @@
 
 @push('styles')
 <style>
-    body { background: #f8fafc; font-family: 'Tajawal', sans-serif; }
-    .detail-page { max-width: 980px; margin: 0 auto; }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-    }
-    .back-link {
+body { background: #f8fafc; font-family: 'Tajawal', sans-serif; }
+.detail-page { max-width: 980px; margin: 0 auto; }
+.back-link {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -41,28 +32,16 @@
         border: 1px solid #e9ecef;
         transition: all 0.2s;
     }
-    .back-link:hover { background: #f8fafc; color: var(--primary, #182B48); }
-    .header-content { display: flex; align-items: center; gap: 18px; }
-    .header-icon {
-        width: 60px; height: 60px;
-        background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
-        border-radius: 16px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 24px; color: #d4a030;
-        box-shadow: 0 8px 22px rgba(24,43,72,0.2);
-    }
-    .header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-    .header-text p { color: #6c7a89; font-size: 13px; margin: 0; }
-
-    .info-card {
+.back-link:hover { background: #f8fafc; color: var(--primary, #182B48); }
+.info-card {
         background: #ffffff;
         border: 1px solid #eef0f4;
-        border-radius: 16px;
-        padding: 20px 22px;
+        border-radius: 13px;
+        padding: 16px 16px;
         margin-bottom: 16px;
         box-shadow: 0 1px 2px rgba(15, 28, 51, 0.03);
     }
-    .info-card-title {
+.info-card-title {
         font-size: 12px;
         font-weight: 700;
         color: #8a96a8;
@@ -71,31 +50,29 @@
         align-items: center;
         gap: 8px;
     }
-    .info-card-title i { color: #d4a030; font-size: 13px; }
-
-    .info-grid {
+.info-card-title i { color: #d4a030; font-size: 13px; }
+.info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 12px;
     }
-    .info-cell {
+.info-cell {
         padding: 12px 14px;
         background: #f8fafc;
         border-radius: 10px;
         border: 1px solid #f1f3f7;
     }
-    .info-cell .lbl { font-size: 11px; color: #94a3b8; font-weight: 600; margin-bottom: 4px; }
-    .info-cell .val { font-size: 15px; color: #182B48; font-weight: 700; line-height: 1.3; }
-
-    .score-highlight {
+.info-cell .lbl { font-size: 11px; color: #94a3b8; font-weight: 600; margin-bottom: 4px; }
+.info-cell .val { font-size: 15px; color: #182B48; font-weight: 700; line-height: 1.3; }
+.score-highlight {
         text-align: center;
-        padding: 32px 24px;
+        padding: 16px 16px;
         background: linear-gradient(135deg, #fcf6e8 0%, #fef9ed 100%);
         border: 1px solid #f0e2b8;
-        border-radius: 18px;
+        border-radius: 13px;
         margin-bottom: 16px;
     }
-    .score-circle {
+.score-circle {
         position: relative;
         display: inline-flex;
         align-items: center;
@@ -106,7 +83,7 @@
         box-shadow: 0 4px 18px rgba(212, 160, 48, 0.18);
         margin-bottom: 12px;
     }
-    .score-circle::before {
+.score-circle::before {
         content: '';
         position: absolute;
         inset: -4px;
@@ -114,7 +91,7 @@
         background: conic-gradient(var(--score-color, #d4a030) calc(var(--score-pct, 100) * 1%), #eef0f4 0);
         z-index: 0;
     }
-    .score-circle .score-inner {
+.score-circle .score-inner {
         position: relative; z-index: 1;
         background: white;
         width: 106px; height: 106px;
@@ -122,14 +99,12 @@
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
     }
-    .score-circle .score-value { font-size: 28px; font-weight: 800; color: #182B48; line-height: 1; }
-    .score-circle .score-suffix { font-size: 12px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
-    .score-status { font-size: 16px; font-weight: 700; color: var(--score-color, #d4a030); margin: 0; }
-
-    .status-passed { --score-color: #16a34a; --score-pct: var(--final-pct, 100); }
-    .status-failed { --score-color: #dc2626; --score-pct: var(--final-pct, 100); }
-
-    .notes-card {
+.score-circle .score-value { font-size: 22px; font-weight: 800; color: #182B48; line-height: 1; }
+.score-circle .score-suffix { font-size: 12px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+.score-status { font-size: 16px; font-weight: 700; color: var(--score-color, #d4a030); margin: 0; }
+.status-passed { --score-color: #16a34a; --score-pct: var(--final-pct, 100); }
+.status-failed { --score-color: #dc2626; --score-pct: var(--final-pct, 100); }
+.notes-card {
         background: #fffbeb;
         border: 1px solid #fde68a;
         border-radius: 12px;
@@ -137,7 +112,7 @@
         color: #78350f;
         font-size: 14px;
     }
-    .notes-card strong { color: #92400e; }
+.notes-card strong { color: #92400e; }
 </style>
 @endpush
 
@@ -193,13 +168,13 @@
             @if($session->error_score !== null)
             <div class="info-cell">
                 <div class="lbl">علامة الخطأ</div>
-                <div class="val" style="color: #dc2626;">-{{ number_format((float) $session->error_score, 2) }}</div>
+                <div class="val" style="color:#dc2626">-{{ number_format((float) $session->error_score, 2) }}</div>
             </div>
             @endif
             @if($session->hesitation_score !== null)
             <div class="info-cell">
                 <div class="lbl">علامة التردد</div>
-                <div class="val" style="color: #b36b00;">-{{ number_format((float) $session->hesitation_score, 2) }}</div>
+                <div class="val" style="color:#b36b00">-{{ number_format((float) $session->hesitation_score, 2) }}</div>
             </div>
             @endif
             @if($session->fail_score !== null)
@@ -213,7 +188,7 @@
     @endif
 
     <div class="score-highlight">
-        <div class="score-circle {{ $isPassed ? 'status-passed' : 'status-failed' }}" style="--final-pct: {{ min(100, max(0, $finalScore)) }};">
+        <div class="score-circle {{ $isPassed ? 'status-passed' : 'status-failed' }}" style="--final-pct:{{ min(100, max(0, $finalScore)) }}">
             <div class="score-inner">
                 <div class="score-value">{{ number_format($finalScore, 1) }}</div>
                 <div class="score-suffix">%</div>
@@ -231,15 +206,15 @@
             </div>
             <div class="info-cell">
                 <div class="lbl">الحالة</div>
-                <div class="val" style="color: {{ $isPassed ? '#16a34a' : '#dc2626' }};">{{ $isPassed ? 'ناجح' : 'راسب' }}</div>
+                <div class="val" style="color:{{ $isPassed ? '#16a34a' : '#dc2626' }}">{{ $isPassed ? 'ناجح' : 'راسب' }}</div>
             </div>
             <div class="info-cell">
                 <div class="lbl">إجمالي الأخطاء</div>
-                <div class="val" style="color: #dc2626;">{{ $session->total_errors }}</div>
+                <div class="val" style="color:#dc2626">{{ $session->total_errors }}</div>
             </div>
             <div class="info-cell">
                 <div class="lbl">إجمالي الترددات</div>
-                <div class="val" style="color: #b36b00;">{{ $session->total_hesitations }}</div>
+                <div class="val" style="color:#b36b00">{{ $session->total_hesitations }}</div>
             </div>
         </div>
     </div>

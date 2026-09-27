@@ -99,40 +99,34 @@
 
 <style>
 /* Shared listing styles live in public/css/page.css */
-
 .empty-state-card h5 { color: #182B48; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 .empty-state-card p { color: #7f8c8d; margin-bottom: 16px; }
-
 .levels-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 }
-
 .level-card {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(24, 43, 72, 0.04);
     border: 1px solid #eef2f7;
     transition: all .25s ease;
 }
-
 .level-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 22px rgba(24, 43, 72, 0.1);
 }
-
 .level-card-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 18px;
+    padding: 16px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
     position: relative;
 }
-
 .level-card-header::after {
     content: '';
     position: absolute;
@@ -140,7 +134,6 @@
     height: 3px;
     background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
 }
-
 .level-number {
     width: 48px; height: 48px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
@@ -153,9 +146,7 @@
     color: #fff;
     flex-shrink: 0;
 }
-
 .level-info h5 { color: #fff; font-size: 16px; font-weight: 700; margin: 0 0 6px; }
-
 .students-count {
     display: inline-flex;
     align-items: center;
@@ -167,11 +158,8 @@
     font-size: 11.5px;
     font-weight: 500;
 }
-
 .students-count i { color: #d4a030; }
-
-.level-card-body { padding: 16px 18px; }
-
+.level-card-body { padding: 16px 16px; }
 .level-stats { display: flex; gap: 12px; margin-bottom: 12px; }
 .stat-item {
     display: flex;
@@ -186,17 +174,14 @@
 .stat-item i { font-size: 17px; color: #d4a030; }
 .stat-item span { font-size: 15px; font-weight: 700; color: #182B48; }
 .stat-item small { font-size: 10.5px; color: #7f8c8d; }
-
 .level-description { color: #7f8c8d; font-size: 12.5px; line-height: 1.6; margin: 0; }
-
 .level-card-actions {
     display: flex;
     gap: 8px;
-    padding: 14px 18px;
+    padding: 14px 16px;
     border-top: 1px solid #f0f4f8;
     background: #fafbfc;
 }
-
 .pagination-section { display: flex; justify-content: center; margin-top: 16px; }
 </style>
 @endsection

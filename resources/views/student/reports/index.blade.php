@@ -28,9 +28,9 @@
 
 .student-reports .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -52,20 +52,20 @@
 }
 
 .student-reports .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(212,160,48,0.35);
 }
 
-.student-reports .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.student-reports .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.student-reports .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.student-reports .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .student-reports .stat-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -82,17 +82,17 @@
 }
 
 .student-reports .stat-card-body {
-    padding: 24px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .student-reports .stat-icon {
-    width: 60px; height: 60px;
-    border-radius: 14px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
@@ -102,11 +102,11 @@
 .student-reports .stat-icon.warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: white; }
 
 .student-reports .stat-label { font-size: 12px; color: #6c7a89; margin-bottom: 4px; font-weight: 500; }
-.student-reports .stat-value { font-size: 28px; font-weight: 800; color: var(--navy); line-height: 1; }
+.student-reports .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
 
 .student-reports .content-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -114,17 +114,17 @@
 
 .student-reports .content-card-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; gap: 12px;
 }
 
-.student-reports .content-card-header i { color: var(--gold); font-size: 18px; }
-.student-reports .content-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.student-reports .content-card-header i { color: var(--gold); font-size: 16px; }
+.student-reports .content-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
 .student-reports .data-table { width: 100%; border-collapse: collapse; margin: 0; }
 .student-reports .data-table thead { background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%); }
 .student-reports .data-table th {
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-size: 11px; font-weight: 700;
     color: var(--navy);
     border: none;
@@ -132,8 +132,8 @@
     letter-spacing: 0.5px;
 }
 .student-reports .data-table td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
@@ -141,11 +141,11 @@
 .student-reports .data-table tbody tr { transition: all 0.2s ease; }
 .student-reports .data-table tbody tr:hover { background: linear-gradient(90deg, rgba(212,160,48,0.04) 0%, rgba(24,43,72,0.02) 100%); }
 
-.student-reports .empty-state { text-align: center; padding: 40px 20px; }
-.student-reports .empty-state i { font-size: 36px; color: rgba(24,43,72,0.3); }
+.student-reports .empty-state { text-align: center; padding: 40px 16px; }
+.student-reports .empty-state i { font-size: 26px; color: rgba(24,43,72,0.3); }
 
 @media (max-width: 992px) {
-    .student-reports .page-hero { padding: 20px 24px; }
+    .student-reports .page-hero { padding: 14px 16px; }
     .student-reports .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .student-reports .hero-title { font-size: 18px; }
 }
@@ -369,7 +369,6 @@
 </div>
 
 <style>
-.badge-modern { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; display: inline-block; }
 .badge-modern.success, .badge-modern.green { background: rgba(39,174,96,0.15); color: #27ae60; }
 .badge-modern.danger, .badge-modern.red { background: rgba(192,57,43,0.15); color: #c0392b; }
 .badge-modern.warning { background: rgba(243,156,18,0.15); color: #f39c12; }

@@ -28,9 +28,9 @@
 
 .student-profile .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -52,20 +52,20 @@
 }
 
 .student-profile .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(212,160,48,0.35);
 }
 
-.student-profile .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.student-profile .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.student-profile .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.student-profile .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .student-profile .profile-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -74,7 +74,7 @@
 
 .student-profile .profile-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 30px;
+    padding: 24px 16px;
     text-align: center;
     position: relative;
 }
@@ -118,23 +118,23 @@
 
 .student-profile .form-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .student-profile .form-card-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; gap: 12px;
 }
 
-.student-profile .form-card-header i { color: var(--gold); font-size: 18px; }
-.student-profile .form-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.student-profile .form-card-header i { color: var(--gold); font-size: 16px; }
+.student-profile .form-card-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
-.student-profile .form-card-body { padding: 24px; }
+.student-profile .form-card-body { padding: 16px; }
 
 .student-profile .form-label { font-weight: 600; color: var(--navy); margin-bottom: 8px; font-size: 13px; }
 
@@ -169,8 +169,8 @@
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 28px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -181,8 +181,8 @@
     background: linear-gradient(135deg, var(--warning), #e67e22);
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 28px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -192,8 +192,8 @@
 .student-profile .additional-card {
     background: linear-gradient(135deg, rgba(39,174,96,0.08), rgba(46,204,113,0.08));
     border: 2px solid rgba(39,174,96,0.15);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 13px;
+    padding: 16px;
 }
 
 .student-profile .additional-item {
@@ -202,19 +202,19 @@
 }
 
 .student-profile .additional-value { font-size: 22px; font-weight: 800; color: var(--navy); }
-.student-profile .additional-label { font-size: 11px; color: #6c7a89; font-weight: 500; text-transform: uppercase; }
+.student-profile .additional-label { font-size: 12px; color: #6c7a89; font-weight: 500; text-transform: uppercase; }
 
 .student-profile .alert {
-    border-radius: 12px;
-    padding: 16px 20px;
-    font-size: 14px;
+    border-radius: 13px;
+    padding: 12px 16px;
+    font-size: 13px;
 }
 
 .student-profile .alert-success { background: rgba(39,174,96,0.15); border-color: rgba(39,174,96,0.3); color: var(--success); }
 .student-profile .alert-danger { background: rgba(192,57,43,0.15); border-color: rgba(192,57,43,0.3); color: var(--danger); }
 
 @media (max-width: 992px) {
-    .student-profile .page-hero { padding: 20px 24px; }
+    .student-profile .page-hero { padding: 14px 16px; }
     .student-profile .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .student-profile .hero-title { font-size: 18px; }
 }
@@ -443,7 +443,6 @@
 </div>
 
 <style>
-.badge-modern { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; display: inline-block; }
 .badge-modern.success { background: rgba(39,174,96,0.15); color: #27ae60; }
 </style>
 @endsection

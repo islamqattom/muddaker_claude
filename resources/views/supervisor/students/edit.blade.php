@@ -209,11 +209,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    padding: 20px;
+    gap: 14px;
+    padding: 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.05));
-    border-radius: 12px;
-    margin-bottom: 30px;
+    border-radius: 13px;
+    margin-bottom: 16px;
 }
 
 .quranic-verse-header .verse-decoration {
@@ -225,7 +225,7 @@
 
 .quranic-verse-header .quranic-verse {
     font-family: 'Amiri', serif;
-    font-size: 20px;
+    font-size: 18px;
     color: #182B48;
     margin: 0;
     text-shadow: 0 1px 2px rgba(212,160,48,0.2);
@@ -233,37 +233,10 @@
 
 .main-form-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
-}
-
-.card-header-custom {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 22px 25px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.04), rgba(42,69,112,0.04));
-    border-bottom: 2px solid #f0f4f8;
-}
-
-.card-header-custom.compact {
-    padding: 18px 25px;
-}
-
-.header-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 20px;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(24,43,72,0.2);
 }
 
 .header-icon.secondary {
@@ -277,27 +250,27 @@
 .header-text h5 {
     color: #182B48;
     font-weight: 700;
-    font-size: 17px;
+    font-size: 18px;
     margin: 0 0 4px 0;
 }
 
 .header-text p {
     color: #7f8c8d;
-    font-size: 13px;
+    font-size: 12.5px;
     margin: 0;
 }
 
 .card-body-custom {
-    padding: 25px;
+    padding: 16px;
 }
 
 .form-label-custom {
     display: flex;
     align-items: center;
     color: #182B48;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .form-label-custom i {
@@ -312,9 +285,9 @@
 
 .form-control-custom, .form-select-custom {
     border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 14px;
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-size: 13px;
     transition: all 0.3s ease;
     background: #fff;
     color: #2c3e50;
@@ -356,20 +329,20 @@
 
 .sidebar-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
 }
 
 .avatar-upload-section {
-    padding: 25px 0;
+    padding: 16px 0;
 }
 
 .avatar-preview {
     position: relative;
-    width: 110px;
-    height: 110px;
+    width: 96px;
+    height: 96px;
     margin: 0 auto 15px;
     border-radius: 50%;
     overflow: hidden;
@@ -405,23 +378,23 @@
 .student-name-preview {
     color: #182B48;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 15px;
     margin: 0 0 4px 0;
 }
 
 .student-number-preview {
     color: #7f8c8d;
-    font-size: 13px;
+    font-size: 12.5px;
     margin: 0;
     font-family: monospace;
     background: #f0f4f8;
-    padding: 4px 12px;
-    border-radius: 6px;
+    padding: 3px 10px;
+    border-radius: 7px;
     display: inline-block;
 }
 
 .upload-section {
-    padding: 0 15px;
+    padding: 0;
     margin-top: 10px;
 }
 
@@ -429,7 +402,7 @@
     border: none;
     height: 1px;
     background: linear-gradient(90deg, transparent, #d4a030, transparent);
-    margin: 20px 0;
+    margin: 16px 0;
 }
 
 .action-buttons {
@@ -442,10 +415,10 @@
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
     border: none;
-    border-radius: 12px;
-    padding: 14px 24px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 13px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -468,10 +441,10 @@
     background: transparent;
     color: #182B48;
     border: 2px solid #182B48;
-    border-radius: 12px;
-    padding: 12px 20px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -488,7 +461,7 @@
     background: transparent;
     color: #7f8c8d;
     border: none;
-    padding: 10px;
+    padding: 8px;
     font-weight: 500;
     font-size: 13px;
     transition: all 0.3s ease;
@@ -506,7 +479,7 @@
 @media (max-width: 992px) {
     .sidebar-card {
         position: static !important;
-        margin-top: 20px;
+        margin-top: 16px;
     }
 }
 </style>

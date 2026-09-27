@@ -11,14 +11,14 @@
 @push('styles')
 <style>
 .bulk-assign-page { --gold:#d4a030; --gold-light:#e6b84d; --navy:#182B48; --navy-light:#2A4570; --success:#27ae60; --danger:#c0392b; --radius:16px; --shadow-sm:0 2px 10px rgba(24,43,72,0.05); }
-.bulk-assign-page .page-hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%); border-radius:var(--radius); padding:24px 30px; margin-bottom:24px; color:#fff; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-.bulk-assign-page .page-hero h1 { margin:0; font-size:22px; font-weight:700; }
+.bulk-assign-page .page-hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%); border-radius:14px; padding:16px 22px; margin-bottom:16px; color:#fff; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.bulk-assign-page .page-hero h1 { margin:0; font-size:18px; font-weight:700; }
 .bulk-assign-page .page-hero p { color:rgba(255,255,255,0.8); margin:0; font-size:13px; }
-.bulk-assign-page .hero-icon { width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; }
-.bulk-assign-page .form-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:26px; margin-bottom:22px; border:1px solid rgba(24,43,72,0.05); }
+.bulk-assign-page .hero-icon { width:48px; height:48px; border-radius:13px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.bulk-assign-page .form-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:16px; margin-bottom:16px; border:1px solid rgba(24,43,72,0.05); }
 .bulk-assign-page .form-card h5 { color:var(--navy); font-weight:800; margin-bottom:16px; }
 .bulk-assign-page .form-card h5 i { color:var(--gold); margin-inline-end:8px; }
-.bulk-assign-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:18px; }
+.bulk-assign-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:16px; }
 .bulk-assign-page .criterion-row { display:grid; grid-template-columns:1fr 180px 200px 50px; gap:10px; align-items:center; margin-bottom:10px; padding:10px; border-radius:12px; background:#f8f9fc; }
 .bulk-assign-page .criterion-row .form-control { min-width:0; }
 .bulk-assign-page .criterion-row .remove-btn { background:rgba(192,57,43,0.1); color:var(--danger); border:none; width:40px; height:40px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
@@ -27,7 +27,7 @@
 .bulk-assign-page .type-select label { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid #d6dbe5; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; color:var(--navy); }
 .bulk-assign-page .type-select input { display:none; }
 .bulk-assign-page .type-select label:has(input:checked) { background:rgba(212,160,48,0.1); border-color:var(--gold); }
-.bulk-assign-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:12px 20px; border-radius:12px; font-weight:700; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+.bulk-assign-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:12px 16px; border-radius:12px; font-weight:700; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
 .bulk-assign-page .add-criterion-btn:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
 .bulk-assign-page .target-group { background:#f8f9fc; border-radius:12px; padding:16px; border:1px solid rgba(24,43,72,0.05); }
 .bulk-assign-page .target-group h6 { color:var(--navy); font-weight:800; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
@@ -44,42 +44,41 @@
 .bulk-assign-page .user-list .user-item .avatar.sup { background:linear-gradient(135deg,var(--navy),var(--navy-light)); }
 .bulk-assign-page .user-list .user-item .name { color:var(--navy); font-weight:600; font-size:13px; flex:1; }
 .bulk-assign-page .user-list .user-item .meta { color:#6b7a90; font-size:11px; }
-.bulk-assign-page .user-list .empty-state { padding:24px 12px; text-align:center; color:#6b7a90; font-size:13px; }
 .bulk-assign-page .user-list.disabled-list { opacity:0.55; pointer-events:none; }
-.bulk-assign-page .selected-pill { display:inline-flex; align-items:center; gap:5px; background:rgba(212,160,48,0.15); color:var(--navy); font-weight:700; font-size:12px; padding:3px 10px; border-radius:20px; margin-inline-start:6px; }
+.bulk-assign-page .selected-pill { display:inline-flex; align-items:center; gap:5px; background:rgba(212,160,48,0.15); color:var(--navy); font-weight:700; font-size:12px; padding:3px 10px; border-radius:13px; margin-inline-start:6px; }
 .bulk-assign-page .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
-.bulk-assign-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer; }
+.bulk-assign-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
 .bulk-assign-page .btn-gold:hover { transform:translateY(-1px); }
 .bulk-assign-page .btn-gold:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-.bulk-assign-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:12px 22px; border-radius:12px; font-weight:700; text-decoration:none; }
+.bulk-assign-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:12px 16px; border-radius:12px; font-weight:700; text-decoration:none; }
 .bulk-assign-page .btn-cancel:hover { background:#dee5ed; }
-.bulk-assign-page .summary-box { background:rgba(212,160,48,0.08); border:1px solid rgba(212,160,48,0.25); border-radius:12px; padding:14px 18px; color:var(--navy); font-weight:700; display:flex; align-items:center; gap:10px; }
+.bulk-assign-page .summary-box { background:rgba(212,160,48,0.08); border:1px solid rgba(212,160,48,0.25); border-radius:12px; padding:14px 16px; color:var(--navy); font-weight:700; display:flex; align-items:center; gap:10px; }
 .bulk-assign-page .summary-box i { color:var(--gold); font-size:18px; }
-.bulk-assign-page .mode-toggle { display:inline-flex; background:#fff; border-radius:14px; padding:5px; box-shadow:0 2px 10px rgba(24,43,72,0.08); border:1px solid rgba(24,43,72,0.06); margin-bottom:18px; }
-.bulk-assign-page .mode-toggle button { border:none; background:transparent; color:#6b7a90; font-weight:700; font-size:14px; padding:10px 22px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+.bulk-assign-page .mode-toggle { display:inline-flex; background:#fff; border-radius:13px; padding:5px; box-shadow:0 2px 10px rgba(24,43,72,0.08); border:1px solid rgba(24,43,72,0.06); margin-bottom:16px; }
+.bulk-assign-page .mode-toggle button { border:none; background:transparent; color:#6b7a90; font-weight:700; font-size:14px; padding:10px 16px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
 .bulk-assign-page .mode-toggle button.active { background:linear-gradient(135deg,var(--navy),var(--navy-light)); color:#fff; box-shadow:0 2px 8px rgba(24,43,72,0.25); }
 .bulk-assign-page .mode-toggle button:hover:not(.active) { background:#f0f4f8; color:var(--navy); }
-.bulk-assign-page .program-picker { background:#fff; border:1.5px solid #d6dbe5; border-radius:12px; padding:16px; margin-bottom:18px; }
+.bulk-assign-page .program-picker { background:#fff; border:1.5px solid #d6dbe5; border-radius:12px; padding:16px; margin-bottom:16px; }
 .bulk-assign-page .program-picker label.form-label { color:var(--navy); font-weight:700; margin-bottom:8px; }
 .bulk-assign-page .program-picker select { width:100%; padding:10px 14px; border:1.5px solid #d6dbe5; border-radius:10px; font-size:14px; font-weight:600; color:var(--navy); background:#fff; }
 .bulk-assign-page .program-picker select:focus { border-color:var(--gold); outline:none; }
 .bulk-assign-page .program-info { display:flex; gap:14px; flex-wrap:wrap; padding:12px 14px; background:#f8f9fc; border-radius:10px; margin-top:10px; font-size:13px; color:var(--navy); }
-.bulk-assign-page .program-info .pill { background:rgba(24,43,72,0.08); color:var(--navy); padding:4px 12px; border-radius:20px; font-weight:700; }
+.bulk-assign-page .program-info .pill { background:rgba(24,43,72,0.08); color:var(--navy); padding:4px 12px; border-radius:13px; font-weight:700; }
 .bulk-assign-page .program-info .pill.gold { background:rgba(212,160,48,0.18); }
-.bulk-assign-page .edit-banner { background:rgba(39,174,96,0.10); border:1px solid rgba(39,174,96,0.30); border-radius:12px; padding:14px 18px; color:#1e7e3e; font-weight:700; display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+.bulk-assign-page .edit-banner { background:rgba(39,174,96,0.10); border:1px solid rgba(39,174,96,0.30); border-radius:12px; padding:14px 16px; color:#1e7e3e; font-weight:700; display:flex; align-items:center; gap:10px; margin-bottom:16px; }
 .bulk-assign-page .edit-banner i { font-size:18px; }
 .bulk-assign-page .targets-disabled .target-group { opacity:0.45; pointer-events:none; }
-.bulk-assign-page .delete-card { background:#fff; border:1.5px solid rgba(192,57,43,0.30); border-radius:12px; padding:20px; margin-bottom:18px; }
-.bulk-assign-page .delete-warning { background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.25); border-radius:12px; padding:14px 18px; color:#922b21; font-weight:700; display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.bulk-assign-page .delete-card { background:#fff; border:1.5px solid rgba(192,57,43,0.30); border-radius:12px; padding:16px; margin-bottom:16px; }
+.bulk-assign-page .delete-warning { background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.25); border-radius:12px; padding:14px 16px; color:#922b21; font-weight:700; display:flex; align-items:center; gap:10px; margin-bottom:16px; }
 .bulk-assign-page .delete-warning i { font-size:18px; }
 .bulk-assign-page .delete-card .confirm-row { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; background:#fef5f4; border-radius:10px; margin-top:14px; }
 .bulk-assign-page .delete-card .confirm-row input { margin-top:4px; }
 .bulk-assign-page .delete-card .confirm-row label { font-weight:600; color:#922b21; cursor:pointer; font-size:14px; }
 .bulk-assign-page .owners-preview { background:#f8f9fc; border:1px solid #e8ecf2; border-radius:10px; padding:10px 14px; margin-top:12px; max-height:200px; overflow-y:auto; }
-.bulk-assign-page .owners-preview .owner-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e8ecf2; padding:4px 10px; border-radius:20px; margin:3px 4px 3px 0; font-size:12px; font-weight:600; color:var(--navy); }
+.bulk-assign-page .owners-preview .owner-chip { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #e8ecf2; padding:4px 10px; border-radius:13px; margin:3px 4px 3px 0; font-size:12px; font-weight:600; color:var(--navy); }
 .bulk-assign-page .owners-preview .owner-chip i { color:var(--gold); font-size:11px; }
 .bulk-assign-page .owners-preview .owner-chip.user i { color:var(--navy); }
-.bulk-assign-page .btn-danger-solid { background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; border:none; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer; }
+.bulk-assign-page .btn-danger-solid { background:linear-gradient(135deg,#c0392b,#e74c3c); color:#fff; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
 .bulk-assign-page .btn-danger-solid:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(192,57,43,0.30); }
 .bulk-assign-page .btn-danger-solid:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
 </style>
@@ -93,7 +92,7 @@
             <h1>تعيين برنامج إيماني لعدة مستخدمين</h1>
             <p>أنشئ برنامجاً بمعايير محددة مرة واحدة وعيّنه لكل الطلاب والمشرفين بنقرة واحدة</p>
         </div>
-        <div style="margin-right: auto;">
+        <div style="margin-right:auto">
             <a href="{{ route('admin.iman-program.index') }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
         </div>
     </div>
@@ -124,8 +123,8 @@
             </button>
         </div>
 
-        <div class="program-picker" id="programPicker" style="{{ in_array(request('mode'), ['edit', 'delete']) ? '' : 'display:none;' }}">
-            <label class="form-label"><i class="fas fa-folder-open" style="color:var(--gold);"></i> <span id="pickerLabel">اختر البرنامج</span></label>
+        <div class="program-picker" id="programPicker" style="{{ in_array(request('mode'), ['edit', 'delete']) ? '':'display:none;' }}">
+            <label class="form-label"><i class="fas fa-folder-open" style="color:var(--gold)"></i> <span id="pickerLabel">اختر البرنامج</span></label>
             <select id="programSelect">
                 <option value="">— اختر برنامجاً —</option>
                 @foreach($existingPrograms as $p)
@@ -134,24 +133,24 @@
                     </option>
                 @endforeach
             </select>
-            <div class="program-info" id="programInfo" style="display:none;">
+            <div class="program-info" id="programInfo" style="display:none">
                 <span class="pill gold" id="piOwners">0 مستخدم</span>
                 <span class="pill" id="piCriteria">0 معيار</span>
             </div>
         </div>
 
-        <div class="edit-banner" id="editBanner" style="{{ request('mode') === 'edit' ? '' : 'display:none;' }}">
+        <div class="edit-banner" id="editBanner" style="{{ request('mode') === 'edit' ? '':'display:none;' }}">
             <i class="fas fa-circle-info"></i>
             <span>وضع التعديل: سيتم تحديث المعايير لجميع المستخدمين الذين لديهم هذا البرنامج بنفس الاسم.</span>
         </div>
 
-        <div class="delete-card" id="deleteCard" style="{{ request('mode') === 'delete' ? '' : 'display:none;' }}">
+        <div class="delete-card" id="deleteCard" style="{{ request('mode') === 'delete' ? '':'display:none;' }}">
             <div class="delete-warning">
                 <i class="fas fa-triangle-exclamation"></i>
                 <span>تحذير: سيؤدي الحذف إلى إزالة البرنامج وجميع معاييره وإدخالاته اليومية نهائياً للمستخدمين المدرجين أدناه. لا يمكن التراجع.</span>
             </div>
-            <div id="deleteAffectedWrap" style="display:none;">
-                <label class="form-label" style="color:var(--navy);font-weight:700;">المستخدمون المتأثرون بالحذف:</label>
+            <div id="deleteAffectedWrap" style="display:none">
+                <label class="form-label" style="color:var(--navy);font-weight:700">المستخدمون المتأثرون بالحذف:</label>
                 <div class="owners-preview" id="deleteOwnersList"></div>
             </div>
             <div class="confirm-row">
@@ -211,7 +210,7 @@
                         </div>
                         <input type="number" min="0" name="criteria[{{ $i }}][target_value]" class="form-control target-input"
                                placeholder="الهدف اليومي" value="{{ $rowTarget }}"
-                               style="{{ $rowType === 'number' ? '' : 'display:none;' }}">
+                               style="{{ $rowtype === 'number' ? '':'display:none;' }}">
                         <button type="button" class="remove-btn" title="حذف"><i class="fas fa-times"></i></button>
                     </div>
                 @endforeach
@@ -231,7 +230,7 @@
                     <div class="target-group">
                         <h6>
                             <i class="fas fa-user-graduate"></i> الطلاب
-                            <span class="selected-pill" id="student-selected-pill" style="display:none;">0</span>
+                            <span class="selected-pill" id="student-selected-pill" style="display:none">0</span>
                         </h6>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="all_students" name="all_students" value="1" {{ old('all_students') ? 'checked' : '' }}>
@@ -245,7 +244,7 @@
                                 <label class="user-item" data-name="{{ $s->user->name }} {{ $s->student_number ?? '' }}">
                                     <input class="form-check-input user-checkbox" type="checkbox" name="student_ids[]" value="{{ $s->id }}" data-group="student" {{ in_array($s->id, (array) old('student_ids', [])) ? 'checked' : '' }} {{ old('all_students') ? 'disabled' : '' }}>
                                     <div class="avatar">{{ mb_substr($s->user->name ?? '؟', 0, 1) }}</div>
-                                    <div style="flex:1; min-width:0;">
+                                    <div style="flex:1;min-width:0">
                                         <div class="name">{{ $s->user->name }}</div>
                                         @if($s->student_number)
                                             <div class="meta">#{{ $s->student_number }}</div>
@@ -262,7 +261,7 @@
                     <div class="target-group">
                         <h6>
                             <i class="fas fa-user-tie"></i> المشرفون
-                            <span class="selected-pill" id="supervisor-selected-pill" style="display:none;">0</span>
+                            <span class="selected-pill" id="supervisor-selected-pill" style="display:none">0</span>
                         </h6>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="all_supervisors" name="all_supervisors" value="1" {{ old('all_supervisors') ? 'checked' : '' }}>
@@ -276,7 +275,7 @@
                                 <label class="user-item" data-name="{{ $sup->name }}">
                                     <input class="form-check-input user-checkbox" type="checkbox" name="supervisor_ids[]" value="{{ $sup->id }}" data-group="supervisor" {{ in_array($sup->id, (array) old('supervisor_ids', [])) ? 'checked' : '' }} {{ old('all_supervisors') ? 'disabled' : '' }}>
                                     <div class="avatar sup">{{ mb_substr($sup->name ?? '؟', 0, 1) }}</div>
-                                    <div style="flex:1; min-width:0;">
+                                    <div style="flex:1;min-width:0">
                                         <div class="name">{{ $sup->name }}</div>
                                         <div class="meta">{{ $sup->email }}</div>
                                     </div>

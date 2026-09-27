@@ -24,11 +24,8 @@
 @push('styles')
 <style>
 .form-page { font-family: 'Tajawal', sans-serif; }
-.page-header { display: flex; gap: 20px; align-items: center; margin-bottom: 30px; flex-wrap: wrap; }
-.subject-color-badge { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-.form-card { background: #fff; border-radius: 18px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 30px; border: 1px solid rgba(24,43,72,0.05); }
+.subject-color-badge { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+.form-card { background: #fff; border-radius: 13px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 16px; border: 1px solid rgba(24,43,72,0.05); }
 .form-label { color: #182B48; font-weight: 700; margin-bottom: 8px; display: block; }
 .form-label .required { color: #c0392b; }
 .form-control, .form-select { border-radius: 12px; border: 2px solid #e9ecef; padding: 12px 16px; font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; width: 100%; }
@@ -36,11 +33,10 @@
 textarea.form-control { min-height: 100px; resize: vertical; }
 .form-text { color: #7f8c8d; font-size: 12px; margin-top: 4px; }
 .form-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; margin-top: 24px; border-top: 1px dashed #e9ecef; }
-.btn { border-radius: 12px; padding: 12px 28px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
+.btn { border-radius: 12px; padding: 12px 16px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
 .btn-primary { background: {{ $subject->color }}; color: #fff; }
 .btn-primary:hover { color: #fff; }
 .btn-secondary { background: #f0f4f8; color: #182B48; }
-
 .repeat-box {
     background: rgba(212,160,48,0.06);
     border: 1px dashed #d4a030;
@@ -50,7 +46,7 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 }
 .day-preview {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px; border-radius: 20px;
+    padding: 6px 14px; border-radius: 13px;
     background: {{ $subject->color }}15;
     color: {{ $subject->color }};
     font-weight: 700; font-size: 14px;
@@ -62,7 +58,7 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 @section('content')
 <div class="form-page">
     <div class="page-header">
-        <div class="subject-color-badge" style="background: {{ $subject->color }};"><i class="fas fa-plus-circle"></i></div>
+        <div class="subject-color-badge" style="background:{{ $subject->color }}"><i class="fas fa-plus-circle"></i></div>
         <div class="header-text">
             <h4>إضافة درس جديد</h4>
             <p>المادة: <strong>{{ $subject->name }}</strong></p>
@@ -108,16 +104,16 @@ textarea.form-control { min-height: 100px; resize: vertical; }
                 </div>
 
                 <div class="col-md-12">
-                    <div class="form-check form-switch" style="padding-right: 2.5em;">
+                    <div class="form-check form-switch" style="padding-right:2.5em">
                         <input class="form-check-input" type="checkbox" name="repeat_enabled" id="repeat_enabled" value="1" {{ old('repeat_enabled') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="repeat_enabled" style="color: #182B48; font-weight: 600;">تكرار أسبوعي (نفس اليوم كل أسبوع)</label>
+                        <label class="form-check-label" for="repeat_enabled" style="color:#182B48;font-weight:600">تكرار أسبوعي (نفس اليوم كل أسبوع)</label>
                     </div>
                 </div>
 
-                <div class="col-md-12" id="repeatBox" style="display: {{ old('repeat_enabled') ? 'block' : 'none' }};">
+                <div class="col-md-12" id="repeatBox" style="display:{{ old('repeat_enabled') ? 'block' : 'none' }}">
                     <div class="repeat-box">
                         <label class="form-label">عدد الأسابيع (الحد الأقصى 52)</label>
-                        <input type="number" name="repeat_weeks" class="form-control" min="1" max="52" value="{{ old('repeat_weeks', 4) }}" style="max-width: 200px;">
+                        <input type="number" name="repeat_weeks" class="form-control" min="1" max="52" value="{{ old('repeat_weeks', 4) }}" style="max-width:200px">
                         <small class="form-text">سيتم إنشاء درس منفصل لكل أسبوع بنفس العنوان والمحتوى</small>
                     </div>
                 </div>

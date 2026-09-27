@@ -16,7 +16,7 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header-islamic">
+<div class="page-header">
     <div class="header-content">
         <div class="header-icon-wrapper">
             <div class="header-icon">
@@ -225,38 +225,7 @@
 </div>
 
 <style>
-.page-header-islamic {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding: 25px 30px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 25px rgba(24,43,72,0.08);
-    border: 1px solid rgba(212,160,48,0.1);
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
 .header-icon-wrapper { position: relative; }
-
-.header-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: #d4a030;
-    box-shadow: 0 8px 30px rgba(24,43,72,0.25);
-    position: relative;
-    z-index: 1;
-}
-
 .header-icon-glow {
     position: absolute;
     top: 50%;
@@ -268,17 +237,12 @@
     border-radius: 50%;
     z-index: 0;
 }
-
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .header-actions { display: flex; gap: 12px; }
-
 .edit-btn-islamic {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
     color: #fff;
     border-radius: 12px;
@@ -288,18 +252,16 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(212,160,48,0.3);
 }
-
 .edit-btn-islamic:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(212,160,48,0.4);
     color: #fff;
 }
-
 .back-btn-islamic {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 24px;
+    padding: 12px 16px;
     background: #f8f9fa;
     color: #182B48;
     border-radius: 12px;
@@ -308,17 +270,14 @@
     font-size: 14px;
     transition: all 0.3s ease;
 }
-
 .back-btn-islamic:hover { background: #e9ecef; color: #182B48; }
-
 .profile-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
 .profile-header {
     display: flex;
     align-items: center;
@@ -328,7 +287,6 @@
     position: relative;
     overflow: hidden;
 }
-
 .profile-header::before {
     content: '';
     position: absolute;
@@ -336,7 +294,6 @@
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     opacity: 0.5;
 }
-
 .profile-header::after {
     content: '';
     position: absolute;
@@ -346,14 +303,12 @@
     height: 5px;
     background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
 }
-
 .profile-avatar-wrapper { position: relative; }
-
 .profile-avatar {
     width: 100px;
     height: 100px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
-    border-radius: 22px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -363,7 +318,6 @@
     position: relative;
     z-index: 1;
 }
-
 .profile-avatar-glow {
     position: absolute;
     top: 50%;
@@ -375,24 +329,21 @@
     border-radius: 50%;
     z-index: 0;
 }
-
 .profile-info { position: relative; z-index: 1; }
-.profile-info h3 { color: #fff; font-size: 24px; font-weight: 700; margin: 0 0 8px 0; }
+.profile-info h3 { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 8px 0; }
 .username { color: rgba(255,255,255,0.7); font-size: 14px; display: block; margin-bottom: 12px; }
-
 .relationship-badge-islamic {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background: rgba(255,255,255,0.15);
     padding: 8px 16px;
-    border-radius: 20px;
+    border-radius: 13px;
     color: #fff;
     font-size: 14px;
     font-weight: 500;
     backdrop-filter: blur(5px);
 }
-
 .profile-header-decoration {
     position: absolute;
     top: 20px;
@@ -401,35 +352,30 @@
     color: #d4a030;
     opacity: 0.2;
 }
-
-.profile-body { padding: 30px; }
-
+.profile-body { padding: 16px; }
 .info-grid-islamic {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
-
 .info-item-islamic {
     display: flex;
     align-items: center;
     gap: 18px;
-    padding: 20px;
+    padding: 16px;
     background: linear-gradient(135deg, #f8f9fa, #f0f4f8);
-    border-radius: 16px;
+    border-radius: 13px;
     transition: all 0.3s;
 }
-
 .info-item-islamic:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
-
 .info-icon {
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -437,28 +383,24 @@
     font-size: 20px;
     flex-shrink: 0;
 }
-
 .info-content { display: flex; flex-direction: column; }
 .info-label { font-size: 12px; color: #7f8c8d; margin-bottom: 4px; font-weight: 500; }
 .info-value { font-size: 15px; font-weight: 700; color: #182B48; direction: ltr; text-align: right; }
-
 .students-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
 .card-header-islamic {
-    padding: 20px 25px;
+    padding: 16px 16px;
     border-bottom: 2px solid rgba(212,160,48,0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
 }
-
 .card-title {
     display: flex;
     align-items: center;
@@ -467,7 +409,6 @@
     font-weight: 700;
     color: #182B48;
 }
-
 .card-icon {
     width: 45px;
     height: 45px;
@@ -479,7 +420,6 @@
     color: #d4a030;
     font-size: 18px;
 }
-
 .students-count-islamic {
     display: flex;
     align-items: center;
@@ -491,15 +431,12 @@
     font-weight: 600;
     color: #B4802C;
 }
-
 .students-count-islamic i { color: #d4a030; }
-
 .card-body-islamic { padding: 0; }
-
 .data-table-islamic { width: 100%; border-collapse: collapse; }
 .data-table-islamic thead { background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.03)); }
 .data-table-islamic th {
-    padding: 16px 20px;
+    padding: 16px 16px;
     font-size: 12px;
     font-weight: 700;
     color: #182B48;
@@ -508,7 +445,7 @@
     border-bottom: 2px solid rgba(212,160,48,0.15);
 }
 .data-table-islamic td {
-    padding: 18px 20px;
+    padding: 16px 16px;
     font-size: 14px;
     color: #2c3e50;
     border-bottom: 1px solid #f0f4f8;
@@ -516,7 +453,6 @@
 }
 .data-table-islamic tbody tr { transition: all 0.3s; }
 .data-table-islamic tbody tr:hover { background: linear-gradient(135deg, rgba(212,160,48,0.03), rgba(180,128,44,0.03)); }
-
 .user-cell { display: flex; align-items: center; gap: 15px; }
 .user-avatar {
     width: 45px;
@@ -529,8 +465,6 @@
     color: #d4a030;
     font-size: 18px;
 }
-.user-name { font-weight: 700; color: #182B48; font-size: 15px; }
-
 .student-number-islamic {
     background: linear-gradient(135deg, rgba(212,160,48,0.1), rgba(180,128,44,0.1));
     padding: 5px 12px;
@@ -539,7 +473,6 @@
     color: #B4802C;
     font-weight: 600;
 }
-
 .level-badge-islamic {
     background: rgba(52,152,219,0.1);
     padding: 5px 12px;
@@ -548,52 +481,42 @@
     color: #3498db;
     font-weight: 600;
 }
-
-.supervisor-cell { color: #7f8c8d; }
-
 .actions-card-islamic {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
     position: sticky;
     top: 20px;
 }
-
-.action-buttons-islamic { display: flex; flex-direction: column; gap: 12px; padding: 20px; }
-
+.action-buttons-islamic { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
 .action-btn-primary-islamic, .action-btn-secondary-islamic, .action-btn-danger-islamic {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 15px 20px;
-    border-radius: 14px;
+    padding: 15px 16px;
+    border-radius: 13px;
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
     transition: all 0.3s ease;
 }
-
 .action-btn-primary-islamic {
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
     box-shadow: 0 4px 15px rgba(24,43,72,0.2);
 }
-
 .action-btn-primary-islamic:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(24,43,72,0.3);
     color: #fff;
 }
-
 .action-btn-secondary-islamic {
     background: #f8f9fa;
     color: #182B48;
 }
-
 .action-btn-secondary-islamic:hover { background: #e9ecef; color: #182B48; }
-
 .action-btn-danger-islamic {
     background: rgba(192,57,43,0.1);
     color: #c0392b;
@@ -602,27 +525,22 @@
     width: 100%;
     justify-content: center;
 }
-
 .action-btn-danger-islamic:hover { background: #c0392b; color: #fff; }
-
 .action-btn-primary-islamic i, .action-btn-secondary-islamic i, .action-btn-danger-islamic i { font-size: 18px; width: 24px; }
-
 .quick-info-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
 .quick-info-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 15px 16px;
     border-bottom: 1px solid #f0f4f8;
 }
-
 .quick-info-item:last-child { border-bottom: none; }
 .quick-info-label { color: #7f8c8d; font-size: 14px; }
 .quick-info-value { font-weight: 700; color: #182B48; font-size: 14px; }

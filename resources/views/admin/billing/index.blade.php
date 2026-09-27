@@ -38,7 +38,7 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 </div>
 
 {{-- Page Header --}}
-<div class="page-header-fees">
+<div class="page-header">
     <div class="header-content">
         <div class="header-icon-wrapper">
             <div class="header-icon">
@@ -463,13 +463,13 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
                             <input type="checkbox" class="form-check-input" id="bulk_all_students" checked>
                             <label class="form-check-label" for="bulk_all_students">جميع الطلاب</label>
                         </div>
-                        <div id="bulk_student_search_container" style="display:none;">
+                        <div id="bulk_student_search_container" style="display:none">
                             <input type="text" id="bulk_student_search" class="form-control mb-2" placeholder="ابحث عن طالب...">
-                            <div id="bulk_student_list" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+                            <div id="bulk_student_list" class="border rounded p-2" style="max-height:200px;overflow-y:auto"></div>
                             <div id="bulk_student_count" class="form-text text-muted mt-1"></div>
                         </div>
                     </div>
-                    <div class="alert alert-info" id="bulk_summary" style="display:none;">
+                    <div class="alert alert-info" id="bulk_summary" style="display:none">
                         <i class="fas fa-info-circle me-1"></i>
                         <span id="bulk_summary_text"></span>
                     </div>
@@ -489,22 +489,21 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 .islamic-fees-header {
     position: relative;
     height: 70px;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
+    padding: 16px 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
 }
-
 .header-pattern-overlay {
     position: absolute;
     inset: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     opacity: 0.5;
 }
-
 .header-bismillah {
     font-family: 'Amiri', serif;
     font-size: 22px;
@@ -514,7 +513,6 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     z-index: 1;
     letter-spacing: 2px;
 }
-
 .header-decoration-left {
     position: absolute;
     right: 30px;
@@ -522,7 +520,6 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #d4a030;
     opacity: 0.15;
 }
-
 .header-decoration-right {
     position: absolute;
     left: 30px;
@@ -530,38 +527,7 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #d4a030;
     opacity: 0.15;
 }
-
-.page-header-fees {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding: 25px 30px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 25px rgba(24,43,72,0.08);
-    border: 1px solid rgba(212,160,48,0.1);
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
 .header-icon-wrapper { position: relative; }
-
-.header-icon {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: #d4a030;
-    box-shadow: 0 8px 30px rgba(24,43,72,0.25);
-    position: relative;
-    z-index: 1;
-}
-
 .header-icon-glow {
     position: absolute;
     top: 50%;
@@ -573,17 +539,12 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border-radius: 50%;
     z-index: 0;
 }
-
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .header-actions { display: flex; gap: 12px; }
-
 .btn-action-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 12px 16px;
     background: #fff;
     color: #182B48;
     border: 2px solid rgba(212,160,48,0.2);
@@ -593,42 +554,38 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     transition: all 0.3s ease;
     text-decoration: none;
 }
-
 .btn-action-header:hover {
     border-color: #d4a030;
     color: #d4a030;
     transform: translateY(-2px);
 }
-
 .btn-action-header i { color: #d4a030; }
-
 .stats-grid-fees {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
-
-@media (max-width: 992px) { .stats-grid-fees { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 576px) { .stats-grid-fees { grid-template-columns: 1fr; } }
-
+@media (max-width: 992px) {
+.stats-grid-fees { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 576px) {
+.stats-grid-fees { grid-template-columns: 1fr; }
+}
 .stat-card-fees {
     position: relative;
-    padding: 25px;
-    border-radius: 20px;
+    padding: 16px;
+    border-radius: 13px;
     overflow: hidden;
     transition: all 0.4s ease;
 }
-
 .stat-card-fees:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
-
 .stat-card-fees.primary { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); }
 .stat-card-fees.success { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
 .stat-card-fees.warning { background: linear-gradient(135deg, #d4a030 0%, #B4802C 100%); }
 .stat-card-fees.gold { background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); }
-
 .stat-card-bg-pattern {
     position: absolute;
     top: -40px;
@@ -638,27 +595,8 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border-radius: 50%;
     background: rgba(255,255,255,0.1);
 }
-
 .stat-content-wrapper { display: flex; align-items: flex-start; gap: 15px; position: relative; z-index: 1; }
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    color: #fff;
-    backdrop-filter: blur(5px);
-    flex-shrink: 0;
-}
-
 .stat-content { flex: 1; }
-.stat-number { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
-.stat-label { font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 500; }
-.stat-decoration { position: absolute; bottom: 15px; left: 20px; font-size: 50px; opacity: 0.12; color: #fff; }
 .stat-corner-decoration {
     position: absolute;
     bottom: 0;
@@ -668,25 +606,22 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     background: radial-gradient(circle at bottom right, rgba(255,255,255,0.1) 0%, transparent 70%);
     border-radius: 50% 0 0 0;
 }
-
 .filter-card-fees {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .filter-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.03));
     border-bottom: 2px solid rgba(212,160,48,0.1);
 }
-
 .filter-title {
     display: flex;
     align-items: center;
@@ -695,9 +630,7 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #182B48;
     font-size: 16px;
 }
-
 .filter-title i { color: #d4a030; font-size: 18px; }
-
 .filter-decoration {
     width: 45px;
     height: 45px;
@@ -709,9 +642,6 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #d4a030;
     font-size: 18px;
 }
-
-.filter-form { padding: 25px; }
-
 .form-select-fe {
     width: 100%;
     padding: 12px 16px;
@@ -721,13 +651,11 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     transition: all 0.3s;
     background: #fff;
 }
-
 .form-select-fe:focus {
     border-color: #d4a030;
     box-shadow: 0 0 0 4px rgba(212,160,48,0.15);
     outline: none;
 }
-
 .btn-search-fe {
     width: 100%;
     padding: 12px;
@@ -739,9 +667,7 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     transition: all 0.3s;
     cursor: pointer;
 }
-
 .btn-search-fe:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
-
 .btn-reset-fe {
     width: 100%;
     padding: 12px;
@@ -755,36 +681,32 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     align-items: center;
     justify-content: center;
 }
-
 .btn-reset-fe:hover { border-color: #d4a030; color: #d4a030; }
-
 .actions-bar-fees {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .actions-right { display: flex; gap: 12px; }
 .actions-left .selected-count-fe {
     background: linear-gradient(135deg, rgba(212,160,48,0.1), rgba(180,128,44,0.1));
-    padding: 10px 20px;
+    padding: 10px 16px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     color: #B4802C;
 }
-
 .btn-action-fees {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 12px 16px;
     border-radius: 12px;
     font-weight: 600;
     font-size: 14px;
@@ -792,42 +714,19 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border: none;
     cursor: pointer;
 }
-
 .btn-action-fees.success { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
 .btn-action-fees.success:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(39,174,96,0.3); }
-
 .btn-action-fees.warning { background: linear-gradient(135deg, #d4a030, #B4802C); color: #fff; }
 .btn-action-fees.warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,160,48,0.3); }
-
 .btn-action-fees.primary { background: linear-gradient(135deg, #182B48, #2A4570); color: #fff; }
 .btn-action-fees.primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
-
 .table-card-fees {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.05);
     border: 1px solid rgba(212,160,48,0.1);
     overflow: hidden;
 }
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 25px;
-    border-bottom: 2px solid rgba(212,160,48,0.1);
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #182B48;
-}
-
 .table-icon {
     width: 45px;
     height: 45px;
@@ -839,7 +738,6 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #d4a030;
     font-size: 18px;
 }
-
 .records-count-fe {
     display: flex;
     align-items: center;
@@ -851,13 +749,11 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     font-weight: 600;
     color: #B4802C;
 }
-
 .records-count-fe i { color: #d4a030; }
-
 .data-table-fees { width: 100%; border-collapse: collapse; }
 .data-table-fees thead { background: linear-gradient(135deg, rgba(24,43,72,0.03), rgba(42,69,112,0.03)); }
 .data-table-fees th {
-    padding: 16px 20px;
+    padding: 16px 16px;
     font-size: 12px;
     font-weight: 700;
     color: #182B48;
@@ -866,7 +762,7 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border-bottom: 2px solid rgba(212,160,48,0.15);
 }
 .data-table-fees td {
-    padding: 16px 20px;
+    padding: 16px 16px;
     font-size: 14px;
     color: #2c3e50;
     border-bottom: 1px solid #f0f4f8;
@@ -874,7 +770,6 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 }
 .data-table-fees tbody tr { transition: all 0.3s; }
 .data-table-fees tbody tr:hover { background: linear-gradient(135deg, rgba(212,160,48,0.03), rgba(180,128,44,0.03)); }
-
 .user-cell { display: flex; align-items: center; gap: 12px; }
 .user-avatar {
     width: 40px;
@@ -888,11 +783,8 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     font-size: 16px;
 }
 .user-avatar.gold { background: linear-gradient(135deg, #d4a030, #B4802C); color: #fff; }
-.user-name { font-weight: 600; color: #182B48; }
-
 .student-cell { display: flex; align-items: center; gap: 8px; color: #182B48; }
 .student-cell i { color: #d4a030; }
-
 .category-badge {
     background: rgba(52,152,219,0.1);
     padding: 5px 12px;
@@ -901,25 +793,11 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     color: #3498db;
     font-weight: 600;
 }
-
 .amount-cell { direction: ltr; text-align: right; }
 .amount { font-weight: 700; color: #182B48; font-size: 16px; }
 .currency { color: #7f8c8d; font-size: 12px; margin-right: 4px; }
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-}
 .status-badge.paid { background: rgba(39,174,96,0.1); color: #27ae60; }
 .status-badge.unpaid { background: rgba(192,57,43,0.1); color: #c0392b; }
-
-.date-cell { color: #7f8c8d; font-size: 13px; }
-
-.action-buttons { display: flex; gap: 8px; }
 .action-btn-fees {
     width: 38px;
     height: 38px;
@@ -935,13 +813,11 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 .action-btn-fees.success:hover { background: #27ae60; color: #fff; }
 .action-btn-fees.delete { background: rgba(192,57,43,0.1); color: #c0392b; }
 .action-btn-fees.delete:hover { background: #c0392b; color: #fff; }
-
-.table-footer { padding: 20px 25px; border-top: 1px solid #f0f4f8; }
-.table-footer .pagination { margin: 0; gap: 8px; }
+.table-footer .pagination { margin: 0; gap: 4px; }
 .table-footer .page-link {
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 14px;
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 12.5px;
     border: 2px solid #e9ecef;
     color: #182B48;
     transition: all 0.3s;
@@ -951,25 +827,11 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border-color: #182B48;
     color: #fff;
 }
-
 .empty-state-fees {
     text-align: center;
-    padding: 70px 20px;
+    padding: 40px 16px;
 }
-.empty-icon-wrapper { position: relative; display: inline-block; margin-bottom: 25px; }
-.empty-icon {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.1), rgba(42,69,112,0.1));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    color: #d4a030;
-    position: relative;
-    z-index: 1;
-}
+.empty-icon-wrapper { position: relative; display: inline-block; margin-bottom: 16px; }
 .empty-icon-glow {
     position: absolute;
     top: 50%;
@@ -981,20 +843,19 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     border-radius: 50%;
     z-index: 0;
 }
-.empty-state-fees h5 { color: #182B48; font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-.empty-state-fees p { color: #7f8c8d; margin-bottom: 25px; font-size: 15px; }
-
-.modal-content { border-radius: 16px; border: none; }
+.empty-state-fees h5 { color: #182B48; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+.empty-state-fees p { color: #7f8c8d; margin-bottom: 16px; font-size: 15px; }
+.modal-content { border-radius: 13px; border: none; }
 .modal-header {
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
-    border-radius: 16px 16px 0 0;
+    border-radius: 13px 13px 0 0;
 }
 .modal-title { font-weight: 700; font-size: 18px; }
 .btn-close { filter: invert(1); }
-.modal-body { padding: 25px; }
-.form-group { margin-bottom: 20px; }
+.modal-body { padding: 16px; }
+.form-group { margin-bottom: 16px; }
 .form-label { display: block; font-weight: 600; color: #182B48; margin-bottom: 8px; font-size: 14px; }
 .form-control, .form-select {
     width: 100%;
@@ -1018,67 +879,41 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
     padding: 12px 16px;
     border-radius: 10px;
 }
-.modal-footer { padding: 15px 25px; border-top: 1px solid #f0f4f8; }
-.btn { display: flex; align-items: center; gap: 8px; padding: 12px 25px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: none; cursor: pointer; }
+.modal-footer { padding: 15px 16px; border-top: 1px solid #f0f4f8; }
+.btn { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: none; cursor: pointer; }
 .btn-primary { background: linear-gradient(135deg, #182B48, #2A4570); color: #fff; }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(24,43,72,0.3); }
 .btn-warning { background: linear-gradient(135deg, #d4a030, #B4802C); color: #fff; }
 .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,160,48,0.3); }
 .btn-outline { background: transparent; color: #7f8c8d; border: 2px solid #e9ecef; }
 .btn-outline:hover { border-color: #182B48; color: #182B48; }
-
 /* Mobile responsive */
 @media (max-width: 768px) {
-    .islamic-fees-header { height: 56px; margin-bottom: 16px; }
-    .header-bismillah { font-size: 16px; letter-spacing: 1px; }
-    .header-decoration-left, .header-decoration-right { display: none; }
-
-    .page-header-fees {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 18px 20px;
-        gap: 14px;
-    }
-    .header-content { gap: 12px; }
-    .header-icon { width: 52px; height: 52px; font-size: 22px; border-radius: 14px; }
-    .header-text h4 { font-size: 18px; }
-    .header-text p { font-size: 12px; }
-    .header-actions { flex-wrap: wrap; gap: 8px; }
-    .btn-action-header { padding: 9px 14px; font-size: 12px; }
-
-    .stat-card-fees { padding: 18px; }
-    .stat-icon { width: 48px; height: 48px; font-size: 20px; }
-    .stat-number { font-size: 26px; }
-    .stat-label { font-size: 12px; }
-    .stat-decoration { font-size: 36px; }
-
-    .filter-form { padding: 16px; }
-    .form-select-fe { padding: 10px 12px; font-size: 13px; }
-    .btn-search-fe, .btn-reset-fe { padding: 10px; }
-
-    .actions-bar-fees {
+.islamic-fees-header { height: 56px; margin-bottom: 16px; }
+.header-bismillah { font-size: 16px; letter-spacing: 1px; }
+.header-decoration-left, .header-decoration-right { display: none; }
+.header-actions { flex-wrap: wrap; gap: 8px; }
+.btn-action-header { padding: 9px 14px; font-size: 12px; }
+.stat-card-fees { padding: 16px; }
+.form-select-fe { padding: 10px 12px; font-size: 13px; }
+.btn-search-fe, .btn-reset-fe { padding: 10px; }
+.actions-bar-fees {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
         padding: 14px 16px;
     }
-    .actions-right { flex-wrap: wrap; gap: 8px; }
-    .actions-right .btn-action-fees { flex: 1 1 calc(50% - 4px); justify-content: center; padding: 10px 12px; font-size: 12px; }
-    .actions-left { text-align: center; }
-
-    /* Keep the table layout like desktop; allow horizontal scroll inside the card */
-    .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .data-table-fees { min-width: 760px; }
-    .data-table-fees th, .data-table-fees td { padding: 10px 8px; font-size: 12px; }
-    .user-avatar { width: 32px; height: 32px; font-size: 13px; }
-    .user-name { font-size: 12px; }
-    .category-badge { font-size: 11px; padding: 4px 8px; }
-    .status-badge { font-size: 11px; padding: 5px 10px; }
-    .action-btn-fees { width: 32px; height: 32px; }
-
-    .table-header { flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px 18px; }
-    .table-footer { padding: 14px 16px; }
-    .table-footer .page-link { padding: 8px 12px; font-size: 12px; }
+.actions-right { flex-wrap: wrap; gap: 8px; }
+.actions-right .btn-action-fees { flex: 1 1 calc(50% - 4px); justify-content: center; padding: 10px 12px; font-size: 12px; }
+.actions-left { text-align: center; }
+/* Keep the table layout like desktop; allow horizontal scroll inside the card */
+.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table-fees { min-width: 760px; }
+.data-table-fees th, .data-table-fees td { padding: 10px 8px; font-size: 12px; }
+.user-avatar { width: 32px; height: 32px; font-size: 13px; }
+.category-badge { font-size: 11px; padding: 4px 8px; }
+.action-btn-fees { width: 32px; height: 32px; }
+.table-footer .page-link { padding: 6px 11px; font-size: 12.5px; border-radius: 7px;}
 }
 </style>
 

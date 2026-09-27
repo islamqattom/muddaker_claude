@@ -34,34 +34,13 @@
 
     body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-    }
-    .header-content { display: flex; align-items: center; gap: 20px; }
-    .header-icon {
-        width: 70px; height: 70px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        border-radius: 18px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 30px; color: var(--gold);
-        box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-    }
-    .header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-    .header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
-    .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
     .btn-back {
-        display: inline-flex; align-items: center; gap: 10px;
-        padding: 12px 24px;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 16px;
         background: #fff;
         color: var(--primary); border: 2px solid var(--primary);
-        border-radius: 12px;
-        font-weight: 600; font-size: 14px;
+        border-radius: 9px;
+        font-weight: 600; font-size: 13px;
         transition: all 0.3s ease;
         text-decoration: none;
     }
@@ -73,67 +52,27 @@
 
     .stats-card {
         background: #fff;
-        border-radius: 16px;
-        padding: 25px;
+        border-radius: 13px;
+        padding: 14px 16px;
         box-shadow: var(--card-shadow);
         border: 1px solid rgba(24,43,72,0.05);
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 12px;
+        height: 100%;
     }
     .stats-icon {
-        width: 60px; height: 60px;
-        border-radius: 14px;
+        width: 38px; height: 38px;
+        border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px;
+        font-size: 16px;
+        flex-shrink: 0;
     }
     .stats-icon.gold { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #fff; }
     .stats-icon.success { background: linear-gradient(135deg, var(--success), #219a52); color: #fff; }
     .stats-icon.info { background: linear-gradient(135deg, var(--info), #2980b9); color: #fff; }
-    .stats-text h3 { color: var(--primary); font-size: 28px; font-weight: 700; margin: 0 0 4px 0; }
-    .stats-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
-    .table-card {
-        background: #fff;
-        border-radius: 20px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(24,43,72,0.05);
-        overflow: hidden;
-    }
-    .table-header {
-        display: flex; align-items: center; gap: 12px;
-        padding: 22px 28px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        color: #fff;
-        position: relative;
-    }
-    .table-header i { color: var(--gold); font-size: 20px; }
-    .table-header h5 { margin: 0; font-weight: 700; font-size: 18px; }
-    .table-header::after {
-        content: '';
-        position: absolute;
-        bottom: 0; right: 0; left: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
-    }
-
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th {
-        background: rgba(24,43,72,0.04);
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 13px;
-        padding: 14px 16px;
-        text-align: center;
-    }
-    .data-table td {
-        padding: 16px;
-        text-align: center;
-        border-bottom: 1px solid rgba(24,43,72,0.06);
-        vertical-align: middle;
-    }
-    .data-table tr:last-child td { border-bottom: none; }
-    .data-table tbody tr:hover { background: rgba(212,160,48,0.04); }
+    .stats-text h3 { color: var(--primary); font-size: 22px; font-weight: 800; margin: 0 0 2px 0; line-height: 1.1; }
+    .stats-text p { color: #7f8c8d; font-size: 12px; margin: 0; }
 
     .data-table tr.row-success {
         background: var(--success-row);
@@ -145,13 +84,6 @@
         border-right: 4px solid var(--success);
     }
 
-    .status-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
     .status-badge.mafsil { background: rgba(52,152,219,0.15); color: var(--info); }
     .status-badge.mutqin { background: var(--success-light); color: var(--success); }
     .status-badge.not-completed { background: rgba(192,57,43,0.15); color: var(--danger); }
@@ -172,9 +104,9 @@
     .alert-success {
         background: rgba(39,174,96,0.1);
         border: 1px solid rgba(39,174,96,0.3);
-        border-radius: 12px;
+        border-radius: 13px;
         color: var(--success);
-        padding: 16px 20px;
+        padding: 12px 16px;
     }
 
     @media (max-width: 768px) {
@@ -275,8 +207,10 @@
 
 <div class="table-card">
     <div class="table-header">
-        <i class="fas fa-list"></i>
-        <h5>سجل الأجزاء</h5>
+        <div class="table-title">
+            <i class="fas fa-list"></i>
+            <span>سجل الأجزاء</span>
+        </div>
     </div>
     <div class="table-responsive">
         <table class="data-table">

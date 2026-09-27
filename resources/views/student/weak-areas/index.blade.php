@@ -23,9 +23,9 @@
 
 .weak-areas-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -47,20 +47,21 @@
 }
 
 .weak-areas-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--warning) 0%, #e67e22 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(243,156,18,0.35);
+    flex-shrink: 0;
 }
 
-.weak-areas-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.weak-areas-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.weak-areas-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.weak-areas-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .weak-areas-page .stat-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -69,44 +70,44 @@
 
 .weak-areas-page .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
-.weak-areas-page .stat-card-body { padding: 20px; text-align: center; }
+.weak-areas-page .stat-card-body { padding: 14px; text-align: center; }
 
 .weak-areas-page .stat-icon {
-    width: 50px; height: 50px;
-    border-radius: 12px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin: 0 auto 12px;
+    font-size: 16px;
+    margin: 0 auto 8px;
 }
 
 .weak-areas-page .stat-icon.primary { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); }
 .weak-areas-page .stat-icon.success { background: linear-gradient(135deg, var(--success), #2ecc71); color: white; }
 .weak-areas-page .stat-icon.warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: white; }
 
-.weak-areas-page .stat-value { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; }
-.weak-areas-page .stat-label { font-size: 11px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
+.weak-areas-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
+.weak-areas-page .stat-label { font-size: 12px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
 
 .weak-areas-page .toolbar-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
-    padding: 16px 24px;
-    margin-bottom: 24px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
 }
 
-.weak-areas-page .toolbar-title { font-size: 16px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 10px; }
+.weak-areas-page .toolbar-title { font-size: 14px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 10px; }
 .weak-areas-page .toolbar-title i { color: var(--warning); }
 
 .weak-areas-page .btn-refresh {
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
     color: white;
     border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
     font-size: 13px;
     transition: all 0.2s ease;
@@ -117,7 +118,7 @@
 
 .weak-areas-page .areas-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -126,7 +127,7 @@
 .weak-areas-page .areas-table { width: 100%; border-collapse: collapse; margin: 0; }
 .weak-areas-page .areas-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -135,8 +136,8 @@
     letter-spacing: 0.5px;
 }
 .weak-areas-page .areas-table tbody td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
@@ -145,14 +146,14 @@
 .weak-areas-page .areas-table tbody tr:hover { background: linear-gradient(90deg, rgba(212,160,48,0.04) 0%, rgba(24,43,72,0.02) 100%); }
 
 .weak-areas-page .rate-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
 .weak-areas-page .action-btn {
-    width: 32px; height: 32px;
+    width: 30px; height: 30px;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(24,43,72,0.1);
@@ -169,25 +170,25 @@
 .weak-areas-page .info-card {
     background: linear-gradient(135deg, rgba(52,152,219,0.08), rgba(41,128,185,0.08));
     border: 2px solid rgba(52,152,219,0.15);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 13px;
+    padding: 16px;
 }
 
 .weak-areas-page .info-card h6 { color: var(--navy); font-weight: 700; margin-bottom: 8px; }
-.weak-areas-page .info-card p { font-size: 13px; color: #6c7a89; margin-bottom: 0; }
+.weak-areas-page .info-card p { font-size: 12.5px; color: #6c7a89; margin-bottom: 0; }
 
-.weak-areas-page .empty-state { text-align: center; padding: 80px 20px; }
+.weak-areas-page .empty-state { text-align: center; padding: 40px 16px; }
 .weak-areas-page .empty-icon {
-    width: 100px; height: 100px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(46,204,113,0.15));
-    border-radius: 24px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
+    margin: 0 auto 14px;
 }
-.weak-areas-page .empty-icon i { font-size: 40px; color: var(--success); }
+.weak-areas-page .empty-icon i { font-size: 26px; color: var(--success); }
 
 @media (max-width: 992px) {
-    .weak-areas-page .page-hero { padding: 20px 24px; }
+    .weak-areas-page .page-hero { padding: 14px 16px; }
     .weak-areas-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .weak-areas-page .hero-title { font-size: 18px; }
 }

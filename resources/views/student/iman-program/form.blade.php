@@ -24,33 +24,34 @@
     --navy-light: #2A4570;
     --success: #27ae60;
     --danger: #c0392b;
-    --radius: 16px;
+    --radius: 14px;
     --shadow-sm: 0 2px 10px rgba(24,43,72,0.05);
 }
 
 .iman-form-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: var(--radius);
-    padding: 24px 30px;
-    margin-bottom: 24px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     color: #fff;
     display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
 }
-.iman-form-page .page-hero h1 { margin: 0; font-size: 22px; font-weight: 700; }
-.iman-form-page .page-hero p { color: rgba(255,255,255,0.8); margin: 0; font-size: 13px; }
+.iman-form-page .page-hero h1 { margin: 0; font-size: 18px; font-weight: 700; }
+.iman-form-page .page-hero p { color: rgba(255,255,255,0.8); margin: 0; font-size: 12.5px; }
 .iman-form-page .hero-icon {
-    width: 56px; height: 56px; border-radius: 14px;
+    width: 48px; height: 48px; border-radius: 13px;
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px;
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    flex-shrink: 0;
 }
 .iman-form-page .form-card {
     background: #fff; border-radius: var(--radius);
-    box-shadow: var(--shadow-sm); padding: 26px; margin-bottom: 22px;
+    box-shadow: var(--shadow-sm); padding: 16px; margin-bottom: 16px;
     border: 1px solid rgba(24,43,72,0.05);
 }
-.iman-form-page .form-card h5 { color: var(--navy); font-weight: 800; margin-bottom: 16px; }
+.iman-form-page .form-card h5 { color: var(--navy); font-weight: 800; margin-bottom: 12px; }
 .iman-form-page .form-card h5 i { color: var(--gold); margin-inline-end: 8px; }
-.iman-form-page .form-card p.help { color: #6b7a90; font-size: 13px; margin-bottom: 18px; }
+.iman-form-page .form-card p.help { color: #6b7a90; font-size: 12.5px; margin-bottom: 14px; }
 
 .iman-form-page .criterion-row {
     display: grid; grid-template-columns: 1fr 180px 200px 50px;
@@ -68,7 +69,7 @@
 }
 .iman-form-page .criterion-row .remove-btn {
     background: rgba(192,57,43,0.1); color: var(--danger); border: none;
-    width: 40px; height: 40px; border-radius: 10px; cursor: pointer;
+    width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
 }
 .iman-form-page .criterion-row .remove-btn:hover { background: var(--danger); color: #fff; }
@@ -77,8 +78,8 @@
 }
 .iman-form-page .type-select label {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px; border: 1.5px solid #d6dbe5; border-radius: 10px;
-    cursor: pointer; font-size: 13px; font-weight: 600; color: var(--navy);
+    padding: 6px 12px; border: 1.5px solid #d6dbe5; border-radius: 8px;
+    cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--navy);
 }
 .iman-form-page .type-select input { display: none; }
 .iman-form-page .type-select input:checked + span { color: var(--gold); }
@@ -88,8 +89,8 @@
 
 .iman-form-page .add-criterion-btn {
     background: rgba(24,43,72,0.06); color: var(--navy);
-    border: 2px dashed rgba(24,43,72,0.2); padding: 12px 20px;
-    border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer;
+    border: 2px dashed rgba(24,43,72,0.2); padding: 8px 16px;
+    border-radius: 9px; font-weight: 700; font-size: 13px; width: 100%; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .iman-form-page .add-criterion-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
@@ -103,17 +104,17 @@
     .iman-form-page .form-actions .btn-gold,
     .iman-form-page .form-actions .btn-cancel { flex: 1; text-align: center; }
     .iman-form-page .form-card { padding: 16px; }
-    .iman-form-page .page-hero { padding: 18px; }
+    .iman-form-page .page-hero { padding: 14px 16px; }
 }
 .iman-form-page .btn-gold {
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: #fff; border: none; padding: 12px 28px; border-radius: 12px;
-    font-weight: 700; cursor: pointer;
+    color: #fff; border: none; padding: 8px 16px; border-radius: 9px;
+    font-weight: 700; font-size: 13px; cursor: pointer;
 }
 .iman-form-page .btn-gold:hover { transform: translateY(-1px); }
 .iman-form-page .btn-cancel {
     background: #f0f4f8; color: var(--navy); border: none;
-    padding: 12px 22px; border-radius: 12px; font-weight: 700; text-decoration: none;
+    padding: 8px 16px; border-radius: 9px; font-weight: 700; font-size: 13px; text-decoration: none;
 }
 .iman-form-page .btn-cancel:hover { background: #dee5ed; }
 </style>

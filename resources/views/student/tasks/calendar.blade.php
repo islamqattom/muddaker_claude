@@ -19,22 +19,22 @@
 .calendar-page { font-family: 'Tajawal', sans-serif; }
 .page-header {
     display: flex; justify-content: space-between; align-items: center;
-    gap: 20px; margin-bottom: 30px; flex-wrap: wrap;
+    gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
 }
-.header-content { display: flex; align-items: center; gap: 20px; }
+.header-content { display: flex; align-items: center; gap: 14px; }
 .header-icon {
-    width: 70px; height: 70px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: #fff;
+    border-radius: 13px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #fff;
     box-shadow: 0 8px 25px rgba(39,174,96,0.25);
 }
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
+.header-text h4 { color: #182B48; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+.header-text p { color: #7f8c8d; font-size: 12.5px; margin: 0; }
 .calendar-container {
-    background: #fff; border-radius: 18px;
+    background: #fff; border-radius: 13px;
     box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
-    padding: 25px; border: 1px solid rgba(24,43,72,0.05);
+    padding: 16px; border: 1px solid rgba(24,43,72,0.05);
 }
 .fc { font-family: 'Tajawal', sans-serif; }
 .fc .fc-toolbar-title { font-size: 1.4em; color: #182B48; font-weight: 700; }
@@ -84,10 +84,10 @@
     box-shadow: 0 0 0 4px rgba(39,174,96,0.12);
 }
 .legend-container {
-    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
-    padding: 15px 20px;
+    display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, rgba(39,174,96,0.04) 0%, rgba(46,204,113,0.06) 100%);
-    border-radius: 12px;
+    border-radius: 13px;
 }
 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #5a6c7d; }
 .legend-color { width: 20px; height: 20px; border-radius: 6px; }
@@ -98,8 +98,8 @@
 .legend-overdue { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
 .status-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 .status-badge.pending { background: rgba(243,156,18,0.15); color: #f39c12; }
 .status-badge.in_progress { background: rgba(52,152,219,0.15); color: #3498db; }
@@ -177,10 +177,10 @@
 
 /* Tablets and small desktops */
 @media (max-width: 992px) {
-    .page-header { gap: 15px; margin-bottom: 20px; }
-    .header-icon { width: 60px; height: 60px; font-size: 26px; border-radius: 16px; }
-    .header-text h4 { font-size: 20px; }
-    .calendar-container { padding: 15px; border-radius: 14px; }
+    .page-header { gap: 16px; margin-bottom: 16px; }
+    .header-icon { width: 48px; height: 48px; font-size: 20px; border-radius: 13px; }
+    .header-text h4 { font-size: 18px; }
+    .calendar-container { padding: 16px; border-radius: 13px; }
     .legend-container { gap: 15px; padding: 12px 15px; }
     .legend-item { font-size: 12px; }
     .legend-color { width: 18px; height: 18px; }
@@ -194,10 +194,10 @@
         gap: 12px;
     }
     .page-header .btn { width: 100%; }
-    .header-content { gap: 15px; }
-    .header-icon { width: 55px; height: 55px; font-size: 24px; border-radius: 14px; }
+    .header-content { gap: 14px; }
+    .header-icon { width: 48px; height: 48px; font-size: 20px; border-radius: 13px; }
     .header-text h4 { font-size: 18px; }
-    .header-text p { font-size: 13px; }
+    .header-text p { font-size: 12.5px; }
     .legend-container {
         gap: 10px;
         padding: 10px 12px;
@@ -205,7 +205,7 @@
     }
     .legend-item { font-size: 11px; }
     .legend-color { width: 16px; height: 16px; border-radius: 5px; }
-    .calendar-container { padding: 10px; border-radius: 12px; }
+    .calendar-container { padding: 10px; border-radius: 13px; }
 
     /* FullCalendar mobile adjustments */
     .fc .fc-toolbar.fc-header-toolbar {
@@ -245,7 +245,7 @@
 @media (max-width: 480px) {
     .header-text h4 { font-size: 16px; }
     .header-text p { font-size: 12px; }
-    .header-icon { width: 50px; height: 50px; font-size: 22px; }
+    .header-icon { width: 48px; height: 48px; font-size: 20px; }
 
     .legend-container { gap: 8px; padding: 8px 10px; }
     .legend-item { font-size: 10px; gap: 5px; }

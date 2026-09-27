@@ -17,72 +17,19 @@
     --navy-light: #2A4570;
 }
 
-.ijazah-page .hero-section {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-}
-
-.ijazah-page .hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
-}
-
-.ijazah-page .hero-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.ijazah-page .hero-icon {
-    width: 60px; height: 60px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
-    box-shadow: 0 6px 20px rgba(212, 160, 48, 0.35);
-    flex-shrink: 0;
-}
-
-.ijazah-page .hero-title {
-    color: white; font-size: 22px; font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.ijazah-page .hero-sub {
-    color: rgba(255,255,255,0.75); font-size: 13px; margin: 0;
-}
-
 .ijazah-page .form-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(24, 43, 72, 0.04);
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
-
-.ijazah-page .card-header-custom {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
-    display: flex; align-items: center; gap: 12px;
-}
-
-.ijazah-page .card-header-custom i { color: var(--gold); font-size: 18px; }
-.ijazah-page .card-header-custom h5 { color: white; font-weight: 700; margin: 0; font-size: 16px; }
 
 .ijazah-page .student-select-card {
-    padding: 20px;
+    padding: 14px 16px;
     border: 2px solid #e9ecef;
-    border-radius: 12px;
+    border-radius: 13px;
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -116,7 +63,7 @@
 
 .ijazah-page .part-check-item {
     border: 2px solid #e9ecef;
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 14px 10px;
     text-align: center;
     cursor: pointer;
@@ -161,11 +108,11 @@
 }
 
 .ijazah-page .btn-gold {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 28px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, var(--gold), #B4802C);
-    color: #fff; border: none; border-radius: 12px;
-    font-weight: 700; font-size: 15px;
+    color: #fff; border: none; border-radius: 9px;
+    font-weight: 700; font-size: 13px;
     transition: all 0.3s ease;
 }
 
@@ -183,13 +130,14 @@
     background: rgba(24, 43, 72, 0.05);
     color: var(--navy);
     font-weight: 700;
-    font-size: 13px;
-    padding: 12px 16px;
+    font-size: 11px;
+    padding: 11px 14px;
     text-align: center;
 }
 
 .ijazah-page .ijazah-table td {
-    padding: 14px 16px;
+    padding: 11px 14px;
+    font-size: 13px;
     text-align: center;
     border-bottom: 1px solid rgba(24, 43, 72, 0.04);
 }
@@ -200,9 +148,9 @@
 
 .ijazah-page .status-badge {
     display: inline-flex; align-items: center; gap: 5px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
 .ijazah-page .status-badge.completed {
@@ -225,18 +173,6 @@
     background: rgba(192, 57, 43, 0.2);
 }
 
-.ijazah-page .empty-state {
-    text-align: center;
-    padding: 50px 20px;
-    color: #7f8c8d;
-}
-
-.ijazah-page .empty-state i {
-    font-size: 40px;
-    opacity: 0.3;
-    margin-bottom: 10px;
-}
-
 @media (max-width: 768px) {
     .ijazah-page .parts-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -254,22 +190,24 @@
         </div>
     @endif
 
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-icon">
                 <i class="fas fa-award"></i>
             </div>
-            <div>
-                <h1 class="hero-title">تسجيل الإجازة</h1>
-                <p class="hero-sub">سجل إجازة الطالب في القرآن الكريم</p>
+            <div class="header-text">
+                <h4>تسجيل الإجازة</h4>
+                <p>سجل إجازة الطالب في القرآن الكريم</p>
             </div>
         </div>
     </div>
 
     <div class="form-card">
         <div class="card-header-custom">
-            <i class="fas fa-user-plus"></i>
-            <h5>اختر الطالب</h5>
+            <div class="card-title">
+                <i class="fas fa-user-plus"></i>
+                <span>اختر الطالب</span>
+            </div>
         </div>
         <div class="card-body p-4">
             <form id="ijazahForm" method="POST" action="{{ route('supervisor.ijazah.store') }}">
@@ -315,8 +253,10 @@
     @if($ijazahRecords->count() > 0)
     <div class="form-card">
         <div class="card-header-custom">
-            <i class="fas fa-list"></i>
-            <h5>سجل الإجازات المسجلة</h5>
+            <div class="card-title">
+                <i class="fas fa-list"></i>
+                <span>سجل الإجازات المسجلة</span>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">

@@ -15,7 +15,7 @@
 
 @section('content')
 
-<div class="page-header mb-4">
+<div class="page-header">
     <div class="header-content">
         <div class="header-icon">
             <i class="fas fa-calendar-check"></i>

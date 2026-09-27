@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<div class="rpt-table-card" style="margin-bottom:24px;">
+<div class="rpt-table-card" style="margin-bottom:16px;">
     <div class="rpt-table-header">
         <h5><i class="fas fa-microphone"></i> جلسات التسميع</h5>
         <span class="rpt-count-badge">{{ $sessions->count() }} جلسة</span>

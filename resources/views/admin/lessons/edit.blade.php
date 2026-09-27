@@ -24,29 +24,26 @@
 @push('styles')
 <style>
 .form-page { font-family: 'Tajawal', sans-serif; }
-.page-header { display: flex; gap: 20px; align-items: center; margin-bottom: 30px; flex-wrap: wrap; }
-.subject-color-badge { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-.header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 13px; margin: 0; }
-.form-card { background: #fff; border-radius: 18px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 30px; border: 1px solid rgba(24,43,72,0.05); }
+.subject-color-badge { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+.form-card { background: #fff; border-radius: 13px; box-shadow: 0 4px 25px rgba(24, 43, 72, 0.08); padding: 16px; border: 1px solid rgba(24,43,72,0.05); }
 .form-label { color: #182B48; font-weight: 700; margin-bottom: 8px; display: block; }
 .form-label .required { color: #c0392b; }
 .form-control, .form-select { border-radius: 12px; border: 2px solid #e9ecef; padding: 12px 16px; font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; width: 100%; }
 .form-control:focus, .form-select:focus { border-color: {{ $subject->color }}; box-shadow: 0 0 0 4px {{ $subject->color }}20; outline: none; }
 textarea.form-control { min-height: 100px; resize: vertical; }
 .form-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 24px; margin-top: 24px; border-top: 1px dashed #e9ecef; }
-.btn { border-radius: 12px; padding: 12px 28px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
+.btn { border-radius: 12px; padding: 12px 16px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
 .btn-primary { background: {{ $subject->color }}; color: #fff; }
 .btn-primary:hover { color: #fff; }
 .btn-secondary { background: #f0f4f8; color: #182B48; }
-.day-preview { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; background: {{ $subject->color }}15; color: {{ $subject->color }}; font-weight: 700; font-size: 13px; margin-top: 6px; }
+.day-preview { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 13px; background: {{ $subject->color }}15; color: {{ $subject->color }}; font-weight: 700; font-size: 13px; margin-top: 6px; }
 </style>
 @endpush
 
 @section('content')
 <div class="form-page">
     <div class="page-header">
-        <div class="subject-color-badge" style="background: {{ $subject->color }};"><i class="fas fa-edit"></i></div>
+        <div class="subject-color-badge" style="background:{{ $subject->color }}"><i class="fas fa-edit"></i></div>
         <div class="header-text">
             <h4>تعديل درس</h4>
             <p>المادة: <strong>{{ $subject->name }}</strong></p>

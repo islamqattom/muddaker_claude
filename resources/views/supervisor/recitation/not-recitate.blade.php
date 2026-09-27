@@ -24,9 +24,9 @@
 
 .rec-session .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 20px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -42,37 +42,37 @@
 .rec-session .hero-content { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 
 .rec-session .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(108,117,125,0.35);
 }
 
 .rec-session .student-info { display: flex; align-items: center; gap: 14px; }
 
 .rec-session .student-avatar {
-    width: 50px; height: 50px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; color: white;
+    font-size: 18px; color: white;
     box-shadow: 0 4px 12px rgba(108,117,125,0.3);
 }
 
-.rec-session .student-name { font-size: 20px; font-weight: 700; color: white; margin-bottom: 4px; }
+.rec-session .student-name { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
 
 .rec-session .hero-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .rec-session .compact-badge {
-    font-size: 11px; padding: 5px 12px; border-radius: 8px;
+    font-size: 11.5px; padding: 3px 10px; border-radius: 7px;
 }
 
 .rec-session .type-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 16px; border-radius: 12px;
-    font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 9px;
+    font-size: 12.5px; font-weight: 600;
 }
 
 .rec-session .type-badge.not-recitate { background: rgba(108,117,125,0.25); color: #6c757d; }
@@ -91,7 +91,7 @@
 
 .rec-session .page-card {
     border: 1px solid rgba(24,43,72,0.08);
-    border-radius: 16px;
+    border-radius: 13px;
     overflow: hidden;
     transition: all 0.25s ease;
     box-shadow: 0 2px 12px rgba(0,0,0,0.04);
@@ -100,7 +100,7 @@
 
 .rec-session .page-card-header {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    padding: 14px 18px;
+    padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid rgba(24,43,72,0.04);
 }
@@ -108,9 +108,9 @@
 .rec-session .save-btn {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border: none;
-    border-radius: 12px;
-    padding: 12px 32px;
-    font-size: 14px; font-weight: 700;
+    border-radius: 9px;
+    padding: 8px 16px;
+    font-size: 13px; font-weight: 700;
     color: white;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(24,43,72,0.3);
@@ -120,8 +120,8 @@
 
 .rec-session .btn-cancel {
     border: 1px solid rgba(24,43,72,0.1);
-    border-radius: 12px;
-    padding: 12px 20px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-size: 13px; font-weight: 600;
     transition: all 0.3s ease;
     background: white;
@@ -132,9 +132,9 @@
 
 .rec-session .notes-textarea {
     border: 2px solid rgba(24,43,72,0.08);
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 14px;
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-size: 13px;
     transition: all 0.3s ease;
 }
 

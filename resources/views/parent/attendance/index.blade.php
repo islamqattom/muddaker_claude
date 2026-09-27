@@ -136,13 +136,11 @@
     <div class="table-card">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon">
-                    <i class="fas fa-list"></i>
-                </div>
+                <i class="fas fa-list"></i>
                 <span>سجل الحضور ({{ $attendances->total() }})</span>
             </div>
         </div>
-        <div class="card-body-custom">
+        <div class="card-body-custom p-0">
             @if($attendances->isEmpty())
                 <div class="empty-state">
                     <div class="empty-illustration">
@@ -246,78 +244,9 @@
 </div>
 
 <style>
-.portal-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.header-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 10px 30px rgba(24,43,72,0.2);
-}
-
 .header-icon.success {
     background: linear-gradient(135deg, #16835a, #27ae60);
     color: #fff;
-}
-
-.header-text h4 {
-    color: #182B48;
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0 0 4px 0;
-}
-
-.header-text p {
-    color: #95a5a6;
-    font-size: 14px;
-    margin: 0;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-@media (max-width: 992px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 576px) { .stats-grid { grid-template-columns: 1fr; } }
-
-.stat-card {
-    position: relative;
-    padding: 28px;
-    border-radius: 20px;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
 .stat-card.success { background: linear-gradient(135deg, #16835a, #27ae60); }
@@ -338,183 +267,32 @@
 .stat-icon-wrapper { position: relative; z-index: 1; }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
     background: rgba(255,255,255,0.15);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    color: #fff;
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255,255,255,0.1);
 }
 
 .stat-content { flex: 1; position: relative; z-index: 1; }
 
-.stat-number {
-    font-size: 36px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.1;
-    margin-bottom: 6px;
-}
-
-.stat-label {
-    font-size: 13px;
-    color: rgba(255,255,255,0.75);
-    font-weight: 500;
-}
-
-.stat-decoration {
-    position: absolute;
-    bottom: 12px;
-    left: 18px;
-    font-size: 45px;
-    opacity: 0.1;
-    color: #fff;
-}
-
-.filter-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 28px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
-    border: 1px solid #f0f4f8;
-    margin-bottom: 30px;
-}
-
-.filter-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
-    gap: 18px;
-    align-items: end;
-}
-
-@media (max-width: 992px) { .filter-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 576px) { .filter-grid { grid-template-columns: 1fr; } }
+.stat-number { color: #fff; margin-bottom: 3px; }
+.stat-label { color: rgba(255,255,255,0.75); }
+.stat-decoration { color: #fff; opacity: 0.1; }
 
 .filter-field { display: flex; flex-direction: column; }
 
-.filter-label {
-    color: #182B48;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.filter-actions .btn {
-    padding: 12px 20px;
-}
-
-.table-card {
-    background: #fff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
-    border: 1px solid #f0f4f8;
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 28px;
-    border-bottom: 1px solid #f0f4f8;
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #182B48;
-}
-
-.table-icon {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 18px;
-}
-
-.card-body-custom { padding: 0; }
-
-.empty-state {
-    text-align: center;
-    padding: 70px 30px;
-}
+.filter-actions .btn { padding: 8px 16px; }
 
 .empty-illustration {
-    width: 100px;
-    height: 100px;
+    width: 66px;
+    height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 25px;
-    font-size: 40px;
+    margin: 0 auto 14px;
+    font-size: 26px;
     color: #d4a030;
-}
-
-.empty-state h5 {
-    color: #182B48;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.empty-state p { color: #95a5a6; }
-
-.table-responsive { overflow-x: auto; }
-
-.modern-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.modern-table thead { background: #f8f9fa; }
-
-.modern-table th {
-    padding: 18px 22px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #182B48;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
-}
-
-.modern-table td {
-    padding: 18px 22px;
-    font-size: 14px;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f4f8;
-    vertical-align: middle;
-}
-
-.modern-table tbody tr { transition: all 0.2s; }
-.modern-table tbody tr:hover { background: #fafbfc; }
-
-.row-num {
-    color: #bdc3c7;
-    font-weight: 700;
-    font-size: 13px;
 }
 
 .date-cell {
@@ -523,44 +301,12 @@
     gap: 8px;
     font-weight: 600;
     color: #182B48;
+    font-size: 12.5px;
 }
 
 .date-cell i { color: #d4a030; }
 
-.day-badge {
-    background: #f0f4f8;
-    color: #7f8c8d;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.user-info-cell { display: flex; align-items: center; gap: 14px; }
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 16px;
-}
-
-.user-name { color: #182B48; font-weight: 600; }
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
-}
+.day-badge { background: #f0f4f8; color: #7f8c8d; }
 
 .status-badge.success { background: rgba(39,174,96,0.12); color: #16835a; }
 .status-badge.danger { background: rgba(192,57,43,0.12); color: #a82e1c; }
@@ -572,34 +318,12 @@
     align-items: center;
     gap: 6px;
     color: #7f8c8d;
-    font-size: 13px;
+    font-size: 12.5px;
 }
 
 .time-badge i { color: #d4a030; }
 
-.notes-text { color: #7f8c8d; font-size: 13px; }
-
-.table-footer {
-    padding: 20px 28px;
-    border-top: 1px solid #f0f4f8;
-    display: flex;
-    justify-content: center;
-}
-
-.pagination-wrapper .pagination { margin: 0; gap: 6px; }
-.pagination-wrapper .page-link {
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    border: 1px solid #e9ecef;
-    color: #182B48;
-}
-.pagination-wrapper .page-item.active .page-link {
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-color: #182B48;
-    color: #fff;
-}
-.pagination-wrapper .page-item.disabled .page-link { color: #bdc3c7; }
+.notes-text { color: #7f8c8d; font-size: 12.5px; }
 </style>
 
 @push('scripts')

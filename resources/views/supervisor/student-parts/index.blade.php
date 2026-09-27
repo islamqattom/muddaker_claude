@@ -13,15 +13,15 @@
     .student-selector-card {
         background: var(--primary);
         color: white;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
+        border-radius: 13px;
+        padding: 16px;
+        margin-bottom: 16px;
     }
     .student-info-card {
         background: #f8f9fa;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 24px;
+        border-radius: 13px;
+        padding: 16px;
+        margin-bottom: 16px;
         display: none;
     }
 </style>

@@ -59,7 +59,7 @@
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
     <div class="rpt-chart-card">
         <h6><i class="fas fa-chart-line"></i> أداء التسميع — الشهر الحالي</h6>
         <div class="rpt-chart-wrap"><canvas id="supRecMonthChart"></canvas></div>
@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<div class="rpt-chart-card" style="margin-bottom: 24px;">
+<div class="rpt-chart-card" style="margin-bottom: 16px;">
     <h6><i class="fas fa-trophy"></i> أفضل الطلاب أداءً (الشهر)</h6>
     @if(!empty($topStudents))
         <div class="rpt-mini-list">
@@ -88,59 +88,59 @@
     @endif
 </div>
 
-<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
-    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
-        <div style="background:linear-gradient(135deg,#182B48,#2A4570);padding:20px;display:flex;align-items:center;gap:18px;">
-            <div style="width:54px;height:54px;background:linear-gradient(135deg,#d4a030,#B4802C);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;flex-shrink:0;"><i class="fas fa-quran"></i></div>
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 16px;">
+    <div class="report-card" style="background:#fff;border-radius:13px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#182B48,#2A4570);padding:16px;display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#B4802C);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;"><i class="fas fa-quran"></i></div>
             <div>
-                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير التسميع</div>
-                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">جلسات التسميع والاختبارات</div>
+                <div style="color:#fff;font-size:15px;font-weight:700;">تقرير التسميع</div>
+                <div style="color:rgba(255,255,255,.7);font-size:11.5px;margin-top:3px;">جلسات التسميع والاختبارات</div>
             </div>
         </div>
-        <div style="padding:20px;">
-            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">عرض تقارير شاملة لجلسات التسميع مع إحصائيات النجاح والرسوب، الرسوم البيانية، والتصدير.</p>
+        <div style="padding:16px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:12px;line-height:1.6;">عرض تقارير شاملة لجلسات التسميع مع إحصائيات النجاح والرسوب، الرسوم البيانية، والتصدير.</p>
             <a href="{{ route('supervisor.reports.recitation') }}" class="rpt-btn rpt-btn-primary"><i class="fas fa-chart-line"></i> عرض التقرير</a>
         </div>
     </div>
 
-    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
-        <div style="background:linear-gradient(135deg,#059669,#10b981);padding:20px;display:flex;align-items:center;gap:18px;">
-            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#059669;font-size:22px;flex-shrink:0;"><i class="fas fa-calendar-check"></i></div>
+    <div class="report-card" style="background:#fff;border-radius:13px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#059669,#10b981);padding:16px;display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#059669;font-size:16px;flex-shrink:0;"><i class="fas fa-calendar-check"></i></div>
             <div>
-                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير الحضور</div>
-                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">سجلات الحضور والانصراف</div>
+                <div style="color:#fff;font-size:15px;font-weight:700;">تقرير الحضور</div>
+                <div style="color:rgba(255,255,255,.7);font-size:11.5px;margin-top:3px;">سجلات الحضور والانصراف</div>
             </div>
         </div>
-        <div style="padding:20px;">
-            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">عرض تقارير الحضور مع نسب الحضور والغياب، الرسوم البيانية، والتصدير.</p>
+        <div style="padding:16px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:12px;line-height:1.6;">عرض تقارير الحضور مع نسب الحضور والغياب، الرسوم البيانية، والتصدير.</p>
             <a href="{{ route('supervisor.reports.attendance') }}" class="rpt-btn rpt-btn-success"><i class="fas fa-chart-line"></i> عرض التقرير</a>
         </div>
     </div>
 
-    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
-        <div style="background:linear-gradient(135deg,#0891b2,#06b6d4);padding:20px;display:flex;align-items:center;gap:18px;">
-            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#0891b2;font-size:22px;flex-shrink:0;"><i class="fas fa-users"></i></div>
+    <div class="report-card" style="background:#fff;border-radius:13px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#0891b2,#06b6d4);padding:16px;display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#0891b2;font-size:16px;flex-shrink:0;"><i class="fas fa-users"></i></div>
             <div>
-                <div style="color:#fff;font-size:17px;font-weight:700;">تقرير طالب</div>
-                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">تقرير مفصل لكل طالب</div>
+                <div style="color:#fff;font-size:15px;font-weight:700;">تقرير طالب</div>
+                <div style="color:rgba(255,255,255,.7);font-size:11.5px;margin-top:3px;">تقرير مفصل لكل طالب</div>
             </div>
         </div>
-        <div style="padding:20px;">
-            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">تقرير مفصل لكل طالب يشمل بيانات التسميع والحضور والإنجاز.</p>
+        <div style="padding:16px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:12px;line-height:1.6;">تقرير مفصل لكل طالب يشمل بيانات التسميع والحضور والإنجاز.</p>
             <a href="{{ route('supervisor.students.index') }}" class="rpt-btn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);color:#fff;box-shadow:0 4px 12px rgba(8,145,178,0.25);"><i class="fas fa-users"></i> اختيار طالب</a>
         </div>
     </div>
 
-    <div class="report-card" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
-        <div style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:20px;display:flex;align-items:center;gap:18px;">
-            <div style="width:54px;height:54px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:22px;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></div>
+    <div class="report-card" style="background:#fff;border-radius:13px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05);">
+        <div style="background:linear-gradient(135deg,#7c3aed,#5b21b6);padding:16px;display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:16px;flex-shrink:0;"><i class="fas fa-calendar-alt"></i></div>
             <div>
-                <div style="color:#fff;font-size:17px;font-weight:700;">التقرير الربعي</div>
-                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px;">تقرير شامل لكل ربع من السنة</div>
+                <div style="color:#fff;font-size:15px;font-weight:700;">التقرير الربعي</div>
+                <div style="color:rgba(255,255,255,.7);font-size:11.5px;margin-top:3px;">تقرير شامل لكل ربع من السنة</div>
             </div>
         </div>
-        <div style="padding:20px;">
-            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6;">تقرير ربعي يجمع إحصائيات التسميع والحضور على مدى 3 أشهر، مع رسوم بيانية شهرية وفلاتر متقدمة وتصدير.</p>
+        <div style="padding:16px;">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:12px;line-height:1.6;">تقرير ربعي يجمع إحصائيات التسميع والحضور على مدى 3 أشهر، مع رسوم بيانية شهرية وفلاتر متقدمة وتصدير.</p>
             <a href="{{ route('supervisor.reports.quarter') }}" class="rpt-btn" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,0.25);"><i class="fas fa-chart-line"></i> عرض التقرير</a>
         </div>
     </div>

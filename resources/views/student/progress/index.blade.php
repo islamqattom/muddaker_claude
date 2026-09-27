@@ -24,9 +24,9 @@
 
 .progress-page .page-hero {
     background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -40,22 +40,22 @@
 }
 
 .progress-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: rgba(255,255,255,0.2);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     backdrop-filter: blur(5px);
 }
 
-.progress-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.progress-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; }
+.progress-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.progress-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 12.5px; margin: 0; }
 .progress-page .hero-streak { color: white; font-size: 48px; font-weight: 800; line-height: 1; }
 .progress-page .hero-streak-label { color: rgba(255,255,255,0.8); font-size: 13px; }
 
 .progress-page .stat-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -65,16 +65,16 @@
 .progress-page .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
 .progress-page .stat-card-body {
-    padding: 20px;
+    padding: 14px 16px;
     text-align: center;
 }
 
 .progress-page .stat-icon {
-    width: 50px; height: 50px;
-    border-radius: 12px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin: 0 auto 12px;
+    font-size: 16px;
+    margin: 0 auto 8px;
 }
 
 .progress-page .stat-icon.primary { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); }
@@ -82,32 +82,32 @@
 .progress-page .stat-icon.warning { background: linear-gradient(135deg, var(--warning), #e67e22); color: white; }
 .progress-page .stat-icon.info { background: linear-gradient(135deg, var(--info), #2980b9); color: white; }
 
-.progress-page .stat-value { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; }
-.progress-page .stat-label { font-size: 11px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
+.progress-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
+.progress-page .stat-label { font-size: 12px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
 
 .progress-page .goal-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .progress-page .goal-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between;
 }
 
-.progress-page .goal-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.progress-page .goal-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; display: flex; align-items: center; gap: 10px; }
 .progress-page .goal-header h5 i { color: var(--gold); }
 
 .progress-page .goal-header .btn-goal {
     background: rgba(255,255,255,0.2);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 8px 14px;
     font-size: 12px;
     font-weight: 600;
@@ -116,7 +116,7 @@
 
 .progress-page .goal-header .btn-goal:hover { background: rgba(255,255,255,0.3); }
 
-.progress-page .goal-body { padding: 24px; }
+.progress-page .goal-body { padding: 16px; }
 
 .progress-page .progress-bar {
     height: 20px;
@@ -134,23 +134,23 @@
 
 .progress-page .chart-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .progress-page .chart-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; gap: 12px;
 }
 
-.progress-page .chart-header i { color: var(--gold); font-size: 18px; }
-.progress-page .chart-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.progress-page .chart-header i { color: var(--gold); font-size: 16px; }
+.progress-page .chart-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
-.progress-page .chart-body { padding: 24px; }
+.progress-page .chart-body { padding: 16px; }
 
 .progress-page .achievements-grid {
     display: grid;
@@ -169,27 +169,27 @@
 .progress-page .achievement-item:hover { transform: translateY(-2px); }
 
 .progress-page .achievement-icon {
-    width: 50px; height: 50px;
+    width: 48px; height: 48px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     margin: 0 auto 10px;
 }
 
 .progress-page .achievement-name { font-size: 12px; font-weight: 700; color: var(--navy); }
 
-.progress-page .empty-state { text-align: center; padding: 40px 20px; }
+.progress-page .empty-state { text-align: center; padding: 40px 16px; }
 .progress-page .empty-icon {
-    width: 80px; height: 80px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.1));
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto 14px;
 }
-.progress-page .empty-icon i { font-size: 32px; color: var(--navy); opacity: 0.4; }
+.progress-page .empty-icon i { font-size: 26px; color: var(--navy); opacity: 0.4; }
 
 @media (max-width: 992px) {
-    .progress-page .page-hero { padding: 20px 24px; }
+    .progress-page .page-hero { padding: 14px 16px; }
     .progress-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .progress-page .hero-title { font-size: 18px; }
 }

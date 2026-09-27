@@ -15,7 +15,7 @@
 
 @section('content')
 <style>
-    :root {
+:root {
         --primary: #182B48;
         --primary-light: #2A4570;
         --gold: #d4a030;
@@ -31,102 +31,60 @@
         --bg-main: #f8fafc;
         --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
     }
-
-    body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 24px;
-        flex-wrap: wrap;
-    }
-    .header-content { display: flex; align-items: center; gap: 18px; }
-    .header-icon {
-        width: 64px; height: 64px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-        border-radius: 16px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 26px; color: var(--gold);
-        box-shadow: 0 8px 22px rgba(24,43,72,0.2);
-    }
-    .header-text h4 { color: var(--primary); font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-    .header-text p { color: #6c7a89; font-size: 13px; margin: 0; }
-
-    .stat-grid {
+body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
+.stat-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 14px;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
     }
-    .stat-card {
-        background: white;
-        border-radius: 14px;
-        padding: 18px 20px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(24,43,72,0.05);
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-    .stat-card .icon {
+.stat-card .icon {
         width: 48px; height: 48px;
         border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
         font-size: 20px;
     }
-    .stat-card.total .icon { background: var(--info-soft); color: var(--info); }
-    .stat-card.passed .icon { background: var(--success-soft); color: var(--success); }
-    .stat-card.failed .icon { background: var(--danger-soft); color: var(--danger); }
-    .stat-card .label { font-size: 12px; color: #6c7a89; margin: 0 0 2px 0; font-weight: 600; }
-    .stat-card .value { font-size: 22px; font-weight: 800; color: var(--primary); margin: 0; line-height: 1; }
-
-    .filter-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(24,43,72,0.05);
-        margin-bottom: 20px;
-        overflow: hidden;
-    }
-    .filter-header {
-        padding: 14px 22px;
+.stat-card.total .icon { background: var(--info-soft); color: var(--info); }
+.stat-card.passed .icon { background: var(--success-soft); color: var(--success); }
+.stat-card.failed .icon { background: var(--danger-soft); color: var(--danger); }
+.stat-card .label { font-size: 12px; color: #6c7a89; margin: 0 0 2px 0; font-weight: 600; }
+.stat-card .value { font-size: 22px; font-weight: 800; color: var(--primary); margin: 0; line-height: 1; }
+.filter-header {
+        padding: 14px 16px;
         background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
         border-bottom: 1px solid rgba(24,43,72,0.05);
         font-weight: 700;
         color: var(--primary);
         display: flex; align-items: center; gap: 10px;
     }
-    .filter-header i { color: var(--gold); }
-    .filter-body { padding: 18px 22px; }
-    .filter-body .form-control, .filter-body .form-select {
+.filter-header i { color: var(--gold); }
+.filter-body { padding: 16px 16px; }
+.filter-body .form-control, .filter-body .form-select {
         border-radius: 10px;
         border: 1.5px solid #e9ecef;
         padding: 9px 12px;
         font-size: 14px;
     }
-    .filter-body .form-control:focus, .filter-body .form-select:focus {
+.filter-body .form-control:focus, .filter-body .form-select:focus {
         border-color: var(--gold);
         box-shadow: 0 0 0 3px rgba(212,160,48,0.12);
     }
-    .filter-body label {
+.filter-body label {
         font-size: 12px;
         color: #6c7a89;
         font-weight: 600;
         margin-bottom: 4px;
         display: block;
     }
-
-    .data-card {
+.data-card {
         background: white;
-        border-radius: 16px;
+        border-radius: 13px;
         box-shadow: var(--card-shadow);
         border: 1px solid rgba(24,43,72,0.05);
         overflow: hidden;
     }
-    .data-card-header {
-        padding: 16px 22px;
+.data-card-header {
+        padding: 16px 16px;
         border-bottom: 1px solid #f0f3f7;
         display: flex;
         align-items: center;
@@ -134,17 +92,17 @@
         flex-wrap: wrap;
         gap: 12px;
     }
-    .data-card-header h6 {
+.data-card-header h6 {
         margin: 0;
         color: var(--primary);
         font-weight: 700;
         font-size: 16px;
     }
-    .table-modern {
+.table-modern {
         width: 100%;
         border-collapse: collapse;
     }
-    .table-modern thead th {
+.table-modern thead th {
         background: #f8fafc;
         color: #6c7a89;
         font-size: 12px;
@@ -153,20 +111,19 @@
         text-align: right;
         border-bottom: 1px solid #eef1f6;
     }
-    .table-modern tbody td {
+.table-modern tbody td {
         padding: 14px 16px;
         border-bottom: 1px solid #f3f5f9;
         font-size: 14px;
         color: #2d3a4a;
         vertical-align: middle;
     }
-    .table-modern tbody tr:hover {
+.table-modern tbody tr:hover {
         background: #fafbfd;
     }
-    .table-modern tbody tr:last-child td { border-bottom: none; }
-
-    .student-cell { display: flex; align-items: center; gap: 10px; }
-    .student-avatar {
+.table-modern tbody tr:last-child td { border-bottom: none; }
+.student-cell { display: flex; align-items: center; gap: 10px; }
+.student-avatar {
         width: 38px; height: 38px;
         border-radius: 10px;
         background: linear-gradient(135deg, #f1c40f 0%, var(--gold) 100%);
@@ -176,24 +133,13 @@
         font-size: 14px;
         flex-shrink: 0;
     }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-    .status-badge.passed { background: var(--success-soft); color: var(--success); }
-    .status-badge.failed { background: var(--danger-soft); color: var(--danger); }
-    .status-badge.incomplete { background: #f1f5f9; color: #64748b; }
-    .status-badge.in_progress { background: var(--warning-soft); color: var(--warning); }
-    .status-badge.failed_continued { background: var(--warning-soft); color: var(--warning); }
-    .status-badge.not_recitate { background: #f1f5f9; color: #64748b; }
-
-    .score-pill {
+.status-badge.passed { background: var(--success-soft); color: var(--success); }
+.status-badge.failed { background: var(--danger-soft); color: var(--danger); }
+.status-badge.incomplete { background: #f1f5f9; color: #64748b; }
+.status-badge.in_progress { background: var(--warning-soft); color: var(--warning); }
+.status-badge.failed_continued { background: var(--warning-soft); color: var(--warning); }
+.status-badge.not_recitate { background: #f1f5f9; color: #64748b; }
+.score-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -202,19 +148,10 @@
         font-weight: 700;
         font-size: 13px;
     }
-    .score-pill.passed { background: var(--success-soft); color: var(--success); }
-    .score-pill.failed { background: var(--danger-soft); color: var(--danger); }
-
-    .empty-state {
-        padding: 60px 20px;
-        text-align: center;
-        color: #94a3b8;
-    }
-    .empty-state i { font-size: 56px; margin-bottom: 14px; color: #cbd5e1; }
-    .empty-state h5 { color: #64748b; font-weight: 700; margin: 0 0 6px 0; }
-    .empty-state p { margin: 0; font-size: 14px; }
-
-    .btn-action {
+.score-pill.passed { background: var(--success-soft); color: var(--success); }
+.score-pill.failed { background: var(--danger-soft); color: var(--danger); }
+.empty-state i { font-size: 22px; margin-bottom: 14px; color: #cbd5e1; }
+.btn-action {
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -226,68 +163,66 @@
         transition: all 0.2s;
         border: 1px solid transparent;
     }
-    .btn-action.view {
+.btn-action.view {
         background: var(--primary);
         color: white;
     }
-    .btn-action.view:hover {
+.btn-action.view:hover {
         background: var(--primary-light);
         color: white;
     }
-    .btn-action.danger {
+.btn-action.danger {
         background: var(--danger);
         color: white;
         border: none;
         cursor: pointer;
         font-family: inherit;
     }
-    .btn-action.danger:hover {
+.btn-action.danger:hover {
         background: #a82d22;
         color: white;
     }
-    .actions-wrap {
+.actions-wrap {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         flex-wrap: wrap;
     }
-    .actions-wrap form { display: inline; margin: 0; }
-    .btn-reset {
+.actions-wrap form { display: inline; margin: 0; }
+.btn-reset {
         background: white;
         color: #6c7a89;
         border: 1.5px solid #e9ecef;
-        padding: 8px 18px;
+        padding: 8px 16px;
         border-radius: 10px;
         font-size: 13px;
         font-weight: 600;
         text-decoration: none;
     }
-    .btn-reset:hover { background: #f8fafc; color: #6c7a89; }
-
-    .pagination-wrap {
-        padding: 16px 22px;
+.btn-reset:hover { background: #f8fafc; color: #6c7a89; }
+.pagination-wrap {
+        padding: 16px 16px;
         border-top: 1px solid #f0f3f7;
     }
-
-    .source-tabs {
+.source-tabs {
         display: flex;
         gap: 6px;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
         background: white;
         padding: 6px;
-        border-radius: 14px;
+        border-radius: 13px;
         box-shadow: var(--card-shadow);
         border: 1px solid rgba(24,43,72,0.05);
         flex-wrap: wrap;
     }
-    .source-tab {
+.source-tab {
         flex: 1;
         min-width: 140px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 11px 18px;
+        padding: 11px 16px;
         border-radius: 10px;
         font-size: 14px;
         font-weight: 700;
@@ -296,16 +231,16 @@
         transition: all 0.2s;
         background: transparent;
     }
-    .source-tab:hover {
+.source-tab:hover {
         background: #f8fafc;
         color: var(--primary);
     }
-    .source-tab.active {
+.source-tab.active {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: white;
         box-shadow: 0 4px 12px rgba(24,43,72,0.25);
     }
-    .source-tab .tab-count {
+.source-tab .tab-count {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -318,11 +253,11 @@
         background: rgba(24,43,72,0.1);
         color: var(--primary);
     }
-    .source-tab.active .tab-count {
+.source-tab.active .tab-count {
         background: var(--gold);
         color: var(--primary);
     }
-    .source-tab i { font-size: 14px; }
+.source-tab i { font-size: 14px; }
 </style>
 
 <div class="page-header">
@@ -420,7 +355,7 @@
                     <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
                 </div>
                 <div class="col-md-12 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn-action view" style="padding: 9px 20px;">
+                    <button type="submit" class="btn-action view" style="padding:9px 16px">
                         <i class="fas fa-search"></i> بحث
                     </button>
                     <a href="{{ route('admin.mafsil-history.index', ['source' => $source ?? 'all']) }}" class="btn-reset">
@@ -434,7 +369,7 @@
 
 <div class="data-card">
     <div class="data-card-header">
-        <h6><i class="fas fa-list-ul me-1" style="color: var(--gold);"></i> الجلسات ({{ $sessions->total() }})</h6>
+        <h6><i class="fas fa-list-ul me-1" style="color:var(--gold)"></i> الجلسات ({{ $sessions->total() }})</h6>
     </div>
 
     @if($sessions->isEmpty())
@@ -470,32 +405,32 @@
                         <div class="student-cell">
                             <div class="student-avatar">{{ mb_substr($studentName, 0, 1) }}</div>
                             <div>
-                                <div style="font-weight: 700; color: var(--primary);">{{ $studentName }}</div>
+                                <div style="font-weight:700;color:var(--primary)">{{ $studentName }}</div>
                                 @if($session->student && $session->student->user)
-                                <div style="font-size: 12px; color: #94a3b8;">طالب مسجل</div>
+                                <div style="font-size:12px;color:#94a3b8">طالب مسجل</div>
                                 @else
-                                <div style="font-size: 12px; color: #94a3b8;">زائر</div>
+                                <div style="font-size:12px;color:#94a3b8">زائر</div>
                                 @endif
                             </div>
                         </div>
                     </td>
                     <td>
                         @if($session->mahd_name)
-                        <span style="display: inline-flex; align-items: center; gap: 6px; color: #2d3a4a;">
-                            <i class="fas fa-mosque" style="color: var(--gold); font-size: 13px;"></i>
+                        <span style="display:inline-flex;align-items:center;gap:6px;color:#2d3a4a">
+                            <i class="fas fa-mosque" style="color:var(--gold);font-size:13px"></i>
                             {{ $session->mahd_name }}
                         </span>
                         @else
-                        <span style="color: #cbd5e1;">—</span>
+                        <span style="color:#cbd5e1">—</span>
                         @endif
                     </td>
                     <td>
-                        <div style="font-weight: 600;">{{ $session->session_date->format('Y-m-d') }}</div>
-                        <div style="font-size: 12px; color: #94a3b8;">{{ $session->session_date->translatedFormat('l') }}</div>
+                        <div style="font-weight:600">{{ $session->session_date->format('Y-m-d') }}</div>
+                        <div style="font-size:12px;color:#94a3b8">{{ $session->session_date->translatedFormat('l') }}</div>
                     </td>
                     <td>
-                        <span style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; padding: 5px 10px; border-radius: 8px; font-weight: 700; color: var(--primary);">
-                            <i class="fas fa-layer-group" style="color: var(--gold); font-size: 12px;"></i>
+                        <span style="display:inline-flex;align-items:center;gap:6px;background:#f8fafc;padding:5px 10px;border-radius:8px;font-weight:700;color:var(--primary)">
+                            <i class="fas fa-layer-group" style="color:var(--gold);font-size:12px"></i>
                             {{ $session->mafsil_type }} أجزاء
                         </span>
                     </td>
@@ -505,7 +440,7 @@
                             {{ number_format((float) $session->final_score, 1) }}%
                         </span>
                         @else
-                        <span style="color: #cbd5e1;">—</span>
+                        <span style="color:#cbd5e1">—</span>
                         @endif
                     </td>
                     <td>

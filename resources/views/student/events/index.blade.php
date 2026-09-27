@@ -23,9 +23,9 @@
 
 .events-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -47,24 +47,24 @@
 }
 
 .events-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(212,160,48,0.35);
 }
 
-.events-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.events-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.events-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.events-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .events-page .event-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .events-page .event-card.accent-primary { border-right: 4px solid var(--navy); }
@@ -72,19 +72,19 @@
 
 .events-page .event-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; gap: 12px;
 }
 
 .events-page .event-header.success { background: linear-gradient(135deg, var(--success), #2ecc71); }
-.events-page .event-header i { color: var(--gold); font-size: 20px; }
+.events-page .event-header i { color: var(--gold); font-size: 16px; }
 .events-page .event-header.success i { color: white; }
-.events-page .event-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.events-page .event-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
 .events-page .events-table { width: 100%; border-collapse: collapse; margin: 0; }
 .events-page .events-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -93,8 +93,8 @@
     letter-spacing: 0.5px;
 }
 .events-page .events-table tbody td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
@@ -103,17 +103,17 @@
 .events-page .events-table tbody tr:hover { background: linear-gradient(90deg, rgba(212,160,48,0.04) 0%, rgba(24,43,72,0.02) 100%); }
 
 .events-page .progress-badge {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
     background: linear-gradient(135deg, var(--success), #2ecc71);
     color: white;
 }
 
 .events-page .view-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(24,43,72,0.1);
     background: white;
@@ -127,10 +127,10 @@
     background: linear-gradient(135deg, var(--success), #2ecc71);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 9px;
     padding: 8px 16px;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.2s ease;
     display: inline-flex; align-items: center; gap: 6px;
 }
@@ -139,25 +139,25 @@
 
 .events-page .participant-badge {
     background: rgba(24,43,72,0.06);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--navy);
 }
 
-.events-page .empty-state { text-align: center; padding: 80px 20px; }
+.events-page .empty-state { text-align: center; padding: 40px 16px; }
 .events-page .empty-icon {
-    width: 100px; height: 100px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.06), rgba(42,69,112,0.08));
-    border-radius: 24px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
+    margin: 0 auto 14px;
 }
-.events-page .empty-icon i { font-size: 40px; color: var(--navy); opacity: 0.4; }
+.events-page .empty-icon i { font-size: 26px; color: var(--navy); opacity: 0.4; }
 
 @media (max-width: 992px) {
-    .events-page .page-hero { padding: 20px 24px; }
+    .events-page .page-hero { padding: 14px 16px; }
     .events-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .events-page .hero-title { font-size: 18px; }
 }
@@ -208,7 +208,7 @@
                             <div class="fw-semibold" style="color: var(--navy);">{{ $event->name }}</div>
                             <small class="text-muted">{{ $event->supervisor?->name ?? '-' }}</small>
                         </td>
-                        <td><span class="juz-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">الجزء {{ $event->juz_number }}</span></td>
+                        <td><span class="juz-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">الجزء {{ $event->juz_number }}</span></td>
                         <td><small>{{ $event->start_date->format('Y-m-d') }}</small></td>
                         <td><small>{{ $event->end_date->format('Y-m-d') }}</small></td>
                         <td><span class="participant-badge">{{ $participants }} طالب</span></td>
@@ -255,7 +255,7 @@
                     @foreach($availableEvents as $event)
                     <tr>
                         <td class="fw-semibold" style="color: var(--navy);">{{ $event->name }}</td>
-                        <td><span class="juz-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">الجزء {{ $event->juz_number }}</span></td>
+                        <td><span class="juz-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">الجزء {{ $event->juz_number }}</span></td>
                         <td><small class="text-muted">{{ $event->supervisor?->name ?? '-' }}</small></td>
                         <td><small>{{ $event->start_date->format('Y-m-d') }}</small></td>
                         <td><small>{{ $event->end_date->format('Y-m-d') }}</small></td>

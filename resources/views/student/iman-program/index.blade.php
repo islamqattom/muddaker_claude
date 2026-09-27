@@ -31,15 +31,15 @@ if (! function_exists('thisDayName')) {
     --warning: #f39c12;
     --danger: #c0392b;
     --info: #3498db;
-    --radius: 16px;
+    --radius: 14px;
     --shadow-sm: 0 2px 10px rgba(24,43,72,0.05);
 }
 
 .iman-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: var(--radius);
-    padding: 28px 32px;
-    margin-bottom: 24px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
     color: #fff;
@@ -50,44 +50,42 @@ if (! function_exists('thisDayName')) {
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a030' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
 }
-.iman-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 18px; }
+.iman-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; }
 .iman-page .hero-icon {
-    width: 64px; height: 64px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 16px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 28px; color: #fff;
+    font-size: 20px; color: #fff;
     box-shadow: 0 8px 24px rgba(212,160,48,0.4);
+    flex-shrink: 0;
 }
-.iman-page .hero-title { color: #fff; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.iman-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 14px; margin: 0; }
-.iman-page .hero-actions { margin-right: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+.iman-page .hero-title { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+.iman-page .hero-sub { color: rgba(255,255,255,0.8); font-size: 12.5px; margin: 0; }
+.iman-page .hero-actions { margin-right: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 .iman-page .btn-gold {
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    color: #fff; border: none; padding: 10px 22px; border-radius: 12px;
-    font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+    color: #fff; border: none; padding: 8px 16px; border-radius: 9px;
+    font-weight: 700; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
     box-shadow: 0 6px 18px rgba(212,160,48,0.35);
 }
 .iman-page .btn-gold:hover { color: #fff; transform: translateY(-1px); }
 .iman-page .btn-ghost {
     background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25);
-    padding: 10px 18px; border-radius: 12px; font-weight: 600; text-decoration: none;
+    padding: 8px 16px; border-radius: 9px; font-weight: 600; font-size: 13px; text-decoration: none;
     display: inline-flex; align-items: center; gap: 8px;
 }
 .iman-page .btn-ghost:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
-.iman-page .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 14px; margin-bottom: 24px;
-}
 .iman-page .stat-card {
-    background: #fff; border-radius: var(--radius); padding: 18px 20px;
-    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px;
+    background: #fff; border-radius: 13px; padding: 14px 16px;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px;
     border: 1px solid rgba(24,43,72,0.05);
 }
 .iman-page .stat-icon {
-    width: 52px; height: 52px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff;
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff;
+    flex-shrink: 0;
 }
 .iman-page .stat-icon.navy { background: linear-gradient(135deg, var(--navy), var(--navy-light)); }
 .iman-page .stat-icon.gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); }
@@ -97,41 +95,41 @@ if (! function_exists('thisDayName')) {
 .iman-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); }
 
 .iman-page .week-nav {
-    background: #fff; border-radius: var(--radius); padding: 14px 20px;
+    background: #fff; border-radius: var(--radius); padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    box-shadow: var(--shadow-sm); margin-bottom: 20px; flex-wrap: wrap;
+    box-shadow: var(--shadow-sm); margin-bottom: 16px; flex-wrap: wrap;
 }
 .iman-page .week-nav .week-label {
     font-weight: 700; color: var(--navy); display: inline-flex; align-items: center; gap: 8px;
 }
 .iman-page .week-nav .week-buttons { display: flex; gap: 6px; }
 .iman-page .week-nav .btn-week {
-    background: #f0f4f8; border: none; padding: 8px 14px; border-radius: 10px;
-    color: var(--navy); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    background: #f0f4f8; border: none; padding: 8px 12px; border-radius: 8px;
+    color: var(--navy); font-weight: 600; font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
 }
 .iman-page .week-nav .btn-week:hover { background: var(--navy); color: #fff; }
 
 .iman-page .program-card {
     background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(24,43,72,0.05); margin-bottom: 24px; overflow: hidden;
+    border: 1px solid rgba(24,43,72,0.05); margin-bottom: 16px; overflow: hidden;
 }
 .iman-page .program-header {
     background: linear-gradient(135deg, rgba(24,43,72,0.04), rgba(24,43,72,0.02));
-    padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
     border-bottom: 1px solid #eef1f6; flex-wrap: wrap;
 }
-.iman-page .program-title { display: flex; align-items: center; gap: 12px; }
-.iman-page .program-title h4 { margin: 0; color: var(--navy); font-weight: 800; font-size: 18px; }
+.iman-page .program-title { display: flex; align-items: center; gap: 10px; }
+.iman-page .program-title h4 { margin: 0; color: var(--navy); font-weight: 800; font-size: 15px; }
 .iman-page .program-title small { color: #6b7a90; font-size: 12px; }
 .iman-page .program-title .prog-icon {
-    width: 42px; height: 42px; border-radius: 10px;
+    width: 32px; height: 32px; border-radius: 9px;
     background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
 }
 .iman-page .program-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .iman-page .program-actions a, .iman-page .program-actions button {
-    background: #f0f4f8; border: none; padding: 8px 14px; border-radius: 10px;
-    color: var(--navy); font-weight: 600; text-decoration: none; font-size: 13px;
+    background: #f0f4f8; border: none; padding: 6px 12px; border-radius: 8px;
+    color: var(--navy); font-weight: 600; text-decoration: none; font-size: 12.5px;
     display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
 }
 .iman-page .program-actions a:hover, .iman-page .program-actions button:hover { background: var(--navy); color: #fff; }
@@ -141,11 +139,11 @@ if (! function_exists('thisDayName')) {
     width: 100%; border-collapse: collapse; margin: 0;
 }
 .iman-page .iman-table th, .iman-page .iman-table td {
-    padding: 12px 10px; text-align: center; vertical-align: middle; font-size: 13px;
+    padding: 11px 10px; text-align: center; vertical-align: middle; font-size: 13px;
     border-bottom: 1px solid #eef1f6;
 }
 .iman-page .iman-table thead th {
-    background: #f8f9fc; color: var(--navy); font-weight: 700; font-size: 12px;
+    background: #f8f9fc; color: var(--navy); font-weight: 700; font-size: 11px;
     text-align: center;
 }
 .iman-page .iman-table thead th.day-head { min-width: 90px; }
@@ -159,10 +157,10 @@ if (! function_exists('thisDayName')) {
 .iman-page .iman-table .today-cell { background: rgba(212,160,48,0.05); }
 
 .iman-page .check-cell {
-    width: 38px; height: 38px; border-radius: 10px;
+    width: 34px; height: 34px; border-radius: 9px;
     border: 2px solid #d6dbe5; background: #fff; cursor: pointer;
     display: inline-flex; align-items: center; justify-content: center;
-    transition: all 0.2s ease; color: transparent; font-size: 16px;
+    transition: all 0.2s ease; color: transparent; font-size: 14px;
 }
 .iman-page .check-cell:hover { border-color: var(--gold); }
 .iman-page .check-cell.is-checked {
@@ -182,23 +180,23 @@ if (! function_exists('thisDayName')) {
 }
 
 .iman-page .bulk-save-bar {
-    background: rgba(24,43,72,0.04); padding: 14px 22px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(24,43,72,0.04); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
     border-top: 1px solid #eef1f6; gap: 10px; flex-wrap: wrap;
 }
-.iman-page .bulk-save-bar .bulk-info { color: #6b7a90; font-size: 13px; }
+.iman-page .bulk-save-bar .bulk-info { color: #6b7a90; font-size: 12.5px; }
 
 .iman-page .save-table-btn:hover { opacity: 0.85; }
 .iman-page .save-table-btn:active { transform: scale(0.95); }
 .iman-page .save-table-btn.is-saving { opacity: 0.6; pointer-events: none; }
 
 .iman-page .empty-state {
-    text-align: center; padding: 60px 20px; color: #6b7a90;
+    text-align: center; padding: 40px 16px; color: #6b7a90;
 }
-.iman-page .empty-state i { font-size: 50px; opacity: 0.3; margin-bottom: 14px; }
+.iman-page .empty-state i { font-size: 26px; opacity: 0.3; margin-bottom: 14px; }
 
 @media (max-width: 768px) {
-    .iman-page .page-hero { padding: 20px 22px; }
-    .iman-page .hero-title { font-size: 20px; }
+    .iman-page .page-hero { padding: 14px 16px; }
+    .iman-page .hero-title { font-size: 18px; }
     .iman-page .iman-table th, .iman-page .iman-table td { padding: 8px 6px; font-size: 12px; }
     .iman-page .check-cell { width: 32px; height: 32px; }
     .iman-page .number-cell { width: 70px; }
@@ -319,7 +317,7 @@ if (! function_exists('thisDayName')) {
             </div>
 
             @if($program->description)
-                <div style="padding: 14px 22px; color: #6b7a90; font-size: 14px; border-bottom: 1px solid #eef1f6;">
+                <div style="padding: 12px 16px; color: #6b7a90; font-size: 12.5px; border-bottom: 1px solid #eef1f6;">
                     {{ $program->description }}
                 </div>
             @endif
@@ -392,7 +390,7 @@ if (! function_exists('thisDayName')) {
                 <div class="bulk-save-bar">
                     <div class="bulk-info">احفظ التغييرات يدوياً للتأكد من تسجيل جميع القيم.</div>
                     <button type="button" class="save-table-btn"
-                            style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;border:none;padding:8px 20px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:14px;transition:all 0.2s ease;">
+                            style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;border:none;padding:8px 16px;border-radius:9px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:13px;transition:all 0.2s ease;">
                         <i class="fas fa-save"></i> حفظ التغييرات
                     </button>
                 </div>

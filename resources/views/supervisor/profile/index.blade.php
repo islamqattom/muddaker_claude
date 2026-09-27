@@ -28,11 +28,11 @@
 
 .profile-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 20px;
-    padding: 35px;
+    border-radius: 14px;
+    padding: 16px 22px;
     position: relative;
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 
 .profile-header::before {
@@ -59,7 +59,7 @@
 .profile-content {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 16px;
     position: relative;
     z-index: 1;
 }
@@ -69,11 +69,11 @@
 }
 
 .profile-avatar {
-    width: 130px;
-    height: 130px;
-    border-radius: 20px;
+    width: 84px;
+    height: 84px;
+    border-radius: 13px;
     object-fit: cover;
-    border: 4px solid var(--gold);
+    border: 3px solid var(--gold);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(212, 160, 48, 0.2);
 }
 
@@ -81,15 +81,15 @@
     position: absolute;
     bottom: -8px;
     right: -8px;
-    width: 45px;
-    height: 45px;
+    width: 38px;
+    height: 38px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 20px;
+    font-size: 16px;
     box-shadow: 0 4px 15px rgba(212, 160, 48, 0.4);
     border: 3px solid #fff;
 }
@@ -100,7 +100,7 @@
 
 .profile-info h3 {
     color: #fff;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 700;
     margin: 0 0 8px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -112,18 +112,18 @@
     gap: 8px;
     background: rgba(212, 160, 48, 0.2);
     color: var(--gold);
-    padding: 8px 18px;
-    border-radius: 25px;
-    font-size: 14px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     border: 1px solid rgba(212, 160, 48, 0.3);
 }
 
 .profile-stats {
     display: flex;
-    gap: 30px;
-    margin-top: 20px;
+    gap: 16px;
+    margin-top: 16px;
 }
 
 .profile-stat {
@@ -131,7 +131,7 @@
 }
 
 .profile-stat-value {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: #fff;
 }
@@ -144,18 +144,18 @@
 
 .profile-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24, 43, 72, 0.05);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 
 .profile-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 22px 28px;
+    padding: 12px 16px;
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
     border-bottom: 1px solid rgba(24, 43, 72, 0.05);
     position: relative;
@@ -172,34 +172,34 @@
 }
 
 .profile-card-header i {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--gold);
-    font-size: 18px;
+    font-size: 16px;
     box-shadow: 0 4px 15px rgba(24, 43, 72, 0.2);
 }
 
 .profile-card-header h5 {
     color: var(--primary);
     font-weight: 700;
-    font-size: 18px;
+    font-size: 15px;
     margin: 0;
 }
 
 .profile-card-body {
-    padding: 28px;
+    padding: 16px;
 }
 
 .form-label {
     font-weight: 600;
     color: var(--primary);
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -211,12 +211,12 @@
 }
 
 .form-control, .form-select {
-    border-radius: 12px;
+    border-radius: 9px;
     border: 2px solid #e9ecef;
-    padding: 14px 18px;
+    padding: 10px 14px;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .form-control:focus, .form-select:focus {
@@ -238,8 +238,8 @@
 
 .image-upload-card {
     border: 2px dashed rgba(24, 43, 72, 0.15);
-    border-radius: 16px;
-    padding: 25px;
+    border-radius: 13px;
+    padding: 16px;
     text-align: center;
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.04) 100%);
     transition: all 0.3s ease;
@@ -252,7 +252,7 @@
 }
 
 .image-upload-card i {
-    font-size: 40px;
+    font-size: 32px;
     color: var(--gold);
     margin-bottom: 10px;
 }
@@ -271,13 +271,13 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 35px;
+    padding: 8px 16px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: 9px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 13px;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
     box-shadow: 0 4px 15px rgba(212, 160, 48, 0.3);
@@ -295,9 +295,9 @@
 .alert-success {
     background: rgba(39, 174, 96, 0.1);
     border: 1px solid rgba(39, 174, 96, 0.3);
-    border-radius: 12px;
+    border-radius: 13px;
     color: var(--success);
-    padding: 16px 20px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -318,7 +318,7 @@
     }
 
     .profile-card-body {
-        padding: 20px 15px;
+        padding: 16px;
     }
 }
 </style>

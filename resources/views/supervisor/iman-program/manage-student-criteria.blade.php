@@ -10,29 +10,29 @@
 
 @push('styles')
 <style>
-.manage-criteria-page { --gold:#d4a030; --gold-light:#e6b84d; --navy:#182B48; --navy-light:#2A4570; --success:#27ae60; --danger:#c0392b; --radius:16px; --shadow-sm:0 2px 10px rgba(24,43,72,0.05); }
-.manage-criteria-page .page-hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%); border-radius:var(--radius); padding:24px 30px; margin-bottom:24px; color:#fff; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-.manage-criteria-page .page-hero h1 { margin:0; font-size:22px; font-weight:700; }
-.manage-criteria-page .page-hero p { color:rgba(255,255,255,0.8); margin:0; font-size:13px; }
-.manage-criteria-page .hero-icon { width:56px; height:56px; border-radius:14px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; }
-.manage-criteria-page .student-badge { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); padding:6px 14px; border-radius:20px; font-size:13px; display:inline-flex; align-items:center; gap:6px; margin-top:6px; }
-.manage-criteria-page .form-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:26px; margin-bottom:22px; border:1px solid rgba(24,43,72,0.05); }
-.manage-criteria-page .form-card h5 { color:var(--navy); font-weight:800; margin-bottom:16px; }
+.manage-criteria-page { --gold:#d4a030; --gold-light:#e6b84d; --navy:#182B48; --navy-light:#2A4570; --success:#27ae60; --danger:#c0392b; --radius:14px; --shadow-sm:0 2px 10px rgba(24,43,72,0.05); }
+.manage-criteria-page .page-hero { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%); border-radius:14px; padding:16px 22px; margin-bottom:16px; color:#fff; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.manage-criteria-page .page-hero h1 { margin:0; font-size:18px; font-weight:700; }
+.manage-criteria-page .page-hero p { color:rgba(255,255,255,0.8); margin:0; font-size:12.5px; }
+.manage-criteria-page .hero-icon { width:48px; height:48px; border-radius:13px; background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.manage-criteria-page .student-badge { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); padding:3px 10px; border-radius:7px; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; margin-top:6px; }
+.manage-criteria-page .form-card { background:#fff; border-radius:13px; box-shadow:var(--shadow-sm); padding:16px; margin-bottom:16px; border:1px solid rgba(24,43,72,0.05); }
+.manage-criteria-page .form-card h5 { color:var(--navy); font-weight:700; font-size:15px; margin-bottom:14px; }
 .manage-criteria-page .form-card h5 i { color:var(--gold); margin-inline-end:8px; }
-.manage-criteria-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:18px; }
-.manage-criteria-page .criterion-row { display:grid; grid-template-columns:1fr 180px 200px 50px; gap:10px; align-items:center; margin-bottom:10px; padding:10px; border-radius:12px; background:#f8f9fc; }
-.manage-criteria-page .criterion-row .remove-btn { background:rgba(192,57,43,0.1); color:var(--danger); border:none; width:40px; height:40px; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.manage-criteria-page .form-card p.help { color:#6b7a90; font-size:13px; margin-bottom:16px; }
+.manage-criteria-page .criterion-row { display:grid; grid-template-columns:1fr 180px 200px 50px; gap:10px; align-items:center; margin-bottom:10px; padding:12px; border-radius:13px; background:#f8f9fc; }
+.manage-criteria-page .criterion-row .remove-btn { background:rgba(192,57,43,0.1); color:var(--danger); border:none; width:34px; height:34px; border-radius:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .manage-criteria-page .criterion-row .remove-btn:hover { background:var(--danger); color:#fff; }
 .manage-criteria-page .type-select { display:flex; gap:8px; align-items:center; }
-.manage-criteria-page .type-select label { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid #d6dbe5; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; color:var(--navy); }
+.manage-criteria-page .type-select label { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid #d6dbe5; border-radius:9px; cursor:pointer; font-size:13px; font-weight:600; color:var(--navy); }
 .manage-criteria-page .type-select input { display:none; }
 .manage-criteria-page .type-select label:has(input:checked) { background:rgba(212,160,48,0.1); border-color:var(--gold); }
-.manage-criteria-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:12px 20px; border-radius:12px; font-weight:700; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+.manage-criteria-page .add-criterion-btn { background:rgba(24,43,72,0.06); color:var(--navy); border:2px dashed rgba(24,43,72,0.2); padding:10px 16px; border-radius:9px; font-weight:700; font-size:13px; width:100%; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
 .manage-criteria-page .add-criterion-btn:hover { background:var(--navy); color:#fff; border-color:var(--navy); }
 .manage-criteria-page .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
-.manage-criteria-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:12px 28px; border-radius:12px; font-weight:700; cursor:pointer; }
+.manage-criteria-page .btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; border:none; padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; cursor:pointer; }
 .manage-criteria-page .btn-gold:hover { transform:translateY(-1px); }
-.manage-criteria-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:12px 22px; border-radius:12px; font-weight:700; text-decoration:none; }
+.manage-criteria-page .btn-cancel { background:#f0f4f8; color:var(--navy); border:none; padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; text-decoration:none; }
 .manage-criteria-page .btn-cancel:hover { background:#dee5ed; }
 </style>
 @endpush

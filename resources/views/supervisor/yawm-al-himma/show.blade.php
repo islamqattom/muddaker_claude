@@ -18,41 +18,21 @@
     --radius-sm: 12px;
     --shadow-sm: 0 2px 10px rgba(24,43,72,0.05);
 }
-.yawm-page .hero-section {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 24px;
-    position: relative; overflow: hidden;
-}
-.yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.yawm-page .hero-icon {
-    width: 60px; height: 60px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
-    box-shadow: 0 6px 20px rgba(212,160,48,0.35);
-    flex-shrink: 0;
-}
-.yawm-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
-
 .yawm-page .info-card {
-    background: white; border-radius: var(--radius); padding: 22px;
-    box-shadow: var(--shadow-sm); margin-bottom: 18px;
+    background: white; border-radius: 13px; padding: 16px;
+    box-shadow: var(--shadow-sm); margin-bottom: 16px;
 }
 .yawm-page .info-card h2 {
-    color: var(--navy); font-size: 18px; font-weight: 700; margin-bottom: 14px;
+    color: var(--navy); font-size: 16px; font-weight: 700; margin-bottom: 12px;
     padding-bottom: 10px; border-bottom: 2px solid #fef5e7;
 }
 .yawm-page .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
 .yawm-page .info-item .lbl { font-size: 12px; color: #6b7a90; margin-bottom: 4px; }
-.yawm-page .info-item .val { font-size: 16px; font-weight: 700; color: var(--navy); }
+.yawm-page .info-item .val { font-size: 15px; font-weight: 700; color: var(--navy); }
 
 .yawm-page .summary-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .yawm-page .summary-item {
-    background: #f8f9fc; border-radius: var(--radius-sm); padding: 16px; text-align: center;
+    background: #f8f9fc; border-radius: 13px; padding: 14px; text-align: center;
     border: 1px solid #eef1f6;
 }
 .yawm-page .summary-item .lbl { font-size: 12px; color: #6b7a90; margin-bottom: 6px; }
@@ -61,39 +41,33 @@
 .yawm-page .summary-item.warning .val { color: #b36b00; }
 
 .yawm-page .part-block {
-    background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    background: white; border-radius: 13px; box-shadow: var(--shadow-sm);
     margin-bottom: 16px; overflow: hidden;
 }
 .yawm-page .part-block-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    color: white; padding: 12px 20px; font-weight: 700; font-size: 15px;
+    color: white; padding: 12px 16px; font-weight: 700; font-size: 14px;
 }
 .yawm-page .part-block-body { padding: 0; }
 .yawm-page .page-row {
-    padding: 10px 18px; border-bottom: 1px solid #eef1f6;
+    padding: 11px 14px; border-bottom: 1px solid #eef1f6;
     display: grid; grid-template-columns: 100px 1fr 1fr; gap: 14px;
     align-items: center; justify-items: center; font-size: 13px;
 }
 .yawm-page .page-row:last-of-type { border-bottom: none; }
 .yawm-page .page-row.header { background: #f8f9fc; font-weight: 700; color: var(--navy); }
-.yawm-page .page-num-badge { background: #fef5e7; color: var(--navy); font-weight: 700; padding: 4px 10px; border-radius: 6px; }
-.yawm-page .stat-pill {
-    display: inline-block; padding: 3px 10px; border-radius: 6px;
-    font-weight: 700; font-size: 13px;
-}
-.yawm-page .stat-pill.err { background: #fde8e6; color: #c0392b; }
-.yawm-page .stat-pill.hes { background: #fef5e7; color: #b36b00; }
+.yawm-page .page-num-badge { background: #fef5e7; color: var(--navy); font-weight: 700; padding: 3px 10px; border-radius: 7px; font-size: 11.5px; }
 </style>
 @endpush
 
 @section('content')
 <div class="yawm-page">
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-mosque"></i></div>
-            <div>
-                <h1 class="hero-title">تفاصيل جلسة يوم الهمة</h1>
-                <p class="hero-sub">الطالب: {{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-icon"><i class="fas fa-mosque"></i></div>
+            <div class="header-text">
+                <h4>تفاصيل جلسة يوم الهمة</h4>
+                <p>الطالب: {{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
             </div>
         </div>
     </div>
@@ -160,14 +134,14 @@
                     <div><span class="page-num-badge">ص {{ $p['page_number'] }}</span></div>
                     <div>
                         @if(($p['errors'] ?? 0) > 0)
-                            <span class="stat-pill err">{{ $p['errors'] }}</span>
+                            <span class="badge-modern danger">{{ $p['errors'] }}</span>
                         @else
                             <span class="text-muted">0</span>
                         @endif
                     </div>
                     <div>
                         @if(($p['hesitations'] ?? 0) > 0)
-                            <span class="stat-pill hes">{{ $p['hesitations'] }}</span>
+                            <span class="badge-modern warning">{{ $p['hesitations'] }}</span>
                         @else
                             <span class="text-muted">0</span>
                         @endif
@@ -181,10 +155,10 @@
                 <div class="page-row" style="background: #fef5e7; font-weight: 700; color: var(--navy);">
                     <div style="text-align: center;"><i class="fas fa-calculator me-1" style="color: var(--gold);"></i> مجموع الجزء</div>
                     <div style="text-align: center;">
-                        <span class="stat-pill err">{{ $partErrors }}</span>
+                        <span class="badge-modern danger">{{ $partErrors }}</span>
                     </div>
                     <div style="text-align: center;">
-                        <span class="stat-pill hes">{{ $partHesitations }}</span>
+                        <span class="badge-modern warning">{{ $partHesitations }}</span>
                     </div>
                 </div>
             </div>

@@ -119,13 +119,11 @@
     <div class="linked-students-card mt-4">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon">
-                    <i class="fas fa-users"></i>
-                </div>
+                <i class="fas fa-users"></i>
                 <span>الأبناء المرتبطون ({{ $parent->students->count() }})</span>
             </div>
         </div>
-        <div class="card-body-custom">
+        <div class="card-body-custom p-0">
             @if($parent->students->isEmpty())
                 <div class="empty-state">
                     <div class="empty-illustration">
@@ -188,9 +186,7 @@
     <div class="password-card mt-4">
         <div class="table-header">
             <div class="table-title">
-                <div class="table-icon">
-                    <i class="fas fa-lock"></i>
-                </div>
+                <i class="fas fa-lock"></i>
                 <span>تغيير كلمة المرور</span>
             </div>
         </div>
@@ -237,22 +233,17 @@
 </div>
 
 <style>
-.portal-container {
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
 .profile-layout {
     display: grid;
     grid-template-columns: 380px 1fr;
-    gap: 25px;
+    gap: 16px;
 }
 
 @media (max-width: 992px) { .profile-layout { grid-template-columns: 1fr; } }
 
 .profile-card, .edit-card, .linked-students-card, .password-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     overflow: hidden;
     box-shadow: 0 4px 25px rgba(0,0,0,0.04);
     border: 1px solid #f0f4f8;
@@ -260,7 +251,7 @@
 
 .profile-card-header {
     background: linear-gradient(135deg, #182B48 0%, #1a3356 100%);
-    padding: 45px 30px;
+    padding: 24px 16px;
     text-align: center;
     position: relative;
 }
@@ -276,97 +267,99 @@
 }
 
 .profile-avatar {
-    width: 110px;
-    height: 110px;
+    width: 72px;
+    height: 72px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 22px;
-    font-size: 44px;
+    margin: 0 auto 16px;
+    font-size: 28px;
     color: #fff;
     box-shadow: 0 10px 30px rgba(212,160,48,0.4);
 }
 
 .profile-card-header h4 {
     color: #fff;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
 }
 
 .profile-card-header p {
     color: rgba(255,255,255,0.7);
-    font-size: 14px;
+    font-size: 12.5px;
     margin: 0;
 }
 
-.profile-card-body { padding: 28px; }
+.profile-card-body { padding: 16px; }
 
 .info-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 0;
+    gap: 12px;
+    padding: 12px 0;
     border-bottom: 1px solid #f0f4f8;
 }
 
 .info-item:last-child { border-bottom: none; }
 
 .info-icon {
-    width: 50px;
-    height: 50px;
+    width: 38px;
+    height: 38px;
     background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
-    border-radius: 14px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #d4a030;
-    font-size: 20px;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
 .info-content { display: flex; flex-direction: column; }
 .info-content label { font-size: 12px; color: #95a5a6; margin-bottom: 3px; }
-.info-content span { font-weight: 600; color: #182B48; font-size: 15px; }
+.info-content span { font-weight: 600; color: #182B48; font-size: 13px; }
 
 .edit-card-header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 22px 28px;
+    gap: 12px;
+    padding: 12px 16px;
     border-bottom: 1px solid #f0f4f8;
     background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
 }
 
 .edit-icon {
-    width: 50px;
-    height: 50px;
+    width: 38px;
+    height: 38px;
     background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 14px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #d4a030;
-    font-size: 20px;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
 .edit-card-header h5 {
     color: #182B48;
-    font-size: 19px;
+    font-size: 15px;
     font-weight: 700;
     margin: 0;
 }
 
-.edit-card-body { padding: 28px; }
+.edit-card-body { padding: 16px; }
 
 .alert {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 20px;
-    border-radius: 12px;
-    margin-bottom: 22px;
+    padding: 12px 16px;
+    border-radius: 13px;
+    margin-bottom: 16px;
 }
 
 .alert-success {
@@ -382,16 +375,16 @@
 .avatar-upload {
     display: flex;
     align-items: center;
-    gap: 22px;
-    margin-bottom: 28px;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
 .avatar-preview {
-    width: 90px;
-    height: 90px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid #d4a030;
+    border: 3px solid #d4a030;
 }
 
 .avatar-preview img {
@@ -401,140 +394,36 @@
 }
 
 .upload-controls { flex: 1; }
-.upload-controls .form-label { font-weight: 600; color: #182B48; margin-bottom: 10px; display: block; }
+.upload-controls .form-label { font-weight: 600; color: #182B48; margin-bottom: 6px; display: block; }
 .upload-controls .text-muted { display: block; margin-top: 8px; color: #95a5a6; font-size: 12px; }
 
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 16px;
-}
-
-.user-info-cell { display: flex; align-items: center; gap: 14px; }
-.user-name { color: #182B48; font-weight: 600; }
-
-.level-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
-    color: #182B48;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.supervisor-text { color: #7f8c8d; font-size: 13px; }
+.supervisor-text { color: #7f8c8d; font-size: 12.5px; }
 
 .part-badge {
     display: inline-block;
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 22px 28px;
-    border-bottom: 1px solid #f0f4f8;
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #182B48;
-}
-
-.table-icon {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 18px;
-}
-
-.card-body-custom { padding: 0; }
-
-.empty-state {
-    text-align: center;
-    padding: 50px 20px;
-}
-
 .empty-illustration {
-    width: 80px;
-    height: 80px;
+    width: 66px;
+    height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.08), rgba(42,69,112,0.08));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 15px;
-    font-size: 32px;
+    margin: 0 auto 14px;
+    font-size: 26px;
     color: #d4a030;
 }
 
-.empty-state h5 {
-    color: #182B48;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.table-responsive { overflow-x: auto; }
-
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table thead { background: #f8f9fa; }
-
-.modern-table th {
-    padding: 18px 22px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #182B48;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
-}
-
-.modern-table td {
-    padding: 18px 22px;
-    font-size: 14px;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f4f8;
-    vertical-align: middle;
-}
-
-.modern-table tbody tr { transition: all 0.2s; }
-.modern-table tbody tr:hover { background: #fafbfc; }
-
-.card-body-custom .alert {
-    margin: 20px 28px;
-}
-
-.card-body-custom form {
-    padding: 28px;
-}
-
 .card-body-custom .btn {
-    padding: 12px 24px;
+    padding: 8px 16px;
 }
 </style>
 @endsection

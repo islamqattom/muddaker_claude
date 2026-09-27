@@ -78,11 +78,11 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2" id="fromDateCol" style="{{ request('period', 'year') == 'custom' ? '' : 'display:none;' }}">
+                <div class="col-md-2" id="fromDateCol" style="{{ request('period', 'year') == 'custom' ? '':'display:none;' }}">
                     <label class="form-label">من تاريخ</label>
                     <input type="date" name="from_date" class="form-control" value="{{ request('from_date', $fromDate ? $fromDate->format('Y-m-d') : now()->startOfMonth()->toDateString()) }}">
                 </div>
-                <div class="col-md-2" id="toDateCol" style="{{ request('period', 'year') == 'custom' ? '' : 'display:none;' }}">
+                <div class="col-md-2" id="toDateCol" style="{{ request('period', 'year') == 'custom' ? '':'display:none;' }}">
                     <label class="form-label">إلى تاريخ</label>
                     <input type="date" name="to_date" class="form-control" value="{{ request('to_date', $toDate ? $toDate->format('Y-m-d') : now()->toDateString()) }}">
                 </div>
@@ -145,9 +145,9 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
-    padding: 24px 26px;
-    border-radius: 18px;
-    margin-bottom: 24px;
+    padding: 16px 22px;
+    border-radius: 14px;
+    margin-bottom: 16px;
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
     box-shadow: 0 12px 32px rgba(24,43,72,0.28);
     position: relative;
@@ -164,33 +164,32 @@
     background: radial-gradient(circle, rgba(212,160,48,0.22), transparent 70%);
     pointer-events: none;
 }
-.sp-hero-main { display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; }
+.sp-hero-main { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
 .sp-hero-icon {
-    width: 64px; height: 64px; flex-shrink: 0;
-    border-radius: 16px;
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 13px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 28px;
+    color: #fff; font-size: 20px;
     box-shadow: 0 8px 20px rgba(212,160,48,0.35);
 }
-.sp-hero h4 { color: #fff; font-size: 22px; font-weight: 700; margin: 0 0 4px; }
+.sp-hero h4 { color: #fff; font-size: 18px; font-weight: 700; margin: 0 0 4px; }
 .sp-hero p { color: rgba(255,255,255,0.72); font-size: 13px; margin: 0; }
 .sp-hero-actions { position: relative; z-index: 1; }
-
 .sp-student-banner {
     display: flex;
     align-items: center;
     gap: 18px;
     flex-wrap: wrap;
     background: #fff;
-    border-radius: 16px;
-    padding: 18px 22px;
-    margin-bottom: 24px;
+    border-radius: 13px;
+    padding: 16px 16px;
+    margin-bottom: 16px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
 }
 .sp-student-avatar {
-    width: 58px; height: 58px; border-radius: 15px; flex-shrink: 0;
+    width: 58px; height: 58px; border-radius: 13px; flex-shrink: 0;
     background: linear-gradient(135deg, #8e44ad, #7d3c98);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 24px;
@@ -206,11 +205,10 @@
 .text-success { color: #27ae60 !important; }
 .text-danger { color: #c0392b !important; }
 .text-info { color: #3498db !important; }
-
 @media (max-width: 768px) {
-    .sp-hero { flex-direction: column; align-items: flex-start; }
-    .sp-hero-actions { width: 100%; }
-    .sp-hero-actions .rpt-btn { width: 100%; }
+.sp-hero { flex-direction: column; align-items: flex-start; }
+.sp-hero-actions { width: 100%; }
+.sp-hero-actions .rpt-btn { width: 100%; }
 }
 </style>
 

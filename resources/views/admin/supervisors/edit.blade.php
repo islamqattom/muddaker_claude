@@ -28,41 +28,19 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 18px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
 .form-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
-    margin-bottom: 30px;
+    margin-bottom: 16px;
 }
 .form-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 22px 28px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color: #fff;
     position: relative;
@@ -76,18 +54,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     height: 4px;
     background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
 }
-
-.form-body { padding: 30px 28px; }
-
+.form-body { padding: 16px 16px; }
 .section-title {
     display: flex; align-items: center; gap: 10px;
     color: var(--primary); font-weight: 700; font-size: 15px;
-    margin-bottom: 20px; padding-bottom: 12px;
+    margin-bottom: 16px; padding-bottom: 12px;
     border-bottom: 2px solid rgba(24,43,72,0.08);
 }
 .section-title i { color: var(--gold); font-size: 16px; }
 .section-title::before { content: '◆'; color: var(--gold); font-size: 8px; }
-
 .form-label {
     font-weight: 600;
     color: var(--primary);
@@ -115,28 +90,26 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     margin-top: 5px;
 }
 .text-danger { color: var(--danger); }
-
 .avatar-upload {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 20px;
+    padding: 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.02) 0%, rgba(42,69,112,0.04) 100%);
-    border-radius: 16px;
+    border-radius: 13px;
     border: 2px dashed rgba(24,43,72,0.1);
 }
 .avatar-preview {
     width: 80px; height: 80px;
-    border-radius: 16px;
+    border-radius: 13px;
     object-fit: cover;
     border: 3px solid var(--gold);
 }
 .avatar-info { flex: 1; }
 .avatar-info input { cursor: pointer; }
-
 .btn-submit {
     display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 30px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
     color: #fff; border: none; border-radius: 12px;
     font-weight: 700; font-size: 15px;
@@ -149,10 +122,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     box-shadow: 0 8px 25px rgba(212,160,48,0.4);
 }
 .btn-submit i { font-size: 16px; }
-
 .btn-cancel {
     display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 30px;
+    padding: 14px 16px;
     background: #fff;
     color: var(--primary); border: 2px solid var(--primary);
     border-radius: 12px;
@@ -165,23 +137,21 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     background: var(--primary);
     color: #fff;
 }
-
 .alert-success {
     background: rgba(39,174,96,0.1);
     border: 1px solid rgba(39,174,96,0.3);
     border-radius: 12px;
     color: var(--success);
-    padding: 16px 20px;
+    padding: 16px 16px;
 }
 .alert-danger {
     background: rgba(192,57,43,0.1);
     border: 1px solid rgba(192,57,43,0.3);
     border-radius: 12px;
     color: var(--danger);
-    padding: 16px 20px;
+    padding: 16px 16px;
 }
 .alert-danger ul { margin: 0; padding-right: 20px; }
-
 .form-actions {
     display: flex;
     gap: 15px;
@@ -189,13 +159,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     padding-top: 25px;
     border-top: 1px solid #f0f4f8;
 }
-
 @media (max-width: 768px) {
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-content { margin-bottom: 15px; }
-    .form-body { padding: 20px 15px; }
-    .form-actions { flex-direction: column; }
-    .avatar-upload { flex-direction: column; text-align: center; }
+.form-body { padding: 16px 15px; }
+.form-actions { flex-direction: column; }
+.avatar-upload { flex-direction: column; text-align: center; }
 }
 </style>
 
@@ -243,7 +210,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 <div class="avatar-info">
                     <label class="form-label">صورة الملف الشخصي</label>
                     <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
-                    <small style="color: #95a5a6;">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
+                    <small style="color:#95a5a6">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
                     @error('image')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

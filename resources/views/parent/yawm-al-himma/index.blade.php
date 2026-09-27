@@ -14,15 +14,15 @@
     --gold-light: #e6b84d;
     --navy: #182B48;
     --navy-light: #2A4570;
-    --radius: 16px;
-    --radius-sm: 12px;
+    --radius: 14px;
+    --radius-sm: 10px;
     --shadow-sm: 0 2px 10px rgba(24,43,72,0.05);
 }
 .yawm-page .hero-section {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
     border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 24px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative; overflow: hidden;
 }
 .yawm-page .hero-section::before {
@@ -32,29 +32,25 @@
 }
 .yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; }
 .yawm-page .hero-icon {
-    width: 60px; height: 60px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(212,160,48,0.35);
     flex-shrink: 0;
 }
-.yawm-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.yawm-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
+.yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
-.yawm-page .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px; margin-bottom: 22px;
-}
 .yawm-page .stat-card {
-    background: white; border-radius: var(--radius); padding: 18px 20px;
-    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 14px;
+    background: white; border-radius: 13px; padding: 14px 16px;
+    box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px;
     border: 1px solid rgba(24,43,72,0.05);
 }
 .yawm-page .stat-icon {
-    width: 50px; height: 50px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
 }
 .yawm-page .stat-icon.navy { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white; }
 .yawm-page .stat-icon.gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); color: white; }
@@ -63,31 +59,23 @@
 .yawm-page .stat-label { font-size: 12px; color: #6b7a90; margin-bottom: 4px; }
 .yawm-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); }
 
-.yawm-page .filter-card {
-    background: white; border-radius: var(--radius); padding: 18px 20px;
-    box-shadow: var(--shadow-sm); margin-bottom: 18px;
-}
 .yawm-page .filter-card .form-select {
     border: 2px solid #e4eaf2; border-radius: 10px; padding: 8px 12px; font-size: 13px;
 }
 
-.yawm-page .table-card {
-    background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden;
-}
-.yawm-page .table-card .table { margin: 0; }
 .yawm-page .table-card thead th {
-    background: #f8f9fc; color: var(--navy); font-weight: 700; font-size: 12px;
-    padding: 14px 16px; border-bottom: 2px solid #fef5e7; text-align: right;
+    background: #f8f9fc; color: var(--navy); font-weight: 700; font-size: 11px;
+    padding: 11px 14px; border-bottom: 2px solid #fef5e7; text-align: right;
 }
 .yawm-page .table-card tbody td {
-    padding: 14px 16px; border-bottom: 1px solid #eef1f6; vertical-align: middle; font-size: 13px;
+    padding: 11px 14px; border-bottom: 1px solid #eef1f6; vertical-align: middle; font-size: 13px;
 }
 .yawm-page .table-card tbody tr:last-child td { border-bottom: none; }
 .yawm-page .table-card tbody tr:hover { background: #fafbfd; }
 
 .yawm-page .badge-soft {
-    display: inline-block; padding: 4px 10px; border-radius: 8px;
-    font-size: 12px; font-weight: 700;
+    display: inline-block; padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 700;
 }
 .yawm-page .badge-soft.navy { background: var(--navy); color: white; }
 .yawm-page .badge-soft.gold { background: #fef5e7; color: var(--navy); }
@@ -101,8 +89,8 @@
 }
 .yawm-page .btn-view:hover { background: #2980b9; color: white; }
 
-.yawm-page .empty-state { text-align: center; padding: 50px 20px; color: #6b7a90; }
-.yawm-page .empty-state i { font-size: 50px; margin-bottom: 14px; opacity: 0.3; }
+.yawm-page .empty-state { text-align: center; padding: 40px 16px; color: #6b7a90; }
+.yawm-page .empty-state i { font-size: 26px; margin-bottom: 14px; opacity: 0.3; }
 </style>
 @endpush
 

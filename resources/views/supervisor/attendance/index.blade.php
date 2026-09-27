@@ -15,7 +15,7 @@
 
 @section('content')
 
-<div class="page-header mb-4">
+<div class="page-header">
     <div class="header-content">
         <div class="header-icon">
             <i class="fas fa-calendar-check"></i>
@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<div class="stats-row mb-4">
+<div class="stats-row">
     <div class="stat-item success">
         <div class="stat-item-icon"><i class="fas fa-check"></i></div>
         <div class="stat-item-content">
@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<div class="date-filter-card mb-4">
+<div class="date-filter-card">
     <form method="GET" class="date-filter-form">
         <div class="date-filter-input">
             <i class="fas fa-calendar-alt"></i>
@@ -223,51 +223,19 @@
 </div>
 
 <style>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-    .page-header { flex-direction: column; align-items: stretch; gap: 14px; }
-    .page-header .header-actions { width: 100%; }
-    .page-header .header-actions .btn { width: 100%; justify-content: center; }
-}
-
-.header-content { display: flex; align-items: center; gap: 20px; }
-
-.header-icon {
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-    flex-shrink: 0;
-}
-
-.header-text h4 { color: #182B48; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
 .header-actions { display: flex; gap: 10px; }
 
 .stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 12px;
+    margin-bottom: 16px;
 }
 
 .stat-item {
     background: #fff;
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 13px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -277,13 +245,13 @@
 }
 
 .stat-item-icon {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     color: #fff;
     flex-shrink: 0;
 }
@@ -295,17 +263,16 @@
 .stat-item.secondary .stat-item-icon { background: linear-gradient(135deg, #7f8c8d, #95a5a6); }
 
 .stat-item-content { flex: 1; min-width: 0; }
-.stat-number { font-size: 24px; font-weight: 800; color: #182B48; line-height: 1; }
-.stat-label { font-size: 11px; color: #7f8c8d; margin-top: 4px; }
 
 .date-filter-card {
     background: #fff;
-    border-radius: 12px;
-    padding: 15px 20px;
+    border-radius: 13px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
+    margin-bottom: 16px;
 }
 
 .date-filter-form { margin: 0; width: 100%; }
@@ -322,127 +289,22 @@
 .date-filter-input input {
     padding: 10px 15px 10px 40px;
     border: 1px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 9px;
+    font-size: 13px;
     color: #182B48;
     width: 100%;
     max-width: 240px;
 }
 
-.table-card {
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    border: 1px solid #f0f4f8;
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 25px;
-    border-bottom: 1px solid #f0f4f8;
-    background: linear-gradient(135deg, rgba(24,43,72,0.02), rgba(26,51,86,0.02));
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.table-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #182B48;
-}
-
-.table-title i {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #182B48, #1a3356);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #d4a030;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.table-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
-.record-count { color: #7f8c8d; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-.record-count i { color: #d4a030; }
-
 .bulk-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .bulk-actions .btn { white-space: nowrap; }
-
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table thead { background: #f8f9fa; }
-
-.modern-table th {
-    padding: 16px 20px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #182B48;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
-}
-
-.modern-table td {
-    padding: 14px 20px;
-    font-size: 14px;
-    color: #2c3e50;
-    border-bottom: 1px solid #f0f4f8;
-    vertical-align: middle;
-}
-
-.modern-table tbody tr { transition: all 0.2s; }
-.modern-table tbody tr:hover { background: #fafbfc; }
-
-.row-num { color: #bdc3c7; font-weight: 600; font-size: 13px; }
-
-.user-info-cell { display: flex; align-items: center; gap: 14px; min-width: 0; }
-
-.user-avatar-table {
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 700;
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
-.user-details { display: flex; flex-direction: column; min-width: 0; }
-.user-name { color: #182B48; font-weight: 600; font-size: 14px; }
-.user-username { color: #7f8c8d; font-size: 12px; }
-
-.level-badge {
-    background: linear-gradient(135deg, rgba(24,43,72,0.1), rgba(42,69,112,0.1));
-    color: #182B48;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.no-data { color: #bdc3c7; }
 
 .attendance-status-group { display: flex; gap: 6px; }
 
 .status-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -469,78 +331,30 @@
 
 .arrival-time { max-width: 120px; }
 
-.table-footer {
-    padding: 20px 25px;
-    border-top: 1px solid #f0f4f8;
-    display: flex;
-    justify-content: center;
-}
-
-.footer-actions { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; }
+.footer-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
 .footer-actions .btn { flex: 1; min-width: 160px; justify-content: center; }
-
-.empty-state { text-align: center; padding: 60px 20px; }
-
-.empty-icon {
-    width: 90px;
-    height: 90px;
-    background: linear-gradient(135deg, rgba(24,43,72,0.1), rgba(42,69,112,0.1));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 36px;
-    color: #d4a030;
-}
-
-.empty-state h5 { color: #182B48; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.empty-state p { color: #7f8c8d; margin-bottom: 25px; }
 
 /* ===========================
    MOBILE RESPONSIVE
    =========================== */
 @media (max-width: 768px) {
-    .header-icon { width: 52px; height: 52px; font-size: 22px; border-radius: 14px; }
-    .header-text h4 { font-size: 18px; }
-    .header-text p { font-size: 12px; }
-    .header-content { gap: 12px; }
-
     .stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .stat-item { padding: 12px; gap: 10px; }
-    .stat-item-icon { width: 38px; height: 38px; font-size: 16px; border-radius: 10px; }
-    .stat-number { font-size: 20px; }
-    .stat-label { font-size: 10px; }
+    .stat-item-icon { width: 34px; height: 34px; font-size: 15px; }
 
     .date-filter-card { padding: 12px 14px; }
-    .date-filter-input input { font-size: 14px; padding: 8px 12px 8px 36px; }
+    .date-filter-input input { font-size: 13px; padding: 8px 12px 8px 36px; }
 
-    .table-header { padding: 14px 16px; flex-direction: column; align-items: stretch; }
-    .table-title { font-size: 14px; }
-    .table-title i { width: 34px; height: 34px; font-size: 14px; }
-    .table-actions { width: 100%; justify-content: space-between; gap: 8px; }
-    .record-count { font-size: 12px; }
     .bulk-actions { width: 100%; flex-wrap: wrap; gap: 6px; }
     .bulk-actions .btn { flex: 1; min-width: 0; padding: 6px 10px; font-size: 12px; }
     .bulk-actions .btn i { margin: 0 !important; }
     .bulk-actions .btn-text-mobile { display: none; }
 
-    .modern-table th { padding: 10px 12px; font-size: 10px; }
-    .modern-table td { padding: 10px 12px; font-size: 13px; }
-    .row-num { font-size: 12px; min-width: 24px; }
-    .user-avatar-table { width: 36px; height: 36px; font-size: 14px; }
-    .user-info-cell { gap: 10px; }
-    .user-name { font-size: 13px; }
-    .user-username { font-size: 11px; }
-    .level-badge { padding: 4px 10px; font-size: 11px; }
-    .no-data { font-size: 12px; }
-
     .attendance-status-group { gap: 4px; }
-    .status-btn { width: 32px; height: 32px; font-size: 12px; border-radius: 8px; }
+    .status-btn { width: 30px; height: 30px; font-size: 12px; }
 
     .arrival-time { max-width: 100%; width: 100%; }
 
-    .table-footer { padding: 14px 16px; }
     .footer-actions { flex-direction: column; gap: 10px; }
     .footer-actions .btn { width: 100%; }
 }
@@ -548,11 +362,8 @@
 @media (max-width: 480px) {
     .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
     .stat-item { padding: 10px; }
-    .stat-item-icon { width: 34px; height: 34px; font-size: 14px; }
-    .stat-number { font-size: 18px; }
-    .stat-label { font-size: 9px; }
+    .stat-item-icon { width: 32px; height: 32px; font-size: 14px; }
 
-    .modern-table th, .modern-table td { padding: 8px 10px; }
     .status-btn { width: 28px; height: 28px; font-size: 11px; }
     .attendance-status-group { gap: 3px; }
 }

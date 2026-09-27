@@ -17,13 +17,12 @@
 /* Student Selector Card */
 .student-selector-section {
     background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
-    border-radius: 18px;
-    padding: 30px;
-    margin-bottom: 30px;
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
-
 .student-selector-section::before {
     content: '';
     position: absolute;
@@ -34,7 +33,6 @@
     background: radial-gradient(circle, rgba(212,160,48,0.2) 0%, transparent 70%);
     border-radius: 50%;
 }
-
 .student-selector-section::after {
     content: '';
     position: absolute;
@@ -44,21 +42,19 @@
     height: 4px;
     background: linear-gradient(90deg, #d4a030, #B4802C, #d4a030);
 }
-
 .section-header-quran {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
     position: relative;
     z-index: 1;
 }
-
 .section-icon-large {
     width: 65px;
     height: 65px;
     background: linear-gradient(135deg, #d4a030, #B4802C);
-    border-radius: 16px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -66,29 +62,24 @@
     color: #fff;
     box-shadow: 0 8px 25px rgba(212,160,48,0.4);
 }
-
 .section-title-text h4 {
     color: #fff;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     margin: 0 0 4px 0;
 }
-
 .section-title-text p {
     color: rgba(255,255,255,0.7);
     font-size: 14px;
     margin: 0;
 }
-
 .search-wrapper {
     position: relative;
     z-index: 1;
 }
-
 .select2-wrapper {
     position: relative;
 }
-
 .select2-wrapper::before {
     content: '';
     position: absolute;
@@ -100,11 +91,10 @@
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d4a030' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") no-repeat center;
     pointer-events: none;
 }
-
 .student-select-custom {
     width: 100%;
     max-width: 500px;
-    padding: 16px 20px 16px 50px;
+    padding: 16px 16px 16px 50px;
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.95);
@@ -114,28 +104,24 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
 .student-select-custom:focus {
     outline: none;
     border-color: #d4a030;
     box-shadow: 0 0 0 4px rgba(212,160,48,0.2);
 }
-
 /* Student Info Card */
 .student-info-display {
     background: #fff;
-    border-radius: 16px;
-    padding: 30px;
+    border-radius: 13px;
+    padding: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     border: 1px solid #f0f4f8;
     display: none;
 }
-
 .student-info-display.show {
     display: block;
     animation: slideUp 0.4s ease;
 }
-
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -146,21 +132,19 @@
         transform: translateY(0);
     }
 }
-
 .student-profile-header {
     display: flex;
     align-items: center;
     gap: 25px;
     padding-bottom: 25px;
     border-bottom: 2px solid #f0f4f8;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .student-avatar-large {
     width: 80px;
     height: 80px;
     background: linear-gradient(135deg, #182B48, #2A4570);
-    border-radius: 18px;
+    border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,20 +152,17 @@
     font-size: 32px;
     box-shadow: 0 8px 25px rgba(24,43,72,0.25);
 }
-
 .student-info-main h5 {
     color: #182B48;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     margin: 0 0 8px 0;
 }
-
 .student-info-meta {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
 }
-
 .info-tag {
     display: flex;
     align-items: center;
@@ -192,20 +173,17 @@
     font-size: 13px;
     color: #7f8c8d;
 }
-
 .info-tag i {
     color: #d4a030;
 }
-
 .info-tag strong {
     color: #182B48;
 }
-
 .view-record-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 28px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, #182B48, #2A4570);
     color: #fff;
     border-radius: 12px;
@@ -215,23 +193,19 @@
     transition: all 0.3s ease;
     margin-top: 20px;
 }
-
 .view-record-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 30px rgba(24,43,72,0.3);
     color: #fff;
 }
-
 .view-record-btn i {
     color: #d4a030;
 }
-
 /* Empty Selection State */
 .empty-selection {
     text-align: center;
-    padding: 50px 20px;
+    padding: 40px 16px;
 }
-
 .empty-icon-large {
     width: 100px;
     height: 100px;
@@ -244,25 +218,22 @@
     font-size: 42px;
     color: #d4a030;
 }
-
 .empty-selection h5 {
     color: #182B48;
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 8px;
 }
-
 .empty-selection p {
     color: #7f8c8d;
     font-size: 14px;
 }
-
 /* Responsive */
 @media (max-width: 768px) {
-    .student-selector-section { padding: 20px; }
-    .section-header-quran { flex-direction: column; align-items: flex-start; gap: 15px; }
-    .student-profile-header { flex-direction: column; text-align: center; }
-    .student-info-meta { justify-content: center; }
+.student-selector-section { padding: 16px; }
+.section-header-quran { flex-direction: column; align-items: flex-start; gap: 15px; }
+.student-profile-header { flex-direction: column; text-align: center; }
+.student-info-meta { justify-content: center; }
 }
 </style>
 @endpush

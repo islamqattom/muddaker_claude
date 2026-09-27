@@ -25,22 +25,18 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
 .profile-page {
     direction: rtl;
 }
-
 .profile-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 20px;
+    border-radius: 13px;
     padding: 35px;
     position: relative;
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .profile-header::before {
     content: '';
     position: absolute;
@@ -51,7 +47,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
 }
-
 .profile-header::after {
     content: '';
     position: absolute;
@@ -61,7 +56,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     height: 4px;
     background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
 }
-
 .profile-content {
     display: flex;
     align-items: center;
@@ -69,20 +63,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     position: relative;
     z-index: 1;
 }
-
 .profile-avatar-wrapper {
     position: relative;
 }
-
 .profile-avatar {
     width: 130px;
     height: 130px;
-    border-radius: 20px;
+    border-radius: 13px;
     object-fit: cover;
     border: 4px solid var(--gold);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(212, 160, 48, 0.2);
 }
-
 .profile-avatar-badge {
     position: absolute;
     bottom: -8px;
@@ -99,74 +90,64 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     box-shadow: 0 4px 15px rgba(212, 160, 48, 0.4);
     border: 3px solid #fff;
 }
-
 .profile-info {
     flex: 1;
 }
-
 .profile-info h3 {
     color: #fff;
-    font-size: 28px;
+    font-size: 18px;
     font-weight: 700;
     margin: 0 0 8px;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
-
 .profile-role {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     background: rgba(212, 160, 48, 0.2);
     color: var(--gold);
-    padding: 8px 18px;
-    border-radius: 25px;
+    padding: 8px 16px;
+    border-radius: 13px;
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 15px;
     border: 1px solid rgba(212, 160, 48, 0.3);
 }
-
 .profile-stats {
     display: flex;
     gap: 30px;
     margin-top: 20px;
 }
-
 .profile-stat {
     text-align: center;
 }
-
 .profile-stat-value {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: #fff;
 }
-
 .profile-stat-label {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.7);
     margin-top: 4px;
 }
-
 .profile-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24, 43, 72, 0.05);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .profile-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 22px 28px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
     border-bottom: 1px solid rgba(24, 43, 72, 0.05);
     position: relative;
 }
-
 .profile-card-header::before {
     content: '';
     position: absolute;
@@ -176,7 +157,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     height: 3px;
     background: linear-gradient(90deg, var(--gold), var(--gold-dark), var(--gold));
 }
-
 .profile-card-header i {
     width: 44px;
     height: 44px;
@@ -189,18 +169,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-size: 18px;
     box-shadow: 0 4px 15px rgba(24, 43, 72, 0.2);
 }
-
 .profile-card-header h5 {
     color: var(--primary);
     font-weight: 700;
     font-size: 18px;
     margin: 0;
 }
-
 .profile-card-body {
-    padding: 28px;
+    padding: 16px;
 }
-
 .form-label {
     font-weight: 600;
     color: var(--primary);
@@ -210,69 +187,57 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     align-items: center;
     gap: 8px;
 }
-
 .form-label i {
     color: var(--gold);
     font-size: 12px;
 }
-
 .form-control, .form-select {
     border-radius: 12px;
     border: 2px solid #e9ecef;
-    padding: 14px 18px;
+    padding: 14px 16px;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
     font-size: 14px;
 }
-
 .form-control:focus, .form-select:focus {
     border-color: var(--gold);
     box-shadow: 0 0 0 4px rgba(212, 160, 48, 0.12);
 }
-
 .form-control.is-invalid {
     border-color: var(--danger);
 }
-
 .invalid-feedback {
     color: var(--danger);
     font-size: 12px;
     margin-top: 5px;
 }
-
 .text-danger { color: var(--danger); }
-
 .image-upload-card {
     border: 2px dashed rgba(24, 43, 72, 0.15);
-    border-radius: 16px;
-    padding: 25px;
+    border-radius: 13px;
+    padding: 16px;
     text-align: center;
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.02) 0%, rgba(42, 69, 112, 0.04) 100%);
     transition: all 0.3s ease;
     cursor: pointer;
 }
-
 .image-upload-card:hover {
     border-color: var(--gold);
     background: linear-gradient(135deg, rgba(212, 160, 48, 0.05) 0%, rgba(180, 128, 44, 0.08) 100%);
 }
-
 .image-upload-card i {
     font-size: 40px;
     color: var(--gold);
     margin-bottom: 10px;
 }
-
 .image-upload-card p {
     color: #6c7a89;
     font-size: 13px;
     margin: 0;
 }
-
 .image-upload-card input {
     display: none;
 }
-
 .btn-save {
     display: inline-flex;
     align-items: center;
@@ -288,45 +253,38 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-family: 'Tajawal', sans-serif;
     box-shadow: 0 4px 15px rgba(212, 160, 48, 0.3);
 }
-
 .btn-save:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(212, 160, 48, 0.4);
 }
-
 .btn-save i {
     font-size: 16px;
 }
-
 .alert-success {
     background: rgba(39, 174, 96, 0.1);
     border: 1px solid rgba(39, 174, 96, 0.3);
     border-radius: 12px;
     color: var(--success);
-    padding: 16px 20px;
+    padding: 16px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
 .alert-success i {
     font-size: 18px;
 }
-
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
-
 .info-item {
     background: linear-gradient(135deg, rgba(24, 43, 72, 0.03) 0%, rgba(42, 69, 112, 0.05) 100%);
     border-radius: 12px;
-    padding: 18px;
+    padding: 16px;
     border: 1px solid rgba(24, 43, 72, 0.05);
 }
-
 .info-item-label {
     font-size: 12px;
     color: #7f8c8d;
@@ -335,30 +293,25 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     align-items: center;
     gap: 6px;
 }
-
 .info-item-label i {
     color: var(--gold);
     font-size: 11px;
 }
-
 .info-item-value {
     font-size: 15px;
     font-weight: 600;
     color: var(--primary);
 }
-
 @media (max-width: 768px) {
-    .profile-content {
+.profile-content {
         flex-direction: column;
         text-align: center;
     }
-
-    .profile-stats {
+.profile-stats {
         justify-content: center;
     }
-
-    .profile-card-body {
-        padding: 20px 15px;
+.profile-card-body {
+        padding: 16px 15px;
     }
 }
 </style>
@@ -419,7 +372,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <input type="file" name="image" id="imageInput" accept="image/*" onchange="previewImage(this)">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <p>انقر لتغيير صورة الملف الشخصي</p>
-                            <small style="color: #95a5a6;">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
+                            <small style="color:#95a5a6">الصيغ المدعومة: jpeg, png, jpg, gif, webp</small>
                         </div>
 
                         <div class="row g-4">
@@ -508,7 +461,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             @endif
                         </div>
 
-                        <div class="mt-4" style="border-top: 1px solid #f0f4f8; padding-top: 25px;">
+                        <div class="mt-4" style="border-top:1px solid #f0f4f8;padding-top:16px">
                             <button type="submit" class="btn-save">
                                 <i class="fas fa-save"></i>
                                 <span>حفظ التغييرات</span>

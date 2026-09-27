@@ -27,9 +27,9 @@
 
 .student-warnings .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -51,20 +51,21 @@
 }
 
 .student-warnings .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--danger) 0%, #e74c3c 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(192,57,43,0.35);
+    flex-shrink: 0;
 }
 
-.student-warnings .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.student-warnings .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.student-warnings .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.student-warnings .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .student-warnings .warnings-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -72,18 +73,18 @@
 
 .student-warnings .warnings-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
+    padding: 12px 16px;
     display: flex; align-items: center; justify-content: space-between;
 }
 
-.student-warnings .warnings-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.student-warnings .warnings-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .student-warnings .warnings-header h5 i { color: var(--gold); }
 
 .student-warnings .warnings-table { margin: 0; }
 
 .student-warnings .warnings-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -93,10 +94,10 @@
 }
 
 .student-warnings .warnings-table tbody td {
-    padding: 16px;
+    padding: 11px 14px;
     vertical-align: middle;
     border-color: rgba(24,43,72,0.04);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .student-warnings .warnings-table tbody tr { transition: all 0.2s ease; }
@@ -104,8 +105,8 @@
 .student-warnings .warnings-table tbody tr:hover td:first-child { border-right: 3px solid var(--gold); }
 
 .student-warnings .type-badge {
-    padding: 6px 14px; border-radius: 10px;
-    font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 7px;
+    font-size: 11.5px; font-weight: 600;
 }
 
 .student-warnings .type-badge.attendance { background: rgba(243,156,18,0.15); color: var(--warning); }
@@ -115,16 +116,16 @@
 .student-warnings .warning-number {
     font-family: monospace;
     background: rgba(24,43,72,0.06);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--navy);
 }
 
 .student-warnings .view-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(24,43,72,0.1);
     background: white;
@@ -140,23 +141,23 @@
 }
 
 .student-warnings .pagination-wrapper {
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-top: 1px solid rgba(24,43,72,0.04);
     display: flex; justify-content: center;
 }
 
-.student-warnings .empty-state { text-align: center; padding: 60px 20px; }
+.student-warnings .empty-state { text-align: center; padding: 40px 16px; }
 .student-warnings .empty-icon {
-    width: 90px; height: 90px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(39,174,96,0.15), rgba(46,204,113,0.15));
-    border-radius: 22px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
+    margin: 0 auto 14px;
 }
-.student-warnings .empty-icon i { font-size: 36px; color: var(--success); }
+.student-warnings .empty-icon i { font-size: 26px; color: var(--success); }
 
 @media (max-width: 992px) {
-    .student-warnings .page-hero { padding: 20px 24px; }
+    .student-warnings .page-hero { padding: 14px 16px; }
     .student-warnings .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .student-warnings .hero-title { font-size: 18px; }
 }
@@ -180,7 +181,7 @@
     <div class="warnings-card">
         <div class="warnings-header">
             <h5><i class="fas fa-list"></i>جدول الإنذارات</h5>
-            <span class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 12px; padding: 6px 14px; border-radius: 20px; font-weight: 600;">
+            <span class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 11.5px; padding: 3px 10px; border-radius: 999px; font-weight: 600;">
                 <i class="fas fa-exclamation-circle me-1"></i>
                 {{ $warnings->total() }} إنذار
             </span>

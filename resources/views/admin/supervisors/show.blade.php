@@ -27,7 +27,7 @@
             <div class="card-body">
                 <div class="row align-items-center mb-4">
                     <div class="col-auto">
-                        <img src="{{ $supervisor->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">
+                        <img src="{{ $supervisor->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:80px;height:80px;object-fit:cover">
                     </div>
                     <div class="col">
                         <h4 class="mb-1">{{ $supervisor->name }}</h4>
@@ -95,7 +95,7 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
-                                            <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">
+                                            <img src="{{ $student->user->avatar_url }}" alt="Avatar" class="rounded-circle" style="width:36px;height:36px;object-fit:cover">
                                             <span>{{ $student->user->name }}</span>
                                         </div>
                                     </td>
@@ -114,7 +114,7 @@
 
     <!-- Sidebar -->
     <div class="col-lg-4">
-        <div class="card sticky-top" style="top: 20px;">
+        <div class="card sticky-top" style="top:20px">
             <div class="card-header">
                 <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>الإجراءات</h6>
             </div>

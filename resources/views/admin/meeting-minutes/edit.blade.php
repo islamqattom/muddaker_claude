@@ -31,51 +31,28 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 65px; height: 65px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 16px; display: flex; align-items: center; justify-content: center;
-    font-size: 28px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: var(--primary); font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
 .form-container {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
 }
-
 .form-section {
-    padding: 30px;
+    padding: 16px;
     border-bottom: 1px solid #f0f4f8;
 }
 .form-section:last-child { border-bottom: none; }
 .section-title {
     font-size: 18px; font-weight: 700; color: var(--primary);
-    margin-bottom: 20px; padding-bottom: 15px;
+    margin-bottom: 16px; padding-bottom: 15px;
     border-bottom: 3px solid var(--gold);
     display: flex; align-items: center; gap: 12px;
 }
-.section-title i { color: var(--gold); font-size: 22px; }
+.section-title i { color: var(--gold); font-size: 18px; }
 .section-title span::before { content: '◆'; color: var(--gold); margin-left: 10px; font-size: 10px; }
-
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 .form-group { margin-bottom: 5px; }
 .form-label {
@@ -96,10 +73,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     border-color: var(--gold);
     box-shadow: 0 0 0 4px rgba(212,160,48,0.12);
 }
-
 .supervisor-item {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    border-radius: 14px; padding: 16px 20px;
+    border-radius: 13px; padding: 16px 16px;
     margin-bottom: 12px;
     border: 2px solid rgba(24,43,72,0.06);
     transition: all 0.3s ease;
@@ -110,7 +86,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     box-shadow: 0 4px 15px rgba(24,43,72,0.08);
 }
 .supervisor-item.excluded { opacity: 0.5; background: #f5f5f5; }
-
 .avatar-circle {
     width: 42px; height: 42px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
@@ -125,7 +100,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .supervisor-name { font-weight: 600; color: var(--primary); }
 .supervisor-role { font-size: 12px; color: #95a5a6; }
-
 .toggle-btn {
     padding: 8px 16px; border-radius: 10px;
     font-size: 12px; font-weight: 600;
@@ -135,7 +109,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .toggle-exclude { background: rgba(192,57,43,0.1); color: var(--danger); }
 .toggle-exclude:hover { background: var(--danger); color: #fff; }
 .supervisor-item.excluded .toggle-exclude { background: var(--success); color: #fff; }
-
 .manual-attendee-row {
     background: #f8f9fa; border-radius: 12px; padding: 12px;
     margin-bottom: 10px; border: 2px dashed #e9ecef;
@@ -145,7 +118,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     border: 2px dashed var(--gold);
     border-radius: 12px;
     color: var(--gold);
-    padding: 12px 24px;
+    padding: 12px 16px;
     font-weight: 600;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
@@ -153,11 +126,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .btn-add:hover { background: rgba(212,160,48,0.08); border-style: solid; }
 .btn-add i { font-size: 14px; }
-
 .agenda-card {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border: 2px solid rgba(24,43,72,0.06);
-    border-radius: 14px;
+    border-radius: 13px;
     transition: all 0.3s ease;
 }
 .agenda-card:hover {
@@ -167,25 +139,22 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .badge-custom {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
     color: var(--gold);
-    padding: 8px 16px; border-radius: 20px;
+    padding: 8px 16px; border-radius: 13px;
     font-weight: 600; font-size: 13px;
 }
-
 .task-card {
-    background: #fff; border-radius: 14px; padding: 18px;
+    background: #fff; border-radius: 13px; padding: 16px;
     margin-bottom: 14px; border: 2px solid rgba(24,43,72,0.06);
     transition: all 0.3s ease;
 }
 .task-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(24,43,72,0.1); }
-
 .axis-row {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border-radius: 12px; margin-bottom: 10px; padding: 12px;
     border: 1px solid rgba(24,43,72,0.05);
 }
-
 .student-table {
-    border-radius: 14px; overflow: hidden;
+    border-radius: 13px; overflow: hidden;
     border: 2px solid rgba(24,43,72,0.06);
 }
 .student-table thead {
@@ -203,41 +172,35 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .student-row:hover { background: linear-gradient(135deg, rgba(212,160,48,0.05) 0%, rgba(180,128,44,0.08) 100%); }
 .student-row td { padding: 12px 10px; vertical-align: middle; text-align: center; }
-
 .attendance-indicator { display: flex; flex-direction: column; align-items: center; gap: 5px; }
 .attendance-bar { width: 70px; height: 6px; background: #e9ecef; border-radius: 3px; overflow: hidden; }
 .attendance-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-
 .recitation-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 15px;
+    padding: 5px 12px; border-radius: 13px;
     font-size: 0.8rem; margin: 2px;
     background: linear-gradient(135deg, rgba(212,160,48,0.1) 0%, rgba(180,128,44,0.15) 100%);
 }
-
 .assignment-row {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
-    border-radius: 14px; padding: 16px;
+    border-radius: 13px; padding: 16px;
     margin-bottom: 12px; border: 2px solid rgba(24,43,72,0.06);
 }
-
 .agenda-note-card {
     background: linear-gradient(135deg, rgba(212,160,48,0.05) 0%, rgba(180,128,44,0.08) 100%);
-    border-radius: 14px; padding: 16px;
+    border-radius: 13px; padding: 16px;
     margin-bottom: 12px; border: 2px solid rgba(212,160,48,0.1);
 }
-
 .divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
     margin: 25px 0;
 }
-
 .btn-save {
     display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 32px;
+    padding: 14px 16px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    color: #fff; border: none; border-radius: 14px;
+    color: #fff; border: none; border-radius: 13px;
     font-weight: 700; font-size: 15px;
     transition: all 0.3s ease;
     font-family: 'Tajawal', sans-serif;
@@ -247,106 +210,94 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .btn-save i { color: var(--gold); }
 .btn-cancel {
     display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 32px;
+    padding: 14px 16px;
     background: transparent;
-    color: #7f8c8d; border: 2px solid #e9ecef; border-radius: 14px;
+    color: #7f8c8d; border: 2px solid #e9ecef; border-radius: 13px;
     font-weight: 600; font-size: 15px;
     transition: all 0.3s ease;
     text-decoration: none;
     font-family: 'Tajawal', sans-serif;
 }
 .btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
-
 .section-badge {
     background: var(--gold); color: #fff;
-    padding: 4px 12px; border-radius: 15px;
+    padding: 4px 12px; border-radius: 13px;
     font-size: 12px; font-weight: 600;
     margin-right: 10px;
 }
 .status-badge-sm {
-    padding: 5px 12px; border-radius: 15px;
+    padding: 5px 12px; border-radius: 13px;
     font-size: 11px; font-weight: 600;
 }
 .badge-warning { background: rgba(243,156,18,0.15); color: var(--warning); }
 .badge-success { background: rgba(39,174,96,0.15); color: var(--success); }
 .badge-info { background: rgba(52,152,219,0.15); color: var(--info); }
 .badge-danger { background: rgba(192,57,43,0.15); color: var(--danger); }
-
 /* Responsive Styles */
 @media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+.form-section {
+        padding: 16px 15px;
     }
-    .header-content {
-        width: 100%;
-    }
-    .form-section {
-        padding: 20px 15px;
-    }
-    .form-section .section-title {
+.form-section .section-title {
         font-size: 16px;
         margin-bottom: 15px;
         padding-bottom: 10px;
     }
-    .form-grid {
+.form-grid {
         grid-template-columns: 1fr;
     }
-    .supervisor-item {
+.supervisor-item {
         padding: 12px 15px;
     }
-    .supervisor-item .d-flex {
+.supervisor-item .d-flex {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start !important;
     }
-    .supervisor-item .d-flex.gap-2 {
+.supervisor-item .d-flex.gap-2 {
         flex-direction: row;
         flex-wrap: wrap;
     }
-    .btn-add {
+.btn-add {
         padding: 10px 16px;
         font-size: 13px;
     }
-    .btn-save, .btn-cancel {
+.btn-save, .btn-cancel {
         width: 100%;
         justify-content: center;
-        padding: 12px 20px;
+        padding: 12px 16px;
         font-size: 14px;
     }
-    .d-flex.gap-3.justify-content-center.flex-wrap {
+.d-flex.gap-3.justify-content-center.flex-wrap {
         flex-direction: column;
     }
-    .divider {
+.divider {
         margin: 15px 0;
     }
-    .axis-row .row.g-2 {
+.axis-row .row.g-2 {
         flex-direction: column;
     }
-    .axis-row .col-4,
-    .axis-row .col-8 {
+.axis-row .col-4, .axis-row .col-8 {
         max-width: 100%;
         flex: 0 0 100%;
     }
-    .axis-row {
+.axis-row {
         margin-bottom: 15px;
     }
-    .assignment-row .row.g-3 > div {
+.assignment-row .row.g-3 > div {
         margin-bottom: 10px;
     }
-    .assignment-row .row.g-3 {
+.assignment-row .row.g-3 {
         flex-direction: column;
     }
-    .table-responsive {
+.table-responsive {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    .student-table {
+.student-table {
         font-size: 12px;
     }
-    .student-table thead th,
-    .student-table tbody td {
+.student-table thead th, .student-table tbody td {
         padding: 10px 8px;
         white-space: nowrap;
     }
@@ -395,8 +346,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
             </div>
             <div class="row g-4">
                 <div class="col-lg-6">
-                    <h6 class="mb-3" style="color: var(--primary); font-weight: 600;">
-                        <i class="fas fa-user-tie" style="color: var(--gold); margin-left: 8px;"></i>
+                    <h6 class="mb-3" style="color:var(--primary);font-weight:600">
+                        <i class="fas fa-user-tie" style="color:var(--gold);margin-left:8px"></i>
                         المشرفون
                     </h6>
                     <div id="supervisors-list">
@@ -418,12 +369,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                             <i class="fas fa-user-tie"></i>
                                         </div>
                                         <div class="me-3">
-                                            <span class="fw-semibold supervisor-name" style="{{ $isExcluded ? 'text-decoration: line-through; color: #999;' : '' }}">{{ $supervisor->name }}</span>
+                                            <span class="fw-semibold supervisor-name" style="{{ $isexcluded ? 'text-decoration:line-through;color:#999;':'' }}">{{ $supervisor->name }}</span>
                                             <span class="text-muted small d-block supervisor-role">{{ $supervisor->role === 'admin' ? 'مدير' : 'مشرف' }}</span>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <select name="attendees[{{ $supervisor->id }}][is_present]" class="form-select form-select-sm" style="width: 100px;">
+                                        <select name="attendees[{{ $supervisor->id }}][is_present]" class="form-select form-select-sm" style="width:100px">
                                             <option value="1" {{ $isPresent ? 'selected' : '' }}>حاضر</option>
                                             <option value="0" {{ !$isPresent ? 'selected' : '' }}>غائب</option>
                                         </select>
@@ -443,8 +394,8 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 </div>
 
                 <div class="col-lg-6">
-                    <h6 class="mb-3" style="color: var(--primary); font-weight: 600;">
-                        <i class="fas fa-user-plus" style="color: var(--gold); margin-left: 8px;"></i>
+                    <h6 class="mb-3" style="color:var(--primary);font-weight:600">
+                        <i class="fas fa-user-plus" style="color:var(--gold);margin-left:8px"></i>
                         إضافة حضور يدوي
                     </h6>
                     <div id="manual-attendees-container">
@@ -453,7 +404,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <div class="manual-attendee-row">
                             <div class="d-flex gap-2 align-items-center">
                                 <input type="text" name="manual_attendees[{{ $i }}][name]" class="form-control" placeholder="اسم الحضور" value="{{ $attendee['name'] ?? '' }}">
-                                <button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 42px; border-radius: 10px;">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width:42px;border-radius:10px">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -498,7 +449,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="badge-custom agenda-number">{{ $i + 1 }}</span>
                             @if($i >= 6)
-                            <button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius: 8px;">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius:8px">
                                 <i class="fas fa-times"></i>
                             </button>
                             @else
@@ -519,7 +470,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <div class="divider"></div>
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-sync-alt" style="color: var(--warning);"></i>
+                <i class="fas fa-sync-alt" style="color:var(--warning)"></i>
                 <span>التكليفات المتغيرة</span>
                 <span class="section-badge">{{ $changedTasks->count() }}</span>
             </div>
@@ -529,7 +480,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <div class="task-card">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->title }}</span>
+                                <span class="fw-semibold" style="color:var(--primary)">{{ $task->title }}</span>
                                 <span class="text-muted small d-block">
                                     {{ $task->assignee->name ?? '-' }}
                                     @if($task->meetingMinute)
@@ -557,7 +508,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <div class="divider"></div>
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-tasks" style="color: var(--success);"></i>
+                <i class="fas fa-tasks" style="color:var(--success)"></i>
                 <span>متابعة التكليفات</span>
                 <span class="section-badge">{{ $tasksFromAllMeetings->count() }}</span>
             </div>
@@ -567,7 +518,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     <div class="task-card">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->title }}</span>
+                                <span class="fw-semibold" style="color:var(--primary)">{{ $task->title }}</span>
                                 <span class="text-muted small d-block">
                                     {{ $task->assignee->name ?? '-' }}
                                     @if($task->meetingMinute)
@@ -595,7 +546,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-calendar-week" style="color: var(--purple);"></i>
+                <i class="fas fa-calendar-week" style="color:var(--purple)"></i>
                 <span>برنامج الدّوام</span>
             </div>
             <div id="program-axes-body">
@@ -642,14 +593,14 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <div class="divider"></div>
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-user-graduate" style="color: #ec4899;"></i>
+                <i class="fas fa-user-graduate" style="color:#ec4899"></i>
                 <span>ملخص متابعة الطلاب</span>
             </div>
             <div class="table-responsive">
                 <table class="table student-table mb-0">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width: 60px;">#</th>
+                            <th class="text-center" style="width:60px">#</th>
                             <th class="text-center">المشرف</th>
                             <th class="text-center">الطالب</th>
                             <th class="text-center">الحضور</th>
@@ -663,7 +614,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             @foreach($supervisor->students_with_data as $studentIndex => $student)
                             <tr class="student-row">
                                 <td class="text-center align-middle">
-                                    <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--gold); width: 32px; height: 32px; font-size: 13px; font-weight: 700;">{{ $rowIndex }}</span>
+                                    <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);color:var(--gold);width:32px;height:32px;font-size:13px;font-weight:700">{{ $rowIndex }}</span>
                                 </td>
                                 @if($studentIndex == 0)
                                 <td class="text-center align-middle" rowspan="{{ $studentCount }}">
@@ -671,7 +622,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                         <div class="avatar-circle avatar-primary flex-shrink-0">
                                             <i class="fas fa-user-tie"></i>
                                         </div>
-                                        <span class="fw-bold" style="color: var(--primary);">{{ $supervisor->name }}</span>
+                                        <span class="fw-bold" style="color:var(--primary)">{{ $supervisor->name }}</span>
                                     </div>
                                 </td>
                                 @endif
@@ -680,7 +631,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                         <div class="avatar-circle avatar-secondary flex-shrink-0">
                                             <i class="fas fa-user-graduate"></i>
                                         </div>
-                                        <span style="color: var(--primary); font-weight: 600;">{{ $student->user->name ?? '-' }}</span>
+                                        <span style="color:var(--primary);font-weight:600">{{ $student->user->name ?? '-' }}</span>
                                     </div>
                                 </td>
                                 <td class="text-center align-middle">
@@ -691,7 +642,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                             $attendanceRatio = $presentCount . '/' . $totalDays;
                                             $ratioColor = $presentCount == $totalDays ? '#27ae60' : ($presentCount >= ($totalDays / 2) ? '#f39c12' : '#c0392b');
                                         @endphp
-                                        <span class="attendance-ratio-badge d-inline-flex align-items-center justify-content-center rounded-pill" style="background: {{ $ratioColor }}; color: #fff; padding: 6px 16px; font-weight: 700; font-size: 14px;">
+                                        <span class="attendance-ratio-badge d-inline-flex align-items-center justify-content-center rounded-pill" style="background:{{ $ratioColor }};color:#fff;padding:6px 16px;font-weight:700;font-size:14px">
                                             {{ $attendanceRatio }}
                                         </span>
                                     @else
@@ -702,20 +653,20 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     @if($student->last_two_recitations && $student->last_two_recitations->count() > 0)
                                         <div class="recitations-wrapper d-flex flex-column gap-2">
                                             @foreach($student->last_two_recitations as $recitation)
-                                            <div class="recitation-card d-flex align-items-center gap-2" style="background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%); border: 1px solid rgba(24,43,72,0.1); border-radius: 10px; padding: 10px 12px;">
-                                                <span class="recitation-type fw-bold" style="color: var(--primary); font-size: 13px; flex: 1;">{{ $recitation->type_label }}</span>
-                                                <span class="status-indicator d-inline-flex align-items-center gap-2" style="color: {{ $recitation->status_color }}; font-size: 12px; font-weight: 600;">
-                                                    <span style="width: 8px; height: 8px; background: {{ $recitation->status_color }}; border-radius: 50%;"></span>
+                                            <div class="recitation-card d-flex align-items-center gap-2" style="background:linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);border:1px solid rgba(24,43,72,0.1);border-radius:10px;padding:10px 12px">
+                                                <span class="recitation-type fw-bold" style="color:var(--primary);font-size:13px;flex:1">{{ $recitation->type_label }}</span>
+                                                <span class="status-indicator d-inline-flex align-items-center gap-2" style="color:{{ $recitation->status_color }};font-size:12px;font-weight:600">
+                                                    <span style="width:8px;height:8px;background:{{ $recitation->status_color }};border-radius:50%"></span>
                                                     {{ $recitation->status_label }}
                                                 </span>
-                                                <a href="{{ route('admin.sessions.show', $recitation->id) }}" target="_blank" class="view-btn d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 6px; color: #fff; text-decoration: none; transition: all 0.3s ease;">
-                                                    <i class="fas fa-eye" style="font-size: 10px;"></i>
+                                                <a href="{{ route('admin.sessions.show', $recitation->id) }}" target="_blank" class="view-btn d-inline-flex align-items-center justify-content-center" style="width:26px;height:26px;background:linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);border-radius:6px;color:#fff;text-decoration:none;transition:all 0.3s ease">
+                                                    <i class="fas fa-eye" style="font-size:10px"></i>
                                                 </a>
                                             </div>
                                             @endforeach
                                         </div>
                                     @else
-                                        <span class="text-muted" style="font-size: 13px;">—</span>
+                                        <span class="text-muted" style="font-size:13px">—</span>
                                     @endif
                                 </td>
                             </tr>
@@ -732,34 +683,34 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <div class="divider"></div>
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-edit" style="color: var(--warning);"></i>
+                <i class="fas fa-edit" style="color:var(--warning)"></i>
                 <span>تعديل التكليفات القائمة</span>
                 <span class="section-badge">{{ $meetingMinute->tasks->count() }}</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);">
-                            <th class="text-center" style="color: var(--gold); font-weight: 700; padding: 14px 12px;">#</th>
-                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">المشرف</th>
-                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">وصف التكليف</th>
-                            <th style="color: var(--gold); font-weight: 700; padding: 14px 12px;">الحالة</th>
-                            <th class="text-center" style="color: var(--gold); font-weight: 700; padding: 14px 12px;">الحالة الحالية</th>
+                        <tr style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)">
+                            <th class="text-center" style="color:var(--gold);font-weight:700;padding:14px 12px">#</th>
+                            <th style="color:var(--gold);font-weight:700;padding:14px 12px">المشرف</th>
+                            <th style="color:var(--gold);font-weight:700;padding:14px 12px">وصف التكليف</th>
+                            <th style="color:var(--gold);font-weight:700;padding:14px 12px">الحالة</th>
+                            <th class="text-center" style="color:var(--gold);font-weight:700;padding:14px 12px">الحالة الحالية</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($meetingMinute->tasks as $index => $task)
-                        <tr style="border-bottom: 2px solid rgba(24,43,72,0.08);">
-                            <td class="text-center align-middle" style="padding: 12px;">
-                                <span class="fw-bold" style="color: var(--primary); font-size: 16px;">{{ $index + 1 }}</span>
+                        <tr style="border-bottom:2px solid rgba(24,43,72,0.08)">
+                            <td class="text-center align-middle" style="padding:12px">
+                                <span class="fw-bold" style="color:var(--primary);font-size:16px">{{ $index + 1 }}</span>
                             </td>
-                            <td style="padding: 12px;">
-                                <span class="fw-semibold" style="color: var(--primary);">{{ $task->assignee->name ?? '-' }}</span>
+                            <td style="padding:12px">
+                                <span class="fw-semibold" style="color:var(--primary)">{{ $task->assignee->name ?? '-' }}</span>
                             </td>
-                            <td style="padding: 12px;">
+                            <td style="padding:12px">
                                 <input type="text" name="task_titles[{{ $task->id }}]" class="form-control" value="{{ $task->title }}" placeholder="وصف التكليف">
                             </td>
-                            <td style="padding: 12px; min-width: 160px;">
+                            <td style="padding:12px;min-width:160px">
                                 <select name="task_status[{{ $task->id }}]" class="form-select">
                                     <option value="pending" {{ $task->status == 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
                                     <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>قيد التنفيذ</option>
@@ -767,7 +718,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                     <option value="cancelled" {{ $task->status == 'cancelled' ? 'selected' : '' }}>ملغي</option>
                                 </select>
                             </td>
-                            <td class="text-center align-middle" style="padding: 12px;">
+                            <td class="text-center align-middle" style="padding:12px">
                                 <span class="badge badge-{{ $task->status_color }}">{{ $task->status_label }}</span>
                             </td>
                         </tr>
@@ -782,7 +733,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-clipboard-list" style="color: var(--info);"></i>
+                <i class="fas fa-clipboard-list" style="color:var(--info)"></i>
                 <span>التكليفات الجديدة</span>
             </div>
             <div id="assignments-container">
@@ -804,7 +755,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             <input type="text" name="assignments[{{ $i }}][task]" class="form-control" placeholder="وصف التكليف" value="{{ $assignment['task'] ?? '' }}">
                         </div>
                         <div class="col-md-2">
-                            <button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius: 10px;">
+                            <button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius:10px">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -821,7 +772,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
         <div class="form-section">
             <div class="section-title">
-                <i class="fas fa-file-alt" style="color: #06b6d4;"></i>
+                <i class="fas fa-file-alt" style="color:#06b6d4"></i>
                 <span>تفاصيل بنود جدول الأعمال</span>
             </div>
             <div id="agenda-notes-container">
@@ -875,7 +826,7 @@ function addManualAttendee() {
     var html = '<div class="manual-attendee-row">' +
         '<div class="d-flex gap-2 align-items-center">' +
         '<input type="text" name="manual_attendees[' + count + '][name]" class="form-control" placeholder="اسم الحضور">' +
-        '<button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width: 42px; border-radius: 10px;">' +
+        '<button type="button" class="btn btn-outline-danger btn-sm remove-manual-attendee" style="width:42px;border-radius:10px">' +
         '<i class="fas fa-trash-alt"></i>' +
         '</button>' +
         '</div>' +
@@ -891,7 +842,7 @@ function addAgendaItem() {
         '<div class="agenda-card p-3 h-100">' +
         '<div class="d-flex align-items-center justify-content-between mb-3">' +
         '<span class="badge-custom agenda-number">' + (count + 1) + '</span>' +
-        '<button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius: 8px;">' +
+        '<button type="button" class="btn btn-sm btn-outline-danger remove-agenda" style="border-radius:8px">' +
         '<i class="fas fa-times"></i>' +
         '</button>' +
         '</div>' +
@@ -1000,7 +951,7 @@ function addAssignment() {
         '<input type="text" name="assignments[' + count + '][task]" class="form-control" placeholder="وصف التكليف">' +
         '</div>' +
         '<div class="col-md-2">' +
-        '<button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius: 10px;">' +
+        '<button type="button" class="btn btn-outline-danger w-100 remove-assignment" style="border-radius:10px">' +
         '<i class="fas fa-trash-alt"></i>' +
         '</button>' +
         '</div>' +

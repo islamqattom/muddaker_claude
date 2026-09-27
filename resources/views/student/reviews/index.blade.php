@@ -24,9 +24,9 @@
 
 .reviews-page .page-hero {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: 20px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -48,20 +48,21 @@
 }
 
 .reviews-page .hero-icon {
-    width: 56px; height: 56px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 18px rgba(39,174,96,0.35);
+    flex-shrink: 0;
 }
 
-.reviews-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.reviews-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
+.reviews-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.reviews-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 12.5px; margin: 0; }
 
 .reviews-page .stat-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
@@ -70,14 +71,14 @@
 
 .reviews-page .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
-.reviews-page .stat-card-body { padding: 20px; text-align: center; }
+.reviews-page .stat-card-body { padding: 14px; text-align: center; }
 
 .reviews-page .stat-icon {
-    width: 50px; height: 50px;
-    border-radius: 12px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin: 0 auto 12px;
+    font-size: 16px;
+    margin: 0 auto 8px;
 }
 
 .reviews-page .stat-icon.danger { background: linear-gradient(135deg, var(--danger), #e74c3c); color: white; }
@@ -85,14 +86,14 @@
 .reviews-page .stat-icon.success { background: linear-gradient(135deg, var(--success), #2ecc71); color: white; }
 .reviews-page .stat-icon.primary { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold); }
 
-.reviews-page .stat-value { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; }
-.reviews-page .stat-label { font-size: 11px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
+.reviews-page .stat-value { font-size: 22px; font-weight: 800; color: var(--navy); line-height: 1; }
+.reviews-page .stat-label { font-size: 12px; color: #6c7a89; font-weight: 500; margin-top: 4px; text-transform: uppercase; }
 
 .reviews-page .due-card {
     background: linear-gradient(135deg, var(--danger) 0%, #e74c3c 100%);
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 24px;
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 16px;
     position: relative;
     overflow: hidden;
 }
@@ -107,17 +108,17 @@
 }
 
 .reviews-page .due-content { position: relative; z-index: 1; }
-.reviews-page .due-title { color: white; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-.reviews-page .due-subtitle { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 0; }
+.reviews-page .due-title { color: white; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.reviews-page .due-subtitle { color: rgba(255,255,255,0.8); font-size: 12.5px; margin-bottom: 0; }
 
 .reviews-page .btn-start {
     background: white;
     color: var(--danger);
     border: none;
-    border-radius: 12px;
-    padding: 12px 24px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     transition: all 0.2s ease;
     display: flex; align-items: center; gap: 8px;
 }
@@ -126,11 +127,11 @@
 
 .reviews-page .review-card {
     background: white;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     border: 1px solid rgba(24,43,72,0.04);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .reviews-page .review-card.accent-danger { border-right: 4px solid var(--danger); }
@@ -138,20 +139,20 @@
 
 .reviews-page .review-header {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    padding: 16px 24px;
-    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
 }
 
 .reviews-page .review-header.danger { background: linear-gradient(135deg, var(--danger), #e74c3c); }
 .reviews-page .review-header.warning { background: linear-gradient(135deg, var(--warning), #e67e22); }
-.reviews-page .review-header i { color: var(--gold); font-size: 20px; }
+.reviews-page .review-header i { color: var(--gold); font-size: 16px; }
 .reviews-page .review-header.danger i, .reviews-page .review-header.warning i { color: white; }
-.reviews-page .review-header h5 { color: white; font-weight: 700; margin: 0; font-size: 15px; }
+.reviews-page .review-header h5 { color: white; font-weight: 700; margin: 0; font-size: 14px; }
 
 .reviews-page .review-table { width: 100%; border-collapse: collapse; margin: 0; }
 .reviews-page .review-table thead th {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
-    padding: 14px 16px;
+    padding: 11px 14px;
     font-weight: 700;
     font-size: 11px;
     color: var(--navy);
@@ -160,8 +161,8 @@
     letter-spacing: 0.5px;
 }
 .reviews-page .review-table tbody td {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 11px 14px;
+    font-size: 13px;
     color: #5a6c7d;
     border-bottom: 1px solid rgba(24,43,72,0.04);
     vertical-align: middle;
@@ -170,15 +171,15 @@
 .reviews-page .review-table tbody tr:hover { background: linear-gradient(90deg, rgba(243,156,18,0.04) 0%, rgba(24,43,72,0.02) 100%); }
 
 .reviews-page .ease-badge {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     font-weight: 600;
 }
 
 .reviews-page .delete-btn {
-    width: 34px; height: 34px;
-    border-radius: 10px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     border: 1px solid rgba(192,57,43,0.2);
     background: white;
@@ -188,23 +189,24 @@
 
 .reviews-page .delete-btn:hover { background: var(--danger); color: white; }
 
-.reviews-page .empty-state { text-align: center; padding: 80px 20px; }
+.reviews-page .empty-state { text-align: center; padding: 40px 16px; }
 .reviews-page .empty-icon {
-    width: 100px; height: 100px;
+    width: 66px; height: 66px;
     background: linear-gradient(135deg, rgba(24,43,72,0.06), rgba(42,69,112,0.08));
-    border-radius: 24px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
+    margin: 0 auto 14px;
 }
-.reviews-page .empty-icon i { font-size: 40px; color: var(--navy); opacity: 0.4; }
+.reviews-page .empty-icon i { font-size: 26px; color: var(--navy); opacity: 0.4; }
 
 .reviews-page .btn-start-page {
     background: linear-gradient(135deg, var(--navy), var(--navy-light));
     color: white;
     border: none;
-    border-radius: 12px;
-    padding: 12px 24px;
+    border-radius: 9px;
+    padding: 8px 16px;
     font-weight: 600;
+    font-size: 13px;
     transition: all 0.2s ease;
     display: inline-flex; align-items: center; gap: 8px;
 }
@@ -212,7 +214,7 @@
 .reviews-page .btn-start-page:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(24,43,72,0.3); color: white; }
 
 @media (max-width: 992px) {
-    .reviews-page .page-hero { padding: 20px 24px; }
+    .reviews-page .page-hero { padding: 14px 16px; }
     .reviews-page .hero-icon { width: 48px; height: 48px; font-size: 20px; }
     .reviews-page .hero-title { font-size: 18px; }
     .reviews-page .due-card { flex-direction: column; text-align: center; }
@@ -320,7 +322,7 @@
                     @foreach($overdueItems as $item)
                     <tr>
                         <td class="fw-semibold" style="color: var(--navy);">سورة {{ $item->surah }}</td>
-                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
+                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
                         <td><small class="text-muted">{{ $item->last_reviewed_at?->diffForHumans() ?? 'لم تراجع بعد' }}</small></td>
                         <td><span class="ease-badge" style="background: rgba(108,117,125,0.15); color: #6c757d;">{{ $item->repetitions }}</span></td>
                         <td>
@@ -361,7 +363,7 @@
                     @foreach($todayItems as $item)
                     <tr>
                         <td class="fw-semibold" style="color: var(--navy);">سورة {{ $item->surah }}</td>
-                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
+                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
                         <td>
                             @php
                                 $easeColor = $item->ease_factor >= 2.5 ? 'success' : ($item->ease_factor >= 1.8 ? 'warning' : 'danger');
@@ -406,7 +408,7 @@
                     @foreach($upcomingItems->take(10) as $item)
                     <tr>
                         <td class="fw-semibold" style="color: var(--navy);">سورة {{ $item->surah }}</td>
-                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
+                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
                         <td><small>{{ $item->next_review_date?->format('Y-m-d') }}</small></td>
                         <td><span class="ease-badge" style="background: rgba(108,117,125,0.15); color: #6c757d;">{{ $item->repetitions }}</span></td>
                     </tr>
@@ -437,7 +439,7 @@
                     @foreach($futureItems->take(10) as $item)
                     <tr>
                         <td class="fw-semibold" style="color: var(--navy);">سورة {{ $item->surah }}</td>
-                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
+                        <td><span class="verses-badge" style="background: rgba(24,43,72,0.06); padding: 3px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: var(--navy);">{{ $item->verse_start }} - {{ $item->verse_end }}</span></td>
                         <td><small>{{ $item->next_review_date?->format('Y-m-d') }}</small></td>
                         <td><span class="ease-badge" style="background: rgba(108,117,125,0.15); color: #6c757d;">{{ $item->repetitions }}</span></td>
                     </tr>

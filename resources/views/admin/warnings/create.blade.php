@@ -30,49 +30,26 @@
     --bg-main: #f8fafc;
     --card-shadow: 0 4px 25px rgba(24, 43, 72, 0.08);
 }
-
 body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    border-radius: 18px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: var(--gold);
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: var(--primary); font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #6c7a89; font-size: 14px; margin: 0; }
 .header-text p::before { content: '✦'; color: var(--gold); margin-left: 8px; }
-
 .form-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 .form-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 22px 28px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(26,51,86,0.05) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; font-size: 17px; color: var(--primary);
 }
 .form-header i { color: var(--gold); font-size: 20px; }
-.form-body { padding: 25px 28px; }
-
-.form-group { margin-bottom: 20px; }
+.form-body { padding: 16px 16px; }
+.form-group { margin-bottom: 16px; }
 .form-label {
     font-weight: 600; color: #5a6c7d;
     margin-bottom: 10px; display: block;
@@ -96,19 +73,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     border-color: var(--danger);
 }
 .invalid-feedback { color: var(--danger); font-size: 13px; margin-top: 5px; }
-
 .section-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(24,43,72,0.1), transparent);
     margin: 25px 0;
 }
-
 .data-section {
     background: linear-gradient(135deg, rgba(24,43,72,0.03) 0%, rgba(42,69,112,0.05) 100%);
     border: 1px solid rgba(24,43,72,0.08);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
+    border-radius: 13px;
+    padding: 16px;
+    margin-bottom: 16px;
 }
 .data-section-header {
     display: flex; align-items: center; gap: 10px;
@@ -117,7 +92,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-size: 15px;
 }
 .data-section-header i { color: var(--gold); }
-
 .data-table {
     width: 100%; border-collapse: collapse;
 }
@@ -137,20 +111,18 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .data-table tbody tr:hover { background: rgba(212,160,48,0.03); }
 .data-table tbody tr:last-child td { border-bottom: none; }
-
 .btn-fetch {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 20px;
+    padding: 10px 16px;
     background: linear-gradient(135deg, var(--info) 0%, #2980b9 100%);
     color: #fff; border: none; border-radius: 10px;
     font-weight: 600; font-size: 13px;
     transition: all 0.3s ease;
 }
 .btn-fetch:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52,152,219,0.3); }
-
 .sidebar-card {
     background: #fff;
-    border-radius: 20px;
+    border-radius: 13px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(24,43,72,0.05);
     overflow: hidden;
@@ -159,21 +131,20 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .sidebar-header {
     display: flex; align-items: center; gap: 12px;
-    padding: 20px 25px;
+    padding: 16px 16px;
     background: linear-gradient(135deg, rgba(24,43,72,0.05) 0%, rgba(26,51,86,0.08) 100%);
     border-bottom: 1px solid rgba(24,43,72,0.05);
     font-weight: 700; font-size: 17px; color: var(--primary);
 }
 .sidebar-header i { color: var(--gold); font-size: 18px; }
-.sidebar-body { padding: 22px 25px; }
-
+.sidebar-body { padding: 16px 16px; }
 .student-preview {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
     border: 2px solid rgba(24,43,72,0.08);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 13px;
+    padding: 16px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 .student-avatar {
     width: 70px; height: 70px;
@@ -184,8 +155,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     font-size: 28px; color: #fff;
 }
 .student-name { font-size: 17px; font-weight: 700; color: var(--primary); }
-.student-number { font-size: 13px; color: #95a5a6; }
-
 .stat-box {
     background: linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);
     border-radius: 12px;
@@ -195,14 +164,12 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 .stat-box.warning-type { background: rgba(243,156,18,0.1); border: 1px solid rgba(243,156,18,0.2); }
 .stat-box.info-type { background: rgba(52,152,219,0.1); border: 1px solid rgba(52,152,219,0.2); }
-.stat-box .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 5px; }
+.stat-box .stat-value { font-size: 22px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 5px; }
 .stat-box .stat-value.success { color: var(--success); }
 .stat-box .stat-value.danger { color: var(--danger); }
-.stat-box .stat-label { font-size: 12px; color: #6c7a89; }
-
 .action-btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 14px 20px; border-radius: 12px;
+    padding: 14px 16px; border-radius: 12px;
     font-weight: 600; font-size: 14px;
     transition: all 0.3s ease;
     border: none; cursor: pointer;
@@ -220,11 +187,6 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     color: #7f8c8d; border: 2px solid #e9ecef;
 }
 .action-btn.cancel:hover { border-color: var(--danger); color: var(--danger); }
-
-@media (max-width: 992px) {
-    .page-header { flex-direction: column; align-items: flex-start; }
-    .header-content { margin-bottom: 15px; }
-}
 </style>
 
 <form action="{{ route('admin.warnings.store') }}" method="POST" id="warningForm">
@@ -302,9 +264,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                 </div>
             </div>
 
-            <div class="form-card" id="attendanceDataSection" style="display: none;">
+            <div class="form-card" id="attendanceDataSection" style="display:none">
                 <div class="form-header">
-                    <i class="fas fa-calendar-alt" style="color: var(--warning);"></i>
+                    <i class="fas fa-calendar-alt" style="color:var(--warning)"></i>
                     <span>سجل الحضور (اختياري)</span>
                 </div>
                 <div class="form-body">
@@ -319,7 +281,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3" id="attendanceTableContainer" style="display: none;">
+                    <div class="mt-3" id="attendanceTableContainer" style="display:none">
                         <div class="table-responsive">
                             <table class="data-table" id="attendanceTable">
                                 <thead>
@@ -340,15 +302,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
                         </div>
                     </div>
-                    <div class="mt-2" id="noAttendanceMessage" style="display: none;">
+                    <div class="mt-2" id="noAttendanceMessage" style="display:none">
                         <div class="alert alert-info mb-0">لا توجد سجلات حضور للفترة المحددة</div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-card" id="recitationDataSection" style="display: none;">
+            <div class="form-card" id="recitationDataSection" style="display:none">
                 <div class="form-header">
-                    <i class="fas fa-microphone" style="color: var(--info);"></i>
+                    <i class="fas fa-microphone" style="color:var(--info)"></i>
                     <span>سجل التسميع (اختياري)</span>
                 </div>
                 <div class="form-body">
@@ -363,7 +325,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3" id="recitationTableContainer" style="display: none;">
+                    <div class="mt-3" id="recitationTableContainer" style="display:none">
                         <div class="table-responsive">
                             <table class="data-table" id="recitationTable">
                                 <thead>
@@ -385,7 +347,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             يمكنك حذف أي صف غير مرغوب فيه قبل إصدار الإنذار
                         </div>
                     </div>
-                    <div class="mt-2" id="noRecitationMessage" style="display: none;">
+                    <div class="mt-2" id="noRecitationMessage" style="display:none">
                         <div class="alert alert-info mb-0">لا توجد سجلات تسميع للفترة المحددة</div>
                     </div>
                 </div>
@@ -401,9 +363,9 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                         <table class="data-table" id="testTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 45%;">الاختبار</th>
-                                    <th style="width: 45%;">ملاحظات</th>
-                                    <th style="width: 10%;"></th>
+                                    <th style="width:45%">الاختبار</th>
+                                    <th style="width:45%">ملاحظات</th>
+                                    <th style="width:10%"></th>
                                 </tr>
                             </thead>
                             <tbody id="testTableBody"></tbody>
@@ -467,7 +429,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
                         @if($attendanceStats)
                             <div class="stat-box warning-type">
-                                <div class="stat-label" style="color: var(--warning); margin-bottom: 10px;">
+                                <div class="stat-label" style="color:var(--warning);margin-bottom:10px">
                                     <i class="fas fa-calendar-times me-1"></i>إحصائيات الحضور
                                 </div>
                                 <div class="row g-2">
@@ -480,7 +442,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                                         <div class="stat-label">غائب</div>
                                     </div>
                                     <div class="col-6">
-                                        <div class="stat-value" style="color: var(--warning);">{{ $attendanceStats['late'] }}</div>
+                                        <div class="stat-value" style="color:var(--warning)">{{ $attendanceStats['late'] }}</div>
                                         <div class="stat-label">متأخر</div>
                                     </div>
                                     <div class="col-6">
@@ -493,7 +455,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 
                         @if($recitationStats)
                             <div class="stat-box info-type">
-                                <div class="stat-label" style="color: var(--info); margin-bottom: 10px;">
+                                <div class="stat-label" style="color:var(--info);margin-bottom:10px">
                                     <i class="fas fa-microphone me-1"></i>إحصائيات التسميع
                                 </div>
                                 <div class="row g-2">
@@ -513,15 +475,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                             </div>
                         @endif
                     @else
-                        <div style="text-align: center; padding: 30px 0; color: #95a5a6;">
-                            <i class="fas fa-user-graduate fa-2x mb-2 d-block" style="opacity: 0.4;"></i>
+                        <div style="text-align:center;padding:16px 0;color:#95a5a6">
+                            <i class="fas fa-user-graduate fa-2x mb-2 d-block" style="opacity:0.4"></i>
                             <p>اختر طالباً لعرض الإحصائيات</p>
                         </div>
                     @endif
 
                     <div class="section-divider"></div>
 
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display:flex;flex-direction:column;gap:12px">
                         <button type="submit" class="action-btn submit">
                             <i class="fas fa-save"></i>إصدار الإنذار
                         </button>
@@ -543,7 +505,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <td class="att-time"></td>
         <td class="att-notes"></td>
         <td>
-            <button type="button" class="btn btn-sm" style="background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;" onclick="deleteAttendanceRow(__INDEX__)">
+            <button type="button" class="btn btn-sm" style="background:rgba(192,57,43,0.1);color:var(--danger);border-radius:8px" onclick="deleteAttendanceRow(__INDEX__)">
                 <i class="fas fa-trash"></i>
             </button>
         </td>
@@ -559,7 +521,7 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         <td class="rec-passed"></td>
         <td class="rec-failed"></td>
         <td>
-            <button type="button" class="btn btn-sm" style="background: rgba(192,57,43,0.1); color: var(--danger); border-radius: 8px;" onclick="deleteRecitationRow(__INDEX__)">
+            <button type="button" class="btn btn-sm" style="background:rgba(192,57,43,0.1);color:var(--danger);border-radius:8px" onclick="deleteRecitationRow(__INDEX__)">
                 <i class="fas fa-trash"></i>
             </button>
         </td>

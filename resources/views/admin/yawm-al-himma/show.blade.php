@@ -22,22 +22,22 @@
 }
 .yawm-page .hero-section {
     background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-    border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 24px;
+    border-radius: 14px;
+    padding: 16px 22px;
+    margin-bottom: 16px;
     position: relative; overflow: hidden;
 }
-.yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.yawm-page .hero-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .yawm-page .hero-icon {
-    width: 60px; height: 60px;
+    width: 48px; height: 48px;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    border-radius: 14px;
+    border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: white;
+    font-size: 20px; color: white;
     box-shadow: 0 6px 20px rgba(212,160,48,0.35);
     flex-shrink: 0;
 }
-.yawm-page .hero-title { color: white; font-size: 22px; font-weight: 700; margin: 0 0 4px 0; }
+.yawm-page .hero-title { color: white; font-size: 18px; font-weight: 700; margin: 0 0 4px 0; }
 .yawm-page .hero-sub { color: rgba(255,255,255,0.75); font-size: 13px; margin: 0; }
 .yawm-page .hero-actions { margin-right: auto; }
 .yawm-page .btn-ghost {
@@ -47,18 +47,8 @@
     backdrop-filter: blur(4px);
 }
 .yawm-page .btn-ghost:hover { background: rgba(255,255,255,0.25); color: white; }
-
-.yawm-page .filter-card {
-    background: white; border-radius: var(--radius); padding: 18px 20px;
-    box-shadow: var(--shadow-sm); margin-bottom: 18px;
-}
 .yawm-page .filter-card .form-control {
     border: 2px solid #e4eaf2; border-radius: 10px; padding: 8px 12px; font-size: 13px;
-}
-
-.yawm-page .table-card {
-    background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    overflow: hidden;
 }
 .yawm-page .table-card .table { margin: 0; }
 .yawm-page .table-card thead th {
@@ -72,7 +62,6 @@
 }
 .yawm-page .table-card tbody tr:last-child td { border-bottom: none; }
 .yawm-page .table-card tbody tr:hover { background: #fafbfd; }
-
 .yawm-page .badge-soft {
     display: inline-block; padding: 4px 10px; border-radius: 8px;
     font-size: 12px; font-weight: 700;
@@ -81,22 +70,12 @@
 .yawm-page .badge-soft.gold { background: var(--gold-soft); color: var(--navy); }
 .yawm-page .badge-soft.danger { background: #fde8e6; color: var(--danger); }
 .yawm-page .badge-soft.warning { background: #fef5e7; color: #b36b00; }
-
-.yawm-page .action-btn {
-    width: 32px; height: 32px; border-radius: 8px; border: none; color: white;
-    display: inline-flex; align-items: center; justify-content: center;
-    margin: 0 2px; transition: all 0.15s; font-size: 12px;
-}
-.yawm-page .action-btn.view { background: #3498db; }
-.yawm-page .action-btn.delete { background: var(--danger); }
-.yawm-page .action-btn:hover { transform: translateY(-1px); }
-
 .yawm-page .day-summary {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px; margin-bottom: 22px;
+    gap: 12px; margin-bottom: 16px;
 }
 .yawm-page .day-summary-item {
-    background: white; border-radius: var(--radius); padding: 18px;
+    background: white; border-radius: var(--radius); padding: 16px;
     box-shadow: var(--shadow-sm); text-align: center; border: 1px solid rgba(24,43,72,0.05);
 }
 .yawm-page .day-summary-item .icon {
@@ -108,19 +87,14 @@
 .yawm-page .day-summary-item .icon.gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); }
 .yawm-page .day-summary-item .icon.danger { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); }
 .yawm-page .day-summary-item .icon.warning { background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%); }
-.yawm-page .day-summary-item .num { font-size: 24px; font-weight: 800; color: var(--navy); }
+.yawm-page .day-summary-item .num { font-size: 22px; font-weight: 800; color: var(--navy); }
 .yawm-page .day-summary-item .lbl { font-size: 12px; color: #6b7a90; }
 .yawm-page .day-summary-item.danger .num { color: var(--danger); }
 .yawm-page .day-summary-item.warning .num { color: #b36b00; }
-
-.yawm-page .empty-state {
-    text-align: center; padding: 50px 20px; color: #6b7a90;
-}
-.yawm-page .empty-state i { font-size: 50px; margin-bottom: 14px; opacity: 0.3; }
-
+.yawm-page .empty-state i { font-size: 22px; margin-bottom: 14px; opacity: 0.3; }
 .yawm-page .chart-card {
     background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    padding: 22px; margin-bottom: 22px;
+    padding: 16px; margin-bottom: 16px;
 }
 .yawm-page .chart-card .chart-header {
     display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
@@ -155,7 +129,7 @@
 .yawm-page .chart-card .chart-view.active { display: block; }
 .yawm-page .precision-card {
     background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    padding: 22px; margin-bottom: 22px;
+    padding: 16px; margin-bottom: 16px;
 }
 .yawm-page .precision-card .precision-title {
     font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 14px;
@@ -236,12 +210,12 @@
     margin-bottom: 16px; width: 100%; max-width: 320px;
 }
 .yawm-page .grouped-precision-empty {
-    text-align: center; color: #6b7a90; padding: 30px;
+    text-align: center; color: #6b7a90; padding: 40px;
     background: #f8f9fc; border-radius: var(--radius-sm);
 }
 .yawm-page .leaderboard-card {
     background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    padding: 22px; margin-bottom: 22px;
+    padding: 16px; margin-bottom: 16px;
 }
 .yawm-page .leaderboard-card .leaderboard-title {
     font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 14px;
@@ -270,7 +244,7 @@
 }
 .yawm-page .section-toggle {
     background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 14px 16px; margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;
 }
 .yawm-page .section-toggle .btn-toggle {
     border: 1px solid #e4eaf2; background: #f8f9fc; color: #6b7a90;
@@ -364,7 +338,7 @@
                         <th>الأجزاء</th>
                         <th>الأخطاء</th>
                         <th>الترددات</th>
-                        <th style="width: 110px;">إجراءات</th>
+                        <th style="width:110px">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -380,7 +354,7 @@
                         </td>
                         <td>
                             @foreach($session->parts as $p)
-                                <span class="badge-soft navy" style="margin: 1px;">{{ $p }}</span>
+                                <span class="badge-soft navy" style="margin:1px">{{ $p }}</span>
                             @endforeach
                         </td>
                         <td>
@@ -462,7 +436,7 @@
                         @endforelse
                     </select>
                 </div>
-                <div id="groupedPrecisionEmpty" class="grouped-precision-empty" style="display: none;">
+                <div id="groupedPrecisionEmpty" class="grouped-precision-empty" style="display:none">
                     <i class="fas fa-users-slash fa-2x mb-2"></i><br>
                     لا يوجد طلاب كافيين بنفس عدد الأجزاء للمقارنة
                 </div>
@@ -551,7 +525,7 @@
     <div class="modal fade" id="sessionModal{{ $session->id }}" tabindex="-1" aria-labelledby="sessionModalLabel{{ $session->id }}" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: white;">
+                <div class="modal-header" style="background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);color:white">
                     <h5 class="modal-title" id="sessionModalLabel{{ $session->id }}">
                         <i class="fas fa-mosque me-2"></i> تفاصيل الجلسة #{{ $session->id }}
                     </h5>
@@ -579,29 +553,29 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-4">
-                            <div class="p-3 text-center rounded" style="background: #fde8e6;">
+                            <div class="p-3 text-center rounded" style="background:#fde8e6">
                                 <div class="text-muted small">الأخطاء</div>
-                                <div class="fw-bold fs-4" style="color: var(--danger);">{{ $session->total_errors }}</div>
+                                <div class="fw-bold fs-4" style="color:var(--danger)">{{ $session->total_errors }}</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="p-3 text-center rounded" style="background: #fef5e7;">
+                            <div class="p-3 text-center rounded" style="background:#fef5e7">
                                 <div class="text-muted small">الترددات</div>
-                                <div class="fw-bold fs-4" style="color: #b36b00;">{{ $session->total_hesitations }}</div>
+                                <div class="fw-bold fs-4" style="color:#b36b00">{{ $session->total_hesitations }}</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="p-3 text-center rounded" style="background: #f8f9fc;">
+                            <div class="p-3 text-center rounded" style="background:#f8f9fc">
                                 <div class="text-muted small">الصفحات</div>
-                                <div class="fw-bold fs-4" style="color: var(--navy);">{{ count($session->pages_data) }}</div>
+                                <div class="fw-bold fs-4" style="color:var(--navy)">{{ count($session->pages_data) }}</div>
                             </div>
                         </div>
                     </div>
 
                     @foreach($session->parts as $partNumber)
                         @php $partPages = $grouped->get($partNumber, collect()); @endphp
-                        <div class="card mb-3 border-0" style="box-shadow: var(--shadow-sm); border-radius: var(--radius-sm);">
-                            <div class="card-header text-white" style="background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border-radius: var(--radius-sm) var(--radius-sm) 0 0;">
+                        <div class="card mb-3 border-0" style="box-shadow:var(--shadow-sm);border-radius:var(--radius-sm)">
+                            <div class="card-header text-white" style="background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);border-radius:var(--radius-sm) var(--radius-sm) 0 0">
                                 <i class="fas fa-book-open me-2"></i> الجزء {{ $partNumber }}
                                 <span class="float-end opacity-75 small">{{ $partPages->count() }} صفحة</span>
                             </div>
@@ -611,8 +585,8 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="text-center">الصفحة</th>
-                                                <th class="text-center"><i class="fas fa-times-circle" style="color: var(--danger);"></i> الأخطاء</th>
-                                                <th class="text-center"><i class="fas fa-question-circle" style="color: #b36b00;"></i> الترددات</th>
+                                                <th class="text-center"><i class="fas fa-times-circle" style="color:var(--danger)"></i> الأخطاء</th>
+                                                <th class="text-center"><i class="fas fa-question-circle" style="color:#b36b00"></i> الترددات</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -639,8 +613,8 @@
                                                 $partErrors = $partPages->sum(fn($p) => (int)($p['errors'] ?? 0));
                                                 $partHesitations = $partPages->sum(fn($p) => (int)($p['hesitations'] ?? 0));
                                             @endphp
-                                            <tr style="background: var(--gold-soft); font-weight: 700; color: var(--navy);">
-                                                <td class="text-center"><i class="fas fa-calculator me-1" style="color: var(--gold);"></i> مجموع الجزء</td>
+                                            <tr style="background:var(--gold-soft);font-weight:700;color:var(--navy)">
+                                                <td class="text-center"><i class="fas fa-calculator me-1" style="color:var(--gold)"></i> مجموع الجزء</td>
                                                 <td class="text-center"><span class="badge-soft danger">{{ $partErrors }}</span></td>
                                                 <td class="text-center"><span class="badge-soft warning">{{ $partHesitations }}</span></td>
                                             </tr>
@@ -652,9 +626,9 @@
                     @endforeach
 
                     @if($session->notes)
-                    <div class="alert" style="background: var(--gold-soft); color: var(--navy);">
+                    <div class="alert" style="background:var(--gold-soft);color:var(--navy)">
                         <strong><i class="fas fa-sticky-note me-1"></i> الملاحظات:</strong>
-                        <div style="white-space: pre-line;">{{ $session->notes }}</div>
+                        <div style="white-space:pre-line">{{ $session->notes }}</div>
                     </div>
                     @endif
                 </div>

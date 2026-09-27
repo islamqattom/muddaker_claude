@@ -28,60 +28,46 @@
 @push('styles')
 <style>
 .subject-show-page { font-family: 'Tajawal', sans-serif; }
-.page-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-.header-content { display: flex; align-items: center; gap: 20px; flex: 1; }
-.subject-color-badge { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 800; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
+.subject-color-badge { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
 .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.btn { border-radius: 12px; padding: 10px 22px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
-
-.subject-info-card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 4px 20px rgba(24,43,72,0.07); border: 1px solid rgba(24,43,72,0.05); margin-bottom: 20px; }
+.btn { border-radius: 12px; padding: 10px 16px; font-weight: 700; font-family: 'Tajawal', sans-serif; border: none; }
+.subject-info-card { background: #fff; border-radius: 13px; padding: 16px; box-shadow: 0 4px 20px rgba(24,43,72,0.07); border: 1px solid rgba(24,43,72,0.05); margin-bottom: 16px; }
 .subject-info-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed #e9ecef; }
 .subject-meta-info { display: flex; gap: 14px; flex-wrap: wrap; }
-.meta-item { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(24,43,72,0.05); border-radius: 20px; font-size: 13px; color: #182B48; font-weight: 600; }
+.meta-item { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(24,43,72,0.05); border-radius: 13px; font-size: 13px; color: #182B48; font-weight: 600; }
 .meta-item i { color: {{ $subject->color }}; }
 .subject-description { color: #5a6c7d; line-height: 1.8; }
-
-.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
-.stat-card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 2px 12px rgba(24,43,72,0.05); border: 1px solid rgba(24,43,72,0.05); display: flex; align-items: center; gap: 14px; }
-.stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 16px; }
 .stat-icon.total { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); }
 .stat-icon.completed { background: linear-gradient(135deg, #27ae60 0%, #219a52 100%); }
 .stat-icon.pending { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
 .stat-icon.overdue { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
-.stat-info h3 { margin: 0; font-size: 22px; color: #182B48; font-weight: 800; }
+.stat-info h3 { margin: 0; font-size: 18px; color: #182B48; font-weight: 800; }
 .stat-info span { color: #7f8c8d; font-size: 12px; font-weight: 600; }
-
-.progress-section { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(24,43,72,0.05); margin-bottom: 20px; }
+.progress-section { background: #fff; border-radius: 13px; padding: 16px; box-shadow: 0 2px 12px rgba(24,43,72,0.05); margin-bottom: 16px; }
 .progress-label { display: flex; justify-content: space-between; font-weight: 700; color: #182B48; margin-bottom: 8px; }
 .progress { height: 14px; background: rgba(24,43,72,0.06); border-radius: 8px; overflow: hidden; }
 .progress-bar { background: linear-gradient(90deg, {{ $subject->color }} 0%, #B4802C 100%); height: 100%; border-radius: 8px; transition: width 0.4s; }
-
-.filter-bar { background: #fff; padding: 14px 18px; border-radius: 12px; box-shadow: 0 2px 10px rgba(24,43,72,0.05); margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filter-bar { background: #fff; padding: 14px 16px; border-radius: 12px; box-shadow: 0 2px 10px rgba(24,43,72,0.05); margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .filter-bar .form-control, .filter-bar .form-select { border-radius: 10px; border: 1.5px solid #e9ecef; padding: 8px 14px; }
-.filter-bar .btn { padding: 8px 18px; }
-
+.filter-bar .btn { padding: 8px 16px; }
 .lessons-list { display: flex; flex-direction: column; gap: 12px; }
-.lesson-item { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 2px 12px rgba(24,43,72,0.05); border-right: 5px solid #e9ecef; transition: all 0.3s ease; display: flex; gap: 16px; align-items: center; }
+.lesson-item { background: #fff; border-radius: 13px; padding: 16px; box-shadow: 0 2px 12px rgba(24,43,72,0.05); border-right: 5px solid #e9ecef; transition: all 0.3s ease; display: flex; gap: 16px; align-items: center; }
 .lesson-item:hover { box-shadow: 0 6px 20px rgba(24,43,72,0.10); transform: translateX(-2px); }
 .lesson-item.status-pending { border-right-color: #f39c12; }
 .lesson-item.status-completed { border-right-color: #27ae60; }
 .lesson-item.status-cancelled { border-right-color: #7f8c8d; }
 .lesson-item.is-overdue { border-right-color: #c0392b; background: rgba(192,57,43,0.02); }
-
 .lesson-date-block { min-width: 80px; text-align: center; padding: 10px; background: rgba(24,43,72,0.04); border-radius: 10px; }
 .lesson-day { color: #182B48; font-weight: 800; font-size: 14px; }
 .lesson-date-num { color: #182B48; font-weight: 800; font-size: 22px; line-height: 1; margin: 4px 0; }
 .lesson-month { color: #7f8c8d; font-size: 12px; }
-
 .lesson-content { flex: 1; }
 .lesson-title { color: #182B48; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
 .lesson-content-text { color: #5a6c7d; font-size: 13px; line-height: 1.5; margin-bottom: 6px; }
 .lesson-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: #7f8c8d; }
 .lesson-meta span { display: inline-flex; align-items: center; gap: 4px; }
 .lesson-meta i { color: {{ $subject->color }}; }
-
 .lesson-actions { display: flex; gap: 6px; }
 .btn-icon { width: 34px; height: 34px; border-radius: 9px; border: none; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
 .btn-icon:hover { transform: translateY(-2px); color: #fff; }
@@ -90,21 +76,16 @@
 .btn-icon.complete { background: linear-gradient(135deg, #27ae60 0%, #219a52 100%); }
 .btn-icon.undo { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
 .btn-icon.delete { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
-
-.status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 .status-badge.pending { background: rgba(243,156,18,0.12); color: #f39c12; }
 .status-badge.completed { background: rgba(39,174,96,0.12); color: #27ae60; }
 .status-badge.cancelled { background: rgba(127,140,141,0.15); color: #7f8c8d; }
 .status-badge.overdue { background: rgba(192,57,43,0.12); color: #c0392b; }
-
-.empty-state { text-align: center; padding: 50px 20px; background: #fff; border-radius: 18px; box-shadow: 0 4px 20px rgba(24,43,72,0.05); }
-.empty-state i { font-size: 60px; color: rgba(212,160,48,0.4); margin-bottom: 16px; }
-
+.empty-state i { font-size: 22px; color: rgba(212,160,48,0.4); margin-bottom: 16px; }
 @media (max-width: 768px) {
-    .lesson-item { flex-direction: column; align-items: stretch; }
-    .lesson-date-block { display: flex; gap: 8px; align-items: center; justify-content: center; }
-    .header-actions { width: 100%; }
-    .header-actions .btn { flex: 1; }
+.lesson-item { flex-direction: column; align-items: stretch; }
+.lesson-date-block { display: flex; gap: 8px; align-items: center; justify-content: center; }
+.header-actions { width: 100%; }
+.header-actions .btn { flex: 1; }
 }
 </style>
 @endpush
@@ -113,7 +94,7 @@
 <div class="subject-show-page">
     <div class="page-header">
         <div class="header-content">
-            <div class="subject-color-badge" style="background: linear-gradient(135deg, {{ $subject->color }} 0%, #B4802C 100%);">
+            <div class="subject-color-badge" style="background:linear-gradient(135deg, {{ $subject->color }} 0%, #B4802C 100%)">
                 <i class="fas fa-book-open"></i>
             </div>
             <div class="header-text">
@@ -122,16 +103,16 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="{{ route($role . '.subjects.calendar', $subject->id) }}" class="btn btn-primary" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); color: #fff;">
+            <a href="{{ route($role . '.subjects.calendar', $subject->id) }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);color:#fff">
                 <i class="fas fa-calendar-alt ms-1"></i> التقويم
             </a>
-            <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background: #16a085; color: #fff;">
+            <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background:#16a085;color:#fff">
                 <i class="fas fa-file-excel ms-1"></i> تنزيل قالب
             </a>
-            <button type="button" class="btn" style="background: #f39c12; color: #fff;" onclick="document.getElementById('importModal').classList.add('show');document.getElementById('importModal').style.display='block';">
+            <button type="button" class="btn" style="background:#f39c12;color:#fff" onclick="document.getElementById('importModal').classList.add('show');document.getElementById('importModal').style.display='block';">
                 <i class="fas fa-file-upload ms-1"></i> استيراد من Excel
             </button>
-            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background: {{ $subject->color }}; color: #fff;">
+            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background:{{ $subject->color }};color:#fff">
                 <i class="fas fa-plus-circle ms-1"></i> إضافة درس
             </a>
         </div>
@@ -173,16 +154,16 @@
         <div class="progress-section">
             <div class="progress-label">
                 <span>نسبة الإنجاز الكلية</span>
-                <span style="color: {{ $subject->color }};">{{ $progress }}%</span>
+                <span style="color:{{ $subject->color }}">{{ $progress }}%</span>
             </div>
             <div class="progress">
-                <div class="progress-bar" style="width: {{ $progress }}%"></div>
+                <div class="progress-bar" style="width:{{ $progress }}%"></div>
             </div>
         </div>
     @endif
 
     <form method="GET" class="filter-bar">
-        <select name="status" class="form-select" style="max-width: 200px;">
+        <select name="status" class="form-select" style="max-width:200px">
             <option value="all" {{ request('status', 'all') === 'all' ? 'selected' : '' }}>كل الحالات</option>
             <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>قيد الانتظار</option>
             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>منجزة</option>
@@ -190,7 +171,7 @@
         </select>
         <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}" placeholder="من">
         <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}" placeholder="إلى">
-        <button type="submit" class="btn btn-primary" style="background: {{ $subject->color }}; color: #fff;"><i class="fas fa-search"></i> تصفية</button>
+        <button type="submit" class="btn btn-primary" style="background:{{ $subject->color }};color:#fff"><i class="fas fa-search"></i> تصفية</button>
         <a href="{{ route($role . '.subjects.show', $subject->id) }}" class="btn btn-secondary">إعادة</a>
     </form>
 
@@ -252,7 +233,7 @@
             <i class="fas fa-calendar-plus"></i>
             <h5>لا توجد دروس بعد</h5>
             <p>ابدأ بتفريغ الدروس زمنياً لهذه المادة</p>
-            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn mt-3" style="background: {{ $subject->color }}; color: #fff; padding: 10px 24px; border-radius: 12px; font-weight: 700;">
+            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn mt-3" style="background:{{ $subject->color }};color:#fff;padding:10px 16px;border-radius:12px;font-weight:700">
                 <i class="fas fa-plus ms-1"></i> إضافة أول درس
             </a>
         </div>
@@ -305,19 +286,19 @@ function deleteLesson(subjectId, lessonId, name) {
 }
 </script>
 
-<div class="modal fade" id="importModal" tabindex="-1" style="display: none;" aria-hidden="true">
+<div class="modal fade" id="importModal" tabindex="-1" style="display:none" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content" style="border-radius: 16px; border: none;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: #fff; border-radius: 16px 16px 0 0;">
-                <h5 class="modal-title" style="color: #fff; font-weight: 700;"><i class="fas fa-file-excel ms-2"></i> استيراد دروس من ملف Excel</h5>
+        <div class="modal-content" style="border-radius:13px;border:none">
+            <div class="modal-header" style="background:linear-gradient(135deg, #f39c12 0%, #e67e22 100%);color:#fff;border-radius:13px 13px 0 0">
+                <h5 class="modal-title" style="color:#fff;font-weight:700"><i class="fas fa-file-excel ms-2"></i> استيراد دروس من ملف Excel</h5>
                 <button type="button" class="btn-close btn-close-white" onclick="document.getElementById('importModal').classList.remove('show');document.getElementById('importModal').style.display='none';"></button>
             </div>
             <form method="POST" action="{{ route($role . '.lessons.import', $subject->id) }}" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-body" style="padding: 24px;">
-                    <div class="alert" style="background: rgba(212,160,48,0.10); border: 1px dashed #d4a030; border-radius: 12px; padding: 16px; color: #182B48;">
-                        <h6 style="font-weight: 800; margin-bottom: 8px;"><i class="fas fa-info-circle"></i> إرشادات الاستيراد</h6>
-                        <ol style="margin: 0; padding-right: 18px; line-height: 1.9; font-size: 13px;">
+                <div class="modal-body" style="padding:16px">
+                    <div class="alert" style="background:rgba(212,160,48,0.10);border:1px dashed #d4a030;border-radius:12px;padding:16px;color:#182B48">
+                        <h6 style="font-weight:800;margin-bottom:8px"><i class="fas fa-info-circle"></i> إرشادات الاستيراد</h6>
+                        <ol style="margin:0;padding-right:16px;line-height:1.9;font-size:13px">
                             <li>قم بتنزيل القالب أولاً من زر <strong>"تنزيل قالب"</strong>.</li>
                             <li>القالب يحتوي على العناوين التالية: العنوان، المحتوى، التاريخ، وقت البداية، وقت النهاية، الحالة، الملاحظات.</li>
                             <li>الحقل الوحيد الإلزامي هو <strong>العنوان</strong>، البقية اختيارية.</li>
@@ -329,20 +310,20 @@ function deleteLesson(subjectId, lessonId, name) {
                     </div>
 
                     <div class="mt-3">
-                        <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background: #16a085; color: #fff; border-radius: 10px;">
+                        <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background:#16a085;color:#fff;border-radius:10px">
                             <i class="fas fa-download ms-1"></i> تنزيل القالب
                         </a>
                     </div>
 
                     <div class="mt-3">
-                        <label class="form-label" style="color: #182B48; font-weight: 700;">اختر ملف Excel</label>
-                        <input type="file" name="file" accept=".xlsx,.xls,.csv" class="form-control" required style="border: 2px dashed #d4a030; padding: 20px; border-radius: 12px; background: rgba(212,160,48,0.04);">
+                        <label class="form-label" style="color:#182B48;font-weight:700">اختر ملف Excel</label>
+                        <input type="file" name="file" accept=".xlsx,.xls,.csv" class="form-control" required style="border:2px dashed #d4a030;padding:16px;border-radius:12px;background:rgba(212,160,48,0.04)">
                         <small class="form-text text-muted">الصيغ المدعومة: xlsx, xls, csv</small>
                     </div>
                 </div>
-                <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #e9ecef; border-radius: 0 0 16px 16px;">
-                    <button type="button" class="btn" style="background: #f0f4f8; color: #182B48; border-radius: 10px;" onclick="document.getElementById('importModal').classList.remove('show');document.getElementById('importModal').style.display='none';">إلغاء</button>
-                    <button type="submit" class="btn" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: #fff; border-radius: 10px;"><i class="fas fa-upload ms-1"></i> رفع واستيراد</button>
+                <div class="modal-footer" style="background:#f8f9fa;border-top:1px solid #e9ecef;border-radius:0 0 13px 13px">
+                    <button type="button" class="btn" style="background:#f0f4f8;color:#182B48;border-radius:10px" onclick="document.getElementById('importModal').classList.remove('show');document.getElementById('importModal').style.display='none';">إلغاء</button>
+                    <button type="submit" class="btn" style="background:linear-gradient(135deg, #f39c12 0%, #e67e22 100%);color:#fff;border-radius:10px"><i class="fas fa-upload ms-1"></i> رفع واستيراد</button>
                 </div>
             </form>
         </div>
@@ -357,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (data) {
         const errors = JSON.parse(data.dataset.errors);
         if (errors.length > 0) {
-            let html = '<ul style="text-align: right; margin: 0; padding-right: 20px;">';
+            let html = '<ul style="text-align:right;margin:0;padding-right:16px">';
             errors.forEach(e => { html += '<li>' + e + '</li>'; });
             html += '</ul>';
             Swal.fire({

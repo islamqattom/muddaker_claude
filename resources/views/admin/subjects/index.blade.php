@@ -22,52 +22,16 @@
 @push('styles')
 <style>
 .subjects-page { font-family: 'Tajawal', sans-serif; }
-.page-header {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 20px; margin-bottom: 30px; flex-wrap: wrap;
-}
-.header-content { display: flex; align-items: center; gap: 20px; flex: 1; }
-.header-icon {
-    width: 70px; height: 70px;
-    background: linear-gradient(135deg, #182B48 0%, #2A4570 100%);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center;
-    font-size: 30px; color: #d4a030;
-    box-shadow: 0 8px 25px rgba(24,43,72,0.25);
-}
-.header-text h4 { color: #182B48; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.header-text p { color: #7f8c8d; font-size: 14px; margin: 0; }
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-}
-.stat-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(24,43,72,0.06);
-    border: 1px solid rgba(24,43,72,0.05);
-    display: flex; align-items: center; gap: 16px;
-}
-.stat-icon {
-    width: 56px; height: 56px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; color: #fff;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.10);
-}
 .stat-icon.primary { background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); }
 .stat-icon.success { background: linear-gradient(135deg, #27ae60 0%, #219a52 100%); }
 .stat-icon.warning { background: linear-gradient(135deg, #d4a030 0%, #B4802C 100%); }
 .stat-icon.info { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
-.stat-info h3 { margin: 0; font-size: 26px; color: #182B48; font-weight: 800; }
+.stat-info h3 { margin: 0; font-size: 22px; color: #182B48; font-weight: 800; }
 .stat-info span { color: #7f8c8d; font-size: 13px; font-weight: 600; }
-
 .filter-bar {
     background: #fff;
-    padding: 16px 20px;
-    border-radius: 14px;
+    padding: 16px 16px;
+    border-radius: 13px;
     box-shadow: 0 2px 12px rgba(24,43,72,0.05);
     margin-bottom: 16px;
     display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
@@ -79,7 +43,6 @@
 .filter-bar .form-control:focus, .filter-bar .form-select:focus {
     border-color: #d4a030; box-shadow: 0 0 0 3px rgba(212,160,48,0.10);
 }
-
 .subjects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -87,8 +50,8 @@
 }
 .subject-card {
     background: #fff;
-    border-radius: 18px;
-    padding: 22px;
+    border-radius: 13px;
+    padding: 16px;
     box-shadow: 0 4px 20px rgba(24,43,72,0.07);
     border: 1px solid rgba(24,43,72,0.05);
     transition: all 0.3s ease;
@@ -125,13 +88,12 @@
 }
 .meta-pill {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 20px;
+    padding: 5px 12px; border-radius: 13px;
     background: rgba(24,43,72,0.05);
     color: #182B48;
     font-size: 12px; font-weight: 600;
 }
 .meta-pill i { color: #d4a030; font-size: 11px; }
-
 .progress-wrap {
     margin: 14px 0;
 }
@@ -150,7 +112,6 @@
     transition: width 0.4s ease;
 }
 .progress-bar.completed { background: linear-gradient(90deg, #27ae60 0%, #219a52 100%); }
-
 .subject-footer {
     display: flex; justify-content: space-between; align-items: center;
     padding-top: 14px;
@@ -162,7 +123,6 @@
     display: flex; align-items: center; gap: 6px;
 }
 .subject-creator i { color: #d4a030; }
-
 .subject-actions {
     display: flex; gap: 6px;
 }
@@ -181,34 +141,15 @@
 .btn-icon.calendar { background: linear-gradient(135deg, #d4a030 0%, #B4802C 100%); }
 .btn-icon.edit { background: linear-gradient(135deg, #8e44ad 0%, #732d91 100%); }
 .btn-icon.delete { background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); }
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 20px rgba(24,43,72,0.05);
-}
 .empty-state i {
-    font-size: 60px; color: rgba(212,160,48,0.4);
+    font-size: 22px; color: rgba(212,160,48,0.4);
     margin-bottom: 16px;
-}
-.empty-state h5 { color: #182B48; font-weight: 700; }
-.empty-state p { color: #7f8c8d; }
-
-.status-badge {
-    position: absolute; top: 14px; left: 14px;
-    padding: 4px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 700;
 }
 .status-badge.active { background: rgba(39,174,96,0.12); color: #27ae60; }
 .status-badge.inactive { background: rgba(127,140,141,0.15); color: #7f8c8d; }
 .status-badge.overdue { background: rgba(192,57,43,0.12); color: #c0392b; }
-
 @media (max-width: 768px) {
-    .header-icon { width: 60px; height: 60px; font-size: 26px; }
-    .header-text h4 { font-size: 20px; }
-    .subjects-grid { grid-template-columns: 1fr; }
+.subjects-grid { grid-template-columns: 1fr; }
 }
 </style>
 @endpush
@@ -225,7 +166,7 @@
                 <p>إدارة المواد وتفريغ الدروس زمنياً ومتابعة إتمامها</p>
             </div>
         </div>
-        <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); border: none; border-radius: 12px; padding: 10px 22px; font-weight: 700;">
+        <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);border:none;border-radius:12px;padding:16px 22px;font-weight:700">
             <i class="fas fa-plus-circle ms-1"></i> إضافة مادة جديدة
         </a>
     </div>
@@ -276,10 +217,10 @@
             @endforeach
         </select>
         @endif
-        <button type="submit" class="btn btn-primary" style="background: #d4a030; border: none; border-radius: 10px; padding: 8px 20px; font-weight: 700;">
+        <button type="submit" class="btn btn-primary" style="background:#d4a030;border:none;border-radius:10px;padding:8px 16px;font-weight:700">
             <i class="fas fa-search"></i> بحث
         </button>
-        <a href="{{ route($role . '.subjects.index') }}" class="btn btn-secondary" style="border-radius: 10px; padding: 8px 18px;">إعادة تعيين</a>
+        <a href="{{ route($role . '.subjects.index') }}" class="btn btn-secondary" style="border-radius:10px;padding:8px 16px">إعادة تعيين</a>
     </form>
 
     @if($subjects->count() > 0)
@@ -291,19 +232,19 @@
                     $pending = $subject->pending_lessons_count ?? 0;
                     $progress = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
                 @endphp
-                <div class="subject-card" style="--subject-color: {{ $subject->color }};">
+                <div class="subject-card" style="--subject-color:{{ $subject->color }}">
                     <span class="status-badge {{ $subject->is_active ? 'active' : 'inactive' }}">
                         <i class="fas fa-{{ $subject->is_active ? 'check' : 'pause' }}"></i>
                         {{ $subject->is_active ? 'نشطة' : 'غير نشطة' }}
                     </span>
                     @if($pending > 0 && \App\Models\Lesson::where('subject_id', $subject->id)->where('status', 'pending')->where('lesson_date', '<', now()->toDateString())->exists())
-                        <span class="status-badge overdue" style="left: 100px;">
+                        <span class="status-badge overdue" style="left:100px">
                             <i class="fas fa-exclamation"></i> متأخرة
                         </span>
                     @endif
 
                     <div class="subject-header">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: {{ $subject->color }}20; color: {{ $subject->color }}; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        <div style="width:38px;height:38px;border-radius:10px;background:{{ $subject->color }}20;color:{{ $subject->color }};display:flex;align-items:center;justify-content:center;font-size:16px">
                             <i class="fas fa-book-open"></i>
                         </div>
                     </div>
@@ -317,10 +258,10 @@
                         <span class="meta-pill">
                             <i class="fas fa-list"></i> {{ $total }} درس
                         </span>
-                        <span class="meta-pill" style="background: rgba(39,174,96,0.10); color: #27ae60;">
+                        <span class="meta-pill" style="background:rgba(39,174,96,0.10);color:#27ae60">
                             <i class="fas fa-check"></i> {{ $completed }} تم
                         </span>
-                        <span class="meta-pill" style="background: rgba(243,156,18,0.10); color: #f39c12;">
+                        <span class="meta-pill" style="background:rgba(243,156,18,0.10);color:#f39c12">
                             <i class="fas fa-clock"></i> {{ $pending }} قادم
                         </span>
                     </div>
@@ -328,10 +269,10 @@
                     <div class="progress-wrap">
                         <div class="progress-label">
                             <span>نسبة الإنجاز</span>
-                            <span style="color: #182B48; font-weight: 800;">{{ $progress }}%</span>
+                            <span style="color:#182B48;font-weight:800">{{ $progress }}%</span>
                         </div>
                         <div class="progress">
-                            <div class="progress-bar {{ $progress === 100 ? 'completed' : '' }}" style="width: {{ $progress }}%"></div>
+                            <div class="progress-bar {{ $progress === 100 ? 'completed' : '' }}" style="width:{{ $progress }}%"></div>
                         </div>
                     </div>
 
@@ -359,7 +300,7 @@
             <i class="fas fa-book-open"></i>
             <h5>لا توجد مواد دراسية بعد</h5>
             <p>ابدأ بإضافة أول مادة دراسية لتفريغ دروسها ومتابعتها زمنياً</p>
-            <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary mt-3" style="background: linear-gradient(135deg, #182B48 0%, #2A4570 100%); border: none; border-radius: 10px; padding: 8px 22px;">
+            <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary mt-3" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);border:none;border-radius:10px;padding:16px 22px">
                 <i class="fas fa-plus ms-1"></i> إضافة أول مادة
             </a>
         </div>

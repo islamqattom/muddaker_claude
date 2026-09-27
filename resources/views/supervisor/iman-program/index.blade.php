@@ -62,51 +62,51 @@
     $progressPercent = $stats['week_total'] > 0 ? round(($stats['week_completed'] / $stats['week_total']) * 100) : 0;
 @endphp
 
-<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:16px;padding:24px 30px;margin-bottom:24px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
-    <div style="width:60px;height:60px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;">
+<div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:14px;padding:16px 22px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;">
         <i class="fas fa-star-and-crescent"></i>
     </div>
     <div>
-        <h1 style="margin:0;font-size:22px;font-weight:700;">{{ $scope === 'self' ? 'برنامجي الإيماني' : 'البرنامج الإيماني للطلاب' }}</h1>
-        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:13px;">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'اختر طالباً لإضافة/متابعة برنامجه الإيماني' }}</p>
+        <h1 style="margin:0;font-size:18px;font-weight:700;">{{ $scope === 'self' ? 'برنامجي الإيماني' : 'البرنامج الإيماني للطلاب' }}</h1>
+        <p style="margin:0;color:rgba(255,255,255,0.8);font-size:12.5px;">{{ $scope === 'self' ? 'حدد معاييرك الشخصية وتابع التزامك اليومي' : 'اختر طالباً لإضافة/متابعة برنامجه الإيماني' }}</p>
     </div>
     @if($scope === 'self' || $student)
         <div style="margin-right:auto;display:flex;gap:10px;flex-wrap:wrap;">
             @if($scope === 'student' && $student)
                 <a href="{{ route('supervisor.iman-program.student-report', $student->id) }}"
-                   style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                   style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                     <i class="fas fa-chart-pie"></i> تقرير الطالب
                 </a>
             @endif
             <a href="{{ $scope === 'self' ? route('supervisor.iman-program.create', ['scope' => 'self']) : route('supervisor.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
-               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:10px 22px;border-radius:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+               style="background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;border:none;padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
                 <i class="fas fa-plus-circle"></i> برنامج جديد
             </a>
         </div>
     @endif
 </div>
 
-<div style="background:#fff;border-radius:16px;padding:14px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;">
+<div style="background:#fff;border-radius:13px;padding:12px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
     <a href="{{ route('supervisor.iman-program.index', ['scope' => 'self']) }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'self' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+       style="padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'self' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user"></i> برنامجي الشخصي
     </a>
     <a href="{{ route('supervisor.iman-program.index', ['scope' => 'student']) }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
+       style="padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;{{ $scope === 'student' ? 'background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;' : 'background:#f0f4f8;color:#182B48;' }}">
         <i class="fas fa-user-graduate"></i> برامج الطلاب
     </a>
     <a href="{{ route('supervisor.iman-program.reports.students') }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
+       style="padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
         <i class="fas fa-chart-column"></i> تقرير الطلاب
     </a>
     <a href="{{ route('supervisor.iman-program.reports.self') }}"
-       style="padding:10px 20px;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
+       style="padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;background:#f0f4f8;color:#182B48;">
         <i class="fas fa-user-check"></i> تقريري
     </a>
 </div>
 
 @if($scope === 'student')
-    <div style="background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px;">
         <form method="GET" action="{{ route('supervisor.iman-program.index') }}" class="row g-3 align-items-end">
             <input type="hidden" name="scope" value="student">
             <div class="col-md-7">
@@ -130,7 +130,7 @@
         </form>
     </div>
 @else
-    <div style="background:#fff;border-radius:16px;padding:18px 22px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:20px;">
+    <div style="background:#fff;border-radius:13px;padding:16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);margin-bottom:16px;">
         <form method="GET" action="{{ route('supervisor.iman-program.index') }}" class="row g-3 align-items-end">
             <input type="hidden" name="scope" value="self">
             <div class="col-md-9">
@@ -145,21 +145,21 @@
 @endif
 
 @if($scope === 'self' || $student)
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-bookmark"></i></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px;">
+        <div style="background:#fff;border-radius:13px;padding:14px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#182B48,#2A4570);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;"><i class="fas fa-bookmark"></i></div>
             <div><div style="font-size:12px;color:#6b7a90;">البرامج</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['programs_count'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-list-check"></i></div>
+        <div style="background:#fff;border-radius:13px;padding:14px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#d4a030,#e6b84d);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;"><i class="fas fa-list-check"></i></div>
             <div><div style="font-size:12px;color:#6b7a90;">المعايير</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['criteria_count'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-circle-check"></i></div>
+        <div style="background:#fff;border-radius:13px;padding:14px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;"><i class="fas fa-circle-check"></i></div>
             <div><div style="font-size:12px;color:#6b7a90;">منجز هذا الأسبوع</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $stats['week_completed'] }} / {{ $stats['week_total'] }}</div></div>
         </div>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
-            <div style="width:50px;height:50px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;"><i class="fas fa-chart-pie"></i></div>
+        <div style="background:#fff;border-radius:13px;padding:14px 16px;box-shadow:0 2px 10px rgba(24,43,72,0.05);display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#3498db,#5dade2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;"><i class="fas fa-chart-pie"></i></div>
             <div><div style="font-size:12px;color:#6b7a90;">نسبة الإنجاز</div><div style="font-size:22px;font-weight:800;color:#182B48;">{{ $progressPercent }}%</div></div>
         </div>
     </div>
@@ -169,8 +169,8 @@
 @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
 @if($scope === 'student' && !$student)
-    <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-        <i class="fas fa-user-graduate" style="font-size:50px;opacity:0.3;"></i>
+    <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
+        <i class="fas fa-user-graduate" style="font-size:40px;opacity:0.3;"></i>
         <h5 style="color:#182B48;margin-top:14px;">اختر طالباً للبدء</h5>
         <p>قم باختيار طالب من القائمة أعلاه لإضافة/متابعة برنامجه الإيماني.</p>
     </div>
@@ -189,11 +189,11 @@
             :can-edit="true"
             :show-save-button="true" />
     @empty
-        <div style="background:#fff;border-radius:16px;padding:60px 20px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
-            <i class="fas fa-star-and-crescent" style="font-size:50px;opacity:0.3;"></i>
+        <div style="background:#fff;border-radius:13px;padding:40px 16px;text-align:center;color:#6b7a90;box-shadow:0 2px 10px rgba(24,43,72,0.05);">
+            <i class="fas fa-star-and-crescent" style="font-size:40px;opacity:0.3;"></i>
             <h5 style="color:#182B48;margin-top:14px;">{{ $scope === 'self' ? 'لا توجد برامج شخصية بعد' : 'لا توجد برامج إيمانية لهذا الطالب' }}</h5>
             <a href="{{ $scope === 'self' ? route('supervisor.iman-program.create', ['scope' => 'self']) : route('supervisor.iman-program.create', ['scope' => 'student', 'student_id' => $student->id]) }}"
-               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:12px 24px;border-radius:12px;font-weight:700;text-decoration:none;">
+               style="display:inline-block;margin-top:14px;background:linear-gradient(135deg,#d4a030,#e6b84d);color:#fff;padding:8px 16px;border-radius:9px;font-weight:700;text-decoration:none;">
                 <i class="fas fa-plus-circle"></i> {{ $scope === 'self' ? 'أنشئ برنامجك الشخصي' : 'أنشئ أول برنامج للطالب' }}
             </a>
         </div>
