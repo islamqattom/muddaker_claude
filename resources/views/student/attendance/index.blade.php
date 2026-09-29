@@ -116,7 +116,6 @@
 </div>
 
 <style>
-/* Shared listing styles live in public/css/page.css */
 
 .header-stats { display: flex; gap: 8px; flex-wrap: wrap; }
 .stat-pill.success { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }

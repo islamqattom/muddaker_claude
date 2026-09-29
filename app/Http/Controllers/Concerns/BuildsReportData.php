@@ -33,9 +33,15 @@ trait BuildsReportData
 
     protected function buildRecitationData(Request $request, ?int $supervisorId): array
     {
-        $query       = $this->reports->recitationQuery($request, $supervisorId);
-        $sessions    = (clone $query)->latest('session_date')->paginate(20)->withQueryString();
-        $allSessions = (clone $query)->get();
+        // Full set keeps the "لم يسمع" markers so the student summary can
+        // count the days a student did not recite.
+        $fullSessions = $this->reports->recitationQuery($request, $supervisorId)->get();
+
+        // Genuine recitation sessions only, used by the KPI, results table,
+        // charts and exports so every "session" number agrees.
+        $actualQuery = $this->reports->recitationQuery($request, $supervisorId, true);
+        $sessions    = (clone $actualQuery)->latest('session_date')->paginate(20)->withQueryString();
+        $allSessions = (clone $actualQuery)->get();
         [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
 
         return array_merge([
@@ -45,7 +51,7 @@ trait BuildsReportData
             'trend'             => $this->reports->recitationDailyTrend($allSessions),
             'top'               => $this->reports->topStudents($allSessions, 5),
             'typeDistribution'  => $this->reports->typeDistribution($allSessions),
-            'summary'           => $this->reports->studentSummary($allSessions),
+            'summary'           => $this->reports->studentSummary($fullSessions, null, $fromDate, $toDate),
             'prevStats'         => $this->previousStats($request, $fromDate, $toDate, $supervisorId, 'recitation'),
             'fromDate'          => $fromDate,
             'toDate'            => $toDate,
@@ -66,7 +72,7 @@ trait BuildsReportData
             'stats'              => $this->reports->attendanceStats($allAttendances),
             'trend'              => $this->reports->attendanceDailyTrend($allAttendances),
             'statusDistribution' => $this->attendanceStatusDistribution($allAttendances),
-            'summary'            => $this->reports->studentSummary(collect(), $allAttendances),
+            'summary'            => $this->reports->studentSummary(collect(), $allAttendances, $fromDate, $toDate),
             'prevStats'          => $this->previousStats($request, $fromDate, $toDate, $supervisorId, 'attendance'),
             'fromDate'           => $fromDate,
             'toDate'             => $toDate,
@@ -106,8 +112,13 @@ trait BuildsReportData
         $recQuery = $this->reports->recitationQuery($request, $supervisorId);
         $attQuery = $this->reports->attendanceQuery($request, $supervisorId);
 
-        $allSessions    = (clone $recQuery)->orderBy('session_date')->get();
+        $fullSessions   = (clone $recQuery)->orderBy('session_date')->get();
         $allAttendances = (clone $attQuery)->orderBy('date')->get();
+
+        // Genuine sessions only for the KPIs/charts/exports; the written
+        // breakdown and summary still use the full set so "لم يسمع" days are
+        // reported separately.
+        $allSessions = $this->reports->actualRecitationSessions($fullSessions);
 
         return [
             'allSessions'        => $allSessions,
@@ -117,10 +128,10 @@ trait BuildsReportData
             'recTrend'           => $this->reports->recitationMonthlyTrend($allSessions),
             'attTrend'           => $this->reports->attendanceMonthlyTrend($allAttendances),
             'top'                => $this->reports->topStudents($allSessions, 5),
-            'breakdown'          => $this->reports->studentBreakdown($allSessions, $allAttendances, $toDate),
+            'breakdown'          => $this->reports->studentBreakdown($fullSessions, $allAttendances, $toDate, $fromDate),
             'typeDistribution'   => $this->reports->typeDistribution($allSessions),
             'statusDistribution' => $this->attendanceStatusDistribution($allAttendances),
-            'summary'            => $this->reports->studentSummary($allSessions, $allAttendances),
+            'summary'            => $this->reports->studentSummary($fullSessions, $allAttendances, $fromDate, $toDate),
             'prevStats'          => [
                 'rec' => $this->previousStats($request, $fromDate, $toDate, $supervisorId, 'recitation'),
                 'att' => $this->previousStats($request, $fromDate, $toDate, $supervisorId, 'attendance'),

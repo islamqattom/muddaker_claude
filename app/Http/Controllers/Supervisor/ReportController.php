@@ -31,8 +31,10 @@ class ReportController extends Controller
         $monthStart = Carbon::now()->startOfMonth();
         $monthEnd = Carbon::now()->endOfMonth();
 
-        $monthSessions = RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
-            ->whereBetween('session_date', [$monthStart, $monthEnd])->get();
+        $monthSessions = $this->reports->actualRecitationSessions(
+            RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
+                ->whereBetween('session_date', [$monthStart, $monthEnd])->get()
+        );
         $monthStats = $this->reports->recitationStats($monthSessions);
         $monthTrend = $this->reports->recitationDailyTrend($monthSessions);
         $topStudents = $this->reports->topStudents($monthSessions, 5);
@@ -44,7 +46,10 @@ class ReportController extends Controller
 
         $stats = [
             'total_students' => $students->count(),
-            'total_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->count(),
+            'total_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
+                ->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
+                ->where('status', '!=', RecitationSession::STATUS_NOT_RECITE)
+                ->count(),
             'passed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->where('status', 'passed')->count(),
             'failed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count(),
             'avg_score' => round((float) RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereNotNull('final_score')->avg('final_score') ?? 0, 1),
@@ -117,11 +122,13 @@ class ReportController extends Controller
 
         $student->load(['user', 'level', 'supervisor']);
 
-        $sessions = RecitationSession::where('student_id', $student->id)
-            ->with(['part', 'pages'])
-            ->whereBetween('session_date', [$fromDate, $toDate])
-            ->orderBy('session_date', 'desc')
-            ->get();
+        $sessions = $this->reports->actualRecitationSessions(
+            RecitationSession::where('student_id', $student->id)
+                ->with(['part', 'pages'])
+                ->whereBetween('session_date', [$fromDate, $toDate])
+                ->orderBy('session_date', 'desc')
+                ->get()
+        );
 
         $attendances = Attendance::where('student_id', $student->id)
             ->whereBetween('date', [$fromDate, $toDate])
@@ -130,13 +137,14 @@ class ReportController extends Controller
 
         $sessionStats = $this->reports->recitationStats($sessions);
         $attendanceStats = $this->reports->attendanceStats($attendances);
+        $dayStats = $this->reports->studentDayStats($sessions, $attendances, $fromDate, $toDate);
 
         if ($request->export === 'pdf') {
-            return $this->exporter->exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate);
+            return $this->exporter->exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate, $dayStats);
         }
 
         return view('supervisor.reports.student', compact(
-            'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'fromDate', 'toDate'
+            'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'dayStats', 'fromDate', 'toDate'
         ));
     }
 }

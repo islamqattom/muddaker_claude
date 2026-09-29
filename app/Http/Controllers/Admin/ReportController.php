@@ -35,7 +35,9 @@ class ReportController extends Controller
         $request->merge(['period' => $request->period ?? ReportService::PERIOD_MONTH]);
         [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
 
-        $sessions    = $this->reports->recitationQuery($request)->get();
+        $sessions    = $this->reports->actualRecitationSessions(
+            $this->reports->recitationQuery($request)->get()
+        );
         $attendances = $this->reports->attendanceQuery($request)->get();
 
         $stats       = $this->reports->recitationStats($sessions);
@@ -142,7 +144,7 @@ class ReportController extends Controller
             $sessions    = $sessionsQuery->get();
             $attendances = $attendanceQuery->get();
 
-            $breakdown = $this->reports->studentBreakdown($sessions, $attendances, $toDate);
+            $breakdown = $this->reports->studentBreakdown($sessions, $attendances, $toDate, $fromDate);
             $recStats  = $this->reports->recitationStats($sessions);
             $attStats  = $this->reports->attendanceStats($attendances);
         }
@@ -174,11 +176,13 @@ class ReportController extends Controller
 
         $student->load(['user', 'level', 'supervisor']);
 
-        $sessions = RecitationSession::where('student_id', $student->id)
-            ->with(['part', 'pages'])
-            ->whereBetween('session_date', [$fromDate, $toDate])
-            ->orderBy('session_date', 'desc')
-            ->get();
+        $sessions = $this->reports->actualRecitationSessions(
+            RecitationSession::where('student_id', $student->id)
+                ->with(['part', 'pages'])
+                ->whereBetween('session_date', [$fromDate, $toDate])
+                ->orderBy('session_date', 'desc')
+                ->get()
+        );
 
         $attendances = Attendance::where('student_id', $student->id)
             ->whereBetween('date', [$fromDate, $toDate])
@@ -187,13 +191,14 @@ class ReportController extends Controller
 
         $sessionStats    = $this->reports->recitationStats($sessions);
         $attendanceStats = $this->reports->attendanceStats($attendances);
+        $dayStats        = $this->reports->studentDayStats($sessions, $attendances, $fromDate, $toDate);
 
         if ($request->export === 'pdf') {
-            return $this->exporter->exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate);
+            return $this->exporter->exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate, $dayStats);
         }
 
         return view('admin.reports.student', compact(
-            'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'fromDate', 'toDate'
+            'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'dayStats', 'fromDate', 'toDate'
         ));
     }
 }

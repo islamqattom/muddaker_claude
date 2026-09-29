@@ -21,7 +21,7 @@
                         </div>
                         <div class="rpt-written-lines" style="display:flex; flex-direction:column; gap:4px; padding-right:22px; color:#182B48; font-size:14px; line-height:1.8;">
                             <div>1- العدد الكلي للجلسات: <strong style="color:#182B48;">{{ $row['att_total'] ?? 0 }}</strong></div>
-                            <div>2- عدد أيام الحضور: <strong style="color:#27ae60;">{{ $row['att_present'] ?? 0 }}</strong></div>
+                            <div>2- عدد أيام الحضور: <strong style="color:#27ae60;">{{ $row['att_days'] ?? 0 }}</strong>@if(!is_null($row['att_days_total'] ?? null)) من <strong style="color:#182B48;">{{ $row['att_days_total'] }}</strong>@endif</div>
                             <div>3- عدد أيام الغياب: <strong style="color:#c0392b;">{{ $row['att_absent'] ?? 0 }}</strong></div>
                             <div>4- عدد أيام التأخير: <strong style="color:#d97706;">{{ $row['att_late'] ?? 0 }}</strong></div>
                             <div>5- عدد أيام الغياب بعذر: <strong style="color:#3498db;">{{ $row['att_excused'] ?? 0 }}</strong></div>
@@ -30,10 +30,11 @@
                     <div>
                         <div style="margin-bottom: 4px;">
                             <i class="fas fa-user-slash" style="color:#6c757d;"></i>
-                            <strong>عدم التسميع:</strong>
+                            <strong>التسميع:</strong>
                         </div>
                         <div class="rpt-written-lines" style="display:flex; flex-direction:column; gap:4px; padding-right:22px; color:#182B48; font-size:14px; line-height:1.8;">
-                            <div>عدد الأيام التي لم يسمع بها: <strong style="color:#6c757d;">{{ $row['not_recite_days'] ?? 0 }}</strong></div>
+                            <div>1- عدد أيام التسميع: <strong style="color:#16a085;">{{ $row['rec_days'] ?? 0 }}</strong>@if(!is_null($row['rec_days_total'] ?? null)) من <strong style="color:#182B48;">{{ $row['rec_days_total'] }}</strong>@endif</div>
+                            <div>2- عدد الأيام التي لم يسمع بها: <strong style="color:#6c757d;">{{ $row['not_recite_days'] ?? 0 }}</strong></div>
                         </div>
                     </div>
                     <div>

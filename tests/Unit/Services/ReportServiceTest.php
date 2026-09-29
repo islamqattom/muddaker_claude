@@ -300,6 +300,92 @@ class ReportServiceTest extends TestCase
         $this->assertSame(1, $row['sessions_without_not_recite']);
     }
 
+    public function test_configured_day_ranges_return_null_for_open_ended_period(): void
+    {
+        $this->assertNull($this->svc->workDaysInRange(null, null));
+        $this->assertNull($this->svc->recitationDaysInRange(null, null));
+    }
+
+    public function test_recitation_stats_excludes_not_recite_from_total(): void
+    {
+        $sessions = collect([
+            $this->session(['status' => 'passed']),
+            $this->session(['type' => 'not_recitate', 'status' => 'not_recitate']),
+            $this->session(['status' => 'in_progress']),
+        ]);
+
+        $stats = $this->svc->recitationStats($sessions);
+
+        // The "لم يسمع" marker is not a session; in-progress still counts.
+        $this->assertSame(2, $stats['total']);
+        $this->assertSame(1, $stats['in_progress']);
+        $this->assertSame(1, $stats['passed']);
+    }
+
+    public function test_student_summary_counts_in_progress_but_not_not_recite(): void
+    {
+        $sessions = collect([
+            $this->session(['student_id' => 1, 'status' => 'passed']),
+            $this->session(['student_id' => 1, 'status' => 'in_progress']),
+            $this->session(['student_id' => 1, 'type' => 'not_recitate', 'status' => 'not_recitate', 'session_date' => Carbon::create(2026, 1, 5)]),
+        ]);
+
+        $summary = $this->svc->studentSummary($sessions);
+
+        $this->assertCount(1, $summary);
+        // passed + in-progress count; the "لم يسمع" marker does not.
+        $this->assertSame(2, $summary[0]['sessions']);
+        $this->assertSame(1, $summary[0]['not_recite_days']);
+    }
+
+    public function test_student_summary_reports_incomplete_and_failed_days(): void
+    {
+        $sessions = collect([
+            $this->session(['student_id' => 1, 'status' => 'passed']),
+            $this->session(['student_id' => 1, 'status' => 'incomplete']),
+            $this->session(['student_id' => 1, 'status' => 'failed', 'session_date' => Carbon::create(2026, 1, 10)]),
+            $this->session(['student_id' => 1, 'status' => 'failed_continued', 'session_date' => Carbon::create(2026, 1, 10)]),
+            $this->session(['student_id' => 1, 'status' => 'failed', 'session_date' => Carbon::create(2026, 1, 11)]),
+        ]);
+
+        $summary = $this->svc->studentSummary($sessions);
+
+        $this->assertCount(1, $summary);
+        // Only the explicit incomplete status counts here.
+        $this->assertSame(1, $summary[0]['incomplete']);
+        // Distinct days with a failing session (Jan 10 and Jan 11), not the
+        // number of failing sessions (three).
+        $this->assertSame(2, $summary[0]['fail_days']);
+    }
+
+    public function test_student_breakdown_counts_distinct_recited_and_attended_days(): void
+    {
+        $sessions = collect([
+            $this->session(['student_id' => 1, 'type' => 'review', 'status' => 'passed', 'session_date' => Carbon::create(2026, 1, 3)]),
+            // Two decided sessions on the same day count as one recitation day.
+            $this->session(['student_id' => 1, 'type' => 'review', 'status' => 'passed', 'session_date' => Carbon::create(2026, 1, 4)]),
+            $this->session(['student_id' => 1, 'type' => 'recitation', 'status' => 'passed', 'session_date' => Carbon::create(2026, 1, 4)]),
+            $this->session(['student_id' => 1, 'type' => 'not_recitate', 'status' => 'not_recitate', 'session_date' => Carbon::create(2026, 1, 5)]),
+        ]);
+        $attendances = collect([
+            $this->attendanceOn('present', '2026-01-03'),
+            $this->attendanceOn('late', '2026-01-04'),
+            $this->attendanceOn('present', '2026-01-04'),
+            $this->attendanceOn('absent', '2026-01-05'),
+        ]);
+
+        $row = $this->svc->studentBreakdown($sessions, $attendances)[0];
+
+        // Days 3 and 4 were recited; the not_recitate day is not counted.
+        $this->assertSame(2, $row['rec_days']);
+        // Distinct present/late days (3 and 4); the absent day is excluded.
+        $this->assertSame(2, $row['att_days']);
+        $this->assertNull($row['att_days_total']);
+        $this->assertNull($row['rec_days_total']);
+        $this->assertNull($row['att_days_rate']);
+        $this->assertNull($row['rec_days_rate']);
+    }
+
     private function session(array $attrs = []): object
     {
         return (object) array_merge([
@@ -321,10 +407,15 @@ class ReportServiceTest extends TestCase
 
     private function attendance(string $status): object
     {
+        return $this->attendanceOn($status, '2026-01-10');
+    }
+
+    private function attendanceOn(string $status, string $date): object
+    {
         return (object) [
             'student_id' => 1,
             'status' => $status,
-            'date' => Carbon::create(2026, 1, 10),
+            'date' => Carbon::parse($date),
         ];
     }
 }

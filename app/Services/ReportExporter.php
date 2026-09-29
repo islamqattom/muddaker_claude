@@ -147,10 +147,16 @@ class ReportExporter
         };
     }
 
-    public function exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate)
+    public function exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate, array $dayStats = [])
     {
         $attendancePct = $attendanceStats['attendance_rate'];
         $passRate = $sessionStats['pass_rate'];
+
+        $dayText = function (string $daysKey, string $totalKey) use ($dayStats) {
+            $days  = (int) ($dayStats[$daysKey] ?? 0);
+            $total = $dayStats[$totalKey] ?? null;
+            return $total === null ? (string) $days : $days . ' من ' . $total;
+        };
 
         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -185,6 +191,7 @@ class ReportExporter
             <td align="center" bgcolor="#ffc107"><b>متأخر</b><br>' . $attendanceStats['late'] . '</td>
             <td align="center" bgcolor="#17a2b8" color="white"><b>بعذر</b><br>' . $attendanceStats['excused'] . '</td>
             <td align="center" bgcolor="#6c757d" color="white"><b>نسبة الحضور</b><br>' . $attendancePct . '%</td>
+            <td align="center" bgcolor="#059669" color="white"><b>أيام الحضور</b><br>' . $dayText('att_days', 'att_days_total') . '</td>
         </tr></table>', true, false, false, false, 'R');
         $pdf->Ln(5);
 
@@ -195,6 +202,7 @@ class ReportExporter
             <td align="center" bgcolor="#28a745" color="white"><b>ناجح</b><br>' . $sessionStats['passed'] . '</td>
             <td align="center" bgcolor="#dc3545" color="white"><b>راسب</b><br>' . $sessionStats['failed'] . '</td>
             <td align="center" bgcolor="#ffc107"><b>نسبة النجاح</b><br>' . $passRate . '%</td>
+            <td align="center" bgcolor="#16a085" color="white"><b>أيام التسميع</b><br>' . $dayText('rec_days', 'rec_days_total') . '</td>
         </tr></table>', true, false, false, false, 'R');
 
         $filename = $this->pdfFilename(
@@ -263,21 +271,27 @@ class ReportExporter
         $line = fn (string $label, $value, array $palette) =>
             '<tr><td width="62%" color="#475569">' . $label . '</td>'
             . '<td width="38%" align="center" bgcolor="' . $palette['bg'] . '" color="' . $palette['text'] . '"><b>' . $value . '</b></td></tr>';
+        $dayLine = function (string $daysKey, string $totalKey) use ($row, $num) {
+            $days  = (int) ($row[$daysKey] ?? 0);
+            $total = $row[$totalKey] ?? null;
+            return $total === null ? $num($days) : $num($days) . ' من ' . $num($total);
+        };
 
         $html = '';
 
         // الحضور والغياب (green)
         $rows  = $section('الحضور والغياب', '#059669');
         $rows .= $line('1- العدد الكلي للجلسات', $num($v('att_total')), $base);
-        $rows .= $line('2- عدد أيام الحضور', $num($v('att_present')), $ok);
+        $rows .= $line('2- عدد أيام الحضور', $dayLine('att_days', 'att_days_total'), $ok);
         $rows .= $line('3- عدد أيام الغياب', $num($v('att_absent')), $bad);
         $rows .= $line('4- عدد أيام التأخير', $num($v('att_late')), $warn);
         $rows .= $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info);
         $html .= $table($rows);
 
-        // عدم التسميع (gray) - separate section
-        $rows  = $section('عدم التسميع', '#6c757d');
-        $rows .= $line('1- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base);
+        // التسميع (teal) - separate section
+        $rows  = $section('التسميع', '#16a085');
+        $rows .= $line('1- عدد أيام التسميع', $dayLine('rec_days', 'rec_days_total'), $base);
+        $rows .= $line('2- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base);
         $html .= $table($rows);
 
         // الحفظ الجديد (navy)
@@ -716,6 +730,11 @@ class ReportExporter
         foreach ($breakdown as $row) {
             $v   = fn ($key) => $row[$key] ?? 0;
             $num = fn ($n) => number_format((float) $n);
+            $dayLine = function (string $daysKey, string $totalKey) use ($row, $num) {
+                $days  = (int) ($row[$daysKey] ?? 0);
+                $total = $row[$totalKey] ?? null;
+                return $total === null ? $num($days) : $num($days) . ' من ' . $num($total);
+            };
 
             $html .= '<table border="1" cellpadding="6"><tr bgcolor="#2A4570" color="#ffffff">'
                 . '<td align="center"><b>الطالب: ' . ($row['name'] ?? '-') . '</b></td></tr></table>';
@@ -724,16 +743,17 @@ class ReportExporter
             $html .= $table(
                 $section('الحضور والغياب', '#059669')
                 . $line('1- العدد الكلي للجلسات', $num($v('att_total')), $base)
-                . $line('2- عدد أيام الحضور', $num($v('att_present')), $ok)
+                . $line('2- عدد أيام الحضور', $dayLine('att_days', 'att_days_total'), $ok)
                 . $line('3- عدد أيام الغياب', $num($v('att_absent')), $bad)
                 . $line('4- عدد أيام التأخير', $num($v('att_late')), $warn)
                 . $line('5- عدد أيام الغياب بعذر', $num($v('att_excused')), $info)
             );
 
-            // عدم التسميع (separate section)
+            // التسميع (separate section)
             $html .= $table(
-                $section('عدم التسميع', '#6c757d')
-                . $line('1- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base)
+                $section('التسميع', '#16a085')
+                . $line('1- عدد أيام التسميع', $dayLine('rec_days', 'rec_days_total'), $base)
+                . $line('2- عدد الأيام التي لم يسمع بها', $num($v('not_recite_days')), $base)
             );
 
             // الحفظ الجديد

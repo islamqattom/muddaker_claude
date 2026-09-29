@@ -18,7 +18,10 @@ class ReportController extends Controller {
     public function index(Request $request) {
         $student = Auth::user()->student;
 
-        $totalSessions = RecitationSession::where('student_id', $student->id)->count();
+        $totalSessions = RecitationSession::where('student_id', $student->id)
+            ->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
+            ->where('status', '!=', RecitationSession::STATUS_NOT_RECITE)
+            ->count();
         $attendanceRate = $student->attendance_rate;
         $passRate = $student->pass_rate;
         $memorizedParts = $this->reports->memorizedPartsCountForStudent($student->id);
@@ -50,7 +53,8 @@ class ReportController extends Controller {
         $breakdown = $this->reports->studentBreakdown(
             $sessionsQuery->get(),
             $attendanceQuery->get(),
-            $toDate
+            $toDate,
+            $fromDate
         );
         $periodLabel = $this->periodLabel($period);
 

@@ -59,6 +59,16 @@
         <div class="rpt-kpi-value">{{ $attendanceStats['attendance_rate'] }}%</div>
         <div class="rpt-kpi-label">نسبة الحضور</div>
     </div>
+    <div class="rpt-kpi" style="--kpi-color:#059669;--kpi-bg:rgba(5,150,105,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-calendar-day"></i></div>
+        <div class="rpt-kpi-value">{{ $dayStats['att_days'] }}@if(!is_null($dayStats['att_days_total'])) من {{ $dayStats['att_days_total'] }}@endif</div>
+        <div class="rpt-kpi-label">أيام الحضور</div>
+    </div>
+    <div class="rpt-kpi" style="--kpi-color:#16a085;--kpi-bg:rgba(22,160,133,0.10);">
+        <div class="rpt-kpi-icon"><i class="fas fa-microphone-alt"></i></div>
+        <div class="rpt-kpi-value">{{ $dayStats['rec_days'] }}@if(!is_null($dayStats['rec_days_total'])) من {{ $dayStats['rec_days_total'] }}@endif</div>
+        <div class="rpt-kpi-label">أيام التسميع</div>
+    </div>
 </div>
 
 <div class="rpt-table-card" style="margin-bottom:16px;">

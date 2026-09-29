@@ -8,6 +8,7 @@ use App\Models\QuranPart;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\Supervisor;
+use App\Providers\SettingsServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -111,11 +112,65 @@ class ReportService
         };
     }
 
-    public function recitationQuery(Request $request, ?int $supervisorScopeUserId = null): Builder
+    /**
+     * Count the dates within a period that fall on the configured weekdays
+     * (e.g. work_days / recitation_days settings). Returns null for an
+     * open-ended (all-time) period so callers can omit the denominator.
+     */
+    public function configuredDayCount(?Carbon $fromDate, ?Carbon $toDate, string $settingKey): ?int
+    {
+        if (!$fromDate || !$toDate) {
+            return null;
+        }
+
+        $dayNumbers = SettingsServiceProvider::carbonDaysForDayNames(
+            (string) config('app.' . $settingKey, '')
+        );
+
+        if (empty($dayNumbers)) {
+            return 0;
+        }
+
+        $count  = 0;
+        $cursor = $fromDate->copy()->startOfDay();
+        $end    = $toDate->copy()->startOfDay();
+
+        while ($cursor->lte($end)) {
+            if (in_array((int) $cursor->dayOfWeek, $dayNumbers, true)) {
+                $count++;
+            }
+            $cursor->addDay();
+        }
+
+        return $count;
+    }
+
+    /**
+     * Total configured working days inside the period.
+     */
+    public function workDaysInRange(?Carbon $fromDate, ?Carbon $toDate): ?int
+    {
+        return $this->configuredDayCount($fromDate, $toDate, 'work_days');
+    }
+
+    /**
+     * Total configured recitation days inside the period.
+     */
+    public function recitationDaysInRange(?Carbon $fromDate, ?Carbon $toDate): ?int
+    {
+        return $this->configuredDayCount($fromDate, $toDate, 'recitation_days');
+    }
+
+    public function recitationQuery(Request $request, ?int $supervisorScopeUserId = null, bool $excludeNotRecite = false): Builder
     {
         [$fromDate, $toDate, $period] = $this->resolvePeriod($request);
 
         $query = RecitationSession::with(['student.user', 'student.supervisor', 'supervisor', 'part', 'pages.mafsilPosition']);
+
+        if ($excludeNotRecite) {
+            $query->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
+                  ->where('status', '!=', RecitationSession::STATUS_NOT_RECITE);
+        }
 
         if ($supervisorScopeUserId) {
             $query->whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorScopeUserId));
@@ -174,8 +229,33 @@ class ReportService
         return $query;
     }
 
+    /**
+     * A "لم يسمع" marker: a session that records a recitation day the
+     * student did not recite. It is not a real recitation session.
+     */
+    private function isNotRecite($session): bool
+    {
+        return ($session->type ?? null) === RecitationSession::TYPE_NOT_RECITE
+            || ($session->status ?? null) === RecitationSession::STATUS_NOT_RECITE;
+    }
+
+    /**
+     * Keep only genuine recitation sessions (drops "لم يسمع" markers).
+     * In-progress sessions are kept.
+     */
+    public function actualRecitationSessions(Collection $sessions): Collection
+    {
+        return $sessions
+            ->reject(fn ($s) => $this->isNotRecite($s))
+            ->values();
+    }
+
     public function recitationStats(Collection $sessions): array
     {
+        // "لم يسمع" markers are not recitation sessions, so they are kept
+        // out of the headline total. In-progress sessions still count.
+        $sessions = $this->actualRecitationSessions($sessions);
+
         $total    = $sessions->count();
         $passedSessions = $sessions->where('status', 'passed');
         $passed   = $passedSessions->count();
@@ -370,9 +450,14 @@ class ReportService
      * how many new parts they memorized, how many review/recitation
      * sessions they had, etc.
      */
-    public function studentBreakdown(Collection $sessions, ?Collection $attendances = null, ?Carbon $untilDate = null): array
+    public function studentBreakdown(Collection $sessions, ?Collection $attendances = null, ?Carbon $untilDate = null, ?Carbon $fromDate = null): array
     {
         $attendanceByStudent = $this->attendanceSummaryByStudent($attendances ?? collect());
+
+        // Period denominators driven by the work_days / recitation_days
+        // settings. Null for open-ended periods (no "X من Y" total then).
+        $attDaysTotal = $this->workDaysInRange($fromDate, $untilDate);
+        $recDaysTotal = $this->recitationDaysInRange($fromDate, $untilDate);
 
         // Load memorization + recitation sessions (with pages) up to the end
         // of the selected period for every student in the breakdown, in a
@@ -392,7 +477,7 @@ class ReportService
 
         return $sessions
             ->groupBy('student_id')
-            ->map(function ($group, $studentId) use ($attendanceByStudent, $historyByStudent) {
+            ->map(function ($group, $studentId) use ($attendanceByStudent, $historyByStudent, $attDaysTotal, $recDaysTotal) {
                 $student = $group->first()?->student;
 
                 // A session that was not completed (لم يكمل) is reported with
@@ -430,6 +515,24 @@ class ReportService
                     ->unique()
                     ->count();
 
+                // Days the student actually recited: distinct session dates
+                // excluding the auto-generated "لم يسمع" markers.
+                $reciteDays = $group
+                    ->reject(fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
+                        || $s->status === RecitationSession::STATUS_NOT_RECITE)
+                    ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                    ->filter()
+                    ->unique()
+                    ->count();
+
+                $attDays = (int) (($attendanceByStudent[$studentId]['att_days'] ?? 0));
+                $attDaysRate = ($attDaysTotal !== null && $attDaysTotal > 0)
+                    ? round(($attDays / $attDaysTotal) * 100, 1)
+                    : null;
+                $recDaysRate = ($recDaysTotal !== null && $recDaysTotal > 0)
+                    ? round(($reciteDays / $recDaysTotal) * 100, 1)
+                    : null;
+
                 $recitationPassed  = $passed->where('type', 'recitation');
                 $mafsilPassed      = $passed->where('type', 'mafsil');
 
@@ -439,6 +542,12 @@ class ReportService
                     'total_sessions'              => $decided->count() + $notReciteDays,
                     'sessions_without_not_recite' => $decided->count(),
                     'not_recite_days'             => $notReciteDays,
+                    'att_days'                    => $attDays,
+                    'att_days_total'              => $attDaysTotal,
+                    'att_days_rate'               => $attDaysRate,
+                    'rec_days'                    => $reciteDays,
+                    'rec_days_total'              => $recDaysTotal,
+                    'rec_days_rate'               => $recDaysRate,
                     'review_sessions'             => $review->count(),
                     'review_passed'               => $review->where('status', RecitationSession::STATUS_PASSED)->count(),
                     'review_failed'               => $review->whereIn('status', $failedStatuses)->count(),
@@ -908,9 +1017,10 @@ class ReportService
             'mafsil'           => ['label' => 'مفصل',           'color' => '#d4a030'],
         ];
 
-        // Include not-completed (لم يكمل) sessions so every finished session
-        // is represented in the distribution.
-        $decided = $sessions->whereIn('status', ['passed', 'failed', 'failed_continued', 'incomplete']);
+        // Every genuine session (in-progress included) is represented in the
+        // distribution; "لم يسمع" markers are excluded so the slices sum to
+        // the headline session total.
+        $actual = $this->actualRecitationSessions($sessions);
 
         $out = [];
         foreach ($meta as $key => $info) {
@@ -918,7 +1028,7 @@ class ReportService
                 'key'   => $key,
                 'label' => $info['label'],
                 'color' => $info['color'],
-                'count' => $decided->where('type', $key)->count(),
+                'count' => $actual->where('type', $key)->count(),
             ];
         }
 
@@ -930,10 +1040,13 @@ class ReportService
      * either collection independently so the same table works on the
      * recitation, attendance and aggregate report pages.
      */
-    public function studentSummary(Collection $sessions, ?Collection $attendances = null): array
+    public function studentSummary(Collection $sessions, ?Collection $attendances = null, ?Carbon $fromDate = null, ?Carbon $toDate = null): array
     {
         $attendances = $attendances ?? collect();
         $rows = [];
+
+        $attDaysTotal = $this->workDaysInRange($fromDate, $toDate);
+        $recDaysTotal = $this->recitationDaysInRange($fromDate, $toDate);
 
         foreach ($sessions->groupBy('student_id') as $studentId => $group) {
             // Not-completed (لم يكمل) sessions count with the failing ones.
@@ -942,22 +1055,45 @@ class ReportService
             $avg     = $group->whereNotNull('final_score')->avg('final_score');
             $total   = $decided->count();
             $passCnt = $passed->count();
+            // Total sessions counts every genuine session (in-progress
+            // included) but not the "لم يسمع" markers.
+            $inProgress = $group->where('status', 'in_progress')->count();
+
+            $reciteDays = $group
+                ->reject(fn ($s) => $this->isNotRecite($s))
+                ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                ->filter()
+                ->unique()
+                ->count();
 
             $rows[$studentId] = array_merge([
                 'student_id' => $studentId,
                 'name'       => $group->first()?->student?->user?->name ?? '—',
-                'sessions'   => $total,
+                'sessions'   => $total + $inProgress,
                 'passed'     => $passCnt,
-                'pass_rate'  => $total > 0 ? round(($passCnt / $total) * 100, 1) : 0.0,
-                'avg_score'  => $avg ? round($avg, 1) : 0.0,
-                'pages'      => $this->sumPages($passed),
-                'not_recite_days' => $group
-                    ->filter(fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
-                        || $s->status === RecitationSession::STATUS_NOT_RECITE)
+                'incomplete' => $group->where('status', RecitationSession::STATUS_INCOMPLETE)->count(),
+                // Distinct days on which the student failed (failed or
+                // failed-and-continued); not-completed days stay separate.
+                'fail_days'  => $group
+                    ->whereIn('status', [RecitationSession::STATUS_FAILED, RecitationSession::STATUS_FAILED_CONTINUED])
                     ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
                     ->filter()
                     ->unique()
                     ->count(),
+                'pass_rate'  => $total > 0 ? round(($passCnt / $total) * 100, 1) : 0.0,
+                'avg_score'  => $avg ? round($avg, 1) : 0.0,
+                'pages'      => $this->sumPages($passed),
+                'not_recite_days' => $group
+                    ->filter(fn ($s) => $this->isNotRecite($s))
+                    ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+                    ->filter()
+                    ->unique()
+                    ->count(),
+                'rec_days'       => $reciteDays,
+                'rec_days_total' => $recDaysTotal,
+                'rec_days_rate'  => ($recDaysTotal !== null && $recDaysTotal > 0)
+                    ? round(($reciteDays / $recDaysTotal) * 100, 1)
+                    : null,
             ], $this->emptyAttendanceSummary());
         }
 
@@ -968,6 +1104,8 @@ class ReportService
                     'name'       => $group->first()?->student?->user?->name ?? '—',
                     'sessions'   => 0,
                     'passed'     => 0,
+                    'incomplete' => 0,
+                    'fail_days'  => 0,
                     'pass_rate'  => 0.0,
                     'avg_score'  => 0.0,
                     'pages'      => 0,
@@ -977,6 +1115,11 @@ class ReportService
             $total   = $group->count();
             $excused = $group->where('status', 'excused')->count();
             $present = $group->whereIn('status', ['present', 'late'])->count();
+            $attDays = $group->whereIn('status', ['present', 'late'])
+                ->map(fn ($a) => $this->dateKey($a))
+                ->filter()
+                ->unique()
+                ->count();
 
             $rows[$studentId]['att_total']        = $total;
             // att_present stays the exclusive status so the summary row
@@ -986,12 +1129,51 @@ class ReportService
             $rows[$studentId]['att_absent']       = $group->where('status', 'absent')->count();
             $rows[$studentId]['att_late']         = $group->where('status', 'late')->count();
             $rows[$studentId]['att_excused']      = $excused;
+            $rows[$studentId]['att_days']         = $attDays;
+            $rows[$studentId]['att_days_total']   = $attDaysTotal;
+            $rows[$studentId]['att_days_rate']    = ($attDaysTotal !== null && $attDaysTotal > 0)
+                ? round(($attDays / $attDaysTotal) * 100, 1)
+                : null;
             $rows[$studentId]['attendance_rate']  = ($total - $excused) > 0
                 ? round(($present / ($total - $excused)) * 100, 1)
                 : 0.0;
         }
 
         return collect($rows)->sortBy('name')->values()->toArray();
+    }
+
+    /**
+     * Day-based metrics for a single student: distinct attended days
+     * (present + late), distinct recited days, and the configured period
+     * totals. Used by the individual student report pages.
+     */
+    public function studentDayStats(Collection $sessions, Collection $attendances, ?Carbon $fromDate = null, ?Carbon $toDate = null): array
+    {
+        $attDays = $attendances->whereIn('status', ['present', 'late'])
+            ->map(fn ($a) => $this->dateKey($a))
+            ->filter()
+            ->unique()
+            ->count();
+
+        $recDays = $sessions
+            ->reject(fn ($s) => $s->type === RecitationSession::TYPE_NOT_RECITE
+                || $s->status === RecitationSession::STATUS_NOT_RECITE)
+            ->map(fn ($s) => $this->sessionDate($s)?->toDateString())
+            ->filter()
+            ->unique()
+            ->count();
+
+        $attTotal = $this->workDaysInRange($fromDate, $toDate);
+        $recTotal = $this->recitationDaysInRange($fromDate, $toDate);
+
+        return [
+            'att_days'       => $attDays,
+            'att_days_total' => $attTotal,
+            'att_days_rate'  => ($attTotal !== null && $attTotal > 0) ? round(($attDays / $attTotal) * 100, 1) : null,
+            'rec_days'       => $recDays,
+            'rec_days_total' => $recTotal,
+            'rec_days_rate'  => ($recTotal !== null && $recTotal > 0) ? round(($recDays / $recTotal) * 100, 1) : null,
+        ];
     }
 
     private function emptyAttendanceSummary(): array
@@ -1002,6 +1184,9 @@ class ReportService
             'att_absent'      => 0,
             'att_late'        => 0,
             'att_excused'     => 0,
+            'att_days'        => 0,
+            'att_days_total'  => null,
+            'att_days_rate'   => null,
             'attendance_rate' => null,
         ];
     }
@@ -1018,6 +1203,11 @@ class ReportService
             $total   = $group->count();
             $excused = $group->where('status', 'excused')->count();
             $present = $group->whereIn('status', ['present', 'late'])->count();
+            $attDays = $group->whereIn('status', ['present', 'late'])
+                ->map(fn ($a) => $this->dateKey($a))
+                ->filter()
+                ->unique()
+                ->count();
 
             $out[$studentId] = [
                 'att_total'       => $total,
@@ -1028,6 +1218,7 @@ class ReportService
                 'att_absent'      => $group->where('status', 'absent')->count(),
                 'att_late'        => $group->where('status', 'late')->count(),
                 'att_excused'     => $excused,
+                'att_days'        => $attDays,
                 'attendance_rate' => ($total - $excused) > 0
                     ? round(($present / ($total - $excused)) * 100, 1)
                     : 0.0,
@@ -1035,6 +1226,29 @@ class ReportService
         }
 
         return $out;
+    }
+
+    /**
+     * Normalise a record's date (attendance.date or session_date) to a
+     * Y-m-d string, tolerating Carbon casts and plain test objects.
+     */
+    private function dateKey($model): ?string
+    {
+        $date = $model->date ?? $model->session_date ?? null;
+
+        if (!$date) {
+            return null;
+        }
+
+        if ($date instanceof Carbon) {
+            return $date->toDateString();
+        }
+
+        try {
+            return Carbon::parse($date)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public function dropdownData(Request $request, ?int $supervisorScopeUserId = null): array

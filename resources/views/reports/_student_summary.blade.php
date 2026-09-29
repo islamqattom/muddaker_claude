@@ -17,16 +17,20 @@
                         <th data-sort>الطالب</th>
                         @if($showRec)
                             <th data-sort="num">الجلسات</th>
-                            <th data-sort="num">ناجح</th>
                             <th data-sort="num">نسبة النجاح</th>
+                            <th data-sort="num">ناجح</th>
+                            <th data-sort="num">راسب</th>
+                            <th data-sort="num">لم يكمل</th>
+                            <th data-sort="num">أيام لم يسمع بها</th>
                             <th data-sort="num">الصفحات</th>
-                            <th data-sort="num">أيام لم يسمع</th>
+                            <th data-sort="num">نسبة أيام التسميع</th>
                         @endif
                         @if($showAtt)
                             <th data-sort="num">حضور</th>
                             <th data-sort="num">غياب</th>
                             <th data-sort="num">تأخير</th>
                             <th data-sort="num">نسبة الحضور</th>
+                            <th data-sort="num">نسبة أيام الحضور</th>
                         @endif
                     </tr>
                 </thead>
@@ -41,12 +45,17 @@
                             </td>
                             @if($showRec)
                                 <td data-sort-value="{{ $row['sessions'] }}">{{ $row['sessions'] }}</td>
-                                <td data-sort-value="{{ $row['passed'] }}" style="color:#27ae60;font-weight:700;">{{ $row['passed'] }}</td>
                                 <td data-sort-value="{{ $row['pass_rate'] }}">
                                     <span class="rpt-score {{ $row['pass_rate'] >= 90 ? 'high' : ($row['pass_rate'] >= 75 ? 'medium' : 'low') }}">{{ $row['pass_rate'] }}%</span>
                                 </td>
-                                <td data-sort-value="{{ $row['pages'] }}">{{ $row['pages'] }}</td>
+                                <td data-sort-value="{{ $row['passed'] }}" style="color:#27ae60;font-weight:700;">{{ $row['passed'] }}</td>
+                                <td data-sort-value="{{ $row['fail_days'] ?? 0 }}" style="color:#c0392b;font-weight:700;">{{ $row['fail_days'] ?? 0 }}</td>
+                                <td data-sort-value="{{ $row['incomplete'] ?? 0 }}" style="color:#6c757d;font-weight:700;">{{ $row['incomplete'] ?? 0 }}</td>
                                 <td data-sort-value="{{ $row['not_recite_days'] ?? 0 }}">{{ $row['not_recite_days'] ?? 0 }}</td>
+                                <td data-sort-value="{{ $row['pages'] }}">{{ $row['pages'] }}</td>
+                                <td data-sort-value="{{ $row['rec_days_rate'] ?? -1 }}">
+                                    {{ is_null($row['rec_days_rate'] ?? null) ? '—' : $row['rec_days_rate'] . '%' }}
+                                </td>
                             @endif
                             @if($showAtt)
                                 <td data-sort-value="{{ $row['att_present'] }}" style="color:#27ae60;font-weight:700;">{{ $row['att_present'] }}</td>
@@ -54,6 +63,9 @@
                                 <td data-sort-value="{{ $row['att_late'] }}" style="color:#d97706;font-weight:700;">{{ $row['att_late'] }}</td>
                                 <td data-sort-value="{{ $row['attendance_rate'] ?? -1 }}">
                                     {{ is_null($row['attendance_rate']) ? '—' : $row['attendance_rate'] . '%' }}
+                                </td>
+                                <td data-sort-value="{{ $row['att_days_rate'] ?? -1 }}">
+                                    {{ is_null($row['att_days_rate'] ?? null) ? '—' : $row['att_days_rate'] . '%' }}
                                 </td>
                             @endif
                         </tr>

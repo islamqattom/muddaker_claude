@@ -127,10 +127,13 @@
         </div>
     </div>
 
+    @php $bd = $breakdown[0] ?? []; @endphp
     <div class="rpt-kpi-grid">
         @include('reports._kpi', ['label' => 'جلسات التسميع', 'value' => $recStats['total'], 'icon' => 'fa-microphone', 'color' => '#182B48', 'bg' => 'rgba(24,43,72,0.10)', 'sub' => $periodLabel])
         @include('reports._kpi', ['label' => 'نسبة النجاح', 'value' => $recStats['pass_rate'] . '%', 'icon' => 'fa-check-circle', 'color' => '#27ae60', 'bg' => 'rgba(39,174,96,0.10)', 'sub' => $periodLabel])
         @include('reports._kpi', ['label' => 'نسبة الحضور', 'value' => $attStats['attendance_rate'] . '%', 'icon' => 'fa-calendar-check', 'color' => '#059669', 'bg' => 'rgba(5,150,105,0.10)', 'sub' => $periodLabel])
+        @include('reports._kpi', ['label' => 'أيام الحضور', 'value' => ($bd['att_days'] ?? 0) . (is_null($bd['att_days_total'] ?? null) ? '' : ' من ' . $bd['att_days_total']), 'icon' => 'fa-calendar-day', 'color' => '#059669', 'bg' => 'rgba(5,150,105,0.10)', 'sub' => $periodLabel])
+        @include('reports._kpi', ['label' => 'أيام التسميع', 'value' => ($bd['rec_days'] ?? 0) . (is_null($bd['rec_days_total'] ?? null) ? '' : ' من ' . $bd['rec_days_total']), 'icon' => 'fa-microphone-alt', 'color' => '#16a085', 'bg' => 'rgba(22,160,133,0.10)', 'sub' => $periodLabel])
     </div>
 
     @include('reports._written_report', ['breakdown' => $breakdown, 'periodLabel' => $periodLabel, 'studentLabel' => 'طالب'])

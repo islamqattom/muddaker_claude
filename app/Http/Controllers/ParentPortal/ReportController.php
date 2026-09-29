@@ -61,7 +61,10 @@ class ReportController extends Controller {
         if ($fromDate && $toDate) {
             $sessionsQuery->whereBetween('session_date', [$fromDate, $toDate]);
         }
-        $sessions = $sessionsQuery->get();
+        // Keep the full set for the written breakdown ("لم يسمع" days) while
+        // the session counters use genuine sessions only.
+        $allSessions = $sessionsQuery->get();
+        $sessions = $this->reports->actualRecitationSessions($allSessions);
 
         $totalSessions = $sessions->count();
         $passedSessions = $sessions->where('status', 'passed')->count();
@@ -108,7 +111,7 @@ class ReportController extends Controller {
         }
 
         // التقرير المكتوب (تظهر لولي الأمر بنفس منطق تقارير المشرف).
-        $breakdown = $this->reports->studentBreakdown($sessions, $attendances, $toDate);
+        $breakdown = $this->reports->studentBreakdown($allSessions, $attendances, $toDate, $fromDate);
         $periodLabel = $this->periodLabel($period);
 
         if (request('export') === 'pdf') {

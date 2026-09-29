@@ -60,7 +60,7 @@
                 @if($showSupervisorFilter)
                     <div class="col-md-2">
                         <label class="form-label">المشرف</label>
-                        <select name="supervisor_id" class="form-select" id="supervisorSelect" onchange="filterStudents()">
+                        <select name="supervisor_id" class="form-select" id="supervisorSelect" onchange="filterStudents(true)">
                             <option value="">الكل</option>
                             @foreach($supervisors as $supervisor)
                                 <option value="{{ $supervisor->user_id }}" {{ request('supervisor_id') == $supervisor->user_id ? 'selected' : '' }}>{{ $supervisor->user->name }}</option>
@@ -256,7 +256,7 @@ function handlePeriodChange() {
     document.getElementById('fromDateCol').style.display = period === 'custom' ? '' : 'none';
     document.getElementById('toDateCol').style.display   = period === 'custom' ? '' : 'none';
 }
-function filterStudents() {
+function filterStudents(clearSelection) {
     var supEl = document.getElementById('supervisorSelect');
     if (!supEl) return;
     var sup = supEl.value;
@@ -265,9 +265,13 @@ function filterStudents() {
         if (!o.value) return;
         o.style.display = (!sup || o.getAttribute('data-supervisor-id') === sup) ? '' : 'none';
     });
-    sel.value = '';
+    // Keep the current student on page load; only reset it when the
+    // supervisor itself changes.
+    if (clearSelection) {
+        sel.value = '';
+    }
 }
-document.addEventListener('DOMContentLoaded', function () { filterStudents(); });
+document.addEventListener('DOMContentLoaded', function () { filterStudents(false); });
 
 (function () {
     if (!window.Chart) return;

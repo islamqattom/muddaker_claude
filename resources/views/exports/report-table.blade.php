@@ -54,10 +54,10 @@
             <tr>
                 <th>الطالب</th>
                 @if($summaryMode !== 'attendance')
-                    <th>الجلسات</th><th>ناجح</th><th>نسبة النجاح</th><th>الصفحات</th><th>أيام لم يسمع</th>
+                    <th>الجلسات</th><th>نسبة النجاح</th><th>ناجح</th><th>راسب</th><th>لم يكمل</th><th>أيام لم يسمع بها</th><th>الصفحات</th><th>نسبة أيام التسميع</th>
                 @endif
                 @if($summaryMode !== 'recitation')
-                    <th>حضور</th><th>غياب</th><th>تأخير</th><th>نسبة الحضور</th>
+                    <th>حضور</th><th>غياب</th><th>تأخير</th><th>نسبة الحضور</th><th>نسبة أيام الحضور</th>
                 @endif
             </tr>
         </thead>
@@ -67,16 +67,20 @@
                     <td>{{ $row['name'] }}</td>
                     @if($summaryMode !== 'attendance')
                         <td>{{ $row['sessions'] }}</td>
-                        <td>{{ $row['passed'] }}</td>
                         <td>{{ $row['pass_rate'] }}%</td>
-                        <td>{{ $row['pages'] }}</td>
+                        <td>{{ $row['passed'] }}</td>
+                        <td>{{ $row['fail_days'] ?? 0 }}</td>
+                        <td>{{ $row['incomplete'] ?? 0 }}</td>
                         <td>{{ $row['not_recite_days'] ?? 0 }}</td>
+                        <td>{{ $row['pages'] }}</td>
+                        <td>{{ is_null($row['rec_days_rate'] ?? null) ? '—' : $row['rec_days_rate'] . '%' }}</td>
                     @endif
                     @if($summaryMode !== 'recitation')
                         <td>{{ $row['att_present'] }}</td>
                         <td>{{ $row['att_absent'] }}</td>
                         <td>{{ $row['att_late'] }}</td>
                         <td>{{ is_null($row['attendance_rate']) ? '—' : $row['attendance_rate'] . '%' }}</td>
+                        <td>{{ is_null($row['att_days_rate'] ?? null) ? '—' : $row['att_days_rate'] . '%' }}</td>
                     @endif
                 </tr>
             @endforeach
