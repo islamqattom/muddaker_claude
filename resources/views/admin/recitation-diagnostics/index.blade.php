@@ -81,6 +81,7 @@
                 <div class="card-body">
                     <p class="text-muted small">
                         الفحص التلقائي يغطي آخر {{ $autoLookbackDays }} أيام فقط. لإنشاء جلسات لفترة أقدم، اعرض المعاينة أولاً ثم أكّد.
+                        ستُظهر المعاينة جدولاً بالأيام التي ستُنشأ فيها الجلسات مع عدد الحاضرين والطلاب المتأثرين.
                     </p>
                     <form method="POST" action="{{ route('admin.recitation-diagnostics.backfill') }}" id="backfillForm">
                         @csrf
@@ -101,7 +102,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div id="bfResult" class="mt-2 small"></div>
+                        <div id="bfResult" class="mt-3"></div>
                     </form>
                 </div>
             </div>
@@ -173,18 +174,103 @@ function previewBackfill() {
     const result = document.getElementById('bfResult');
     const confirmBtn = document.getElementById('bfConfirm');
 
-    if (!from || !to) { result.textContent = 'يرجى تحديد الفترة.'; return; }
+    if (!from || !to) {
+        result.innerHTML = '<span class="text-danger">يرجى تحديد الفترة.</span>';
+        confirmBtn.disabled = true;
+        return;
+    }
 
-    fetch('{{ route('admin.recitation-diagnostics.preview') }}?from=' + from + '&to=' + to, {
+    result.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:14px;color:var(--primary);"><i class="fas fa-spinner fa-spin" style="color:#d4a030;font-size:18px;"></i><span>جارٍ حساب المعاينة...</span></div>';
+    confirmBtn.disabled = true;
+
+    fetch('{{ route('admin.recitation-diagnostics.preview') }}?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to), {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
     })
     .then(r => r.ok ? r.json() : null)
     .then(data => {
-        if (!data) { result.textContent = 'تعذّر الحصول على المعاينة.'; return; }
-        result.innerHTML = 'سيتم إنشاء <strong>' + data.count + '</strong> جلسة "لم يسمع" لهذه الفترة.';
+        if (!data) { result.innerHTML = '<span class="text-danger">تعذّر الحصول على المعاينة.</span>'; return; }
+
+        if (!data.days || data.days.length === 0) {
+            result.innerHTML = '<div class="table-card mb-0"><div class="empty-state">' +
+                '<div class="empty-icon" style="background:linear-gradient(135deg,#182B48,#2A4570);color:#d4a030;">' +
+                '<i class="fas fa-calendar-xmark"></i></div>' +
+                '<h5 style="color:var(--primary);">لا توجد جلسات لإنشائها</h5>' +
+                '<p>لا توجد جلسات "لم يسمع" تطابق الفترة المختارة.</p>' +
+                '</div></div>';
+            confirmBtn.disabled = true;
+            return;
+        }
+
+        let html = '<div class="table-card mb-0">';
+        html += '<div class="table-header" style="background:linear-gradient(135deg,#fbfcfe 0%,#fcf6e8 100%);">' +
+            '<div class="table-title">' +
+                '<div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#182B48,#2A4570);display:flex;align-items:center;justify-content:center;color:#d4a030;flex-shrink:0;">' +
+                '<i class="fas fa-calendar-days"></i></div>' +
+                '<span style="color:var(--primary);font-weight:700;">معاينة جلسات "لم يسمع"</span>' +
+            '</div>' +
+            '<div class="table-actions">' +
+                '<span class="record-count" style="background:linear-gradient(135deg,#d4a030,#B4802C);color:#fff;padding:6px 14px;border-radius:9px;">' +
+                '<i class="fas fa-microphone"></i> سيتم إنشاء ' + data.count + ' جلسة</span>' +
+            '</div></div>';
+        html += '<div class="card-body-custom p-0"><div class="table-responsive"><table class="modern-table">';
+        html += '<thead><tr>' +
+            '<th style="color:var(--primary);"><i class="fas fa-calendar-day me-1" style="color:#d4a030;"></i>اليوم</th>' +
+            '<th class="text-center" style="color:var(--primary);"><i class="fas fa-user-check me-1" style="color:#3498db;"></i>حاضر</th>' +
+            '<th class="text-center" style="color:var(--primary);"><i class="fas fa-book me-1" style="color:#27ae60;"></i>له جلسة</th>' +
+            '<th class="text-center" style="color:var(--primary);"><i class="fas fa-plus-circle me-1" style="color:#d4a030;"></i>سيُنشأ</th>' +
+            '<th style="color:var(--primary);"><i class="fas fa-users me-1" style="color:#8e44ad;"></i>الطلاب</th>' +
+            '</tr></thead><tbody>';
+
+        data.days.forEach(function (day) {
+            const students = (day.students || []).map(function (s) {
+                const dotColor = s.status === 'late' ? '#f39c12' : '#27ae60';
+                return '<span class="type-badge me-1 mb-1" style="background:#fff;border:1px solid #e9ecef;color:var(--primary);">' +
+                    '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + dotColor + ';margin-inline-end:6px;vertical-align:middle;"></span>' +
+                    escapeHtml(s.name) +
+                    '</span>';
+            }).join('');
+
+            html += '<tr>' +
+                '<td><div class="d-flex flex-column gap-1">' +
+                    '<span class="day-badge" style="background:linear-gradient(135deg,#182B48,#2A4570);color:#fff;align-self:flex-start;">' + escapeHtml(day.day_name) + '</span>' +
+                    '<span class="date-badge" style="background:#fcf6e8;color:#B4802C;align-self:flex-start;">' + escapeHtml(day.date) + '</span>' +
+                '</div></td>' +
+                '<td class="text-center">' +
+                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:28px;padding:0 10px;border-radius:8px;background:rgba(52,152,219,.12);color:#3498db;font-weight:700;">' + day.present_count + '</span>' +
+                '</td>' +
+                '<td class="text-center">' +
+                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:28px;padding:0 10px;border-radius:8px;background:rgba(39,174,96,.12);color:#27ae60;font-weight:700;">' + day.already_has_session_count + '</span>' +
+                '</td>' +
+                '<td class="text-center">' +
+                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:30px;padding:0 12px;border-radius:9px;background:linear-gradient(135deg,#d4a030,#B4802C);color:#fff;font-weight:800;box-shadow:0 2px 6px rgba(212,160,48,.35);">' + day.will_create_count + '</span>' +
+                '</td>' +
+                '<td>' + (students || '<span class="no-data">-</span>') + '</td>' +
+            '</tr>';
+        });
+
+        html += '</tbody></table></div></div>';
+        html += '<div class="table-footer" style="background:linear-gradient(135deg,#fcf6e8,#fbfcfe);">' +
+            '<div style="display:flex;align-items:center;gap:10px;padding:6px 14px;background:#fff;border-radius:10px;border:1px solid #fcf6e8;">' +
+                '<i class="fas fa-calculator" style="color:#d4a030;font-size:16px;"></i>' +
+                '<span style="color:var(--primary);font-weight:700;">الإجمالي</span>' +
+                '<span style="background:linear-gradient(135deg,#182B48,#2A4570);color:#d4a030;padding:2px 14px;border-radius:7px;font-weight:800;">' + data.count + '</span>' +
+                '<span style="color:var(--primary);">جلسة</span>' +
+            '</div></div>';
+        html += '</div>';
+
+        result.innerHTML = html;
         confirmBtn.disabled = data.count === 0;
     })
-    .catch(() => { result.textContent = 'تعذّر الحصول على المعاينة.'; });
+    .catch(function () { result.innerHTML = '<span class="text-danger">تعذّر الحصول على المعاينة.</span>'; });
+}
+
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 </script>
 @endpush

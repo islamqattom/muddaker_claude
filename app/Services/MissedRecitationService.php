@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Attendance;
 use App\Models\RecitationSession;
+use App\Providers\SettingsServiceProvider;
 use App\Services\Concerns\ReservesDailyRun;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +85,7 @@ class MissedRecitationService
         foreach ($candidates as $attendance) {
             if (! $this->shouldCreateForAttendance($attendance, $now)) {
                 $skipped++;
+
                 continue;
             }
 
@@ -111,6 +114,67 @@ class MissedRecitationService
             ->get()
             ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now))
             ->count();
+    }
+
+    /**
+     * Per-day breakdown of the sessions a range would create, without writing
+     * anything. Only days that would produce at least one "لم يسمع" session
+     * are returned, so the admin can review them before confirming.
+     *
+     * @return array{total:int, days:array<int, array{
+     *     date:string,
+     *     day_name:string,
+     *     present_count:int,
+     *     already_has_session_count:int,
+     *     will_create_count:int,
+     *     students:array<int, array{name:string, status:string, status_label:string}>
+     * }>}
+     */
+    public function previewRangeDetails(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): array
+    {
+        $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
+
+        $attendances = Attendance::query()
+            ->with('student.user')
+            ->whereIn('status', $attendedStatuses)
+            ->where('date', '>=', $from->toDateString())
+            ->where('date', '<=', $to->toDateString())
+            ->orderBy('date')
+            ->get()
+            ->groupBy(fn (Attendance $attendance) => $attendance->date->toDateString());
+
+        $days = [];
+        $total = 0;
+
+        foreach ($attendances as $date => $dayAttendances) {
+            $willCreate = $dayAttendances
+                ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now));
+
+            if ($willCreate->isEmpty()) {
+                continue;
+            }
+
+            $alreadyHasSession = $dayAttendances
+                ->filter(fn (Attendance $attendance) => $this->hasExistingSession($attendance))
+                ->count();
+
+            $days[] = [
+                'date' => $date,
+                'day_name' => SettingsServiceProvider::arabicDayName(Carbon::parse($date)->dayOfWeek),
+                'present_count' => $dayAttendances->count(),
+                'already_has_session_count' => $alreadyHasSession,
+                'will_create_count' => $willCreate->count(),
+                'students' => $willCreate->map(fn (Attendance $attendance) => [
+                    'name' => data_get($attendance, 'student.user.name') ?? ('#'.$attendance->student_id),
+                    'status' => $attendance->status,
+                    'status_label' => $attendance->status_label,
+                ])->values()->all(),
+            ];
+
+            $total += $willCreate->count();
+        }
+
+        return ['total' => $total, 'days' => $days];
     }
 
     /**
@@ -234,14 +298,14 @@ class MissedRecitationService
                 }
 
                 RecitationSession::create([
-                    'student_id'      => $attendance->student_id,
-                    'supervisor_id'   => $attendance->supervisor_id,
-                    'type'            => config('recitation.type', 'not_recitate'),
-                    'status'          => config('recitation.status', 'not_recitate'),
-                    'session_date'    => $attendance->date,
-                    'attendance_id'   => $attendance->id,
-                    'auto_generated'  => true,
-                    'notes'           => 'تسميع تلقائي - انتهى يوم التسميع دون تسجيل تسميع',
+                    'student_id' => $attendance->student_id,
+                    'supervisor_id' => $attendance->supervisor_id,
+                    'type' => config('recitation.type', 'not_recitate'),
+                    'status' => config('recitation.status', 'not_recitate'),
+                    'session_date' => $attendance->date,
+                    'attendance_id' => $attendance->id,
+                    'auto_generated' => true,
+                    'notes' => 'تسميع تلقائي - انتهى يوم التسميع دون تسجيل تسميع',
                 ]);
             });
         } catch (UniqueConstraintViolationException $e) {
@@ -250,7 +314,7 @@ class MissedRecitationService
         } catch (\Throwable $e) {
             Log::error('Failed to auto-register a missed recitation session', [
                 'attendance_id' => $attendance->id,
-                'error'         => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
 
             return false;
@@ -292,12 +356,12 @@ class MissedRecitationService
             ->whereIn('student_id', $studentIds)
             ->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
             ->get(['student_id', 'session_date'])
-            ->map(fn ($s) => $s->student_id . '|' . (optional($s->session_date)->toDateString() ?? $s->session_date))
+            ->map(fn ($s) => $s->student_id.'|'.(optional($s->session_date)->toDateString() ?? $s->session_date))
             ->flip();
 
         $idsToDelete = $autoSessions
             ->filter(function ($s) use ($realSessions) {
-                $key = $s->student_id . '|' . (optional($s->session_date)->toDateString() ?? $s->session_date);
+                $key = $s->student_id.'|'.(optional($s->session_date)->toDateString() ?? $s->session_date);
 
                 return $realSessions->has($key);
             })

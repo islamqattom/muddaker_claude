@@ -88,9 +88,17 @@ class RecitationDiagnosticsController extends Controller
             'to' => 'required|date|after_or_equal:from',
         ]);
 
-        $count = $service->previewRange(now(), Carbon::parse($validated['from']), Carbon::parse($validated['to']));
+        $details = $service->previewRangeDetails(
+            now(),
+            Carbon::parse($validated['from']),
+            Carbon::parse($validated['to'])
+        );
 
-        return response()->json(['success' => true, 'count' => $count]);
+        return response()->json([
+            'success' => true,
+            'count' => $details['total'],
+            'days' => $details['days'],
+        ]);
     }
 
     /**
@@ -123,7 +131,7 @@ class RecitationDiagnosticsController extends Controller
 
         Artisan::call('migrate', ['--force' => true]);
 
-        return back()->with('success', 'تم تشغيل الـ migrations.' . "\n" . Artisan::output());
+        return back()->with('success', 'تم تشغيل الـ migrations.'."\n".Artisan::output());
     }
 
     public function clearConfig()

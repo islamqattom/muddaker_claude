@@ -19,7 +19,7 @@ class MissedRecitationServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new MissedRecitationService();
+        $this->service = new MissedRecitationService;
     }
 
     private function attendance(string $date, string $status, string $createdAt, ?Student $student = null): Attendance
@@ -27,12 +27,12 @@ class MissedRecitationServiceTest extends TestCase
         $student ??= Student::factory()->create();
 
         return Attendance::factory()->create([
-            'student_id'    => $student->id,
+            'student_id' => $student->id,
             'supervisor_id' => $student->supervisor_id,
-            'date'          => $date,
-            'status'        => $status,
-            'created_at'    => $createdAt,
-            'updated_at'    => $createdAt,
+            'date' => $date,
+            'status' => $status,
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
         ]);
     }
 
@@ -50,12 +50,12 @@ class MissedRecitationServiceTest extends TestCase
 
         $this->assertSame(1, $result['created']);
         $this->assertDatabaseHas('recitation_sessions', [
-            'student_id'     => $attendance->student_id,
-            'supervisor_id'  => $attendance->supervisor_id,
-            'type'           => RecitationSession::TYPE_NOT_RECITE,
-            'status'         => RecitationSession::STATUS_NOT_RECITE,
-            'session_date'   => '2026-01-03',
-            'attendance_id'  => $attendance->id,
+            'student_id' => $attendance->student_id,
+            'supervisor_id' => $attendance->supervisor_id,
+            'type' => RecitationSession::TYPE_NOT_RECITE,
+            'status' => RecitationSession::STATUS_NOT_RECITE,
+            'session_date' => '2026-01-03',
+            'attendance_id' => $attendance->id,
             'auto_generated' => true,
         ]);
     }
@@ -101,10 +101,10 @@ class MissedRecitationServiceTest extends TestCase
         $this->attendance('2026-01-03', 'present', '2026-01-02 10:00:00', $student);
 
         RecitationSession::factory()->create([
-            'student_id'   => $student->id,
+            'student_id' => $student->id,
             'session_date' => '2026-01-03',
-            'type'         => 'review',
-            'status'       => 'passed',
+            'type' => 'review',
+            'status' => 'passed',
         ]);
 
         $result = $this->runAt('2026-01-04 00:05:00');
@@ -187,8 +187,8 @@ class MissedRecitationServiceTest extends TestCase
         $this->runAt('2026-01-04 00:05:00');
 
         $this->assertDatabaseHas('audit_logs', [
-            'role'       => 'system',
-            'action'     => 'created',
+            'role' => 'system',
+            'action' => 'created',
             'model_type' => RecitationSession::class,
         ]);
     }
@@ -221,8 +221,9 @@ class MissedRecitationServiceTest extends TestCase
             $this->assertSame(1, $first['created']);
             $this->assertSame(1, RecitationSession::where('auto_generated', true)->count());
 
-            // Another eligible record (a required day) appears later the same day.
-            $this->attendance('2026-01-01', 'present', '2026-01-01 10:00:00');
+            // Another eligible record (a required Tuesday) appears later the
+            // same day, after the first scan already ran.
+            $this->attendance('2025-12-30', 'present', '2025-12-30 10:00:00');
 
             $second = $this->service->runOncePerDay();
             $this->assertTrue($second['already_ran']);
@@ -256,5 +257,57 @@ class MissedRecitationServiceTest extends TestCase
         } finally {
             Carbon::setTestNow();
         }
+    }
+
+    public function test_preview_range_details_lists_only_days_with_new_sessions(): void
+    {
+        // Saturday (required): a present student with no session.
+        $pending = Student::factory()->create();
+        Attendance::factory()->create([
+            'student_id' => $pending->id,
+            'supervisor_id' => $pending->supervisor_id,
+            'date' => '2026-01-03',
+            'status' => 'present',
+        ]);
+
+        // Same required day, but this student already has a session.
+        $recorded = Student::factory()->create();
+        Attendance::factory()->create([
+            'student_id' => $recorded->id,
+            'supervisor_id' => $recorded->supervisor_id,
+            'date' => '2026-01-03',
+            'status' => 'present',
+        ]);
+        RecitationSession::factory()->create([
+            'student_id' => $recorded->id,
+            'session_date' => '2026-01-03',
+            'type' => 'review',
+            'status' => 'passed',
+        ]);
+
+        // Monday is not a required day and must not appear.
+        $monday = Student::factory()->create();
+        Attendance::factory()->create([
+            'student_id' => $monday->id,
+            'supervisor_id' => $monday->supervisor_id,
+            'date' => '2026-01-05',
+            'status' => 'present',
+        ]);
+
+        $now = Carbon::parse('2026-01-10 09:00:00');
+        $from = Carbon::parse('2026-01-01');
+        $to = Carbon::parse('2026-01-07');
+
+        $details = $this->service->previewRangeDetails($now, $from, $to);
+
+        $this->assertSame(1, $details['total']);
+        $this->assertCount(1, $details['days']);
+        $this->assertSame('2026-01-03', $details['days'][0]['date']);
+        $this->assertSame(2, $details['days'][0]['present_count']);
+        $this->assertSame(1, $details['days'][0]['already_has_session_count']);
+        $this->assertSame(1, $details['days'][0]['will_create_count']);
+
+        // The breakdown total must match the plain counter.
+        $this->assertSame($details['total'], $this->service->previewRange($now, $from, $to));
     }
 }

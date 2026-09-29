@@ -35,7 +35,7 @@ class MissedRecitationAutomationTest extends TestCase
             'user_id' => User::factory()->student()->create()->id,
             'supervisor_id' => $this->supervisor->id,
             'level_id' => $level->id,
-            'student_number' => 'STU-' . uniqid(),
+            'student_number' => 'STU-'.uniqid(),
             'memorized_parts' => 0,
             'current_part' => 1,
             'current_page' => 1,
@@ -123,7 +123,7 @@ class MissedRecitationAutomationTest extends TestCase
         // 20 days ago is outside the 7-day auto window.
         $old = now()->subDays(20);
         // Keep it on a required day so the only reason it is skipped is the window.
-        while (! in_array($old->dayOfWeek, [6, 2, 4], true)) {
+        while (! in_array($old->dayOfWeek, [6, 2], true)) {
             $old->subDay();
         }
         $this->attendance($student, $old->toDateString());
@@ -138,7 +138,7 @@ class MissedRecitationAutomationTest extends TestCase
     {
         $student = $this->student();
         $from = now()->subDays(40);
-        while (! in_array($from->dayOfWeek, [6, 2, 4], true)) {
+        while (! in_array($from->dayOfWeek, [6, 2], true)) {
             $from->subDay();
         }
         $this->attendance($student, $from->toDateString());
@@ -218,5 +218,57 @@ class MissedRecitationAutomationTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.recitation-diagnostics.index'))
             ->assertOk();
+    }
+
+    public function test_backfill_preview_lists_only_days_with_new_sessions_and_affected_students(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        // Saturday (required): one present student without a session.
+        $pending = $this->student();
+        $this->attendance($pending, '2026-01-03');
+
+        // Same required day, but this student already has a session.
+        $recorded = $this->student();
+        $this->attendance($recorded, '2026-01-03');
+        RecitationSession::factory()->create([
+            'student_id' => $recorded->id,
+            'session_date' => '2026-01-03',
+            'type' => 'review',
+            'status' => 'passed',
+        ]);
+
+        // Monday is not a required day and must not appear.
+        $monday = $this->student();
+        $this->attendance($monday, '2026-01-05');
+
+        Carbon::setTestNow(Carbon::parse('2026-01-10 09:00:00'));
+
+        try {
+            $resp = $this->actingAs($admin)->getJson(route('admin.recitation-diagnostics.preview', [
+                'from' => '2026-01-01',
+                'to' => '2026-01-07',
+            ]));
+
+            $resp->assertOk()
+                ->assertJsonPath('success', true)
+                ->assertJsonPath('count', 1);
+
+            $days = $resp->json('days');
+
+            $this->assertCount(1, $days);
+            $this->assertSame('2026-01-03', $days[0]['date']);
+            $this->assertSame('السبت', $days[0]['day_name']);
+            $this->assertSame(2, $days[0]['present_count']);
+            $this->assertSame(1, $days[0]['already_has_session_count']);
+            $this->assertSame(1, $days[0]['will_create_count']);
+            $this->assertCount(1, $days[0]['students']);
+            $this->assertSame($pending->user->name, $days[0]['students'][0]['name']);
+
+            // Previewing must not create anything.
+            $this->assertSame(0, RecitationSession::where('auto_generated', true)->count());
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }
