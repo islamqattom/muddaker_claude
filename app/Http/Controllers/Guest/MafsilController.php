@@ -63,6 +63,7 @@ class MafsilController extends Controller
                 'student_name' => 'required|string|max:255',
                 'mahd_name' => 'nullable|string|max:255',
                 'mafsil_type' => 'required|integer|min:1|max:30',
+                'positions_per_part' => 'required|integer|min:1|max:10',
                 'error_score' => 'nullable|numeric|min:0|max:100',
                 'hesitation_score' => 'nullable|numeric|min:0|max:100',
                 'fail_score' => 'nullable|numeric|min:0|max:100',
@@ -73,6 +74,7 @@ class MafsilController extends Controller
                 'student_name' => $request->student_name,
                 'mahd_name' => $request->mahd_name,
                 'mafsil_type' => $request->mafsil_type,
+                'positions_per_part' => $request->positions_per_part,
                 'error_score' => $request->error_score ?? 3,
                 'hesitation_score' => $request->hesitation_score ?? 0.33,
                 'fail_score' => $request->fail_score ?? 60,
@@ -83,6 +85,8 @@ class MafsilController extends Controller
         $studentName = trim((string) $request->query('student_name', $request->input('student_name', '')));
         $mahdName = trim((string) $request->query('mahd_name', $request->input('mahd_name', '')));
         $mafsilType = (int) $request->query('mafsil_type', $request->input('mafsil_type', 0));
+        $positionsPerPart = (int) $request->query('positions_per_part', $request->input('positions_per_part', 3));
+        $positionsPerPart = max(1, min(10, $positionsPerPart));
         $sessionDate = $request->query('session_date', $request->input('session_date', date('Y-m-d')));
         $errorScore = (float) $request->query('error_score', $request->input('error_score', 3));
         $hesitationScore = (float) $request->query('hesitation_score', $request->input('hesitation_score', 0.33));
@@ -91,6 +95,7 @@ class MafsilController extends Controller
         if ($studentName === '' || $mafsilType < 1 || $mafsilType > 30) {
             return view('guest.mafsil-form', [
                 'today' => date('Y-m-d'),
+                'positionsPerPart' => old('positions_per_part', 3),
             ]);
         }
 
@@ -111,6 +116,7 @@ class MafsilController extends Controller
                 'student_name' => 'required|string|max:255',
                 'mahd_name' => 'nullable|string|max:255',
                 'mafsil_type' => 'required|integer|min:1|max:30',
+                'positions_per_part' => 'required|integer|min:1|max:10',
                 'error_score' => 'nullable|numeric|min:0|max:100',
                 'hesitation_score' => 'nullable|numeric|min:0|max:100',
                 'fail_score' => 'nullable|numeric|min:0|max:100',
@@ -139,13 +145,13 @@ class MafsilController extends Controller
             }
 
             $difficultyDistribution = $request->input('difficulty', []);
-            $validatedDistribution = $this->validateDifficultyDistribution($selectedParts, $difficultyDistribution);
+            $validatedDistribution = $this->validateDifficultyDistribution($selectedParts, $difficultyDistribution, $positionsPerPart);
 
             if ($validatedDistribution === null) {
-                return back()->withErrors(['difficulty' => 'توزيع المواضيع غير صالح. يجب أن يكون المجموع 3 لكل جزء.'])->withInput();
+                return back()->withErrors(['difficulty' => 'توزيع المواضيع غير صالح. يجب أن يكون المجموع '.$positionsPerPart.' لكل جزء.'])->withInput();
             }
 
-            $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
+            $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution, $positionsPerPart);
             $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
                 ->get(['id', 'name', 'category']);
 
@@ -154,7 +160,7 @@ class MafsilController extends Controller
             return view('guest.mafsil', compact(
                 'student', 'studentName', 'mahdName', 'mafsilType', 'maxScore', 'parts', 'partsCount',
                 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions',
-                'tajweedRules', 'sessionDate', 'errorScore', 'hesitationScore', 'failScore'
+                'tajweedRules', 'sessionDate', 'errorScore', 'hesitationScore', 'failScore', 'positionsPerPart'
             ));
         }
 
@@ -166,11 +172,11 @@ class MafsilController extends Controller
         return view('guest.mafsil', compact(
             'student', 'studentName', 'mahdName', 'mafsilType', 'maxScore', 'parts', 'partsCount',
             'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions',
-            'tajweedRules', 'sessionDate', 'errorScore', 'hesitationScore', 'failScore'
+            'tajweedRules', 'sessionDate', 'errorScore', 'hesitationScore', 'failScore', 'positionsPerPart'
         ));
     }
 
-    private function validateDifficultyDistribution(array $selectedParts, array $difficultyDistribution): ?array
+    private function validateDifficultyDistribution(array $selectedParts, array $difficultyDistribution, int $positionsPerPart = 3): ?array
     {
         $validated = [];
 
@@ -184,7 +190,7 @@ class MafsilController extends Controller
                 return null;
             }
 
-            if (($easy + $medium + $hard) !== 3) {
+            if (($easy + $medium + $hard) !== $positionsPerPart) {
                 return null;
             }
 
@@ -198,7 +204,7 @@ class MafsilController extends Controller
         return $validated;
     }
 
-    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): \Illuminate\Support\Collection
+    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution, int $positionsPerPart = 3): \Illuminate\Support\Collection
     {
         $allPositions = MafsilPosition::with(['startAyah.surah', 'endAyah.surah'])
             ->whereIn('juz_number', $selectedParts)
@@ -231,7 +237,7 @@ class MafsilController extends Controller
             }
 
             if ($partSelected->isEmpty()) {
-                $partSelected = $this->buildPlaceholderPositions($partNumber, 3, 0, 0);
+                $partSelected = $this->buildPlaceholderPositions($partNumber, $positionsPerPart, 0, 0);
             }
 
             $selectedPositions = $selectedPositions->merge(
