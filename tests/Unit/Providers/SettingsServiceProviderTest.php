@@ -34,6 +34,34 @@ class SettingsServiceProviderTest extends TestCase
         $this->assertSame([0, 1, 2, 3, 4, 5, 6], config('recitation.excluded_days'));
     }
 
+    public function test_default_work_days_cover_every_day(): void
+    {
+        $this->assertSame(
+            [0, 1, 2, 3, 4, 5, 6],
+            SettingsServiceProvider::carbonDaysForDayNames(SettingsServiceProvider::DEFAULT_WORK_DAYS)
+        );
+    }
+
+    public function test_day_name_maps_stay_in_sync(): void
+    {
+        $numbers = array_keys(SettingsServiceProvider::DAY_NUMBERS);
+        $labels = array_keys(SettingsServiceProvider::DAY_NAMES_AR);
+        sort($numbers);
+        sort($labels);
+
+        $this->assertSame($numbers, $labels);
+    }
+
+    public function test_missing_recitation_setting_falls_back_to_default(): void
+    {
+        DB::table('settings')->where('key', 'recitation_days')->delete();
+
+        SettingsServiceProvider::applySettingsToConfig();
+
+        $this->assertSame([2, 6], config('recitation.required_days'));
+        $this->assertSame([0, 1, 3, 4, 5], config('recitation.excluded_days'));
+    }
+
     public function test_apply_settings_to_config_loads_known_keys(): void
     {
         $now = now();

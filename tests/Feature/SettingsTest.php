@@ -15,8 +15,8 @@ class SettingsTest extends TestCase
     private function admin(): User
     {
         return User::create([
-            'name' => 'مدير', 'username' => 'admin_' . uniqid('', true),
-            'email' => uniqid('', true) . '@test.local',
+            'name' => 'مدير', 'username' => 'admin_'.uniqid('', true),
+            'email' => uniqid('', true).'@test.local',
             'password' => Hash::make('secret'), 'role' => 'admin', 'is_active' => true,
         ]);
     }
@@ -29,6 +29,17 @@ class SettingsTest extends TestCase
         $resp->assertSee('إعدادات النظام', false);
         $resp->assertSee('أيام التسميع', false);
         $resp->assertSee('recitation_days[]', false);
+    }
+
+    public function test_admin_dashboard_shows_work_days_in_arabic(): void
+    {
+        SettingsServiceProvider::applySettingsToConfig();
+
+        $resp = $this->actingAs($this->admin())->get('/admin/dashboard');
+
+        $resp->assertStatus(200);
+        $resp->assertSee('السبت', false);
+        $resp->assertSee('الجمعة', false);
     }
 
     public function test_admin_can_save_settings_and_values_persist(): void
@@ -98,8 +109,8 @@ class SettingsTest extends TestCase
     public function test_non_admin_cannot_access_settings(): void
     {
         $supervisor = User::create([
-            'name' => 'مشرف', 'username' => 'sup_' . uniqid('', true),
-            'email' => uniqid('', true) . '@test.local',
+            'name' => 'مشرف', 'username' => 'sup_'.uniqid('', true),
+            'email' => uniqid('', true).'@test.local',
             'password' => Hash::make('secret'), 'role' => 'supervisor', 'is_active' => true,
         ]);
 

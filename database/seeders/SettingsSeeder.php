@@ -18,8 +18,8 @@ class SettingsSeeder extends Seeder
             ['key' => 'center_phone', 'value' => '', 'group' => 'general'],
             ['key' => 'work_start_time', 'value' => '08:00', 'group' => 'general'],
             ['key' => 'work_end_time', 'value' => '20:00', 'group' => 'general'],
-            ['key' => 'work_days', 'value' => 'saturday,sunday,monday,tuesday,wednesday,thursday', 'group' => 'general'],
-            ['key' => 'recitation_days', 'value' => 'saturday,tuesday', 'group' => 'general'],
+            ['key' => 'work_days', 'value' => \App\Providers\SettingsServiceProvider::DEFAULT_WORK_DAYS, 'group' => 'general'],
+            ['key' => 'recitation_days', 'value' => \App\Providers\SettingsServiceProvider::DEFAULT_RECITATION_DAYS, 'group' => 'general'],
             ['key' => 'enable_notifications', 'value' => 'true', 'group' => 'general'],
         ];
 

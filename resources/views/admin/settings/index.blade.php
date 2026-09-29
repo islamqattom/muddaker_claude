@@ -120,7 +120,7 @@
                         <label class="form-label">اختر أيام العمل</label>
                         <div class="days-grid">
                             @php
-                                $workDays = explode(',', config('app.work_days', 'saturday,sunday,monday,tuesday,thursday'));
+                                $workDays = explode(',', config('app.work_days', \App\Providers\SettingsServiceProvider::DEFAULT_WORK_DAYS));
                             @endphp
                             <div class="day-checkbox">
                                 <input type="checkbox" name="work_days[]" value="saturday" id="saturday" {{ in_array('saturday', $workDays) ? 'checked' : '' }}>
@@ -185,7 +185,7 @@
                         <label class="form-label">اختر الأيام التي يكون فيها تسميع</label>
                         <div class="days-grid">
                             @php
-                                $recitationDays = explode(',', config('app.recitation_days', 'saturday,tuesday'));
+                                $recitationDays = explode(',', config('app.recitation_days', \App\Providers\SettingsServiceProvider::DEFAULT_RECITATION_DAYS));
                                 $recitationDayOptions = [
                                     'saturday'  => 'السبت',
                                     'sunday'    => 'الأحد',

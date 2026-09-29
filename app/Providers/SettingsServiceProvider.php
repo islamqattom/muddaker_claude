@@ -24,17 +24,42 @@ class SettingsServiceProvider extends ServiceProvider
     ];
 
     /**
+     * Default list of actual work days, used by every place that needs a
+     * fallback so the value can never drift between files. The site may be
+     * opened at any time and on any day, so the default covers every day.
+     */
+    public const DEFAULT_WORK_DAYS = 'saturday,sunday,monday,tuesday,wednesday,thursday,friday';
+
+    /**
+     * Default list of recitation days. Kept independent from the work days.
+     */
+    public const DEFAULT_RECITATION_DAYS = 'saturday,tuesday';
+
+    /**
+     * Arabic labels for the English day names stored in the settings.
+     */
+    public const DAY_NAMES_AR = [
+        'saturday' => 'السبت',
+        'sunday' => 'الأحد',
+        'monday' => 'الاثنين',
+        'tuesday' => 'الثلاثاء',
+        'wednesday' => 'الأربعاء',
+        'thursday' => 'الخميس',
+        'friday' => 'الجمعة',
+    ];
+
+    /**
      * Map English day names (as stored in the "work_days" setting) to their
      * Carbon day numbers (0 = Sunday ... 6 = Saturday).
      */
     public const DAY_NUMBERS = [
-        'sunday'    => 0,
-        'monday'    => 1,
-        'tuesday'   => 2,
+        'sunday' => 0,
+        'monday' => 1,
+        'tuesday' => 2,
         'wednesday' => 3,
-        'thursday'  => 4,
-        'friday'    => 5,
-        'saturday'  => 6,
+        'thursday' => 4,
+        'friday' => 5,
+        'saturday' => 6,
     ];
 
     /**
@@ -87,12 +112,14 @@ class SettingsServiceProvider extends ServiceProvider
                 $value = false;
             }
 
-            config(['app.' . $key => $value]);
+            config(['app.'.$key => $value]);
         }
 
-        if (isset($settings['recitation_days'])) {
-            self::applyRecitationDays((string) $settings['recitation_days']->value);
-        }
+        self::applyRecitationDays(
+            isset($settings['recitation_days'])
+                ? (string) $settings['recitation_days']->value
+                : self::DEFAULT_RECITATION_DAYS
+        );
     }
 
     /**
@@ -128,5 +155,19 @@ class SettingsServiceProvider extends ServiceProvider
         sort($days);
 
         return $days;
+    }
+
+    /**
+     * Arabic label for a Carbon day number (0 = Sunday ... 6 = Saturday).
+     */
+    public static function arabicDayName(int $carbonDay): string
+    {
+        $english = array_search($carbonDay, self::DAY_NUMBERS, true);
+
+        if ($english === false) {
+            return (string) $carbonDay;
+        }
+
+        return self::DAY_NAMES_AR[$english] ?? $english;
     }
 }

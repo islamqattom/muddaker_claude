@@ -20,8 +20,7 @@ class AttendanceReminderService
 
     public function __construct(
         private readonly NotificationService $notifications,
-    ) {
-    }
+    ) {}
 
     /**
      * Send a reminder to every supervisor who still has students without an
@@ -83,7 +82,7 @@ class AttendanceReminderService
                 $supervisor,
                 'attendance',
                 'تذكير بتسجيل الحضور والغياب',
-                'لم يتم تسجيل الحضور والغياب لهذا اليوم لـ ' . $missing . ' طالب. يرجى تسجيله قبل نهاية اليوم.',
+                'لم يتم تسجيل الحضور والغياب لهذا اليوم لـ '.$missing.' طالب. يرجى تسجيله قبل نهاية اليوم.',
                 route('supervisor.attendance.index')
             );
 
@@ -99,7 +98,7 @@ class AttendanceReminderService
     public function isWorkDay(CarbonInterface $now): bool
     {
         $workDays = SettingsServiceProvider::carbonDaysForDayNames(
-            (string) config('app.work_days', 'saturday,sunday,monday,tuesday,wednesday,thursday')
+            (string) config('app.work_days', SettingsServiceProvider::DEFAULT_WORK_DAYS)
         );
 
         return in_array((int) $now->dayOfWeek, $workDays, true);
@@ -113,7 +112,7 @@ class AttendanceReminderService
         $end = (string) config('app.work_end_time', '20:00');
 
         try {
-            $endTime = Carbon::parse($now->toDateString() . ' ' . $end);
+            $endTime = Carbon::parse($now->toDateString().' '.$end);
         } catch (\Throwable $e) {
             $endTime = $now->copy()->setTime(20, 0, 0);
         }

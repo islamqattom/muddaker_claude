@@ -19,7 +19,7 @@ return new class extends Migration
 
         DB::table('settings')->insert([
             'key' => 'recitation_days',
-            'value' => 'saturday,tuesday,thursday',
+            'value' => 'saturday,tuesday',
             'group' => 'general',
             'created_at' => now(),
             'updated_at' => now(),
@@ -31,7 +31,7 @@ return new class extends Migration
         // Only remove the row when it still holds the value this migration set.
         DB::table('settings')
             ->where('key', 'recitation_days')
-            ->where('value', 'saturday,tuesday,thursday')
+            ->where('value', 'saturday,tuesday')
             ->delete();
     }
 };

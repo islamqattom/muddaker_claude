@@ -1,14 +1,22 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
+use App\Providers\SettingsServiceProvider;
 use Illuminate\Http\Request;
 
-class SettingsController extends Controller {
-    public function index() {
+class SettingsController extends Controller
+{
+    public function index()
+    {
         return view('admin.settings.index');
     }
 
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
+        $validDays = implode(',', array_keys(SettingsServiceProvider::DAY_NAMES_AR));
+
         $request->validate([
             'center_name' => 'nullable|string|max:255',
             'center_email' => 'nullable|email',
@@ -16,13 +24,13 @@ class SettingsController extends Controller {
             'work_start_time' => 'nullable',
             'work_end_time' => 'nullable',
             'work_days' => 'nullable|array',
-            'work_days.*' => 'nullable|string|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'work_days.*' => 'nullable|string|in:'.$validDays,
             'recitation_days' => 'nullable|array',
-            'recitation_days.*' => 'nullable|string|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
+            'recitation_days.*' => 'nullable|string|in:'.$validDays,
         ]);
 
-        $defaultWorkDays = ['saturday', 'sunday', 'monday', 'tuesday', 'thursday'];
-        $defaultRecitationDays = ['saturday', 'tuesday'];
+        $defaultWorkDays = array_keys(SettingsServiceProvider::DAY_NAMES_AR);
+        $defaultRecitationDays = explode(',', SettingsServiceProvider::DEFAULT_RECITATION_DAYS);
 
         // A checkbox group sends nothing when every day is unchecked. The
         // hidden "<group>_submitted" markers let us distinguish "all
@@ -65,7 +73,7 @@ class SettingsController extends Controller {
             } elseif ($value === 'false') {
                 $configValue = false;
             }
-            config(['app.' . $key => $configValue]);
+            config(['app.'.$key => $configValue]);
         }
 
         return redirect()->route('admin.settings.index')->with('success', 'تم حفظ الإعدادات بنجاح');
@@ -78,7 +86,7 @@ class SettingsController extends Controller {
      */
     private function selectedDays(Request $request, string $field, array $defaults): array
     {
-        if ($request->has($field . '_submitted')) {
+        if ($request->has($field.'_submitted')) {
             return $request->input($field) ?? [];
         }
 
