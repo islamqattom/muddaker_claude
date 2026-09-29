@@ -10,7 +10,8 @@ class SessionController extends Controller {
 
         $sessions = RecitationSession::where('supervisor_id', $supervisor->id)
             ->with('student.user', 'part', 'pages.mafsilPosition', 'supervisor')
-            ->latest()
+            ->latest('session_date')
+            ->latest('id')
             ->paginate(20);
 
         return view('supervisor.sessions.index', compact('sessions'));

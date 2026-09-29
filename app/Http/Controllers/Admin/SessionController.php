@@ -60,7 +60,7 @@ class SessionController extends Controller {
             $query->whereBetween('session_date', [$fromDate, $toDate]);
         }
 
-        $sessions = $query->latest()->paginate(20);
+        $sessions = $query->latest('session_date')->latest('id')->paginate(20)->withQueryString();
 
         // Get data for dropdowns
         $students = Student::with('user')->orderedByName()->get();

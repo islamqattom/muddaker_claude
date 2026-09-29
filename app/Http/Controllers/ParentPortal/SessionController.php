@@ -63,7 +63,7 @@ class SessionController extends Controller {
             $query->whereBetween('session_date', [$fromDate, $toDate]);
         }
 
-        $sessions = $query->latest()->paginate(20);
+        $sessions = $query->latest('session_date')->latest('id')->paginate(20)->withQueryString();
         $students = $parent->students()->with('user')->get()->sortBy(fn ($s) => $s->user->name ?? '')->values();
 
         return view('parent.sessions.index', compact('sessions', 'students'));
