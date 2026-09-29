@@ -271,4 +271,61 @@ class MissedRecitationAutomationTest extends TestCase
             Carbon::setTestNow();
         }
     }
+
+    public function test_auto_not_recitate_sessions_get_attendance_date_and_list_in_date_order(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        // Two attendances on different past required days. The auto sessions
+        // created by the backfill must keep the attendance date so the admin
+        // sessions list shows them in their proper date position.
+        $older = $this->student();
+        $this->attendance($older, '2026-01-03');
+
+        $newer = $this->student();
+        $this->attendance($newer, '2026-01-06');
+
+        Carbon::setTestNow(Carbon::parse('2026-01-10 09:00:00'));
+
+        try {
+            $resp = $this->actingAs($admin)->post(route('admin.recitation-diagnostics.backfill'), [
+                'from' => '2026-01-01',
+                'to' => '2026-01-07',
+            ]);
+
+            $resp->assertSessionHas('success');
+
+            $auto = RecitationSession::where('auto_generated', true)
+                ->orderBy('id')
+                ->get();
+
+            $this->assertCount(2, $auto);
+
+            // Every auto-created session must carry the attendance date.
+            foreach ($auto as $session) {
+                $this->assertContains(
+                    $session->session_date->toDateString(),
+                    ['2026-01-03', '2026-01-06'],
+                    'session_date must equal the attendance date, not the creation date'
+                );
+            }
+
+            // The admin /admin/sessions endpoint must order by session_date
+            // DESC first, then by id DESC — so the older date sits below the
+            // newer date, not pinned to the top by created_at.
+            $listing = $this->actingAs($admin)->get(route('admin.sessions.index'));
+            $listing->assertOk();
+
+            $rows = $listing->viewData('sessions');
+            $dates = $rows->pluck('session_date')->map(fn ($d) => $d->toDateString())->all();
+
+            $this->assertSame(
+                ['2026-01-06', '2026-01-03'],
+                array_slice($dates, 0, 2),
+                'newest session_date must come first, then older dates in their own group'
+            );
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
 }
