@@ -1861,28 +1861,40 @@
 @media (max-width: 576px) {
     .rec-session .ayahs-modal-layout {
         flex-direction: column;
-        height: min(80vh, 640px);
+        height: min(82vh, 680px);
     }
     .rec-session .ayahs-scoring-tab {
         flex: 0 0 auto;
         width: 100%;
         flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         gap: 8px;
         border-inline-start: none;
         border-top: 1px solid #eef0f3;
-        padding: 8px 12px;
+        padding: 8px 10px;
         overflow: visible;
     }
-    .rec-session .ayahs-tab-block,
-    .rec-session .ayahs-tab-score {
+    .rec-session .ayahs-tab-block {
+        flex: 1 1 calc(50% - 8px);
         flex-direction: row;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 8px;
+        margin: 0;
+    }
+    .rec-session .ayahs-tab-score {
+        flex: 1 1 100%;
+        flex-direction: row;
+        justify-content: center;
         gap: 8px;
         padding: 6px 8px;
-        margin-top: 0;
+        margin: 0;
     }
     .rec-session .ayahs-tab-controls { flex-direction: row; }
+    .rec-session .ayahs-tab-btn { width: 24px; height: 22px; }
+    .rec-session .ayahs-tab-value { font-size: 13px; }
 }
 
 /* =========================
@@ -1905,14 +1917,16 @@
 /* =========================
    RESPONSIVE
    ========================= */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .rec-session .hero-top { flex-direction: column; align-items: stretch; }
     .rec-session .hero-stats { justify-content: center; }
     .rec-session .student-block { justify-content: center; text-align: center; flex-direction: column; }
     .rec-session .student-meta { justify-content: center; }
     .rec-session .quran-verse { font-size: 12.5px; }
     .rec-session .part-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
-    .rec-session .card-body-modern { padding: 16px; }
+    .rec-session .card-header-modern,
+    .rec-session .part-section-header { flex-wrap: wrap; row-gap: 8px; }
+    .rec-session .card-body-modern { padding: 14px; }
     .rec-session .action-bar-sticky { margin: 16px -16px -16px; padding: 12px 16px; }
     .rec-session .part-section-body { padding: 14px; }
     .rec-session .position-card { grid-template-columns: 1fr; }
@@ -1928,7 +1942,7 @@
     .rec-session .distribution-grid { flex-direction: column; }
     .rec-session .distribution-grid > [class*="col-"] { width: 100%; }
     .rec-session .score-stats-grid { grid-template-columns: 1fr; }
-    .rec-session .score-dashboard { position: relative; top: 0; }
+    .rec-session .score-dashboard { position: static; top: auto; }
 }
 
 @media (max-width: 480px) {
@@ -1947,6 +1961,43 @@
     .rec-session .stat-pill { padding: 8px 12px; }
     .rec-session .stat-pill .stat-text .val { font-size: 14px; }
     .rec-session .btn-primary-modern, .rec-session .btn-outline-modern { padding: 8px 16px; font-size: 13px; }
+}
+
+/* Phones: compact layout, no horizontal overflow */
+@media (max-width: 576px) {
+    .rec-session .session-hero { margin-bottom: 12px; border-radius: 11px; }
+    .rec-session .hero-top { padding: 12px; gap: 12px; }
+    .rec-session .student-name { font-size: 16px; }
+    .rec-session .chip { font-size: 11px; padding: 4px 9px; }
+    .rec-session .stat-pill { padding: 8px 12px; }
+    .rec-session .info-alert { padding: 10px 12px; font-size: 12.5px; }
+    .rec-session .card-header-modern { padding: 10px 12px; }
+    .rec-session .card-body-modern { padding: 12px; }
+    .rec-session .part-section-body { padding: 12px; }
+
+    /* Selection: drop forced min-widths that caused overflow */
+    .rec-session .progress-card .progress-text-block { min-width: 0; }
+    .rec-session .progress-card .progress-track { min-width: 0; flex-basis: 100%; }
+    .rec-session .search-box { min-width: 0; width: 100%; }
+
+    /* Position rows: two columns so the scoring controls fit */
+    .rec-session .position-card-body { grid-template-columns: 1fr 1fr; gap: 6px; }
+    .rec-session .position-stat.deduction,
+    .rec-session .position-stat.score { grid-column: span 1; }
+    .rec-session .scoring-input-group input { width: 28px; }
+    .rec-session .scoring-input-group button { width: 22px; height: 24px; }
+
+    /* Score dashboard: compact and non-sticky */
+    .rec-session .score-dashboard { position: static; top: auto; }
+    .rec-session .score-dashboard-body { padding: 12px; gap: 12px; }
+    .rec-session .score-ring { width: 104px; height: 104px; }
+    .rec-session .score-ring .ring-value { font-size: 22px; }
+    .rec-session .score-ring-wrapper { flex-wrap: wrap; justify-content: center; gap: 12px; text-align: center; }
+    .rec-session .score-stats-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .rec-session .score-stat { flex-direction: column; text-align: center; padding: 8px; gap: 6px; }
+    .rec-session .score-stat .stat-icon-circle { width: 30px; height: 30px; font-size: 12px; }
+    .rec-session .score-stat .stat-text .lbl { font-size: 9px; }
+    .rec-session .score-stat .stat-text .val { font-size: 15px; }
 }
 
 /* =========================
