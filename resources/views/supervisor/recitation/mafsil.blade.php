@@ -2715,7 +2715,7 @@
             <textarea name="notes" class="notes-textarea" rows="3" placeholder="أي ملاحظات حول جلسة المفصل..."></textarea>
         </div>
 
-        <div class="d-flex flex-wrap gap-3 justify-content-between mt-4 mb-5">
+        <div class="d-flex flex-wrap gap-3 justify-content-between mt-4 mb-3">
             <a href="{{ route('supervisor.recitation.index') }}" class="btn-outline-modern">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
