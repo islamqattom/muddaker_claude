@@ -2044,9 +2044,8 @@
         -webkit-overflow-scrolling: touch;
     }
     .rec-session .ayahs-scoring-tab {
-        order: -1;
         position: sticky;
-        top: 0;
+        bottom: 0;
         z-index: 3;
         flex: 0 0 auto;
         width: 100%;
@@ -2058,8 +2057,8 @@
         padding: 6px 10px;
         background: #f8fafc;
         border-inline-start: none;
-        border-bottom: 1px solid #eef0f3;
-        box-shadow: 0 4px 12px rgba(15, 28, 51, 0.06);
+        border-top: 1px solid #eef0f3;
+        box-shadow: 0 -4px 12px rgba(15, 28, 51, 0.06);
         overflow: visible;
     }
     .rec-session .ayahs-tab-block {
