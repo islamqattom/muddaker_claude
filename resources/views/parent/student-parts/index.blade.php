@@ -8,17 +8,10 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon primary">
-                <i class="fas fa-book-quran"></i>
-            </div>
-            <div class="header-text">
-                <h4>سجل أجزاء الأبناء</h4>
-                <p>تابع تقدم أبنائك في حفظ أجزاء القرآن الكريم</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-book-quran">
+        <h1 class="page-banner-title">سجل أجزاء الأبناء</h1>
+        <p class="page-banner-sub">تابع تقدم أبنائك في حفظ أجزاء القرآن الكريم</p>
+    </x-page-hero>
 
     <div class="student-selector-card">
         <div class="selector-header">

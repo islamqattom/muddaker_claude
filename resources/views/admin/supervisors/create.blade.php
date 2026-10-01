@@ -163,17 +163,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-user-tie"></i>
-        </div>
-        <div class="header-text">
-            <h4>إضافة مشرف جديد</h4>
-            <p>إضافة مشرف جديد للنظام</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-user-tie">
+    <h1 class="page-banner-title">إضافة مشرف جديد</h1>
+    <p class="page-banner-sub">إضافة مشرف جديد للنظام</p>
+</x-page-hero>
 
 <div class="form-card">
     <div class="form-header">

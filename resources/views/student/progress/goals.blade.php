@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-bullseye">
+    <h1 class="page-banner-title">إدارة الأهداف</h1>
+</x-page-hero>
 <div class="card">
     <div class="card-header">
         <h5><i class="fas fa-bullseye me-2"></i>إدارة الأهداف</h5>

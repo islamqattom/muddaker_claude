@@ -15,20 +15,15 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-layer-group"></i>
-        </div>
-        <div class="header-text">
-            <h4>إدارة المستويات</h4>
-            <p>إضافة وتعديل مستويات حفظ القرآن الكريم</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.levels.create') }}" class="add-btn">
-        <i class="fas fa-plus me-2"></i>إضافة مستوى
-    </a>
-</div>
+<x-page-hero icon="fas fa-layer-group">
+    <h1 class="page-banner-title">إدارة المستويات</h1>
+    <p class="page-banner-sub">إضافة وتعديل مستويات حفظ القرآن الكريم</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.levels.create') }}" class="btn-gold">
+            <i class="fas fa-plus me-2"></i>إضافة مستوى
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Levels Cards --}}
 @if($levels->isEmpty())

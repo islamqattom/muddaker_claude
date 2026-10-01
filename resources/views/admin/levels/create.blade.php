@@ -16,17 +16,10 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon success">
-            <i class="fas fa-plus-circle"></i>
-        </div>
-        <div class="header-text">
-            <h4>إضافة مستوى جديد</h4>
-            <p>إنشاء مستوى جديد لإدارة حفظ القرآن</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-plus-circle">
+    <h1 class="page-banner-title">إضافة مستوى جديد</h1>
+    <p class="page-banner-sub">إنشاء مستوى جديد لإدارة حفظ القرآن</p>
+</x-page-hero>
 
 <div class="form-card">
     @if(session('success'))

@@ -233,7 +233,7 @@
 }
 /* Tablets portrait and large phones */
 @media (max-width: 768px) {
-.page-header .btn { width: 100%; }
+.page-banner-actions .btn { width: 100%; }
 .legend-container {
         gap: 10px;
         padding: 10px 12px;
@@ -636,20 +636,15 @@
 
 @section('content')
 <div class="calendar-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div class="header-text">
-                <h4>تقويم المهام التفاعلي</h4>
-                <p>عرض وإدارة المهام الموكلة على شكل تقويم</p>
-            </div>
-        </div>
-        <button class="btn btn-primary" onclick="openCreateTaskModal()">
-            <i class="fas fa-plus"></i> إضافة مهمة
-        </button>
-    </div>
+    <x-page-hero icon="fas fa-calendar-alt">
+        <h1 class="page-banner-title">تقويم المهام التفاعلي</h1>
+        <p class="page-banner-sub">عرض وإدارة المهام الموكلة على شكل تقويم</p>
+        <x-slot:actions>
+            <button class="btn btn-primary" onclick="openCreateTaskModal()">
+                <i class="fas fa-plus"></i> إضافة مهمة
+            </button>
+        </x-slot:actions>
+    </x-page-hero>
 
     @php
         $calendarTab = request('view') === 'student' ? 'student' : ($studentFilter ? 'student' : 'all');

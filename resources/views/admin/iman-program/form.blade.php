@@ -43,17 +43,13 @@
 
 @section('content')
 <div class="iman-form-page">
-    <div class="page-hero">
-        <div class="hero-icon"><i class="fas fa-seedling"></i></div>
-        <div>
-            <h1>{{ $program ? 'تعديل البرنامج الإيماني' : 'برنامج إيماني جديد' }}</h1>
-            <p>{{ $student ? 'للطالب: ' . $student->user->name : 'البرنامج الإيماني الخاص بك' }}</p>
-        </div>
-        <div style="margin-right:auto">
+    <x-page-hero icon="fas fa-seedling">
+        <h1 class="page-banner-title">{{ $program ? 'تعديل البرنامج الإيماني' : 'برنامج إيماني جديد' }}</h1>
+        <p class="page-banner-sub">{{ $student ? 'للطالب: ' . $student->user->name : 'البرنامج الإيماني الخاص بك' }}</p>
+        <x-slot:actions>
             <a href="{{ $student ? route('admin.iman-program.index', ['scope' => 'student', 'student_id' => $student->id]) : route('admin.iman-program.index', ['scope' => 'self']) }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
-
+        </x-slot:actions>
+    </x-page-hero>
     @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>

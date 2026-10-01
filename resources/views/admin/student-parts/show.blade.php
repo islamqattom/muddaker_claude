@@ -218,21 +218,16 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 @endpush
 
 @section('content')
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-book-quran"></i>
-        </div>
-        <div class="header-text">
-            <h4>سجل أجزاء الطالب — {{ $student->user->name }}</h4>
-            <p>عرض جميع أجزاء التسميع للطالب</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.student-parts.index') }}" class="btn-back">
-        <i class="fas fa-arrow-right"></i>
-        رجوع
-    </a>
-</div>
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">سجل أجزاء الطالب — {{ $student->user->name }}</h1>
+    <p class="page-banner-sub">عرض جميع أجزاء التسميع للطالب</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.student-parts.index') }}" class="btn-back">
+            <i class="fas fa-arrow-right"></i>
+            رجوع
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 @if(session('success'))
     <div class="alert alert-success mb-4">

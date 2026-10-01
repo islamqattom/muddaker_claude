@@ -57,13 +57,10 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 
 @section('content')
 <div class="form-page">
-    <div class="page-header">
-        <div class="subject-color-badge" style="background:{{ $subject->color }}"><i class="fas fa-plus-circle"></i></div>
-        <div class="header-text">
-            <h4>إضافة درس جديد</h4>
-            <p>المادة: <strong>{{ $subject->name }}</strong></p>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-plus-circle">
+        <h1 class="page-banner-title">إضافة درس جديد</h1>
+        <p class="page-banner-sub">المادة: <strong>{{ $subject->name }}</strong></p>
+    </x-page-hero>
 
     <div class="form-card">
         <form method="POST" action="{{ route($role . '.lessons.store', $subject->id) }}">

@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-microphone-alt">
+    <h1 class="page-banner-title">نتيجة تقييم النطق</h1>
+</x-page-hero>
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">نتيجة التقييم</h5>

@@ -166,17 +166,10 @@
 
 @section('content')
 <div class="student-warnings">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">الإنذارات</h1>
-                <p class="hero-sub">سجل الإنذارات والتوبيخات</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-exclamation-triangle">
+        <h1 class="page-banner-title">الإنذارات</h1>
+        <p class="page-banner-sub">سجل الإنذارات والتوبيخات</p>
+    </x-page-hero>
 
     <div class="warnings-card">
         <div class="warnings-header">

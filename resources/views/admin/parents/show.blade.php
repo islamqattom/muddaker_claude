@@ -16,30 +16,22 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon-wrapper">
-            <div class="header-icon">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="header-icon-glow"></div>
+<x-page-hero icon="fas fa-user">
+    <h1 class="page-banner-title">بيانات ولي الأمر</h1>
+    <p class="page-banner-sub">معلومات وإحصائيات ولي الأمر</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <a href="{{ route('admin.parents.edit', $parent->id) }}" class="edit-btn-islamic">
+                <i class="fas fa-edit"></i>
+                <span>تعديل</span>
+            </a>
+            <a href="{{ route('admin.parents.index') }}" class="back-btn-islamic">
+                <i class="fas fa-arrow-right"></i>
+                <span>القائمة</span>
+            </a>
         </div>
-        <div class="header-text">
-            <h4>بيانات ولي الأمر</h4>
-            <p>معلومات وإحصائيات ولي الأمر</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        <a href="{{ route('admin.parents.edit', $parent->id) }}" class="edit-btn-islamic">
-            <i class="fas fa-edit"></i>
-            <span>تعديل</span>
-        </a>
-        <a href="{{ route('admin.parents.index') }}" class="back-btn-islamic">
-            <i class="fas fa-arrow-right"></i>
-            <span>القائمة</span>
-        </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-4">
     {{-- Main Content --}}

@@ -245,32 +245,10 @@
 
 @section('content')
 <div class="session-detail">
-    <div class="page-hero">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="hero-content d-flex align-items-center gap-3">
-                <div class="hero-icon">
-                    <i class="fas fa-quran"></i>
-                </div>
-                <div>
-                    <h1 class="hero-title">تفاصيل جلسة التسميع</h1>
-                    <p class="hero-sub">بيانات وتقرير جلسة التحفيظ للطالب</p>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="meta-date">
-                    <i class="fas fa-calendar-alt"></i>
-                    {{ $session->session_date->format('Y/m/d') }}
-                </span>
-                <span class="type-badge {{ $session->type }}">
-                    {{ $session->type_label }}
-                </span>
-            </div>
-        </div>
-        <div class="quran-verse">
-            <i class="fas fa-book-quran me-2"></i>
-            {{ 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا' }}
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-quran">
+        <h1 class="page-banner-title">تفاصيل جلسة التسميع</h1>
+        <p class="page-banner-sub">بيانات وتقرير جلسة التحفيظ للطالب</p>
+    </x-page-hero>
 
     <div class="row g-4">
         <div class="col-lg-8">

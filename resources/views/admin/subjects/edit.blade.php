@@ -44,13 +44,10 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 
 @section('content')
 <div class="form-page">
-    <div class="page-header">
-        <div class="header-icon"><i class="fas fa-edit"></i></div>
-        <div class="header-text">
-            <h4>تعديل: {{ $subject->name }}</h4>
-            <p>قم بتحديث بيانات المادة الدراسية</p>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-edit">
+        <h1 class="page-banner-title">تعديل: {{ $subject->name }}</h1>
+        <p class="page-banner-sub">قم بتحديث بيانات المادة الدراسية</p>
+    </x-page-hero>
 
     <div class="form-card">
         <form method="POST" action="{{ route($role . '.subjects.update', $subject->id) }}">

@@ -198,17 +198,10 @@
 
 @section('content')
 <div class="leaderboard-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">لوحة المتصدرين</h1>
-                <p class="hero-sub">تصنيف الطلاب حسب الأداء</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-trophy">
+        <h1 class="page-banner-title">لوحة المتصدرين</h1>
+        <p class="page-banner-sub">تصنيف الطلاب حسب الأداء</p>
+    </x-page-hero>
 
     <div class="filter-card">
         <form method="GET" class="filter-form">

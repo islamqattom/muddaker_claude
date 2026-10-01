@@ -204,21 +204,10 @@
 
 @section('content')
 <div class="student-sessions">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-microphone"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">جلسات التسميع</h1>
-                <p class="hero-sub">سجل جلسات التحفيظ والتقييم</p>
-            </div>
-        </div>
-        <div class="quran-verse">
-            <i class="fas fa-book-quran me-2"></i>
-            {{ 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا' }}
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-microphone">
+        <h1 class="page-banner-title">جلسات التسميع</h1>
+        <p class="page-banner-sub">سجل جلسات التحفيظ والتقييم</p>
+    </x-page-hero>
 
     <div class="sessions-card">
         <div class="sessions-header">

@@ -9,6 +9,11 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-star-and-crescent">
+    <h1 class="page-banner-title">تقاريري الإيمانية</h1>
+</x-page-hero>
+
     @include('partials.iman-program.student-report-body', [
         'data' => $data,
         'formAction' => $formAction,

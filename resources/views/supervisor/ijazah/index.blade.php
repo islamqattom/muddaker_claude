@@ -190,17 +190,10 @@
         </div>
     @endif
 
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-award"></i>
-            </div>
-            <div class="header-text">
-                <h4>تسجيل الإجازة</h4>
-                <p>سجل إجازة الطالب في القرآن الكريم</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-award">
+        <h1 class="page-banner-title">تسجيل الإجازة</h1>
+        <p class="page-banner-sub">سجل إجازة الطالب في القرآن الكريم</p>
+    </x-page-hero>
 
     <div class="form-card">
         <div class="card-header-custom">

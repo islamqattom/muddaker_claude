@@ -173,17 +173,10 @@
 
 @section('content')
 <div class="azkar-category">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-4">
-            <div class="hero-icon">
-                <i class="fas {{ $category->icon }}"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">{{ $category->name }}</h1>
-                <p class="hero-sub">{{ $category->adhkar->count() }} ذكر</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero :icon="'fas ' . $category->icon">
+        <h1 class="page-banner-title">{{ $category->name }}</h1>
+        <p class="page-banner-sub">{{ $category->adhkar->count() }} ذكر</p>
+    </x-page-hero>
 
     <a href="{{ route('student.azkar') }}" class="btn btn-sm mb-4" style="background: #f8f9fa; color: #6c7a89; border-radius: 9px;">
         <i class="fas fa-arrow-right me-1"></i> رجوع للأقسام

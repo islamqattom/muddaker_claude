@@ -22,24 +22,16 @@
 </div>
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon-wrapper">
-            <div class="header-icon">
-                <i class="fas fa-tags"></i>
-            </div>
-            <div class="header-icon-glow"></div>
-        </div>
-        <div class="header-text">
-            <h4>إدارة فئات الرسوم</h4>
-            <p>إضافة وتعديل فئات الرسوم الشهرية للطلاب</p>
-        </div>
-    </div>
-    <button type="button" class="add-btn-category" onclick="openCreateModal()">
-        <i class="fas fa-plus"></i>
-        <span>إضافة فئة جديدة</span>
-    </button>
-</div>
+<x-page-hero icon="fas fa-tags">
+    <h1 class="page-banner-title">إدارة فئات الرسوم</h1>
+    <p class="page-banner-sub">إضافة وتعديل فئات الرسوم الشهرية للطلاب</p>
+    <x-slot:actions>
+        <button type="button" class="btn-gold" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i>
+            <span>إضافة فئة جديدة</span>
+        </button>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Stats Cards --}}
 <div class="stats-grid-categories mb-4">

@@ -15,6 +15,10 @@
 
 @section('content')
 
+<x-page-hero icon="fas fa-layer-group">
+    <h1 class="page-banner-title">تفاصيل المستوى</h1>
+</x-page-hero>
+
 <div class="details-layout">
     {{-- Level Info Card --}}
     <div class="info-card">

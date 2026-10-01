@@ -180,17 +180,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-quran"></i>
-        </div>
-        <div class="header-text">
-            <h4>جلسات التسميع</h4>
-            <p>متابعة وتسجيل جلسات تحفيظ القرآن الكريم</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-quran">
+    <h1 class="page-banner-title">جلسات التسميع</h1>
+    <p class="page-banner-sub">متابعة وتسجيل جلسات تحفيظ القرآن الكريم</p>
+</x-page-hero>
 
 <div class="filter-card">
     <div class="filter-header">

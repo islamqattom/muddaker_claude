@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-book-open">
+    <h1 class="page-banner-title">التفسير</h1>
+</x-page-hero>
 <link rel="stylesheet" href="{{ asset('css/student/tarteel-center.css') }}?v={{ time() }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="api-token" content="{{ $apiToken ?? '' }}">

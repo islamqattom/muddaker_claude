@@ -166,21 +166,16 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="header-text">
-            <h4>الإنذارات</h4>
-            <p>سجل ومتابعة إنذارات الطلاب</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.warnings.create') }}" class="add-btn">
-        <i class="fas fa-plus-circle"></i>
-        إضافة إنذار
-    </a>
-</div>
+<x-page-hero icon="fas fa-exclamation-triangle">
+    <h1 class="page-banner-title">الإنذارات</h1>
+    <p class="page-banner-sub">سجل ومتابعة إنذارات الطلاب</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.warnings.create') }}" class="btn-gold">
+            <i class="fas fa-plus-circle"></i>
+            إضافة إنذار
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="filter-card">
     <div class="filter-header">

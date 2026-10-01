@@ -198,22 +198,17 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .assignment-row .form-label i { color: var(--gold); margin-left: 6px; }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-tasks"></i>
+<x-page-hero icon="fas fa-tasks">
+    <h1 class="page-banner-title">إدارة التكليفات</h1>
+    <p class="page-banner-sub">متابعة وتتبع جميع التكليفات المكلّفة للمشرفين</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <button type="button" class="btn btn-primary" onclick="openCreateTaskModal()">
+                <i class="fas fa-plus"></i> إضافة تكليف
+            </button>
         </div>
-        <div class="header-text">
-            <h4>إدارة التكليفات</h4>
-            <p>متابعة وتتبع جميع التكليفات المكلّفة للمشرفين</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        <button type="button" class="btn btn-primary" onclick="openCreateTaskModal()">
-            <i class="fas fa-plus"></i> إضافة تكليف
-        </button>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 @php
     $statusCounts = [

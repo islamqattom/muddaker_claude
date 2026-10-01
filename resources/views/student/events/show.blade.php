@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-users">
+    <h1 class="page-banner-title">تفاصيل الحدث الجماعي</h1>
+</x-page-hero>
 <!-- Event Header -->
 <div class="card mb-4">
     <div class="card-body">

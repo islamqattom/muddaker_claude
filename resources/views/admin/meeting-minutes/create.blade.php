@@ -304,17 +304,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-plus-circle"></i>
-        </div>
-        <div class="header-text">
-            <h4>إضافة محضر اجتماع جديد</h4>
-            <p>تسجيل محضر جلسة جمعية تحفيظ القرآن الكريم</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-plus-circle">
+    <h1 class="page-banner-title">إضافة محضر اجتماع جديد</h1>
+    <p class="page-banner-sub">تسجيل محضر جلسة جمعية تحفيظ القرآن الكريم</p>
+</x-page-hero>
 
 <div class="form-container">
     <form method="POST" action="{{ route('admin.meeting-minutes.store') }}">

@@ -39,26 +39,13 @@
 
 @section('content')
 <div class="manage-criteria-page">
-    <div class="page-hero">
-        <div class="hero-icon"><i class="fas fa-user-graduate"></i></div>
-        <div>
-            <h1>إدارة معايير برنامج الطالب</h1>
-            <p>أضف أو عدّل المعايير الخاصة ببرنامج الطالب</p>
-            <div class="student-badge">
-                <i class="fas fa-user"></i>
-                الطالب: {{ $student->user->name }}
-                @if($student->student_number) ({{ $student->student_number }}) @endif
-            </div>
-            <div class="student-badge" style="margin-inline-start:8px;">
-                <i class="fas fa-seedling"></i>
-                البرنامج: {{ $program->name }}
-            </div>
-        </div>
-        <div style="margin-right: auto;">
+    <x-page-hero icon="fas fa-user-graduate">
+        <h1 class="page-banner-title">إدارة معايير برنامج الطالب</h1>
+        <p class="page-banner-sub">أضف أو عدّل المعايير الخاصة ببرنامج الطالب</p>
+        <x-slot:actions>
             <a href="{{ route('supervisor.iman-program.index', ['scope' => 'student', 'student_id' => $student->id]) }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
-
+        </x-slot:actions>
+    </x-page-hero>
     @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>

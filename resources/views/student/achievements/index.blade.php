@@ -205,17 +205,10 @@
 
 @section('content')
 <div class="achievements-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">إنجازاتي</h1>
-                <p class="hero-sub">عرض إنجازاتك والشهادات التي حققتها</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-trophy">
+        <h1 class="page-banner-title">إنجازاتي</h1>
+        <p class="page-banner-sub">عرض إنجازاتك والشهادات التي حققتها</p>
+    </x-page-hero>
 
     <div class="row g-3 mb-4">
         <div class="col-6">

@@ -15,22 +15,15 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header mb-4">
-    <div class="header-content">
-        <div class="header-icon supervisors">
-            <i class="fas fa-user-tie"></i>
-        </div>
-        <div class="header-text">
-            <h4>إدارة المشرفين</h4>
-            <p>عرض وإدارة جميع مشرفي مركز التسميع</p>
-        </div>
-    </div>
-    <div class="header-stats">
-        <a href="{{ route('admin.supervisors.create') }}" class="btn btn-success header-btn">
+<x-page-hero icon="fas fa-user-tie">
+    <h1 class="page-banner-title">إدارة المشرفين</h1>
+    <p class="page-banner-sub">عرض وإدارة جميع مشرفي مركز التسميع</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.supervisors.create') }}" class="btn-gold">
             <i class="fas fa-plus me-2"></i>إضافة مشرف
         </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Supervisors Cards Grid --}}
 @if($supervisors->isEmpty())

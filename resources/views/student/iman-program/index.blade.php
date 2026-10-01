@@ -211,24 +211,18 @@ if (! function_exists('thisDayName')) {
 @endphp
 
 <div class="iman-page">
-    <div class="page-hero">
-        <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-star-and-crescent"></i></div>
-            <div>
-                <h1 class="hero-title">البرنامج الإيماني</h1>
-                <p class="hero-sub">حدد معاييرك اليومية وتابع التزامك على مدار الأسبوع</p>
-            </div>
-            <div class="hero-actions">
-                <a href="{{ route('student.iman-program.my-report') }}" class="btn-ghost">
-                    <i class="fas fa-chart-pie"></i> تقاريري
-                </a>
-                <a href="{{ route('student.iman-program.create') }}" class="btn-gold">
-                    <i class="fas fa-plus-circle"></i> برنامج جديد
-                </a>
-            </div>
-        </div>
-    </div>
-
+    <x-page-hero icon="fas fa-star-and-crescent">
+        <h1 class="page-banner-title">البرنامج الإيماني</h1>
+        <p class="page-banner-sub">حدد معاييرك اليومية وتابع التزامك على مدار الأسبوع</p>
+        <x-slot:actions>
+            <a href="{{ route('student.iman-program.my-report') }}" class="btn-ghost">
+                <i class="fas fa-chart-pie"></i> تقاريري
+            </a>
+            <a href="{{ route('student.iman-program.create') }}" class="btn-gold">
+                <i class="fas fa-plus-circle"></i> برنامج جديد
+            </a>
+        </x-slot:actions>
+    </x-page-hero>
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon navy"><i class="fas fa-bookmark"></i></div>

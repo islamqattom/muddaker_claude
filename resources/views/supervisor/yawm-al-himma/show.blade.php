@@ -62,15 +62,10 @@
 
 @section('content')
 <div class="yawm-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon"><i class="fas fa-mosque"></i></div>
-            <div class="header-text">
-                <h4>تفاصيل جلسة يوم الهمة</h4>
-                <p>الطالب: {{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-mosque">
+        <h1 class="page-banner-title">تفاصيل جلسة يوم الهمة</h1>
+        <p class="page-banner-sub">الطالب: {{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
+    </x-page-hero>
 
     <div class="info-card">
         <h2><i class="fas fa-info-circle me-2" style="color: var(--gold);"></i>بيانات الجلسة</h2>

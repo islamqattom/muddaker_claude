@@ -217,21 +217,16 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 </style>
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-calendar-check"></i>
-        </div>
-        <div class="header-text">
-            <h4>محاضر الاجتماعات</h4>
-            <p>إدارة وتتبع محاضر جلسات جمعية تحفيظ القرآن الكريم</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.meeting-minutes.create') }}" class="add-btn">
-        <i class="fas fa-plus-circle"></i>
-        إضافة محضر جديد
-    </a>
-</div>
+<x-page-hero icon="fas fa-calendar-check">
+    <h1 class="page-banner-title">محاضر الاجتماعات</h1>
+    <p class="page-banner-sub">إدارة وتتبع محاضر جلسات جمعية تحفيظ القرآن الكريم</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.meeting-minutes.create') }}" class="btn-gold">
+            <i class="fas fa-plus-circle"></i>
+            إضافة محضر جديد
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Stats Cards --}}
 <div class="stats-grid">

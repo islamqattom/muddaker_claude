@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-swords">
+    <h1 class="page-banner-title">إنشاء تحدي جديد</h1>
+</x-page-hero>
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0"><i class="fas fa-swords me-2"></i>إنشاء تحدي جديد</h5>

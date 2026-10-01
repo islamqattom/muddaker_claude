@@ -168,22 +168,10 @@
 
 @section('content')
 <div class="pronunciation-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="hero-icon">
-                    <i class="fas fa-microphone-alt"></i>
-                </div>
-                <div>
-                    <h1 class="hero-title">نشاط النطق</h1>
-                    <p class="hero-sub">سجل محاولات النطق والتجويد</p>
-                </div>
-            </div>
-            <a href="{{ route('student.pronunciation.practice') }}" class="btn-new">
-                <i class="fas fa-plus"></i>محاولة جديدة
-            </a>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-microphone-alt">
+        <h1 class="page-banner-title">نشاط النطق</h1>
+        <p class="page-banner-sub">سجل محاولات النطق والتجويد</p>
+    </x-page-hero>
 
     @if($attempts->count() > 0)
         <div class="attempts-card">

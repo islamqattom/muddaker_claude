@@ -17,6 +17,10 @@
 
 @section('content')
 
+<x-page-hero icon="fas fa-user-graduate">
+    <h1 class="page-banner-title">تعديل بيانات الطالب</h1>
+</x-page-hero>
+
 <div class="quranic-verse-header mb-4">
     <div class="verse-decoration"></div>
     <p class="quranic-verse">﴿ خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ ﴾</p>

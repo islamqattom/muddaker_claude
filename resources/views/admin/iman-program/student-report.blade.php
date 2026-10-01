@@ -10,6 +10,11 @@
 
 @section('content')
 
+<x-page-hero icon="fas fa-star-and-crescent">
+    <h1 class="page-banner-title">تقرير البرنامج الإيماني</h1>
+</x-page-hero>
+
+
 <div style="background:linear-gradient(135deg,#182B48 0%,#2A4570 100%);border-radius:14px;padding:16px 22px;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
     <div style="width:48px;height:48px;border-radius:13px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">
         <i class="fas fa-user-graduate"></i>

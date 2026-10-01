@@ -166,17 +166,10 @@
 
 @section('content')
 <div class="events-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">الأحداث الجماعية</h1>
-                <p class="hero-sub">أحداث الحفظ الجماعي والتحديات</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-users">
+        <h1 class="page-banner-title">الأحداث الجماعية</h1>
+        <p class="page-banner-sub">أحداث الحفظ الجماعي والتحديات</p>
+    </x-page-hero>
 
     @if($myEvents->count() > 0)
     <div class="event-card accent-primary">

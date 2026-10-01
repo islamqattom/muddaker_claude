@@ -15,17 +15,10 @@
 
 @section('content')
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-history"></i>
-        </div>
-        <div class="header-text">
-            <h4>سجل الحضور والغياب</h4>
-            <p>عرض سجل الحضور والغياب للطلاب</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-history">
+    <h1 class="page-banner-title">سجل الحضور والغياب</h1>
+    <p class="page-banner-sub">عرض سجل الحضور والغياب للطلاب</p>
+</x-page-hero>
 
 <div class="filter-card">
     <form method="GET" action="{{ route('supervisor.attendance.history') }}" class="filter-form">

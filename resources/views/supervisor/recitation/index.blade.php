@@ -370,18 +370,10 @@ $sessionTypes = [
 <div class="recitation-index">
     <div class="row g-3">
         <div class="col-lg-5">
-            <div class="hero-section">
-                <div class="hero-content">
-                    <div class="hero-icon">
-                        <i class="fas fa-book-quran"></i>
-                    </div>
-                    <div>
-                        <h1 class="hero-title">جلسة تسميع</h1>
-                        <p class="hero-subtitle">ابدأ جلسة جديدة مع طالب</p>
-                        <p class="quran-verse">وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا</p>
-                    </div>
-                </div>
-            </div>
+            <x-page-hero icon="fas fa-book-quran">
+                <h1 class="page-banner-title">جلسة تسميع</h1>
+                <p class="page-banner-sub">ابدأ جلسة جديدة مع طالب</p>
+            </x-page-hero>
 
             <div class="form-card">
                 <div class="card-header">

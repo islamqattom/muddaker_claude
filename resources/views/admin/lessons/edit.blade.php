@@ -42,13 +42,10 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 
 @section('content')
 <div class="form-page">
-    <div class="page-header">
-        <div class="subject-color-badge" style="background:{{ $subject->color }}"><i class="fas fa-edit"></i></div>
-        <div class="header-text">
-            <h4>تعديل درس</h4>
-            <p>المادة: <strong>{{ $subject->name }}</strong></p>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-edit">
+        <h1 class="page-banner-title">تعديل درس</h1>
+        <p class="page-banner-sub">المادة: <strong>{{ $subject->name }}</strong></p>
+    </x-page-hero>
 
     <div class="form-card">
         <form method="POST" action="{{ route($role . '.lessons.update', [$subject->id, $lesson->id]) }}">

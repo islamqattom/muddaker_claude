@@ -159,17 +159,10 @@
 
 @section('content')
 <div class="parts-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-book-quran"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">سجل أجزاء الطالب</h1>
-                <p class="hero-sub">{{ $student->user->name }}</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-book-quran">
+        <h1 class="page-banner-title">سجل أجزاء الطالب</h1>
+        <p class="page-banner-sub">{{ $student->user->name }}</p>
+    </x-page-hero>
 
     @if(session('success'))
         <div class="alert alert-success mb-4" style="border-radius: 13px; padding: 12px 16px; background: rgba(39,174,96,0.15); border-color: rgba(39,174,96,0.3); color: #27ae60;">

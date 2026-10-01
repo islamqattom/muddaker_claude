@@ -241,17 +241,10 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header mb-4">
-    <div class="header-content">
-        <div class="header-icon quran">
-            <i class="fas fa-book-quran"></i>
-        </div>
-        <div class="header-text">
-            <h4>سجل أجزاء الطلاب</h4>
-            <p>البحث عن طالب لعرض سجل أجزاء التسميع</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">سجل أجزاء الطلاب</h1>
+    <p class="page-banner-sub">البحث عن طالب لعرض سجل أجزاء التسميع</p>
+</x-page-hero>
 
 {{-- Student Selector Section --}}
 <div class="student-selector-section">

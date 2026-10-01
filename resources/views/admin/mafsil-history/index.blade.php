@@ -258,17 +258,42 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
         color: var(--primary);
     }
 .source-tab i { font-size: 14px; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+.btn-mafsil-guest {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    background: linear-gradient(135deg, #d4a030, #B4802C);
+    color: #fff;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: 'Tajawal', sans-serif;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(212,160,48,0.35);
+    transition: all 0.3s ease;
+}
+.btn-mafsil-guest:hover {
+    background: linear-gradient(135deg, #B4802C, #d4a030);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(212,160,48,0.45);
+}
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon"><i class="fas fa-book-quran"></i></div>
-        <div class="header-text">
-            <h4>سجل اختبار الأجزاء</h4>
-            <p>عرض جميع جلسات اختبار الأجزاء المسجلة</p>
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">سجل اختبار الأجزاء</h1>
+    <p class="page-banner-sub">عرض جميع جلسات اختبار الأجزاء المسجلة</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <a href="{{ route('public.recitation.mafsil') }}" target="_blank" rel="noopener" class="btn-mafsil-guest">
+                <i class="fas fa-external-link-alt"></i>
+                <span>فتح اختبار الأجزاء (صفحة الزائر)</span>
+            </a>
         </div>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="source-tabs">
     <a href="{{ route('admin.mafsil-history.index', array_merge(request()->except('source', 'page'), ['source' => 'all'])) }}"

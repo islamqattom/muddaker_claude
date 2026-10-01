@@ -154,17 +154,10 @@
 
 @section('content')
 <div class="student-reports">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">تقاريري</h1>
-                <p class="hero-sub">عرض إحصائيات وتقارير أدائك</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-chart-bar">
+        <h1 class="page-banner-title">تقاريري</h1>
+        <p class="page-banner-sub">عرض إحصائيات وتقارير أدائك</p>
+    </x-page-hero>
 
     <div class="row g-4 mb-4">
         <div class="col-md-6 col-lg-3">

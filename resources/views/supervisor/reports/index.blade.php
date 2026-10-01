@@ -19,6 +19,10 @@
 @endphp
 
 @section('content')
+
+<x-page-hero icon="fas fa-chart-bar">
+    <h1 class="page-banner-title">التقارير</h1>
+</x-page-hero>
 @include('admin.reports._styles')
 
 <div class="rpt-header">

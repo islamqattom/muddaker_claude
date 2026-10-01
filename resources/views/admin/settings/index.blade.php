@@ -15,17 +15,10 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-cogs"></i>
-        </div>
-        <div class="header-text">
-            <h4>إعدادات النظام</h4>
-            <p>إدارة إعدادات ومعلومات مركز التسميع</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-cogs">
+    <h1 class="page-banner-title">إعدادات النظام</h1>
+    <p class="page-banner-sub">إدارة إعدادات ومعلومات مركز التسميع</p>
+</x-page-hero>
 
 <div class="settings-layout">
     {{-- Settings Form --}}

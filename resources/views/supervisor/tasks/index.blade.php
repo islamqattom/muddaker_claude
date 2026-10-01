@@ -203,17 +203,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-clipboard-list"></i>
-        </div>
-        <div class="header-text">
-            <h4>تكليفاتي</h4>
-            <p>التكليفات الصادرة من محاضر الاجتماعات</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-clipboard-list">
+    <h1 class="page-banner-title">تكليفاتي</h1>
+    <p class="page-banner-sub">التكليفات الصادرة من محاضر الاجتماعات</p>
+</x-page-hero>
 
 @php
     $statusCounts = [

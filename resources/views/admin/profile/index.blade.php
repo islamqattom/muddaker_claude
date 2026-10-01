@@ -13,6 +13,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-user-cog">
+    <h1 class="page-banner-title">الملف الشخصي</h1>
+</x-page-hero>
 <style>
 :root {
     --primary: #182B48;

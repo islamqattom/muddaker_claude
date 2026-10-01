@@ -113,17 +113,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .action-btn i { color: var(--gold); }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="header-text">
-            <h4>تعديل الإنذار</h4>
-            <p>تعديل بيانات إنذار طالب</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-exclamation-triangle">
+    <h1 class="page-banner-title">تعديل الإنذار</h1>
+    <p class="page-banner-sub">تعديل بيانات إنذار طالب</p>
+</x-page-hero>
 
 @if(session('success'))
     <div class="alert alert-success" style="border-radius:12px;margin-bottom:16px">{{ session('success') }}</div>

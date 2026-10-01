@@ -14,6 +14,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-exclamation-triangle">
+    <h1 class="page-banner-title">تفاصيل الإنذار</h1>
+</x-page-hero>
 <div class="row">
     <div class="col-lg-8">
         <!-- Warning Details Card -->

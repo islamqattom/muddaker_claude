@@ -11,6 +11,10 @@
 @endsection
 @section('content')
 
+<x-page-hero icon="fas fa-user-cog">
+    <h1 class="page-banner-title">الملف الشخصي</h1>
+</x-page-hero>
+
 <div class="portal-container">
     <div class="profile-layout">
         <div class="profile-card">

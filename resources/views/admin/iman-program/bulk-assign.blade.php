@@ -86,17 +86,13 @@
 
 @section('content')
 <div class="bulk-assign-page">
-    <div class="page-hero">
-        <div class="hero-icon"><i class="fas fa-bullhorn"></i></div>
-        <div>
-            <h1>تعيين برنامج إيماني لعدة مستخدمين</h1>
-            <p>أنشئ برنامجاً بمعايير محددة مرة واحدة وعيّنه لكل الطلاب والمشرفين بنقرة واحدة</p>
-        </div>
-        <div style="margin-right:auto">
+    <x-page-hero icon="fas fa-bullhorn">
+        <h1 class="page-banner-title">تعيين برنامج إيماني لعدة مستخدمين</h1>
+        <p class="page-banner-sub">أنشئ برنامجاً بمعايير محددة مرة واحدة وعيّنه لكل الطلاب والمشرفين بنقرة واحدة</p>
+        <x-slot:actions>
             <a href="{{ route('admin.iman-program.index') }}" class="btn-cancel"><i class="fas fa-arrow-right"></i> رجوع</a>
-        </div>
-    </div>
-
+        </x-slot:actions>
+    </x-page-hero>
     @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>

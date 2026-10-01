@@ -188,16 +188,8 @@
 
 /* Tablets portrait and large phones */
 @media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-    .page-header .btn { width: 100%; }
-    .header-content { gap: 14px; }
-    .header-icon { width: 48px; height: 48px; font-size: 20px; border-radius: 13px; }
-    .header-text h4 { font-size: 18px; }
-    .header-text p { font-size: 12.5px; }
+    .page-banner-actions { width: 100%; }
+    .page-banner-actions .btn { width: 100%; }
     .legend-container {
         gap: 10px;
         padding: 10px 12px;
@@ -622,23 +614,18 @@
 
 @section('content')
 <div class="calendar-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-calendar-alt"></i>
-            </div>
-            <div class="header-text">
-                <h4>تقويم مهامي</h4>
-                <p>إدارة المهام الشخصية والمكلف بها</p>
-            </div>
-        </div>
-        <button class="btn btn-primary" onclick="openCreateTaskModal()" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); border: none;">
-            <i class="fas fa-plus"></i> إضافة مهمة شخصية
-        </button>
-        <button class="btn" onclick="openManageTasksModal()" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
-            <i class="fas fa-tasks"></i> إدارة وحذف المهام المتكررة
-        </button>
-    </div>
+    <x-page-hero icon="fas fa-calendar-alt">
+        <h1 class="page-banner-title">تقويم مهامي</h1>
+        <p class="page-banner-sub">إدارة المهام الشخصية والمكلف بها</p>
+        <x-slot:actions>
+            <button class="btn btn-primary" onclick="openCreateTaskModal()" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); border: none;">
+                <i class="fas fa-plus"></i> إضافة مهمة شخصية
+            </button>
+            <button class="btn" onclick="openManageTasksModal()" style="background: linear-gradient(135deg, #c0392b 0%, #a93226 100%); color: #fff; border: none;">
+                <i class="fas fa-tasks"></i> إدارة وحذف المهام المتكررة
+            </button>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="legend-container">
         <div class="legend-item">

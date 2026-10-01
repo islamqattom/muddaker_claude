@@ -12,17 +12,10 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon success">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="header-text">
-                <h4>سجل الحضور</h4>
-                <p>تابع حضور أبنائك وانتظامهم في الحلقات</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-calendar-check">
+        <h1 class="page-banner-title">سجل الحضور</h1>
+        <p class="page-banner-sub">تابع حضور أبنائك وانتظامهم في الحلقات</p>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card success">

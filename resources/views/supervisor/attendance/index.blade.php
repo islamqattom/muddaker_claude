@@ -15,22 +15,17 @@
 
 @section('content')
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-calendar-check"></i>
+<x-page-hero icon="fas fa-calendar-check">
+    <h1 class="page-banner-title">تسجيل الحضور والغياب</h1>
+    <p class="page-banner-sub">سجل حضور يوم {{ $date->translatedFormat('l d/m/Y') }}</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <a href="{{ route('supervisor.attendance.history') }}" class="btn btn-outline-primary">
+                <i class="fas fa-history me-2"></i>سجل الحضور
+            </a>
         </div>
-        <div class="header-text">
-            <h4>تسجيل الحضور والغياب</h4>
-            <p>سجل حضور يوم {{ $date->translatedFormat('l d/m/Y') }}</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        <a href="{{ route('supervisor.attendance.history') }}" class="btn btn-outline-primary">
-            <i class="fas fa-history me-2"></i>سجل الحضور
-        </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="stats-row">
     <div class="stat-item success">

@@ -23,24 +23,16 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 </div>
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon-wrapper">
-            <div class="header-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="header-icon-glow"></div>
-        </div>
-        <div class="header-text">
-            <h4>إدارة أولياء الأمور</h4>
-            <p>عرض وإدارة بيانات أولياء أمور الطلاب</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.parents.create') }}" class="add-btnIslamic">
-        <i class="fas fa-plus"></i>
-        <span>إضافة ولي أمر</span>
-    </a>
-</div>
+<x-page-hero icon="fas fa-users">
+    <h1 class="page-banner-title">إدارة أولياء الأمور</h1>
+    <p class="page-banner-sub">عرض وإدارة بيانات أولياء أمور الطلاب</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.parents.create') }}" class="btn-gold">
+            <i class="fas fa-plus"></i>
+            <span>إضافة ولي أمر</span>
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Stats Cards --}}
 <div class="stats-grid-islamic mb-4">

@@ -372,17 +372,8 @@
 <div class="review-session">
     <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
 
-    <div class="page-header">
-        <div class="page-header-content">
-            <div class="page-icon">
-                <i class="fas fa-book-quran"></i>
-            </div>
-            <div>
-                <h1 class="page-title">مراجعة السورة</h1>
-                <p class="page-subtitle">سورة {{ $reviewItem->surah }} - آيات {{ $reviewItem->verse_start }} : {{ $reviewItem->verse_end }}</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-book-quran">
+    </x-page-hero>
 
     <div class="row">
         <div class="col-12">

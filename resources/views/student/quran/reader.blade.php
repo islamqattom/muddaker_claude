@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">قراءة القرآن الكريم</h1>
+</x-page-hero>
 @include('student.partials.audio-player')
 
 <!-- Navigation Header -->

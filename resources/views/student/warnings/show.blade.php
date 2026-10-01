@@ -212,23 +212,10 @@
 
 @section('content')
 <div class="warning-detail">
-    <div class="page-hero">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="hero-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div>
-                    <h1 class="hero-title">تفاصيل الإنذار</h1>
-                    <p class="hero-sub">بيانات وتقرير الإنذار</p>
-                </div>
-            </div>
-            <span class="type-badge-display {{ $warning->type }}">
-                <i class="fas fa-{{ $warning->type === 'attendance' ? 'calendar-times' : ($warning->type === 'recitation' ? 'microphone' : 'exclamation-circle') }}"></i>
-                {{ $warning->type_label }}
-            </span>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-exclamation-triangle">
+        <h1 class="page-banner-title">تفاصيل الإنذار</h1>
+        <p class="page-banner-sub">بيانات وتقرير الإنذار</p>
+    </x-page-hero>
 
     <div class="info-card">
         <div class="card-accent"></div>

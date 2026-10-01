@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-swords">
+    <h1 class="page-banner-title">تفاصيل التحدي</h1>
+</x-page-hero>
 @php
 $isChallenger = $challenge->challenger_id === auth()->user()->student->id;
 $isChallenged = $challenge->challenged_id === auth()->user()->student->id;

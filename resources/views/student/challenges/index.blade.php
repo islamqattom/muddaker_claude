@@ -234,17 +234,10 @@
 
 @section('content')
 <div class="challenges-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-swords"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">تحدياتي</h1>
-                <p class="hero-sub">تحديات الحفظ مع الزملاء</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-swords">
+        <h1 class="page-banner-title">تحدياتي</h1>
+        <p class="page-banner-sub">تحديات الحفظ مع الزملاء</p>
+    </x-page-hero>
 
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">

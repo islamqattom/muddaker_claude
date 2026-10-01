@@ -223,17 +223,10 @@
 
 @section('content')
 <div class="student-profile">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-user-cog"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">ملفي الشخصي</h1>
-                <p class="hero-sub">عرض وتعديل بياناتك الشخصية</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-user-cog">
+        <h1 class="page-banner-title">ملفي الشخصي</h1>
+        <p class="page-banner-sub">عرض وتعديل بياناتك الشخصية</p>
+    </x-page-hero>
 
     <div class="row g-4">
         <div class="col-lg-4">

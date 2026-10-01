@@ -92,31 +92,26 @@
 
 @section('content')
 <div class="subject-show-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="subject-color-badge" style="background:linear-gradient(135deg, {{ $subject->color }} 0%, #B4802C 100%)">
-                <i class="fas fa-book-open"></i>
+    <x-page-hero icon="fas fa-book-open">
+        <h1 class="page-banner-title">{{ $subject->name }}</h1>
+        <p class="page-banner-sub">الدروس المجدولة والمكتملة لهذه المادة</p>
+        <x-slot:actions>
+            <div class="header-actions">
+                <a href="{{ route($role . '.subjects.calendar', $subject->id) }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);color:#fff">
+                    <i class="fas fa-calendar-alt ms-1"></i> التقويم
+                </a>
+                <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background:#16a085;color:#fff">
+                    <i class="fas fa-file-excel ms-1"></i> تنزيل قالب
+                </a>
+                <button type="button" class="btn" style="background:#f39c12;color:#fff" onclick="document.getElementById('importModal').classList.add('show');document.getElementById('importModal').style.display='block';">
+                    <i class="fas fa-file-upload ms-1"></i> استيراد من Excel
+                </button>
+                <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background:{{ $subject->color }};color:#fff">
+                    <i class="fas fa-plus-circle ms-1"></i> إضافة درس
+                </a>
             </div>
-            <div class="header-text">
-                <h4>{{ $subject->name }}</h4>
-                <p>الدروس المجدولة والمكتملة لهذه المادة</p>
-            </div>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route($role . '.subjects.calendar', $subject->id) }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);color:#fff">
-                <i class="fas fa-calendar-alt ms-1"></i> التقويم
-            </a>
-            <a href="{{ route($role . '.lessons.template', $subject->id) }}" class="btn" style="background:#16a085;color:#fff">
-                <i class="fas fa-file-excel ms-1"></i> تنزيل قالب
-            </a>
-            <button type="button" class="btn" style="background:#f39c12;color:#fff" onclick="document.getElementById('importModal').classList.add('show');document.getElementById('importModal').style.display='block';">
-                <i class="fas fa-file-upload ms-1"></i> استيراد من Excel
-            </button>
-            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background:{{ $subject->color }};color:#fff">
-                <i class="fas fa-plus-circle ms-1"></i> إضافة درس
-            </a>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="subject-info-card">
         <div class="subject-info-header">

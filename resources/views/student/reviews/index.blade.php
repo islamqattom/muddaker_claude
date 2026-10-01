@@ -224,17 +224,10 @@
 
 @section('content')
 <div class="reviews-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-clipboard-list"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">جدول المراجعة</h1>
-                <p class="hero-sub">مراجعة الحفظ باستخدام خوارزمية SM-2</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-clipboard-list">
+        <h1 class="page-banner-title">جدول المراجعة</h1>
+        <p class="page-banner-sub">مراجعة الحفظ باستخدام خوارزمية SM-2</p>
+    </x-page-hero>
 
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">

@@ -337,21 +337,10 @@
 
 @section('content')
 <div class="session-history">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-4">
-            <div class="hero-icon">
-                <i class="fas fa-history"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">سجل جلسات التسميع</h1>
-                <p class="hero-subtitle">عرض وتصفية سجلات جلسات التحفيظ للطلاب</p>
-            </div>
-        </div>
-        <div class="quran-verse">
-            <i class="fas fa-book-quran me-2"></i>
-            {{ 'وَرَتِّلِ الْقُرْآنَ تَرْتِيلًا' }}
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-history">
+        <h1 class="page-banner-title">سجل جلسات التسميع</h1>
+        <p class="page-banner-sub">عرض وتصفية سجلات جلسات التحفيظ للطلاب</p>
+    </x-page-hero>
 
     <div class="filter-card">
         <div class="filter-header">

@@ -166,17 +166,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-user-edit"></i>
-        </div>
-        <div class="header-text">
-            <h4>تعديل بيانات المشرف</h4>
-            <p>تعديل بيانات المشرف في النظام</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-user-edit">
+    <h1 class="page-banner-title">تعديل بيانات المشرف</h1>
+    <p class="page-banner-sub">تعديل بيانات المشرف في النظام</p>
+</x-page-hero>
 
 <div class="form-card">
     <div class="form-header">

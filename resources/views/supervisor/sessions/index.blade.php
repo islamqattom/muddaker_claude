@@ -14,6 +14,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-microphone">
+    <h1 class="page-banner-title">جلسات التسميع</h1>
+</x-page-hero>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h6 class="mb-0">

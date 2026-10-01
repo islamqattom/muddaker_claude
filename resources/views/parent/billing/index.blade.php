@@ -8,17 +8,10 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon warning">
-                <i class="fas fa-money-bill"></i>
-            </div>
-            <div class="header-text">
-                <h4>الرسوم الشهرية</h4>
-                <p>متابعة المدفوعات والرسوم المستحقة</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-money-bill">
+        <h1 class="page-banner-title">الرسوم الشهرية</h1>
+        <p class="page-banner-sub">متابعة المدفوعات والرسوم المستحقة</p>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card success">

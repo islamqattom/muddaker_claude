@@ -206,20 +206,15 @@
         </div>
     @endif
 
-    <div class="hero-section" style="position:relative">
-        <div class="hero-content">
-            <div class="hero-icon">
-                <i class="fas fa-award"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">تسجيل الإجازة</h1>
-                <p class="hero-sub">سجل إجازة الطالب في القرآن الكريم - يمكن إضافة طالب لأي مشرف</p>
-            </div>
-        </div>
-        <button type="button" class="btn btn-warning position-absolute fw-bold" style="top:20px;left:20px;z-index:10" onclick="openAddStudentModal()">
-            <i class="fas fa-users me-2"></i>الطلاب
-        </button>
-    </div>
+    <x-page-hero icon="fas fa-award">
+        <h1 class="page-banner-title">تسجيل الإجازة</h1>
+        <p class="page-banner-sub">سجل إجازة الطالب في القرآن الكريم - يمكن إضافة طالب لأي مشرف</p>
+        <x-slot:actions>
+            <button type="button" class="btn btn-warning position-absolute fw-bold" style="top:20px;left:20px;z-index:10" onclick="openAddStudentModal()">
+                <i class="fas fa-users me-2"></i>الطلاب
+            </button>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="filter-card">
         <form method="GET" action="{{ route('admin.ijazah.index') }}">

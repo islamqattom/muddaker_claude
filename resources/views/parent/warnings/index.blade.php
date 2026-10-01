@@ -12,25 +12,18 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon warning">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="header-text">
-                <h4>سجل الإنذارات</h4>
-                <p>متابعة إنذارات أبنائك والتعامل معها</p>
-            </div>
-        </div>
-        <div class="header-stats">
+    <x-page-hero icon="fas fa-exclamation-triangle">
+        <h1 class="page-banner-title">سجل الإنذارات</h1>
+        <p class="page-banner-sub">متابعة إنذارات أبنائك والتعامل معها</p>
+        <x-slot:actions>
             @if($warnings->count() > 0)
                 <div class="stat-pill danger">
                     <i class="fas fa-bell"></i>
                     <span>{{ $warnings->total() }} إنذار</span>
                 </div>
             @endif
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="table-card">
         <div class="table-header">

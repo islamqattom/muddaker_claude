@@ -1858,6 +1858,10 @@
 @endpush
 
 @section('content')
+
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">جلسة مفصل</h1>
+</x-page-hero>
 <div class="rec-session">
     {{-- ==================== HERO ==================== --}}
     <div class="session-hero">

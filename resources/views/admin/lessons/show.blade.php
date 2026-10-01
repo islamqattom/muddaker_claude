@@ -48,23 +48,20 @@
 
 @section('content')
 <div class="lesson-show-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="subject-color-badge" style="background:{{ $subject->color }}"><i class="fas fa-book-open"></i></div>
-            <div class="header-text">
-                <h4>{{ $lesson->title }}</h4>
-                <p>المادة: <strong>{{ $subject->name }}</strong> • {{ $lesson->day_name }} - {{ $lesson->lesson_date ? $lesson->lesson_date->format('Y/m/d') : '-' }}</p>
+    <x-page-hero icon="fas fa-book-open">
+        <h1 class="page-banner-title">{{ $lesson->title }}</h1>
+        <p class="page-banner-sub">المادة: <strong>{{ $subject->name }}</strong> • {{ $lesson->day_name }} - {{ $lesson->lesson_date ? $lesson->lesson_date->format('Y/m/d') : '-' }}</p>
+        <x-slot:actions>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a href="{{ route($role . '.lessons.edit', [$subject->id, $lesson->id]) }}" class="btn" style="background:#8e44ad;color:#fff">
+                    <i class="fas fa-edit ms-1"></i> تعديل
+                </a>
+                <a href="{{ route($role . '.subjects.show', $subject->id) }}" class="btn btn-secondary" style="background:#f0f4f8;color:#182B48">
+                    <i class="fas fa-arrow-right ms-1"></i> رجوع
+                </a>
             </div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="{{ route($role . '.lessons.edit', [$subject->id, $lesson->id]) }}" class="btn" style="background:#8e44ad;color:#fff">
-                <i class="fas fa-edit ms-1"></i> تعديل
-            </a>
-            <a href="{{ route($role . '.subjects.show', $subject->id) }}" class="btn btn-secondary" style="background:#f0f4f8;color:#182B48">
-                <i class="fas fa-arrow-right ms-1"></i> رجوع
-            </a>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="detail-card">
         <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">

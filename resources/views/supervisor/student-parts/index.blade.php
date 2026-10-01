@@ -28,6 +28,10 @@
 @endpush
 
 @section('content')
+
+<x-page-hero icon="fas fa-book-quran">
+    <h1 class="page-banner-title">أجزاء الطالب</h1>
+</x-page-hero>
 <div class="container-fluid">
     <div class="student-selector-card">
         <h4><i class="fas fa-search"></i> البحث عن طالب</h4>

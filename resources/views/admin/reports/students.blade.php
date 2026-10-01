@@ -15,6 +15,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-user-graduate">
+    <h1 class="page-banner-title">تقارير الطالب</h1>
+</x-page-hero>
 @include('admin.reports._styles')
 
 @php

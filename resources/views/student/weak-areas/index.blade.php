@@ -197,17 +197,10 @@
 
 @section('content')
 <div class="weak-areas-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center gap-3">
-            <div class="hero-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div>
-                <h1 class="hero-title">المناطق الضعيفة</h1>
-                <p class="hero-sub">المناطق التي تحتاج تقوية إضافية</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-exclamation-triangle">
+        <h1 class="page-banner-title">المناطق الضعيفة</h1>
+        <p class="page-banner-sub">المناطق التي تحتاج تقوية إضافية</p>
+    </x-page-hero>
 
     <div class="row g-3 mb-4">
         <div class="col-4">

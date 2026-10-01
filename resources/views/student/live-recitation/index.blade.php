@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-microphone">
+    <h1 class="page-banner-title">تسميع القرآن</h1>
+</x-page-hero>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @php

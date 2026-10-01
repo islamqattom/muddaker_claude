@@ -14,6 +14,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-coins">
+    <h1 class="page-banner-title">إعدادات الفوترة</h1>
+</x-page-hero>
 <div class="card">
     <div class="card-header">
         <h6 class="mb-0"><i class="fas fa-cog me-2"></i>إعدادات الفوترة</h6>

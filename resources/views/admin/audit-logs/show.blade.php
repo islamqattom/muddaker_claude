@@ -16,20 +16,15 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-search"></i>
-        </div>
-        <div class="header-text">
-            <h4>تفاصيل سجل التدقيق</h4>
-            <p>عرض التفاصيل الكاملة للسجل رقم #{{ $auditLog->id }}</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.audit-logs.index') }}" class="back-btn">
-        <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
-    </a>
-</div>
+<x-page-hero icon="fas fa-search">
+    <h1 class="page-banner-title">تفاصيل سجل التدقيق</h1>
+    <p class="page-banner-sub">عرض التفاصيل الكاملة للسجل رقم #{{ $auditLog->id }}</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.audit-logs.index') }}" class="back-btn">
+            <i class="fas fa-arrow-right me-2"></i>العودة للقائمة
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="details-layout">
     {{-- Main Info Card --}}

@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-stethoscope">
+    <h1 class="page-banner-title">تشخيص "لم يسمع"</h1>
+</x-page-hero>
 <div class="container-fluid">
     <div class="row g-3">
         <div class="col-lg-7">

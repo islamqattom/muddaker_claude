@@ -88,15 +88,10 @@
 
 @section('content')
 <div class="yawm-page">
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-mosque"></i></div>
-            <div>
-                <h1 class="hero-title">تفاصيل جلسة يوم الهمة</h1>
-                <p class="hero-sub">{{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-mosque">
+        <h1 class="page-banner-title">تفاصيل جلسة يوم الهمة</h1>
+        <p class="page-banner-sub">{{ $session->student_name }} • {{ $session->session_date->format('Y-m-d') }}</p>
+    </x-page-hero>
 
     <div class="info-card">
         <h2><i class="fas fa-info-circle me-2" style="color: var(--gold);"></i>بيانات الجلسة</h2>

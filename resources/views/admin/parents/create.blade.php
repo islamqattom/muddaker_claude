@@ -22,15 +22,10 @@
 </div>
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-icon">
-        <i class="fas fa-user-plus"></i>
-    </div>
-    <div class="header-text">
-        <h4>إضافة ولي أمر جديد</h4>
-        <p>إدخال بيانات ولي أمر جديد للنظام</p>
-    </div>
-</div>
+<x-page-hero icon="fas fa-user-plus">
+    <h1 class="page-banner-title">إضافة ولي أمر جديد</h1>
+    <p class="page-banner-sub">إدخال بيانات ولي أمر جديد للنظام</p>
+</x-page-hero>
 
 <div class="form-card-islamic">
     <div class="form-header-islamic">

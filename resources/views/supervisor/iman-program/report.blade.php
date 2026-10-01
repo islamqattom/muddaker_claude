@@ -157,6 +157,11 @@
 @endpush
 
 @section('content')
+
+<x-page-hero icon="fas fa-star-and-crescent">
+    <h1 class="page-banner-title">تقرير البرنامج الإيماني</h1>
+</x-page-hero>
+
 @php
     $today = \Carbon\Carbon::today()->toDateString();
     $dayNames = [

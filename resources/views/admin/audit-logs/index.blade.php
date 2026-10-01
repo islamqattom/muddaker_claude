@@ -15,25 +15,20 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-history"></i>
+<x-page-hero icon="fas fa-history">
+    <h1 class="page-banner-title">سجل التدقيق</h1>
+    <p class="page-banner-sub">مراقبة جميع الأنشطة والإجراءات في النظام</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <a href="{{ route('admin.audit-logs.export', array_merge(request()->query(), ['format' => 'csv'])) }}" class="export-btn csv">
+                <i class="fas fa-file-csv me-2"></i>تصدير CSV
+            </a>
+            <a href="{{ route('admin.audit-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="export-btn pdf">
+                <i class="fas fa-file-pdf me-2"></i>تصدير PDF
+            </a>
         </div>
-        <div class="header-text">
-            <h4>سجل التدقيق</h4>
-            <p>مراقبة جميع الأنشطة والإجراءات في النظام</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        <a href="{{ route('admin.audit-logs.export', array_merge(request()->query(), ['format' => 'csv'])) }}" class="export-btn csv">
-            <i class="fas fa-file-csv me-2"></i>تصدير CSV
-        </a>
-        <a href="{{ route('admin.audit-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="export-btn pdf">
-            <i class="fas fa-file-pdf me-2"></i>تصدير PDF
-        </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Filter Card --}}
 <div class="filter-card">

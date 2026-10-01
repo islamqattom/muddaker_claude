@@ -58,15 +58,10 @@
 
 @section('content')
 <div class="yawm-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon"><i class="fas fa-mosque"></i></div>
-            <div class="header-text">
-                <h4>يوم الهمة - إنجازات الطلاب</h4>
-                <p>تابع تدريبات السرد لطلابك وتقدمهم في كل جلسة</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-mosque">
+        <h1 class="page-banner-title">يوم الهمة - إنجازات الطلاب</h1>
+        <p class="page-banner-sub">تابع تدريبات السرد لطلابك وتقدمهم في كل جلسة</p>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card">

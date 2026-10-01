@@ -195,17 +195,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
     <input type="hidden" name="recitation_data" id="recitationData">
     <input type="hidden" name="test_data" id="testData">
 
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="header-text">
-                <h4>إضافة إنذار جديد</h4>
-                <p>إصدار إنذار لطالب في جمعية تحفيظ القرآن الكريم</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-exclamation-triangle">
+        <h1 class="page-banner-title">إضافة إنذار جديد</h1>
+        <p class="page-banner-sub">إصدار إنذار لطالب في جمعية تحفيظ القرآن الكريم</p>
+    </x-page-hero>
 
     <div class="row g-4">
         <div class="col-lg-8">

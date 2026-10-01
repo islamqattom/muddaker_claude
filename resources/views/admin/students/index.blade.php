@@ -15,23 +15,16 @@
 @section('content')
 
 {{-- Page Header --}}
-<div class="page-header mb-4">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-user-graduate"></i>
-        </div>
-        <div class="header-text">
-            <h4>إدارة الطلاب</h4>
-            <p>عرض وإدارة جميع طلاب مركز التسميع</p>
-        </div>
-    </div>
-    <div class="header-stats">
+<x-page-hero icon="fas fa-user-graduate">
+    <h1 class="page-banner-title">إدارة الطلاب</h1>
+    <p class="page-banner-sub">عرض وإدارة جميع طلاب مركز التسميع</p>
+    <x-slot:actions>
         <div class="stat-pill primary">
             <i class="fas fa-users"></i>
             <span>{{ $students->total() }} طالب</span>
         </div>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Search & Filter Card --}}
 <div class="filter-card mb-4">

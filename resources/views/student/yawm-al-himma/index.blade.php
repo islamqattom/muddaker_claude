@@ -93,15 +93,10 @@
 
 @section('content')
 <div class="yawm-page">
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-mosque"></i></div>
-            <div>
-                <h1 class="hero-title">يوم الهمة</h1>
-                <p class="hero-sub">تابع تدريبات السرد وتقدمك في كل جلسة</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-mosque">
+        <h1 class="page-banner-title">يوم الهمة</h1>
+        <p class="page-banner-sub">تابع تدريبات السرد وتقدمك في كل جلسة</p>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card">

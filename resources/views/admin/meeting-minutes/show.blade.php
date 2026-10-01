@@ -212,33 +212,28 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .info-value i { color: var(--gold); margin-left: 5px; }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-file-signature"></i>
-        </div>
-        <div class="header-text">
-            <h4>عرض محضر اجتماع</h4>
-            <p>تفاصيل ومحتوى محضر جلسة جمعية تحفيظ القرآن الكريم</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        @if($meetingMinute->status === 'draft')
-            <form method="POST" action="{{ route('admin.meeting-minutes.approve', $meetingMinute->id) }}" class="d-inline">
-                @csrf
-                <button type="submit" class="btn-action btn-approve">
-                    <i class="fas fa-check-circle"></i>اعتماد
-                </button>
-            </form>
-            <a href="{{ route('admin.meeting-minutes.edit', $meetingMinute->id) }}" class="btn-action btn-edit">
-                <i class="fas fa-edit"></i>تعديل
+<x-page-hero icon="fas fa-file-signature">
+    <h1 class="page-banner-title">عرض محضر اجتماع</h1>
+    <p class="page-banner-sub">تفاصيل ومحتوى محضر جلسة جمعية تحفيظ القرآن الكريم</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            @if($meetingMinute->status === 'draft')
+                <form method="POST" action="{{ route('admin.meeting-minutes.approve', $meetingMinute->id) }}" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn-action btn-approve">
+                        <i class="fas fa-check-circle"></i>اعتماد
+                    </button>
+                </form>
+                <a href="{{ route('admin.meeting-minutes.edit', $meetingMinute->id) }}" class="btn-action btn-edit">
+                    <i class="fas fa-edit"></i>تعديل
+                </a>
+            @endif
+            <a href="{{ route('admin.meeting-minutes.index') }}" class="btn-action btn-back">
+                <i class="fas fa-arrow-right"></i>العودة
             </a>
-        @endif
-        <a href="{{ route('admin.meeting-minutes.index') }}" class="btn-action btn-back">
-            <i class="fas fa-arrow-right"></i>العودة
-        </a>
-    </div>
-</div>
+        </div>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-4">
     <div class="col-lg-8">

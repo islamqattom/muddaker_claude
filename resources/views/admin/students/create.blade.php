@@ -165,17 +165,10 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-user-graduate"></i>
-        </div>
-        <div class="header-text">
-            <h4>إضافة طالب جديد</h4>
-            <p>تسجيل طالب جديد في نظام التحفيظ</p>
-        </div>
-    </div>
-</div>
+<x-page-hero icon="fas fa-user-graduate">
+    <h1 class="page-banner-title">إضافة طالب جديد</h1>
+    <p class="page-banner-sub">تسجيل طالب جديد في نظام التحفيظ</p>
+</x-page-hero>
 
 <div class="form-card">
     <div class="form-header">

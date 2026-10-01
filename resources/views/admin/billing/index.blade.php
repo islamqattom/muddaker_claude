@@ -38,30 +38,22 @@ window.__STUDENTS_FOR_BULK__ = @json($studentsForBulk);
 </div>
 
 {{-- Page Header --}}
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon-wrapper">
-            <div class="header-icon">
-                <i class="fas fa-coins"></i>
-            </div>
-            <div class="header-icon-glow"></div>
+<x-page-hero icon="fas fa-coins">
+    <h1 class="page-banner-title">إدارة الرسوم الشهرية</h1>
+    <p class="page-banner-sub">متابعة وتحصيل رسوم الطلاب الشهرية</p>
+    <x-slot:actions>
+        <div class="header-actions">
+            <a href="{{ route('admin.billing.feeCategories') }}" class="btn-action-header">
+                <i class="fas fa-tags"></i>
+                <span>فئات الرسوم</span>
+            </a>
+            <a href="{{ route('admin.billing.history') }}" class="btn-action-header">
+                <i class="fas fa-history"></i>
+                <span>سجل المدفوعات</span>
+            </a>
         </div>
-        <div class="header-text">
-            <h4>إدارة الرسوم الشهرية</h4>
-            <p>متابعة وتحصيل رسوم الطلاب الشهرية</p>
-        </div>
-    </div>
-    <div class="header-actions">
-        <a href="{{ route('admin.billing.feeCategories') }}" class="btn-action-header">
-            <i class="fas fa-tags"></i>
-            <span>فئات الرسوم</span>
-        </a>
-        <a href="{{ route('admin.billing.history') }}" class="btn-action-header">
-            <i class="fas fa-history"></i>
-            <span>سجل المدفوعات</span>
-        </a>
-    </div>
-</div>
+    </x-slot:actions>
+</x-page-hero>
 
 {{-- Stats Cards --}}
 <div class="stats-grid-fees mb-4">

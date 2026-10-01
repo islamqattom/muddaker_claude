@@ -210,20 +210,10 @@
 
 @section('content')
 <div class="bookmarks-page">
-    <div class="page-hero">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="hero-icon">
-                    <i class="fas fa-bookmark"></i>
-                </div>
-                <div>
-                    <h1 class="hero-title">علاماتي</h1>
-                    <p class="hero-sub">علاماتك المحفوظة للآيات القرآنية</p>
-                </div>
-            </div>
-            <div class="hero-count">{{ $bookmarks->count() }}</div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-bookmark">
+        <h1 class="page-banner-title">علاماتي</h1>
+        <p class="page-banner-sub">علاماتك المحفوظة للآيات القرآنية</p>
+    </x-page-hero>
 
     <div class="toolbar-card">
         <div class="toolbar-title">

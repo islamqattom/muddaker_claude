@@ -9,6 +9,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-microphone-alt">
+    <h1 class="page-banner-title">تمرين النطق والتجويد</h1>
+</x-page-hero>
 <div class="card">
     <div class="card-header">
         <h5 class="mb-0"><i class="fas fa-microphone-alt me-2"></i>تمرين النطق والتجويد</h5>

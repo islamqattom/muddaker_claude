@@ -181,20 +181,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 .notes-card p { font-size: 15px; color: #5a6c7d; line-height: 1.8; margin: 0; }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-quran"></i>
-        </div>
-        <div class="header-text">
-            <h4>تفاصيل جلسة التسميع</h4>
-            <p>بيانات وتقرير جلسة تحفيظ القرآن الكريم</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.sessions.index') }}" class="btn-back">
-        <i class="fas fa-arrow-right"></i>العودة للقائمة
-    </a>
-</div>
+<x-page-hero icon="fas fa-quran">
+    <h1 class="page-banner-title">تفاصيل جلسة التسميع</h1>
+    <p class="page-banner-sub">بيانات وتقرير جلسة تحفيظ القرآن الكريم</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.sessions.index') }}" class="btn-back">
+            <i class="fas fa-arrow-right"></i>العودة للقائمة
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-4">
     <div class="col-lg-8">

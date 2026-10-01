@@ -30,6 +30,11 @@
 @endpush
 
 @section('content')
+
+<x-page-hero icon="fas fa-star-and-crescent">
+    <h1 class="page-banner-title">البرنامج الإيماني</h1>
+</x-page-hero>
+
 @php
     $today = \Carbon\Carbon::today()->toDateString();
     $progressPercent = $stats['week_total'] > 0 ? round(($stats['week_completed'] / $stats['week_total']) * 100) : 0;

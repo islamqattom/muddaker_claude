@@ -12,23 +12,16 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon primary">
-                <i class="fas fa-microphone"></i>
-            </div>
-            <div class="header-text">
-                <h4>جلسات التسميع</h4>
-                <p>متابعة جلسات التسميع لأبنائك</p>
-            </div>
-        </div>
-        <div class="header-stats">
+    <x-page-hero icon="fas fa-microphone">
+        <h1 class="page-banner-title">جلسات التسميع</h1>
+        <p class="page-banner-sub">متابعة جلسات التسميع لأبنائك</p>
+        <x-slot:actions>
             <div class="stat-pill primary">
                 <i class="fas fa-list"></i>
                 <span>{{ $sessions->total() }} جلسة</span>
             </div>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="filter-card">
         <form method="GET" action="{{ route('parent.sessions.index') }}" class="filter-grid">

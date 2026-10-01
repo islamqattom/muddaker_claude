@@ -262,20 +262,15 @@
 
 @section('content')
 <div class="yawm-page">
-    <div class="hero-section">
-        <div class="hero-content">
-            <div class="hero-icon"><i class="fas fa-mosque"></i></div>
-            <div>
-                <h1 class="hero-title">جلسات يوم الهمة</h1>
-                <p class="hero-sub">{{ $day->translatedFormat('l، Y-m-d') }} • {{ $sessions->total() }} جلسة</p>
-            </div>
-            <div class="hero-actions">
-                <a href="{{ route('admin.yawm-al-himma.index') }}" class="btn-ghost">
-                    <i class="fas fa-arrow-right"></i> العودة للأيام
-                </a>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-mosque">
+        <h1 class="page-banner-title">جلسات يوم الهمة</h1>
+        <p class="page-banner-sub">{{ $day->translatedFormat('l، Y-m-d') }} • {{ $sessions->total() }} جلسة</p>
+        <x-slot:actions>
+            <a href="{{ route('admin.yawm-al-himma.index') }}" class="btn-ghost">
+                <i class="fas fa-arrow-right"></i> العودة للأيام
+            </a>
+        </x-slot:actions>
+    </x-page-hero>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

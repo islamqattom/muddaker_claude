@@ -85,17 +85,10 @@ textarea.form-control { min-height: 100px; resize: vertical; }
 
 @section('content')
 <div class="form-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-book-medical"></i>
-            </div>
-            <div class="header-text">
-                <h4>إضافة مادة دراسية</h4>
-                <p>قم بإنشاء مادة جديدة لتفريغ دروسها ومتابعتها زمنياً</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-book-medical">
+        <h1 class="page-banner-title">إضافة مادة دراسية</h1>
+        <p class="page-banner-sub">قم بإنشاء مادة جديدة لتفريغ دروسها ومتابعتها زمنياً</p>
+    </x-page-hero>
 
     <div class="form-card">
         <form method="POST" action="{{ route($role . '.subjects.store') }}">

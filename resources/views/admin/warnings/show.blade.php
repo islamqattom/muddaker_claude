@@ -199,20 +199,15 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
 }
 </style>
 
-<div class="page-header">
-    <div class="header-content">
-        <div class="header-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-        </div>
-        <div class="header-text">
-            <h4>تفاصيل الإنذار</h4>
-            <p>معلومات وإنذارات الطالب</p>
-        </div>
-    </div>
-    <a href="{{ route('admin.warnings.index') }}" class="btn-back">
-        <i class="fas fa-arrow-right"></i>العودة للقائمة
-    </a>
-</div>
+<x-page-hero icon="fas fa-exclamation-triangle">
+    <h1 class="page-banner-title">تفاصيل الإنذار</h1>
+    <p class="page-banner-sub">معلومات وإنذارات الطالب</p>
+    <x-slot:actions>
+        <a href="{{ route('admin.warnings.index') }}" class="btn-back">
+            <i class="fas fa-arrow-right"></i>العودة للقائمة
+        </a>
+    </x-slot:actions>
+</x-page-hero>
 
 <div class="row g-4">
     <div class="col-lg-8">

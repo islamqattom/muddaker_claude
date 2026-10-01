@@ -124,18 +124,15 @@ body { background: #f8fafc; font-family: 'Tajawal', sans-serif; }
 @endphp
 <div class="detail-page">
 
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon"><i class="fas fa-book-quran"></i></div>
-            <div class="header-text">
-                <h4>تفاصيل جلسة اختبار الأجزاء</h4>
-                <p>عرض كامل لبيانات جلسة اختبار الأجزاء</p>
-            </div>
-        </div>
-        <a href="{{ route('admin.mafsil-history.index') }}" class="back-link">
-            <i class="fas fa-arrow-right"></i> رجوع للسجل
-        </a>
-    </div>
+    <x-page-hero icon="fas fa-book-quran">
+        <h1 class="page-banner-title">تفاصيل جلسة اختبار الأجزاء</h1>
+        <p class="page-banner-sub">عرض كامل لبيانات جلسة اختبار الأجزاء</p>
+        <x-slot:actions>
+            <a href="{{ route('admin.mafsil-history.index') }}" class="back-link">
+                <i class="fas fa-arrow-right"></i> رجوع للسجل
+            </a>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="info-card">
         <div class="info-card-title"><i class="fas fa-user-graduate"></i>معلومات الطالب</div>

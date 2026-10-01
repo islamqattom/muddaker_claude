@@ -14,6 +14,10 @@
 @endsection
 
 @section('content')
+
+<x-page-hero icon="fas fa-user-tie">
+    <h1 class="page-banner-title">بيانات المشرف</h1>
+</x-page-hero>
 <div class="row">
     <div class="col-lg-8">
         <!-- Supervisor Info Card -->

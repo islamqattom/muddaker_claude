@@ -12,17 +12,10 @@
 @section('content')
 
 <div class="portal-container">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon primary">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="header-text">
-                <h4>التقارير</h4>
-                <p>إحصائيات وإنجازات أبنائك</p>
-            </div>
-        </div>
-    </div>
+    <x-page-hero icon="fas fa-chart-bar">
+        <h1 class="page-banner-title">التقارير</h1>
+        <p class="page-banner-sub">إحصائيات وإنجازات أبنائك</p>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card primary">

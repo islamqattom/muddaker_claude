@@ -65,25 +65,20 @@
 
 @section('content')
 <div class="calendar-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="subject-color-badge" style="background:{{ $subject->color }}">
-                <i class="fas fa-book-open"></i>
+    <x-page-hero icon="fas fa-book-open">
+        <h1 class="page-banner-title">تقويم: {{ $subject->name }}</h1>
+        <p class="page-banner-sub">عرض الدروس زمنياً مع إمكانية تعديل حالتها</p>
+        <x-slot:actions>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <a href="{{ route($role . '.subjects.show', $subject->id) }}" class="btn btn-secondary" style="background:#f0f4f8;color:#182B48">
+                    <i class="fas fa-list ms-1"></i> القائمة
+                </a>
+                <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background:{{ $subject->color }};color:#fff">
+                    <i class="fas fa-plus-circle ms-1"></i> إضافة درس
+                </a>
             </div>
-            <div class="header-text">
-                <h4>تقويم: {{ $subject->name }}</h4>
-                <p>عرض الدروس زمنياً مع إمكانية تعديل حالتها</p>
-            </div>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="{{ route($role . '.subjects.show', $subject->id) }}" class="btn btn-secondary" style="background:#f0f4f8;color:#182B48">
-                <i class="fas fa-list ms-1"></i> القائمة
-            </a>
-            <a href="{{ route($role . '.lessons.create', $subject->id) }}" class="btn" style="background:{{ $subject->color }};color:#fff">
-                <i class="fas fa-plus-circle ms-1"></i> إضافة درس
-            </a>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="legend">
         <div class="legend-item"><div class="legend-color legend-pending"></div> لم يتم</div>

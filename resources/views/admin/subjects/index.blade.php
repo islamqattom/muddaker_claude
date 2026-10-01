@@ -156,20 +156,15 @@
 
 @section('content')
 <div class="subjects-page">
-    <div class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fas fa-book"></i>
-            </div>
-            <div class="header-text">
-                <h4>المواد الدراسية</h4>
-                <p>إدارة المواد وتفريغ الدروس زمنياً ومتابعة إتمامها</p>
-            </div>
-        </div>
-        <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);border:none;border-radius:12px;padding:16px 22px;font-weight:700">
-            <i class="fas fa-plus-circle ms-1"></i> إضافة مادة جديدة
-        </a>
-    </div>
+    <x-page-hero icon="fas fa-book">
+        <h1 class="page-banner-title">المواد الدراسية</h1>
+        <p class="page-banner-sub">إدارة المواد وتفريغ الدروس زمنياً ومتابعة إتمامها</p>
+        <x-slot:actions>
+            <a href="{{ route($role . '.subjects.create') }}" class="btn btn-primary" style="background:linear-gradient(135deg, #182B48 0%, #2A4570 100%);border:none;border-radius:12px;padding:16px 22px;font-weight:700">
+                <i class="fas fa-plus-circle ms-1"></i> إضافة مادة جديدة
+            </a>
+        </x-slot:actions>
+    </x-page-hero>
 
     <div class="stats-grid">
         <div class="stat-card">
