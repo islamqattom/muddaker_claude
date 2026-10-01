@@ -1767,6 +1767,124 @@
 .rec-session .ayahs-content .amiri-text .ayah-marker { color: var(--gold); font-weight: bold; margin: 0 4px; }
 .rec-session .ayahs-content .surah-header { text-align: center; font-family: 'Amiri', serif; font-size: 20px; font-weight: 800; color: var(--navy); margin: 16px 0; padding: 10px; background: var(--gold-soft); border-radius: 8px; }
 
+/* Ayahs modal: content + thin scoring rail */
+.rec-session .ayahs-modal-layout {
+    display: flex;
+    align-items: stretch;
+    height: min(72vh, 640px);
+}
+.rec-session .ayahs-modal-layout .ayahs-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+.rec-session .ayahs-scoring-tab {
+    flex: 0 0 88px;
+    width: 88px;
+    background: #f8fafc;
+    border-inline-start: 1px solid #eef0f3;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+.rec-session .ayahs-tab-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eef0f3;
+}
+.rec-session .ayahs-tab-block.errors { color: var(--danger); }
+.rec-session .ayahs-tab-block.hesitations { color: #b45309; }
+.rec-session .ayahs-tab-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.rec-session .ayahs-tab-block.errors .ayahs-tab-label { color: var(--danger); }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-label { color: #b45309; }
+.rec-session .ayahs-tab-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.rec-session .ayahs-tab-value {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--navy);
+    font-feature-settings: "tnum";
+}
+.rec-session .ayahs-tab-btn {
+    width: 26px;
+    height: 24px;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.rec-session .ayahs-tab-btn:active { transform: scale(0.92); }
+.rec-session .ayahs-tab-block.errors .ayahs-tab-btn { background: var(--danger); }
+.rec-session .ayahs-tab-block.errors .ayahs-tab-btn:hover { background: #b91c1c; }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-btn { background: var(--warning); }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-btn:hover { background: #d97706; }
+.rec-session .ayahs-tab-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: var(--gold-soft);
+    border: 1px solid rgba(212, 160, 48, 0.25);
+    margin-top: auto;
+}
+.rec-session .ayahs-tab-score .ayahs-tab-value { color: #b45309; }
+
+@media (max-width: 576px) {
+    .rec-session .ayahs-modal-layout {
+        flex-direction: column;
+        height: min(80vh, 640px);
+    }
+    .rec-session .ayahs-scoring-tab {
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border-inline-start: none;
+        border-top: 1px solid #eef0f3;
+        padding: 8px 12px;
+        overflow: visible;
+    }
+    .rec-session .ayahs-tab-block,
+    .rec-session .ayahs-tab-score {
+        flex-direction: row;
+        gap: 8px;
+        padding: 6px 8px;
+        margin-top: 0;
+    }
+    .rec-session .ayahs-tab-controls { flex-direction: row; }
+}
+
 /* =========================
    WARNING ALERT
    ========================= */
@@ -2334,7 +2452,7 @@
                         </div>
                         @if(!$isPlaceholder)
                         <button type="button" class="btn-view-ayahs"
-                                onclick="showPositionAyahs({{ $mafsilPosition->id }})" title="عرض الآيات بالرسم العثماني">
+                                onclick="showPositionAyahs({{ $mafsilPosition->id }}, {{ $partIndex }}, {{ $posIndex }})" title="عرض الآيات بالرسم العثماني">
                             <i class="fas fa-eye"></i>
                         </button>
                         @endif
@@ -2519,7 +2637,7 @@
 
     {{-- ==================== AYAHS MODAL ==================== --}}
     <div class="modal fade" id="ayahsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
@@ -2528,13 +2646,37 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body ayahs-modal-body">
-                    <div id="ayahsModalContent" class="ayahs-content">
-                        <div class="d-flex justify-content-center align-items-center h-100 py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">جاري التحميل...</span>
+                <div class="modal-body ayahs-modal-body p-0">
+                    <div class="ayahs-modal-layout">
+                        <div id="ayahsModalContent" class="ayahs-content">
+                            <div class="d-flex justify-content-center align-items-center h-100 py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">جاري التحميل...</span>
+                                </div>
                             </div>
                         </div>
+                        <aside class="ayahs-scoring-tab">
+                            <div class="ayahs-tab-block errors">
+                                <span class="ayahs-tab-label"><i class="fas fa-times-circle"></i> أخطاء</span>
+                                <div class="ayahs-tab-controls">
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('errors', 1)" aria-label="زيادة الأخطاء"><i class="fas fa-plus"></i></button>
+                                    <span class="ayahs-tab-value" id="ayahsTabErrors">0</span>
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('errors', -1)" aria-label="إنقاص الأخطاء"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="ayahs-tab-block hesitations">
+                                <span class="ayahs-tab-label"><i class="fas fa-question-circle"></i> ترددات</span>
+                                <div class="ayahs-tab-controls">
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('hesitations', 1)" aria-label="زيادة الترددات"><i class="fas fa-plus"></i></button>
+                                    <span class="ayahs-tab-value" id="ayahsTabHes">0</span>
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('hesitations', -1)" aria-label="إنقاص الترددات"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="ayahs-tab-score">
+                                <span class="ayahs-tab-label">العلامة</span>
+                                <span class="ayahs-tab-value" id="ayahsTabScore">100.0%</span>
+                            </div>
+                        </aside>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -2606,7 +2748,12 @@ let initialFailedRecordSaved = false;
 
 const RING_CIRCUMFERENCE = 2 * Math.PI * 52; // ~326.7
 
-function showPositionAyahs(mafsilPositionId) {
+let ayahsContext = { partIndex: null, posIndex: null };
+
+function showPositionAyahs(mafsilPositionId, partIndex, posIndex) {
+    ayahsContext = { partIndex: partIndex, posIndex: posIndex };
+    ayahsSyncTab();
+
     const modal = new bootstrap.Modal(document.getElementById('ayahsModal'));
     const contentEl = document.getElementById('ayahsModalContent');
 
@@ -2634,6 +2781,34 @@ function showPositionAyahs(mafsilPositionId) {
             contentEl.innerHTML = '<p class="text-danger text-center py-5">حدث خطأ أثناء تحميل الآيات</p>';
             console.error('Error loading ayahs:', error);
         });
+}
+
+function ayahsAdjustStat(kind, delta) {
+    const { partIndex, posIndex } = ayahsContext;
+    if (partIndex === null || posIndex === null) return;
+
+    const id = (kind === 'errors' ? 'errors-' : 'hesitations-') + partIndex + '-' + posIndex;
+    if (!document.getElementById(id)) return;
+
+    adjustMafsil(id, delta, partIndex, posIndex);
+    ayahsSyncTab();
+}
+
+function ayahsSyncTab() {
+    const { partIndex, posIndex } = ayahsContext;
+    if (partIndex === null || posIndex === null) return;
+
+    const errorsInput = document.getElementById('errors-' + partIndex + '-' + posIndex);
+    const hesInput = document.getElementById('hesitations-' + partIndex + '-' + posIndex);
+    const scoreEl = document.getElementById('part-score-' + partIndex + '-' + posIndex);
+
+    const errorsEl = document.getElementById('ayahsTabErrors');
+    const hesEl = document.getElementById('ayahsTabHes');
+    const scoreTabEl = document.getElementById('ayahsTabScore');
+
+    if (errorsEl) errorsEl.textContent = errorsInput ? (parseInt(errorsInput.value) || 0) : 0;
+    if (hesEl) hesEl.textContent = hesInput ? (parseInt(hesInput.value) || 0) : 0;
+    if (scoreTabEl) scoreTabEl.textContent = scoreEl ? scoreEl.textContent : '—';
 }
 
 const positionsPerPartByIndex = {
