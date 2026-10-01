@@ -37,6 +37,9 @@
 
 .rec-session { color: var(--navy); overflow-x: clip; }
 
+/* Override layout padding-bottom to remove white space at page bottom */
+.page-content { padding-bottom: 0 !important; }
+
 /* =========================
    PAGE HERO - Compact Modern
    ========================= */
@@ -2715,7 +2718,7 @@
             <textarea name="notes" class="notes-textarea" rows="3" placeholder="أي ملاحظات حول جلسة المفصل..."></textarea>
         </div>
 
-        <div class="d-flex flex-wrap gap-3 justify-content-between mt-4 mb-3">
+        <div class="d-flex flex-wrap gap-3 justify-content-between mt-4 mb-0">
             <a href="{{ route('supervisor.recitation.index') }}" class="btn-outline-modern">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
@@ -2798,9 +2801,6 @@
                             </div>
                         </aside>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                 </div>
             </div>
         </div>
