@@ -1845,6 +1845,30 @@
     .rec-session .stat-pill { padding: 8px 12px; }
     .rec-session .stat-pill .stat-text .val { font-size: 14px; }
     .rec-session .btn-primary-modern, .rec-session .btn-outline-modern { padding: 10px 18px; font-size: 13px; }
+
+    /* Tighter alert content on small phones */
+    .rec-session .info-alert { gap: 8px; padding: 8px 10px; font-size: 12.5px; }
+    .rec-session .info-alert i.fa-info-circle { font-size: 16px; margin-top: 1px; }
+    .rec-session .info-alert .alert-content { font-size: 12px; line-height: 1.45; }
+    .rec-session .info-alert .alert-content strong { font-weight: 800; }
+    .rec-session .info-alert .badge { padding: 2px 6px; font-size: 10px; }
+    .rec-session .info-alert .alert-legend-rows { display: flex; flex-direction: column; gap: 3px; }
+    .rec-session .info-alert .alert-legend-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .rec-session .info-alert .alert-legend-key { font-weight: 700; }
+    .rec-session .info-alert .alert-legend-note { font-size: 11px; color: #64748b; }
+    .rec-session .info-alert .alert-legend-title { margin-bottom: 4px; }
+}
+
+/* Legend alert: inline rows on tablet+ */
+@media (min-width: 481px) {
+    .rec-session .info-alert .alert-legend-rows {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        vertical-align: middle;
+    }
+    .rec-session .info-alert .alert-legend-row { display: inline-flex; align-items: center; gap: 6px; }
+    .rec-session .info-alert .alert-legend-title { display: inline; margin: 0 6px 0 0; }
 }
 
 /* =========================
@@ -2266,15 +2290,25 @@
     @else
     {{-- ==================== SCORING MODE ==================== --}}
 
-    <div class="info-alert mb-4">
+    <div class="info-alert mb-4 alert-legend">
         <i class="fas fa-info-circle"></i>
         <div class="alert-content">
-            <strong>نظام الخصم:</strong>
-            كل خطأ = <span class="badge bg-danger">-{{ number_format((float) ($errorScore ?? 3), 2) }} علامات</span>
-            &nbsp;|&nbsp;
-            كل تردد = <span class="badge bg-warning text-dark">-{{ number_format((float) ($hesitationScore ?? 0.33), 2) }} علامة</span> (يُحسب كل 3 ترددات كخصم كامل)
-            &nbsp;|&nbsp;
-            علامة الرسوب <span class="badge bg-secondary">{{ number_format((float) $passingPercentage, 2) }}%</span>
+            <span class="alert-legend-title"><strong>نظام الخصم:</strong></span>
+            <span class="alert-legend-rows">
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">كل خطأ</span>
+                    <span class="badge bg-danger">-{{ number_format((float) ($errorScore ?? 3), 2) }} علامات</span>
+                </span>
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">كل تردد</span>
+                    <span class="badge bg-warning text-dark">-{{ number_format((float) ($hesitationScore ?? 0.33), 2) }} علامة</span>
+                    <span class="alert-legend-note">(يُحسب كل 3 ترددات كخصم كامل)</span>
+                </span>
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">علامة الرسوب</span>
+                    <span class="badge bg-secondary">{{ number_format((float) $passingPercentage, 2) }}%</span>
+                </span>
+            </span>
         </div>
     </div>
 

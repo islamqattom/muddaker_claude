@@ -1966,6 +1966,18 @@
     .rec-session .btn-primary-modern, .rec-session .btn-outline-modern { padding: 8px 16px; font-size: 13px; }
 }
 
+/* Legend alert: inline rows on tablet+ */
+@media (min-width: 577px) {
+    .rec-session .info-alert .alert-legend-rows {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        vertical-align: middle;
+    }
+    .rec-session .info-alert .alert-legend-row { display: inline-flex; align-items: center; gap: 6px; }
+    .rec-session .info-alert .alert-legend-title { display: inline; margin: 0 6px 0 0; }
+}
+
 /* Phones: compact layout, no horizontal overflow */
 @media (max-width: 576px) {
     .rec-session .session-hero { margin-bottom: 12px; border-radius: 11px; }
@@ -1973,7 +1985,16 @@
     .rec-session .student-name { font-size: 16px; }
     .rec-session .chip { font-size: 11px; padding: 4px 9px; }
     .rec-session .stat-pill { padding: 8px 12px; }
-    .rec-session .info-alert { padding: 10px 12px; font-size: 12.5px; }
+    .rec-session .info-alert { padding: 8px 10px; gap: 8px; font-size: 12.5px; }
+    .rec-session .info-alert i.fa-info-circle { font-size: 16px; margin-top: 1px; }
+    .rec-session .info-alert .alert-content { font-size: 12px; line-height: 1.45; }
+    .rec-session .info-alert .alert-content strong { font-weight: 800; }
+    .rec-session .info-alert .badge { padding: 2px 6px; font-size: 10px; }
+    .rec-session .info-alert .alert-legend-rows { display: flex; flex-direction: column; gap: 3px; }
+    .rec-session .info-alert .alert-legend-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .rec-session .info-alert .alert-legend-key { font-weight: 700; }
+    .rec-session .info-alert .alert-legend-note { font-size: 11px; color: #64748b; }
+    .rec-session .info-alert .alert-legend-title { margin-bottom: 4px; }
     .rec-session .card-header-modern { padding: 10px 12px; }
     .rec-session .card-body-modern { padding: 12px; }
     .rec-session .part-section-body { padding: 12px; }
@@ -2551,15 +2572,25 @@
     @else
     {{-- ==================== SCORING MODE ==================== --}}
 
-    <div class="info-alert mb-4">
+    <div class="info-alert mb-4 alert-legend">
         <i class="fas fa-info-circle"></i>
         <div class="alert-content">
-            <strong>نظام الخصم:</strong>
-            كل خطأ = <span class="badge bg-danger">-3 علامات</span>
-            &nbsp;|&nbsp;
-            كل تردد = <span class="badge bg-warning text-dark">-0.33 علامة</span> (يُحسب كل 3 ترددات كخصم كامل)
-            &nbsp;|&nbsp;
-            العلامة النهائية لا تقل عن <span class="badge bg-secondary">{{ $passingPercentage }}%</span>
+            <span class="alert-legend-title"><strong>نظام الخصم:</strong></span>
+            <span class="alert-legend-rows">
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">كل خطأ</span>
+                    <span class="badge bg-danger">-3 علامات</span>
+                </span>
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">كل تردد</span>
+                    <span class="badge bg-warning text-dark">-0.33 علامة</span>
+                    <span class="alert-legend-note">(يُحسب كل 3 ترددات كخصم كامل)</span>
+                </span>
+                <span class="alert-legend-row">
+                    <span class="alert-legend-key">العلامة النهائية لا تقل عن</span>
+                    <span class="badge bg-secondary">{{ $passingPercentage }}%</span>
+                </span>
+            </span>
         </div>
     </div>
 
