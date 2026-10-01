@@ -2548,16 +2548,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="position-card-tajweed">
-                        <button type="button" class="btn-tajweed-attach"
-                                onclick="openTajweedModal({{ $globalIndex }}, {{ $partIndex }}, {{ $posIndex }}, '{{ addslashes($mafsilPosition->positionRangeLabel() ?? 'الموضع ' . ($posIndex + 1)) }}')">
-                            <i class="fas fa-book-quran me-1"></i>
-                            <span>أخطاء التجويد</span>
-                            <span class="tajweed-count-badge" id="tajweed-count-{{ $partIndex }}-{{ $posIndex }}" style="display:none;">0</span>
-                        </button>
-                        <div class="tajweed-summary" id="tajweed-summary-{{ $partIndex }}-{{ $posIndex }}"></div>
-                        <div class="tajweed-errors-container" id="tajweed-errors-{{ $globalIndex }}"></div>
-                    </div>
                     <input type="hidden" name="pages[{{ $globalIndex }}][page_number]" value="{{ $part->part_number }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][position]" value="{{ $posIndex + 1 }}">
                     <input type="hidden" name="pages[{{ $globalIndex }}][is_placeholder]" value="{{ $isPlaceholder ? '1' : '0' }}">
