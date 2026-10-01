@@ -320,7 +320,7 @@
         </main>
 
         <!-- Footer -->
-        <footer style="padding: 15px 25px; background: #fff; border-top: 1px solid #eee; text-align: center; color: #7f8c8d; font-size: 12px;">
+        <footer class="d-none d-md-block" style="padding: 15px 25px; background: #fff; border-top: 1px solid #eee; text-align: center; color: #7f8c8d; font-size: 12px;">
             جميع الحقوق محفوظة &copy; {{ date('Y') }} - مشروع مدكر القرآني
         </footer>
     </div>
