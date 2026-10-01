@@ -516,10 +516,16 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     ];
                     $savedAxes = old('program_axes_names', $defaultAxes);
                 @endphp
-                <div class="row g-2">
+                <div class="row g-2" id="program-axes-row">
                     @foreach($savedAxes as $i => $axis)
-                    <div class="col-md-6">
+                    <div class="col-md-6 axis-item" data-index="{{ $i }}">
                         <div class="axis-row">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge-custom axis-number">{{ $i + 1 }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-axis" style="border-radius:8px" title="حذف المحور">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                             <div class="row g-2 align-items-center">
                                 <div class="col-4">
                                     <input type="text" name="program_axes_names[]" class="form-control form-control-sm" value="{{ $axis }}" placeholder="المحور">
@@ -532,98 +538,11 @@ body { background: var(--bg-main); font-family: 'Tajawal', sans-serif; }
                     </div>
                     @endforeach
                 </div>
+                <button type="button" class="btn-add mt-3" onclick="addProgramAxis()">
+                    <i class="fas fa-plus"></i>إضافة محور
+                </button>
             </div>
         </div>
-
-        @if(isset($supervisorStudents) && $supervisorStudents->count() > 0)
-        <div class="divider"></div>
-        <div class="form-section">
-            <div class="section-title">
-                <i class="fas fa-user-graduate" style="color:#ec4899"></i>
-                <span>ملخص متابعة الطلاب</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table student-table mb-0">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width:60px">#</th>
-                            <th class="text-center">المشرف</th>
-                            <th class="text-center">الطالب</th>
-                            <th class="text-center">الحضور</th>
-                            <th class="text-center">التسميع</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $rowIndex = 1; @endphp
-                        @foreach($supervisorStudents as $supervisorIndex => $supervisor)
-                            @php $studentCount = count($supervisor->students_with_data); @endphp
-                            @foreach($supervisor->students_with_data as $studentIndex => $student)
-                            <tr class="student-row">
-                                <td class="text-center align-middle">
-                                    <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);color:var(--gold);width:32px;height:32px;font-size:13px;font-weight:700">{{ $rowIndex }}</span>
-                                </td>
-                                @if($studentIndex == 0)
-                                <td class="text-center align-middle" rowspan="{{ $studentCount }}">
-                                    <div class="supervisor-cell d-flex align-items-center justify-content-center gap-2 py-2">
-                                        <div class="avatar-circle avatar-primary flex-shrink-0">
-                                            <i class="fas fa-user-tie"></i>
-                                        </div>
-                                        <span class="fw-bold" style="color:var(--primary)">{{ $supervisor->name }}</span>
-                                    </div>
-                                </td>
-                                @endif
-                                <td class="text-center align-middle">
-                                    <div class="student-cell d-flex align-items-center justify-content-center gap-2 py-2">
-                                        <div class="avatar-circle avatar-secondary flex-shrink-0">
-                                            <i class="fas fa-user-graduate"></i>
-                                        </div>
-                                        <span style="color:var(--primary);font-weight:600">{{ $student->user->name ?? '-' }}</span>
-                                    </div>
-                                </td>
-                                <td class="text-center align-middle">
-                                    @if($student->last_three_attendances && $student->last_three_attendances->count() > 0)
-                                        @php
-                                            $presentCount = $student->last_three_attendances->where('status', 'present')->count();
-                                            $totalDays = $student->last_three_attendances->count();
-                                            $attendanceRatio = $presentCount . '/' . $totalDays;
-                                            $ratioColor = $presentCount == $totalDays ? '#27ae60' : ($presentCount >= ($totalDays / 2) ? '#f39c12' : '#c0392b');
-                                        @endphp
-                                        <span class="attendance-ratio-badge d-inline-flex align-items-center justify-content-center rounded-pill" style="background:{{ $ratioColor }};color:#fff;padding:6px 16px;font-weight:700;font-size:14px">
-                                            {{ $attendanceRatio }}
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td class="text-center align-middle">
-                                    @if($student->last_two_recitations && $student->last_two_recitations->count() > 0)
-                                        <div class="recitations-wrapper d-flex flex-column gap-2">
-                                            @foreach($student->last_two_recitations as $recitation)
-                                            <div class="recitation-card d-flex align-items-center gap-2" style="background:linear-gradient(135deg, rgba(24,43,72,0.04) 0%, rgba(42,69,112,0.06) 100%);border:1px solid rgba(24,43,72,0.1);border-radius:10px;padding:10px 12px">
-                                                <span class="recitation-type fw-bold" style="color:var(--primary);font-size:13px;flex:1">{{ $recitation->type_label }}</span>
-                                                <span class="status-indicator d-inline-flex align-items-center gap-2" style="color:{{ $recitation->status_color }};font-size:12px;font-weight:600">
-                                                    <span style="width:8px;height:8px;background:{{ $recitation->status_color }};border-radius:50%"></span>
-                                                    {{ $recitation->status_label }}
-                                                </span>
-                                                <a href="{{ route('admin.sessions.show', $recitation->id) }}" target="_blank" class="view-btn d-inline-flex align-items-center justify-content-center" style="width:26px;height:26px;background:linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);border-radius:6px;color:#fff;text-decoration:none;transition:all 0.3s ease">
-                                                    <i class="fas fa-eye" style="font-size:10px"></i>
-                                                </a>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <span class="text-muted" style="font-size:13px">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @php $rowIndex++; @endphp
-                            @endforeach
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        @endif
 
         <div class="divider"></div>
 
@@ -872,6 +791,43 @@ function updateTaskStatusColor(select) {
     badge.removeClass('badge-warning badge-info badge-success badge-danger').addClass('badge-' + statusColors[newStatus]);
     badge.text(statusLabels[newStatus]);
 }
+
+function addProgramAxis() {
+    var container = $('#program-axes-row');
+    var count = container.find('.axis-item').length;
+    var html = '<div class="col-md-6 axis-item">' +
+        '<div class="axis-row">' +
+        '<div class="d-flex justify-content-between align-items-center mb-2">' +
+        '<span class="badge-custom axis-number">' + (count + 1) + '</span>' +
+        '<button type="button" class="btn btn-sm btn-outline-danger remove-axis" style="border-radius:8px" title="حذف المحور">' +
+        '<i class="fas fa-times"></i>' +
+        '</button>' +
+        '</div>' +
+        '<div class="row g-2 align-items-center">' +
+        '<div class="col-4">' +
+        '<input type="text" name="program_axes_names[]" class="form-control form-control-sm" placeholder="المحور">' +
+        '</div>' +
+        '<div class="col-8">' +
+        '<textarea name="program_axes[]" class="form-control form-control-sm" rows="2" placeholder="التفاصيل"></textarea>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+    container.append(html);
+    renumberProgramAxes();
+    container.find('.axis-item').last().find('input[type="text"]').focus();
+}
+
+function renumberProgramAxes() {
+    $('#program-axes-row .axis-item').each(function(i) {
+        $(this).find('.axis-number').text(i + 1);
+    });
+}
+
+$(document).on('click', '.remove-axis', function() {
+    $(this).closest('.axis-item').remove();
+    renumberProgramAxes();
+});
 
 $(document).on('click', '.remove-manual-attendee', function() {
     $(this).closest('.manual-attendee-row').remove();
