@@ -35,7 +35,7 @@
     --shadow-gold: 0 8px 24px rgba(212, 160, 48, 0.25);
 }
 
-.rec-session { color: var(--navy); }
+.rec-session { color: var(--navy); overflow-x: clip; }
 
 /* =========================
    PAGE HERO - Compact Modern
@@ -1998,6 +1998,86 @@
     .rec-session .score-stat .stat-icon-circle { width: 30px; height: 30px; font-size: 12px; }
     .rec-session .score-stat .stat-text .lbl { font-size: 9px; }
     .rec-session .score-stat .stat-text .val { font-size: 15px; }
+
+    /* Part grid: shrink cards so 3 fit per row on narrow phones */
+    .rec-session .part-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+
+    /* Prevent flex/grid blowout in nested wrappers */
+    .rec-session .session-hero,
+    .rec-session .part-section,
+    .rec-session .card-modern,
+    .rec-session .part-checkbox-card { min-width: 0; }
+
+    /* Break long Arabic strings so they don't push width */
+    .rec-session .quran-verse,
+    .rec-session .chip { overflow-wrap: anywhere; word-break: break-word; }
+
+    /* Ayahs modal: full-screen sheet (overrides modal-xl) */
+    .rec-session #ayahsModal .modal-dialog.modal-ayahs {
+        max-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        border-radius: 0;
+    }
+    .rec-session #ayahsModal .modal-content {
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+    }
+    .rec-session #ayahsModal .modal-header,
+    .rec-session #ayahsModal .modal-footer { flex-shrink: 0; }
+    .rec-session #ayahsModal .modal-body { padding: 0; overflow: hidden; flex: 1 1 auto; min-height: 0; }
+
+    /* Ayahs layout: sticky scoring rail on top, scrolling content below */
+    .rec-session .ayahs-modal-layout {
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
+    .rec-session .ayahs-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .rec-session .ayahs-scoring-tab {
+        order: -1;
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 6px 10px;
+        background: #f8fafc;
+        border-inline-start: none;
+        border-bottom: 1px solid #eef0f3;
+        box-shadow: 0 4px 12px rgba(15, 28, 51, 0.06);
+        overflow: visible;
+    }
+    .rec-session .ayahs-tab-block {
+        flex: 1 1 calc(50% - 6px);
+        flex-direction: row;
+        gap: 6px;
+        padding: 4px 6px;
+    }
+    .rec-session .ayahs-tab-score {
+        flex: 1 1 100%;
+        flex-direction: row;
+        gap: 6px;
+        padding: 4px 6px;
+        margin: 0;
+    }
+
+    /* Modal footer: allow button wrap so close isn't clipped */
+    .rec-session #ayahsModal .modal-footer { flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 }
 
 /* =========================
@@ -2678,7 +2758,7 @@
 
     {{-- ==================== AYAHS MODAL ==================== --}}
     <div class="modal fade" id="ayahsModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-ayahs">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
