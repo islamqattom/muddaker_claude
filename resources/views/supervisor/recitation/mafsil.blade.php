@@ -1983,12 +1983,59 @@
     .rec-session .progress-card .progress-track { min-width: 0; flex-basis: 100%; }
     .rec-session .search-box { min-width: 0; width: 100%; }
 
-    /* Position rows: two columns so the scoring controls fit */
-    .rec-session .position-card-body { grid-template-columns: 1fr 1fr; gap: 6px; }
+    /* Position rows: tidy stacked layout for phones */
+    .rec-session .position-card { border-radius: 11px; margin-bottom: 6px; }
+    .rec-session .position-card-head { padding: 8px 10px; gap: 8px; }
+    .rec-session .position-number { width: 26px; height: 26px; font-size: 11px; border-radius: 7px; }
+    .rec-session .position-range { font-size: 12px; }
+    .rec-session .position-sub { font-size: 9px; gap: 6px; }
+    .rec-session .position-sub .difficulty-badge { font-size: 9px; padding: 2px 6px; }
+    .rec-session .btn-view-ayahs { width: 28px; height: 28px; font-size: 12px; }
+    .rec-session .position-card-body {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    /* Errors & hesitations: label centered above controls */
+    .rec-session .position-stat {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        padding: 6px 8px;
+    }
+    .rec-session .position-stat .stat-label {
+        align-self: center;
+        justify-content: center;
+        font-size: 9px;
+        gap: 4px;
+    }
+    .rec-session .scoring-input-group {
+        margin-inline-start: 0;
+        justify-content: center;
+        gap: 4px;
+    }
+    .rec-session .scoring-input-group input { width: 32px; height: 26px; font-size: 12px; }
+    .rec-session .scoring-input-group button { width: 24px; height: 26px; font-size: 10px; }
+
+    /* Deduction & score: full-width row below */
     .rec-session .position-stat.deduction,
-    .rec-session .position-stat.score { grid-column: span 1; }
-    .rec-session .scoring-input-group input { width: 28px; }
-    .rec-session .scoring-input-group button { width: 22px; height: 24px; }
+    .rec-session .position-stat.score {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 10px;
+    }
+    .rec-session .position-stat.deduction .stat-label { font-size: 10px; }
+    .rec-session .position-deduction { font-size: 13px; padding: 0; }
+    .rec-session .position-score-box {
+        min-width: 0;
+        flex: 1;
+        padding: 6px 10px;
+    }
+    .rec-session .position-score-box .score-value { font-size: 16px; }
+    .rec-session .position-score-box .score-label { font-size: 9px; }
 
     /* Score dashboard: compact and non-sticky */
     .rec-session .score-dashboard { position: static; top: auto; }
