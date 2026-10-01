@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.11",
         "maatwebsite/excel": "^3.1",
         "minishlink/web-push": "^10.0",
+        "predis/predis": "^3.6",
         "pusher/pusher-php-server": "*",
         "spatie/laravel-permission": "^5.10",
         "tecnickcom/tcpdf": "^6.10",
@@ -68,6 +69,13 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "ext-pcntl": "8.2",
+            "ext-posix": "8.2"
+        },
+        "audit": {
+            "block-insecure": false
         }
     },
     "minimum-stability": "stable",
