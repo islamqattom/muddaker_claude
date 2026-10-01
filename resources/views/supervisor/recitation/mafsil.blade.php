@@ -2081,7 +2081,7 @@
     .rec-session #ayahsModal .modal-footer { flex-shrink: 0; }
     .rec-session #ayahsModal .modal-body { padding: 0; overflow: hidden; flex: 1 1 auto; min-height: 0; }
 
-    /* Ayahs layout: sticky scoring rail on top, scrolling content below */
+    /* Ayahs layout: scoring rail sits in modal-footer (set by JS) */
     .rec-session .ayahs-modal-layout {
         flex-direction: column;
         height: 100%;
@@ -2093,10 +2093,14 @@
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
+    .rec-session .ayahs-modal-footer {
+        display: flex !important;
+        flex-direction: column;
+        padding: 8px 10px !important;
+        background: #f8fafc;
+        border-top: 1px solid #eef0f3;
+    }
     .rec-session .ayahs-scoring-tab {
-        position: sticky;
-        bottom: 0;
-        z-index: 3;
         flex: 0 0 auto;
         width: 100%;
         flex-direction: row;
@@ -2104,24 +2108,23 @@
         align-items: center;
         justify-content: space-between;
         gap: 6px;
-        padding: 6px 10px;
-        background: #f8fafc;
-        border-inline-start: none;
-        border-top: 1px solid #eef0f3;
-        box-shadow: 0 -4px 12px rgba(15, 28, 51, 0.06);
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
         overflow: visible;
     }
     .rec-session .ayahs-tab-block {
-        flex: 1 1 calc(50% - 6px);
+        flex: 1 1 calc(50% - 4px);
         flex-direction: row;
         gap: 6px;
-        padding: 4px 6px;
+        padding: 4px 8px;
     }
     .rec-session .ayahs-tab-score {
         flex: 1 1 100%;
         flex-direction: row;
         gap: 6px;
-        padding: 4px 6px;
+        padding: 6px 10px;
         margin: 0;
     }
 
@@ -2849,7 +2852,7 @@
                         </aside>
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer ayahs-modal-footer p-0" id="ayahsModalFooter" style="display: none;"></div>
         </div>
     </div>
 
@@ -2916,6 +2919,30 @@ let initialFailedRecordSaved = false;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 52; // ~326.7
 
 let ayahsContext = { partIndex: null, posIndex: null };
+
+const ayahsAside = document.querySelector('#ayahsModal .ayahs-scoring-tab');
+const ayahsFooter = document.getElementById('ayahsModalFooter');
+const ayahsLayout = document.querySelector('#ayahsModal .ayahs-modal-layout');
+
+function placeAyahsRail() {
+    if (!ayahsAside || !ayahsFooter || !ayahsLayout) return;
+    const isPhone = window.matchMedia('(max-width: 576px)').matches;
+    if (isPhone) {
+        if (ayahsAside.parentElement !== ayahsFooter) {
+            ayahsFooter.appendChild(ayahsAside);
+            ayahsFooter.style.display = '';
+        }
+    } else {
+        if (ayahsAside.parentElement !== ayahsLayout) {
+            ayahsLayout.appendChild(ayahsAside);
+            ayahsFooter.style.display = 'none';
+        }
+    }
+}
+
+placeAyahsRail();
+window.matchMedia('(max-width: 576px)').addEventListener('change', placeAyahsRail);
+document.getElementById('ayahsModal')?.addEventListener('show.bs.modal', placeAyahsRail);
 
 function showPositionAyahs(mafsilPositionId, partIndex, posIndex) {
     ayahsContext = { partIndex: partIndex, posIndex: posIndex };
