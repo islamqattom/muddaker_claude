@@ -1283,12 +1283,10 @@ class ReportService
      */
     public function supervisorMissingDays(?Carbon $from, ?Carbon $to, ?int $supervisorId = null): array
     {
-        $settings = app(SettingsServiceProvider::class);
-
-        $requiredSessionDays = $settings->carbonDaysForDayNames(
+        $requiredSessionDays = SettingsServiceProvider::carbonDaysForDayNames(
             config('app.recitation_days', SettingsServiceProvider::DEFAULT_RECITATION_DAYS)
         );
-        $requiredAttendanceDays = $settings->carbonDaysForDayNames(
+        $requiredAttendanceDays = SettingsServiceProvider::carbonDaysForDayNames(
             config('app.work_days', SettingsServiceProvider::DEFAULT_WORK_DAYS)
         );
 
