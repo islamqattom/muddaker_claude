@@ -168,9 +168,9 @@ class ReportExporter
         $pdf->Cell(0, 8, 'الفترة: ' . ($fromDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'الكل'), 0, true, 'C', 0);
         $pdf->Ln(5);
 
-        $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
+        $html = '<table border="1" cellpadding="4" width="100%"><tr bgcolor="#182B48" color="white">';
         foreach (['#', 'التاريخ', 'اليوم', 'المشرف', 'الجلسة', 'الحضور'] as $h) {
-            $html .= '<th align="center">' . $h . '</th>';
+            $html .= '<th align="center" width="16.66%">' . $h . '</th>';
         }
         $html .= '</tr>';
 
