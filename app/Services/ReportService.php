@@ -1315,6 +1315,17 @@ class ReportService
             ->keys()
             ->flip();
 
+        // Days recorded as a holiday are off-days: no session or attendance is expected.
+        $holidayDaysBySupervisor = Attendance::query()
+            ->where('status', 'holiday')
+            ->when($from, fn ($q) => $q->whereDate('date', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('date', '<=', $to))
+            ->when($supervisorId, fn ($q) => $q->where('supervisor_id', $supervisorId))
+            ->get(['supervisor_id', 'date'])
+            ->groupBy(fn ($a) => $a->supervisor_id . '|' . $a->date->toDateString())
+            ->keys()
+            ->flip();
+
         $rows = collect();
 
         $start = ($from ?? Carbon::now()->subMonths(1))->copy()->startOfDay();
@@ -1332,6 +1343,12 @@ class ReportService
                 $dateKey = $cur->toDateString();
                 foreach ($supervisors as $sup) {
                     $supKey = $sup->id . '|' . $dateKey;
+
+                    // Holiday: skip entirely (no session/attendance expected).
+                    if (isset($holidayDaysBySupervisor[$supKey])) {
+                        continue;
+                    }
+
                     $hasSession    = $sessionExpected    && isset($sessionDaysBySupervisor[$supKey]);
                     $hasAttendance = $attendanceExpected && isset($attendanceDaysBySupervisor[$supKey]);
 
