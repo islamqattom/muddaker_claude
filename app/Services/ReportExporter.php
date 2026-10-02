@@ -127,7 +127,20 @@ class ReportExporter
             'حضور ناقص'      => $stats['missing_attendance'],
         ];
 
-        $filename = 'supervisor-missing-' . now()->format('Ymd-His');
+        $supervisorSegment = null;
+        if ($supervisorId) {
+            $supervisorSegment = $rows->pluck('supervisor_name')
+                ->filter()
+                ->unique()
+                ->first() ?? 'غير محدد';
+        }
+
+        $filename = sprintf(
+            'نواقص شهر %s %s%s',
+            (string) ($fromDate?->month ?? now()->month),
+            'المشرف ',
+            $supervisorSegment ?? 'كل المشرفين'
+        );
 
         return match ($format) {
             'excel', 'xlsx' => Excel::download(
@@ -135,8 +148,8 @@ class ReportExporter
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('نواقص المشرفين', $headers, $exportRows, $statsForExport, $subtitle),
-            'pdf'   => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate),
-            default => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate),
+            'pdf'   => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate, $filename),
+            default => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate, $filename),
         };
     }
 
@@ -148,7 +161,7 @@ class ReportExporter
         return $missing ? '✗ ناقص' : '✓ مسجل';
     }
 
-    protected function supervisorMissingPdf(array $rows, array $stats, $fromDate, $toDate)
+    protected function supervisorMissingPdf(array $rows, array $stats, $fromDate, $toDate, ?string $filename = null)
     {
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -168,16 +181,19 @@ class ReportExporter
         $pdf->Cell(0, 8, 'الفترة: ' . ($fromDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'الكل'), 0, true, 'C', 0);
         $pdf->Ln(5);
 
-        $html = '<table border="1" cellpadding="4" width="100%"><tr bgcolor="#182B48" color="white">';
+        $pdf->writeHTML($this->pdfStatsTable($stats, '#182B48', ['#dc3545', '#ffc107', '#059669']), true, false, false, false, 'C');
+        $pdf->Ln(8);
+
+        $html = '<table border="1" cellpadding="4" cols="6" width="100%"><thead><tr bgcolor="#182B48" color="white">';
         foreach (['#', 'التاريخ', 'اليوم', 'المشرف', 'الجلسة', 'الحضور'] as $h) {
-            $html .= '<th align="center" width="16.66%">' . $h . '</th>';
+            $html .= '<th align="center">' . $h . '</th>';
         }
-        $html .= '</tr>';
+        $html .= '</tr></thead><tbody>';
 
         foreach ($rows as $r) {
             $html .= '<tr>';
             foreach ($r as $i => $cell) {
-                $align = $i === 3 ? 'align="right"' : 'align="center"';
+                $align = $i === 3 ? ' align="right"' : ' align="center"';
                 $color = '';
                 if ($cell === '✗ ناقص') {
                     $color = ' color="#dc3545"';
@@ -193,10 +209,10 @@ class ReportExporter
             $html .= '<tr><td colspan="6" align="center">لا توجد نواقص في هذه الفترة</td></tr>';
         }
 
-        $html .= '</table>';
+        $html .= '</tbody></table>';
         $pdf->writeHTML($html, true, false, false, false, '');
 
-        $filename = $this->pdfFilename(
+        $filename ??= $this->pdfFilename(
             'نواقص المشرفين',
             null,
             $this->periodSlug($fromDate, $toDate, 'custom')
