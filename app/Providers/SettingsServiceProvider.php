@@ -33,7 +33,7 @@ class SettingsServiceProvider extends ServiceProvider
     /**
      * Default list of recitation days. Kept independent from the work days.
      */
-    public const DEFAULT_RECITATION_DAYS = 'saturday,tuesday';
+    public const DEFAULT_RECITATION_DAYS = 'saturday,sunday,tuesday,thursday';
 
     /**
      * Arabic labels for the English day names stored in the settings.
