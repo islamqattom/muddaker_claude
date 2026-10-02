@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Concerns\BuildsReportData;
 use App\Http\Controllers\Controller;
-use App\Models\{Attendance, RecitationSession, Student};
+use App\Models\{Attendance, RecitationSession, Student, User};
 use App\Services\ReportExporter;
 use App\Services\ReportService;
 use Carbon\Carbon;
@@ -200,6 +200,42 @@ class ReportController extends Controller
         return view('admin.reports.student', compact(
             'student', 'sessions', 'attendances', 'sessionStats', 'attendanceStats', 'dayStats', 'fromDate', 'toDate'
         ));
+    }
+
+    /**
+     * Report listing every (date, supervisor) pair where the supervisor failed
+     * to add a recitation session on a configured recitation day OR failed to
+     * add any attendance on a configured working day.
+     */
+    public function supervisorMissingReport(Request $request)
+    {
+        [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
+        $supervisorId = $request->input('supervisor_id');
+
+        // Exports share the same data path; dispatch by ?export=excel|print|pdf.
+        $export = $request->input('export');
+        if (in_array($export, ['excel', 'print', 'pdf'], true)) {
+            return $this->exporter->exportSupervisorMissing($export, $fromDate, $toDate, $supervisorId);
+        }
+
+        $payload = $this->reports->supervisorMissingDays($fromDate, $toDate, $supervisorId);
+
+        $supervisors = User::where('role', 'supervisor')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('admin.reports.supervisor-missing', [
+            'rows'                      => $payload['rows'],
+            'stats'                     => $payload['stats'],
+            'fromDate'                  => $fromDate,
+            'toDate'                    => $toDate,
+            'period'                    => $period,
+            'supervisorId'              => $supervisorId,
+            'supervisors'               => $supervisors,
+            'configuredSessionDays'     => $payload['configured_session_days'],
+            'configuredAttendanceDays'  => $payload['configured_attendance_days'],
+        ]);
     }
 }
 

@@ -53,9 +53,23 @@
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>
     <span>سجل اختبار الأجزاء</span>
 </a>
-<a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+@php
+    $comprehensiveReportsActive = request()->routeIs('admin.reports.index')
+        || request()->routeIs('admin.reports.recitation')
+        || request()->routeIs('admin.reports.attendance')
+        || request()->routeIs('admin.reports.quarter')
+        || request()->routeIs('admin.reports.half')
+        || request()->routeIs('admin.reports.year')
+        || request()->routeIs('admin.reports.students')
+        || request()->routeIs('admin.reports.student');
+@endphp
+<a href="{{ route('admin.reports.index') }}" class="nav-link {{ $comprehensiveReportsActive ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-chart-line"></i></div>
     <span>التقارير الشاملة</span>
+</a>
+<a href="{{ route('admin.reports.supervisor-missing') }}" class="nav-link {{ request()->routeIs('admin.reports.supervisor-missing') ? 'active' : '' }}">
+    <div class="icon-wrapper"><i class="fas fa-user-clock"></i></div>
+    <span>نواقص المشرفين</span>
 </a>
 <a href="{{ route('admin.student-parts.index') }}" class="nav-link {{ request()->routeIs('admin.student-parts.*') ? 'active' : '' }}">
     <div class="icon-wrapper"><i class="fas fa-book-quran"></i></div>

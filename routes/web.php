@@ -120,6 +120,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         // (student + period selector, written breakdown, PDF export).
         Route::get('/students', [Admin\ReportController::class, 'studentsReport'])->name('students');
         Route::get('/student/{student}', [Admin\ReportController::class, 'studentReport'])->name('student');
+        // Missing-days report: dates where supervisors did not add
+        // recitation sessions on recitation_days OR attendance on work_days.
+        Route::get('/supervisor-missing', [Admin\ReportController::class, 'supervisorMissingReport'])->name('supervisor-missing');
     });
 
     // Mafil history (اختبار الأجزاء)

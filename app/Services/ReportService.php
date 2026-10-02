@@ -8,6 +8,7 @@ use App\Models\QuranPart;
 use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\Supervisor;
+use App\Models\User;
 use App\Providers\SettingsServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -1270,6 +1271,107 @@ class ReportService
         return [
             'supervisors' => $supervisors,
             'students'    => $students,
+        ];
+    }
+
+    /**
+     * Compute (date, supervisor) rows where the supervisor failed to register
+     * a recitation session on a configured recitation day, or failed to
+     * register any attendance on a configured working day.
+     *
+     * Returns rows + configured day-name arrays for the view banner.
+     */
+    public function supervisorMissingDays(?Carbon $from, ?Carbon $to, ?int $supervisorId = null): array
+    {
+        $settings = app(SettingsServiceProvider::class);
+
+        $requiredSessionDays = $settings->carbonDaysForDayNames(
+            config('app.recitation_days', SettingsServiceProvider::DEFAULT_RECITATION_DAYS)
+        );
+        $requiredAttendanceDays = $settings->carbonDaysForDayNames(
+            config('app.work_days', SettingsServiceProvider::DEFAULT_WORK_DAYS)
+        );
+
+        $supervisors = User::where('role', 'supervisor')
+            ->where('is_active', true)
+            ->when($supervisorId, fn ($q) => $q->where('id', $supervisorId))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $sessionDaysBySupervisor = RecitationSession::query()
+            ->where('auto_generated', false)
+            ->when($from, fn ($q) => $q->whereDate('session_date', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('session_date', '<=', $to))
+            ->when($supervisorId, fn ($q) => $q->where('supervisor_id', $supervisorId))
+            ->get(['supervisor_id', 'session_date'])
+            ->groupBy(fn ($s) => $s->supervisor_id . '|' . $s->session_date->toDateString())
+            ->keys()
+            ->flip();
+
+        $attendanceDaysBySupervisor = Attendance::query()
+            ->when($from, fn ($q) => $q->whereDate('date', '>=', $from))
+            ->when($to, fn ($q) => $q->whereDate('date', '<=', $to))
+            ->when($supervisorId, fn ($q) => $q->where('supervisor_id', $supervisorId))
+            ->get(['supervisor_id', 'date'])
+            ->groupBy(fn ($a) => $a->supervisor_id . '|' . $a->date->toDateString())
+            ->keys()
+            ->flip();
+
+        $rows = collect();
+
+        $start = ($from ?? Carbon::now()->subMonths(1))->copy()->startOfDay();
+        $end   = ($to   ?? Carbon::now())->copy()->endOfDay();
+        if ($start->gt($end)) {
+            [$start, $end] = [$end, $start];
+        }
+
+        $cur = $start->copy();
+        while ($cur->lte($end)) {
+            $sessionExpected    = in_array($cur->dayOfWeek, $requiredSessionDays, true);
+            $attendanceExpected = in_array($cur->dayOfWeek, $requiredAttendanceDays, true);
+
+            if ($sessionExpected || $attendanceExpected) {
+                $dateKey = $cur->toDateString();
+                foreach ($supervisors as $sup) {
+                    $supKey = $sup->id . '|' . $dateKey;
+                    $hasSession    = $sessionExpected    && isset($sessionDaysBySupervisor[$supKey]);
+                    $hasAttendance = $attendanceExpected && isset($attendanceDaysBySupervisor[$supKey]);
+
+                    if (($sessionExpected && ! $hasSession) || ($attendanceExpected && ! $hasAttendance)) {
+                        $rows->push([
+                            'date'                => $cur->copy(),
+                            'day_name'            => SettingsServiceProvider::arabicDayName((int) $cur->dayOfWeek),
+                            'supervisor_id'       => $sup->id,
+                            'supervisor_name'     => $sup->name,
+                            'session_expected'    => $sessionExpected,
+                            'session_missing'     => $sessionExpected && ! $hasSession,
+                            'attendance_expected' => $attendanceExpected,
+                            'attendance_missing'  => $attendanceExpected && ! $hasAttendance,
+                        ]);
+                    }
+                }
+            }
+
+            $cur->addDay();
+        }
+
+        $stats = [
+            'rows_count'              => $rows->count(),
+            'missing_sessions'        => $rows->where('session_missing', true)->count(),
+            'missing_attendance'      => $rows->where('attendance_missing', true)->count(),
+        ];
+
+        return [
+            'rows'                      => $rows,
+            'stats'                     => $stats,
+            'configured_session_days'  => array_map(
+                [SettingsServiceProvider::class, 'arabicDayName'],
+                $requiredSessionDays
+            ),
+            'configured_attendance_days'=> array_map(
+                [SettingsServiceProvider::class, 'arabicDayName'],
+                $requiredAttendanceDays
+            ),
         ];
     }
 }

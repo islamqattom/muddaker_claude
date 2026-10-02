@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exports\AttendanceReportExport;
 use App\Exports\RecitationReportExport;
+use App\Exports\SupervisorMissingExport;
 use Maatwebsite\Excel\Facades\Excel;
 use TCPDF;
 
@@ -96,6 +97,112 @@ class ReportExporter
     public function exportAttendancePdf($attendances, $stats, $fromDate, $toDate)
     {
         return $this->attendancePdf($attendances, $stats, $fromDate, $toDate);
+    }
+
+    public function exportSupervisorMissing(string $format, $fromDate, $toDate, ?int $supervisorId)
+    {
+        /** @var \App\Services\ReportService $reports */
+        $reports = app(\App\Services\ReportService::class);
+        $payload = $reports->supervisorMissingDays($fromDate, $toDate, $supervisorId);
+        $rows     = $payload['rows'];
+        $stats    = $payload['stats'];
+
+        $headers = ['#', 'التاريخ', 'اليوم', 'المشرف', 'الجلسة', 'الحضور'];
+
+        $exportRows = $rows->values()->map(function ($r, $i) {
+            return [
+                $i + 1,
+                $r['date']->format('Y/m/d'),
+                $r['day_name'],
+                $r['supervisor_name'],
+                $this->missingCell($r['session_expected'], $r['session_missing']),
+                $this->missingCell($r['attendance_expected'], $r['attendance_missing']),
+            ];
+        })->toArray();
+
+        $subtitle = $this->dateRangeLabel($fromDate, $toDate, 'custom');
+        $statsForExport = [
+            'إجمالي النواقص' => $stats['rows_count'],
+            'جلسات ناقصة'    => $stats['missing_sessions'],
+            'حضور ناقص'      => $stats['missing_attendance'],
+        ];
+
+        $filename = 'supervisor-missing-' . now()->format('Ymd-His');
+
+        return match ($format) {
+            'excel', 'xlsx' => Excel::download(
+                new SupervisorMissingExport('نواقص المشرفين', $headers, $exportRows, $statsForExport, $subtitle),
+                $filename . '.xlsx'
+            ),
+            'print' => $this->printView('نواقص المشرفين', $headers, $exportRows, $statsForExport, $subtitle),
+            'pdf'   => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate),
+            default => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate),
+        };
+    }
+
+    protected function missingCell(bool $expected, bool $missing): string
+    {
+        if (! $expected) {
+            return '—';
+        }
+        return $missing ? '✗ ناقص' : '✓ مسجل';
+    }
+
+    protected function supervisorMissingPdf(array $rows, array $stats, $fromDate, $toDate)
+    {
+        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->setRTL(true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 10);
+        $pdf->AddPage();
+        $pdf->SetFont('aealarabiya', '', 12);
+
+        $centerName = config('app.center_name', 'مركز التسميع');
+        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 8, $centerName, 0, true, 'C', 0);
+        $pdf->SetFontSize(18);
+        $pdf->Cell(0, 10, 'نواقص المشرفين', 0, true, 'C', 0);
+        $pdf->SetFontSize(12);
+        $pdf->Cell(0, 8, 'الفترة: ' . ($fromDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'الكل'), 0, true, 'C', 0);
+        $pdf->Ln(5);
+
+        $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
+        foreach (['#', 'التاريخ', 'اليوم', 'المشرف', 'الجلسة', 'الحضور'] as $h) {
+            $html .= '<th align="center">' . $h . '</th>';
+        }
+        $html .= '</tr>';
+
+        foreach ($rows as $r) {
+            $html .= '<tr>';
+            foreach ($r as $i => $cell) {
+                $align = $i === 3 ? 'align="right"' : 'align="center"';
+                $color = '';
+                if ($cell === '✗ ناقص') {
+                    $color = ' color="#dc3545"';
+                } elseif ($cell === '✓ مسجل') {
+                    $color = ' color="#28a745"';
+                }
+                $html .= '<td' . $align . $color . '>' . $cell . '</td>';
+            }
+            $html .= '</tr>';
+        }
+
+        if (empty($rows)) {
+            $html .= '<tr><td colspan="6" align="center">لا توجد نواقص في هذه الفترة</td></tr>';
+        }
+
+        $html .= '</table>';
+        $pdf->writeHTML($html, true, false, false, false, '');
+
+        $filename = $this->pdfFilename(
+            'نواقص المشرفين',
+            null,
+            $this->periodSlug($fromDate, $toDate, 'custom')
+        );
+
+        return $this->pdfDownload($pdf, $filename);
     }
 
     public function exportAggregate(string $format, array $payload, array $meta)
