@@ -60,10 +60,10 @@
                     </select>
                 </div>
                 <div class="col-12 d-flex gap-2 justify-content-end">
-                    <button type="submit" class="btn-primary-modern">
+                    <button type="submit" class="rpt-btn rpt-btn-primary">
                         <i class="fas fa-check"></i> تطبيق
                     </button>
-                    <a href="{{ route('admin.reports.supervisor-missing') }}" class="btn-outline-modern">
+                    <a href="{{ route('admin.reports.supervisor-missing') }}" class="rpt-btn rpt-btn-ghost">
                         <i class="fas fa-undo"></i> إعادة
                     </a>
                 </div>
@@ -122,15 +122,15 @@
                 @php
                     $exportParams = array_merge(request()->query(), ['export' => 'excel']);
                 @endphp
-                <a href="?{{ http_build_query($exportParams) }}" class="btn-outline-modern">
+                <a href="?{{ http_build_query($exportParams) }}" class="rpt-btn rpt-btn-success">
                     <i class="fas fa-file-excel"></i> Excel
                 </a>
                 @php $exportParams['export'] = 'print'; @endphp
-                <a href="?{{ http_build_query($exportParams) }}" target="_blank" class="btn-outline-modern">
+                <a href="?{{ http_build_query($exportParams) }}" target="_blank" class="rpt-btn rpt-btn-ghost">
                     <i class="fas fa-print"></i> طباعة
                 </a>
                 @php $exportParams['export'] = 'pdf'; @endphp
-                <a href="?{{ http_build_query($exportParams) }}" class="btn-outline-modern">
+                <a href="?{{ http_build_query($exportParams) }}" class="rpt-btn rpt-btn-danger">
                     <i class="fas fa-file-pdf"></i> PDF
                 </a>
             </div>
