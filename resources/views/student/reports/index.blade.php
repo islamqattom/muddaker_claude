@@ -240,6 +240,7 @@
                                         <th>الجزء</th>
                                         <th>الحالة</th>
                                         <th>التاريخ</th>
+                                        <th>اليوم</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -261,6 +262,7 @@
                                             <span class="badge-modern {{ $session->status_color }}">{{ $session->status_label }}</span>
                                         </td>
                                         <td><small class="text-muted">{{ $session->session_date->format('Y/m/d') }}</small></td>
+                                        <td><small class="text-muted">{{ $session->day ?? '—' }}</small></td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -289,6 +291,7 @@
                                 <thead>
                                     <tr>
                                         <th>التاريخ</th>
+                                        <th>اليوم</th>
                                         <th>الحالة</th>
                                         <th>وقت الحضور</th>
                                     </tr>
@@ -297,6 +300,7 @@
                                     @foreach($recentAttendances as $attendance)
                                     <tr>
                                         <td class="fw-semibold">{{ $attendance->date->format('Y/m/d') }}</td>
+                                        <td class="fw-semibold">{{ $attendance->day ?? '—' }}</td>
                                         <td>
                                             <span class="badge-modern {{ $attendance->status_color }}">{{ $attendance->status_label }}</span>
                                         </td>

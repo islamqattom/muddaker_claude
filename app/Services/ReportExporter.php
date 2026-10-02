@@ -11,7 +11,7 @@ class ReportExporter
 {
     public function exportRecitation(string $format, $sessions, array $stats, $fromDate, $toDate, string $period, array $summary = [])
     {
-        $headers = ['#', 'الطالب', 'المشرف', 'النوع', 'الجزء', 'الصفحات', 'الأخطاء', 'الترددات', 'الدرجة', 'الحالة', 'التاريخ'];
+        $headers = ['#', 'الطالب', 'المشرف', 'النوع', 'الجزء', 'الصفحات', 'الأخطاء', 'الترددات', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'];
         $rows = $sessions->values()->map(function ($s, $i) {
             return [
                 $i + 1,
@@ -25,6 +25,7 @@ class ReportExporter
                 $s->final_score !== null ? number_format($s->final_score, 1) . '%' : '—',
                 $s->status_label,
                 $s->session_date?->format('Y/m/d') ?? '—',
+                $s->day ?? '—',
             ];
         })->toArray();
 
@@ -50,7 +51,7 @@ class ReportExporter
 
     public function exportAttendance(string $format, $attendances, array $stats, $fromDate, $toDate, string $period, array $summary = [])
     {
-        $headers = ['#', 'الطالب', 'المشرف', 'التاريخ', 'وقت الحضور', 'وقت الانصراف', 'الحالة'];
+        $headers = ['#', 'الطالب', 'المشرف', 'التاريخ', 'اليوم', 'وقت الحضور', 'وقت الانصراف', 'الحالة'];
         $rows = $attendances->values()->map(function ($a, $i) {
             $statusLabel = $this->attendanceStatusLabel($a->status);
             return [
@@ -58,6 +59,7 @@ class ReportExporter
                 $a->student->user->name ?? '—',
                 $a->supervisor->name ?? '—',
                 $a->date?->format('Y/m/d') ?? '—',
+                $a->day ?? '—',
                 $a->arrival_time ?? '—',
                 $a->departure_time ?? '—',
                 $statusLabel,
@@ -98,7 +100,7 @@ class ReportExporter
 
     public function exportAggregate(string $format, array $payload, array $meta)
     {
-        $headers = ['القسم', '#', 'الطالب', 'المشرف', 'التفاصيل', 'الدرجة/الحالة', 'التاريخ'];
+        $headers = ['القسم', '#', 'الطالب', 'المشرف', 'التفاصيل', 'الدرجة/الحالة', 'التاريخ', 'اليوم'];
         $rows = [];
 
         $i = 1;
@@ -110,6 +112,7 @@ class ReportExporter
                 $s->parts_label,
                 ($s->final_score !== null ? number_format($s->final_score, 1) . '%' : '—') . ' / ' . $s->status_label,
                 $s->session_date?->format('Y/m/d') ?? '—',
+                $s->day ?? '—',
             ];
         }
         $i = 1;
@@ -121,6 +124,7 @@ class ReportExporter
                 'وقت الحضور: ' . ($a->arrival_time ?? '—'),
                 $this->attendanceStatusLabel($a->status),
                 $a->date?->format('Y/m/d') ?? '—',
+                $a->day ?? '—',
             ];
         }
 
@@ -484,7 +488,7 @@ class ReportExporter
         $pdf->Ln(8);
 
         $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
-        foreach (['#', 'الطالب', 'المشرف', 'الجزء', 'الصفحات', 'الدرجة', 'الحالة', 'التاريخ'] as $h) {
+        foreach (['#', 'الطالب', 'المشرف', 'الجزء', 'الصفحات', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'] as $h) {
             $html .= '<th align="center">' . $h . '</th>';
         }
         $html .= '</tr>';
@@ -511,6 +515,7 @@ class ReportExporter
                 <td align="center">' . $score . '</td>
                 <td align="center" color="' . $statusColor . '"><b>' . $s->status_label . '</b></td>
                 <td align="center">' . ($s->session_date ? $s->session_date->format('Y/m/d') : '-') . '</td>
+                <td align="center">' . ($s->day ?? '-') . '</td>
             </tr>';
         }
         $html .= '</table>';
@@ -554,7 +559,7 @@ class ReportExporter
         $pdf->Ln(8);
 
         $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
-        foreach (['#', 'الطالب', 'المشرف', 'التاريخ', 'وقت الحضور', 'وقت الانصراف', 'الحالة'] as $h) {
+        foreach (['#', 'الطالب', 'المشرف', 'التاريخ', 'اليوم', 'وقت الحضور', 'وقت الانصراف', 'الحالة'] as $h) {
             $html .= '<th align="center">' . $h . '</th>';
         }
         $html .= '</tr>';
@@ -572,6 +577,7 @@ class ReportExporter
                 <td>' . ($a->student->user->name ?? '-') . '</td>
                 <td>' . ($a->supervisor->name ?? '-') . '</td>
                 <td align="center">' . ($a->date?->format('Y/m/d') ?? '-') . '</td>
+                <td align="center">' . ($a->day ?? '-') . '</td>
                 <td align="center">' . ($a->arrival_time ?? '-') . '</td>
                 <td align="center">' . ($a->departure_time ?? '-') . '</td>
                 <td align="center" color="' . $statusColor . '"><b>' . $statusLabel . '</b></td>
@@ -639,7 +645,7 @@ class ReportExporter
 
         if ($allSessions->isNotEmpty()) {
             $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
-            foreach (['#', 'الطالب', 'المشرف', 'الجزء', 'الدرجة', 'الحالة', 'التاريخ'] as $h) {
+            foreach (['#', 'الطالب', 'المشرف', 'الجزء', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'] as $h) {
                 $html .= '<th align="center">' . $h . '</th>';
             }
             $html .= '</tr>';
@@ -658,6 +664,7 @@ class ReportExporter
                     <td align="center">' . ($s->final_score !== null ? number_format($s->final_score, 1) . '%' : '-') . '</td>
                     <td align="center" color="' . $statusColor . '"><b>' . $s->status_label . '</b></td>
                     <td align="center">' . ($s->session_date ? $s->session_date->format('Y/m/d') : '-') . '</td>
+                    <td align="center">' . ($s->day ?? '-') . '</td>
                 </tr>';
             }
             $html .= '</table>';
@@ -673,7 +680,7 @@ class ReportExporter
 
         if ($allAttendances->isNotEmpty()) {
             $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
-            foreach (['#', 'الطالب', 'المشرف', 'التاريخ', 'وقت الحضور', 'الحالة'] as $h) {
+            foreach (['#', 'الطالب', 'المشرف', 'التاريخ', 'اليوم', 'وقت الحضور', 'الحالة'] as $h) {
                 $html .= '<th align="center">' . $h . '</th>';
             }
             $html .= '</tr>';
@@ -690,6 +697,7 @@ class ReportExporter
                     <td>' . ($a->student->user->name ?? '-') . '</td>
                     <td>' . ($a->supervisor->name ?? '-') . '</td>
                     <td align="center">' . ($a->date?->format('Y/m/d') ?? '-') . '</td>
+                    <td align="center">' . ($a->day ?? '-') . '</td>
                     <td align="center">' . ($a->arrival_time ?? '-') . '</td>
                     <td align="center" color="' . $statusColor . '"><b>' . $statusLabel . '</b></td>
                 </tr>';

@@ -172,6 +172,7 @@
                         <th data-sort>الطالب</th>
                         <th data-sort>المشرف</th>
                         <th data-sort>التاريخ</th>
+                        <th data-sort>اليوم</th>
                         <th data-sort>وقت الحضور</th>
                         <th data-sort>وقت الانصراف</th>
                         <th data-sort>الحالة</th>
@@ -189,6 +190,7 @@
                         </td>
                         <td data-sort-value="{{ $a->supervisor->name ?? '' }}" style="font-weight:600;color:var(--primary);">{{ $a->supervisor->name ?? '—' }}</td>
                         <td data-sort-value="{{ $a->date?->format('Y-m-d') }}" style="font-weight:600;">{{ $a->date?->format('Y/m/d') }}</td>
+                        <td data-sort-value="{{ $a->date?->format('Y-m-d') }}" style="font-weight:600;">{{ $a->day ?? '—' }}</td>
                         <td>{{ $a->arrival_time ?? '—' }}</td>
                         <td>{{ $a->departure_time ?? '—' }}</td>
                         <td><span class="rpt-badge {{ $a->status }}">{{ $statusLabels[$a->status] ?? $a->status }}</span></td>

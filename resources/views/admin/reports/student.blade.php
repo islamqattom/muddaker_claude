@@ -119,6 +119,7 @@
                         <th data-sort="num">الدرجة</th>
                         <th data-sort>الحالة</th>
                         <th data-sort>التاريخ</th>
+                        <th data-sort>اليوم</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,6 +140,7 @@
                         </td>
                         <td><span class="rpt-badge {{ $s->status }}">{{ $s->status_label }}</span></td>
                         <td data-sort-value="{{ $s->session_date?->format('Y-m-d') }}" style="font-weight:600">{{ $s->session_date->format('Y/m/d') }}</td>
+                        <td data-sort-value="{{ $s->session_date?->format('Y-m-d') }}" style="font-weight:600">{{ $s->day ?? '—' }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -163,6 +165,7 @@
                         <th data-sort>وقت الحضور</th>
                         <th data-sort>ملاحظة</th>
                         <th data-sort>التاريخ</th>
+                        <th data-sort>اليوم</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,6 +175,7 @@
                         <td>{{ $a->arrival_time ?? '—' }}</td>
                         <td>{{ $a->notes ?? '—' }}</td>
                         <td data-sort-value="{{ $a->date?->format('Y-m-d') }}" style="font-weight:600">{{ $a->date->format('Y/m/d') }}</td>
+                        <td data-sort-value="{{ $a->date?->format('Y-m-d') }}" style="font-weight:600">{{ $a->day ?? '—' }}</td>
                     </tr>
                     @endforeach
                 </tbody>

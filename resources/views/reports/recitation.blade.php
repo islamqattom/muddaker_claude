@@ -212,6 +212,7 @@
                         <th data-sort="num">الدرجة</th>
                         <th data-sort>الحالة</th>
                         <th data-sort>التاريخ</th>
+                        <th data-sort>اليوم</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -240,6 +241,7 @@
                         </td>
                         <td><span class="rpt-badge {{ $session->status }}">{{ $session->status_label }}</span></td>
                         <td data-sort-value="{{ $session->session_date?->format('Y-m-d') }}" style="font-weight:600;">{{ $session->session_date?->format('Y/m/d') }}</td>
+                        <td data-sort-value="{{ $session->session_date?->format('Y-m-d') }}" style="font-weight:600;">{{ $session->day ?? '—' }}</td>
                     </tr>
                     @endforeach
                 </tbody>
