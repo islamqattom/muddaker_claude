@@ -12,8 +12,13 @@ class ReportExporter
 {
     public function exportRecitation(string $format, $sessions, array $stats, $fromDate, $toDate, string $period, array $summary = [])
     {
+        // Order the detailed sessions chronologically by session date.
+        $sessions = $sessions
+            ->sortBy(fn ($s) => optional($s->session_date)->getTimestamp() ?? 0)
+            ->values();
+
         $headers = ['#', 'الطالب', 'المشرف', 'النوع', 'الجزء', 'الصفحات', 'الأخطاء', 'الترددات', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'];
-        $rows = $sessions->values()->map(function ($s, $i) {
+        $rows = $sessions->map(function ($s, $i) {
             return [
                 $i + 1,
                 $s->student->user->name ?? '—',
