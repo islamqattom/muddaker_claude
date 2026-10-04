@@ -54,7 +54,7 @@
             <tr>
                 <th>الطالب</th>
                 @if($summaryMode !== 'attendance')
-                    <th>الجلسات</th><th>نسبة النجاح</th><th>ناجح</th><th>راسب</th><th>لم يكمل</th><th>أيام لم يسمع بها</th><th>الصفحات</th><th>نسبة أيام التسميع</th>
+                    <th>الجلسات</th><th>عدد الجلسات المفترض</th><th>نسبة النجاح</th><th>ناجح</th><th>راسب</th><th>لم يكمل</th><th>أيام لم يسمع بها</th><th>الصفحات</th><th>نسبة أيام التسميع</th>
                 @endif
                 @if($summaryMode !== 'recitation')
                     <th>حضور</th><th>غياب</th><th>تأخير</th><th>نسبة الحضور</th><th>نسبة أيام الحضور</th>
@@ -67,6 +67,7 @@
                     <td>{{ $row['name'] }}</td>
                     @if($summaryMode !== 'attendance')
                         <td>{{ $row['sessions'] }}</td>
+                        <td>{{ is_null($row['expected_sessions'] ?? null) ? '—' : $row['expected_sessions'] }}</td>
                         <td>{{ $row['pass_rate'] }}%</td>
                         <td>{{ $row['passed'] }}</td>
                         <td>{{ $row['fail_days'] ?? 0 }}</td>

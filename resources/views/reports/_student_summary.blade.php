@@ -17,6 +17,7 @@
                         <th data-sort>الطالب</th>
                         @if($showRec)
                             <th data-sort="num">الجلسات</th>
+                            <th data-sort="num">عدد الجلسات المفترض</th>
                             <th data-sort="num">نسبة النجاح</th>
                             <th data-sort="num">ناجح</th>
                             <th data-sort="num">راسب</th>
@@ -45,6 +46,9 @@
                             </td>
                             @if($showRec)
                                 <td data-sort-value="{{ $row['sessions'] }}">{{ $row['sessions'] }}</td>
+                                <td data-sort-value="{{ $row['expected_sessions'] ?? -1 }}">
+                                    {{ is_null($row['expected_sessions'] ?? null) ? '—' : $row['expected_sessions'] }}
+                                </td>
                                 <td data-sort-value="{{ $row['pass_rate'] }}">
                                     <span class="rpt-score {{ $row['pass_rate'] >= 90 ? 'high' : ($row['pass_rate'] >= 75 ? 'medium' : 'low') }}">{{ $row['pass_rate'] }}%</span>
                                 </td>

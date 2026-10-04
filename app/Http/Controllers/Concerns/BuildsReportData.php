@@ -34,14 +34,19 @@ trait BuildsReportData
     protected function buildRecitationData(Request $request, ?int $supervisorId): array
     {
         // Full set keeps the "لم يسمع" markers so the student summary can
-        // count the days a student did not recite.
-        $fullSessions = $this->reports->recitationQuery($request, $supervisorId)->get();
+        // count the days a student did not recite, and the results table can
+        // list them next to the genuine sessions.
+        $fullQuery    = $this->reports->recitationQuery($request, $supervisorId);
+        $fullSessions = (clone $fullQuery)->get();
 
-        // Genuine recitation sessions only, used by the KPI, results table,
-        // charts and exports so every "session" number agrees.
+        // Genuine recitation sessions only, used by the KPI, charts and
+        // exports so every aggregate "session" number agrees.
         $actualQuery = $this->reports->recitationQuery($request, $supervisorId, true);
-        $sessions    = (clone $actualQuery)->latest('session_date')->paginate(20)->withQueryString();
         $allSessions = (clone $actualQuery)->get();
+
+        // The results table lists every recorded session, including the
+        // "لم يسمع" markers, so nothing is hidden from the report.
+        $sessions = (clone $fullQuery)->latest('session_date')->paginate(20)->withQueryString();
         [$fromDate, $toDate, $period] = $this->reports->resolvePeriod($request);
 
         return array_merge([

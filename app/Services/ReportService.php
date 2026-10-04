@@ -125,7 +125,7 @@ class ReportService
         }
 
         $dayNumbers = SettingsServiceProvider::carbonDaysForDayNames(
-            (string) config('app.' . $settingKey, '')
+            $this->configuredDayNames($settingKey)
         );
 
         if (empty($dayNumbers)) {
@@ -144,6 +144,24 @@ class ReportService
         }
 
         return $count;
+    }
+
+    /**
+     * Resolve the configured day-name list for a settings key, tolerating
+     * contexts where the config repository is not bound (e.g. pure unit
+     * tests that do not boot the framework).
+     */
+    private function configuredDayNames(string $settingKey): string
+    {
+        $default = $settingKey === 'work_days'
+            ? SettingsServiceProvider::DEFAULT_WORK_DAYS
+            : SettingsServiceProvider::DEFAULT_RECITATION_DAYS;
+
+        try {
+            return (string) config('app.' . $settingKey, $default);
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 
     /**
@@ -1047,7 +1065,27 @@ class ReportService
         $rows = [];
 
         $attDaysTotal = $this->workDaysInRange($fromDate, $toDate);
-        $recDaysTotal = $this->recitationDaysInRange($fromDate, $toDate);
+
+        // When no explicit period is selected ("all"), fall back to the span
+        // of the reported sessions so the expected-session count and the
+        // recitation-days rate still have a meaningful denominator.
+        $rangeFrom = $fromDate;
+        $rangeTo   = $toDate;
+
+        if ((!$rangeFrom || !$rangeTo) && $sessions->isNotEmpty()) {
+            $dates = $sessions
+                ->map(fn ($s) => $this->sessionDate($s))
+                ->filter()
+                ->values();
+
+            if ($dates->isNotEmpty()) {
+                $sorted    = $dates->sortBy(fn ($d) => $d->getTimestamp())->values();
+                $rangeFrom = $rangeFrom ?? $sorted->first();
+                $rangeTo   = $rangeTo   ?? $sorted->last();
+            }
+        }
+
+        $recDaysTotal = $this->recitationDaysInRange($rangeFrom, $rangeTo);
 
         foreach ($sessions->groupBy('student_id') as $studentId => $group) {
             // Not-completed (لم يكمل) sessions count with the failing ones.
@@ -1092,6 +1130,9 @@ class ReportService
                     ->count(),
                 'rec_days'       => $reciteDays,
                 'rec_days_total' => $recDaysTotal,
+                // Expected number of recitation sessions: configured
+                // recitation days falling inside the filter period.
+                'expected_sessions' => $recDaysTotal,
                 'rec_days_rate'  => ($recDaysTotal !== null && $recDaysTotal > 0)
                     ? round(($reciteDays / $recDaysTotal) * 100, 1)
                     : null,
@@ -1110,6 +1151,7 @@ class ReportService
                     'pass_rate'  => 0.0,
                     'avg_score'  => 0.0,
                     'pages'      => 0,
+                    'expected_sessions' => $recDaysTotal,
                 ], $this->emptyAttendanceSummary());
             }
 
