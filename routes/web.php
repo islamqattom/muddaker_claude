@@ -123,6 +123,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         // Missing-days report: dates where supervisors did not add
         // recitation sessions on recitation_days OR attendance on work_days.
         Route::get('/supervisor-missing', [Admin\ReportController::class, 'supervisorMissingReport'])->name('supervisor-missing');
+        // Himma (يوم الهمة) report: overview + per-day + per-student.
+        Route::get('/himma', [Admin\HimmaReportController::class, 'index'])->name('himma');
+        Route::get('/himma/day/{date}', [Admin\HimmaReportController::class, 'day'])->name('himma.day');
+        Route::get('/himma/student/{student}', [Admin\HimmaReportController::class, 'student'])->name('himma.student');
     });
 
     // Mafil history (اختبار الأجزاء)
@@ -303,6 +307,10 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/half', [Supervisor\ReportController::class, 'halfReport'])->name('half');
         Route::get('/year', [Supervisor\ReportController::class, 'yearReport'])->name('year');
         Route::get('/student/{student}', [Supervisor\ReportController::class, 'studentReport'])->name('student');
+        // Himma (يوم الهمة) report: overview + per-day + per-student.
+        Route::get('/himma', [Supervisor\HimmaReportController::class, 'index'])->name('himma');
+        Route::get('/himma/day/{date}', [Supervisor\HimmaReportController::class, 'day'])->name('himma.day');
+        Route::get('/himma/student/{student}', [Supervisor\HimmaReportController::class, 'student'])->name('himma.student');
     });
 
     // Warnings

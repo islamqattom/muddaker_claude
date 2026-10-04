@@ -112,6 +112,14 @@ class ReportRoutesSmokeTest extends BaseTestCase
             '/admin/reports/recitation?export=excel',
             '/admin/reports/recitation?export=print',
             '/admin/reports/recitation?export=pdf',
+            '/admin/yawm-al-himma',
+            '/admin/reports/himma',
+            '/admin/reports/himma?period=today',
+            '/admin/reports/himma?export=excel',
+            '/admin/reports/himma?export=pdf',
+            '/admin/reports/himma/day/2026-09-01',
+            '/admin/reports/himma/day/2026-09-01?export=pdf',
+            '/admin/reports/himma/day/2026-09-01?export=excel',
             '/admin/reports/attendance?export=excel',
             '/admin/reports/attendance?export=print',
             '/admin/reports/attendance?export=pdf',
@@ -122,6 +130,9 @@ class ReportRoutesSmokeTest extends BaseTestCase
         if ($student) {
             $this->hit('GET', '/admin/reports/student/' . $student->id, 1);
             $this->hit('GET', '/admin/reports/student/' . $student->id . '?export=pdf', 1);
+            $this->hit('GET', '/admin/reports/himma/student/' . $student->id, 1);
+            $this->hit('GET', '/admin/reports/himma/student/' . $student->id . '?export=pdf', 1);
+            $this->hit('GET', '/admin/reports/himma/student/' . $student->id . '?export=excel', 1);
         }
     }
 
@@ -143,6 +154,10 @@ class ReportRoutesSmokeTest extends BaseTestCase
             '/supervisor/reports/quarter?export=excel',
             '/supervisor/reports/quarter?export=print',
             '/supervisor/reports/recitation?export=excel',
+            '/supervisor/yawm-al-himma',
+            '/supervisor/reports/himma',
+            '/supervisor/reports/himma?export=excel',
+            '/supervisor/reports/himma/day/2026-09-01',
         ];
         foreach ($urls as $u) {
             $this->hit('GET', $u, 2);
@@ -150,6 +165,7 @@ class ReportRoutesSmokeTest extends BaseTestCase
         if ($student) {
             $this->hit('GET', '/supervisor/reports/student/' . $student->id, 2);
             $this->hit('GET', '/supervisor/reports/student/' . $student->id . '?export=pdf', 2);
+            $this->hit('GET', '/supervisor/reports/himma/student/' . $student->id, 2);
         }
     }
 

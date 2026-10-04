@@ -61,6 +61,11 @@
     <x-page-hero icon="fas fa-mosque">
         <h1 class="page-banner-title">يوم الهمة - إنجازات الطلاب</h1>
         <p class="page-banner-sub">تابع تدريبات السرد لطلابك وتقدمهم في كل جلسة</p>
+        <x-slot:actions>
+            <a href="{{ route('supervisor.reports.himma') }}" class="btn-view" style="padding:9px 16px;font-size:13px;">
+                <i class="fas fa-chart-line"></i> تقرير يوم الهمة
+            </a>
+        </x-slot:actions>
     </x-page-hero>
 
     <div class="stats-grid">

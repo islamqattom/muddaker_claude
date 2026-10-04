@@ -106,6 +106,9 @@
         <h1 class="page-banner-title">يوم الهمة - الأيام</h1>
         <p class="page-banner-sub">اختر يوم الهمة لعرض جلسات السرد الخاصة به</p>
         <x-slot:actions>
+            <a href="{{ route('admin.reports.himma') }}" class="btn-gold" style="background:linear-gradient(135deg,#2A4570,#182B48);box-shadow:0 4px 14px rgba(24,43,72,0.35);">
+                <i class="fas fa-chart-line"></i> تقرير يوم الهمة
+            </a>
             <a href="{{ url('/guest/yawm-al-himma') }}" target="_blank" class="btn-gold">
                 <i class="fas fa-external-link-alt"></i> فتح بوابة التسجيل
             </a>

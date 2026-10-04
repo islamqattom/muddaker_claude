@@ -278,6 +278,26 @@
             </a>
         </div>
     </div>
+
+    <div class="report-card" style="background:#fff;border-radius:13px;overflow:hidden;box-shadow:var(--card-shadow);border:1px solid rgba(24,43,72,0.05)">
+        <div style="background:linear-gradient(135deg,#0e7490,#155e75);padding:16px;display:flex;align-items:center;gap:18px">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#fff8e1,#d4a030);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#0e7490;font-size:16px;flex-shrink:0">
+                <i class="fas fa-mosque"></i>
+            </div>
+            <div>
+                <div style="color:#fff;font-size:17px;font-weight:700">تقرير يوم الهمة</div>
+                <div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:3px">نظرة شاملة وأيام وطلاب</div>
+            </div>
+        </div>
+        <div style="padding:16px">
+            <p style="color:#6c7a89;font-size:13px;margin-bottom:14px;line-height:1.6">
+                تقرير يوم الهمة يجمع الإحصائيات والأشكال البيانية (المسابقة، المتصدرون، نقاط الدقة)، مع تقارير لكل يوم ولكل طالب والتصدير إلى PDF/Excel.
+            </p>
+            <a href="{{ route('admin.reports.himma') }}" class="rpt-btn" style="background:linear-gradient(135deg,#0e7490,#155e75);color:#fff;box-shadow:0 4px 12px rgba(14,116,144,0.25)">
+                <i class="fas fa-chart-line"></i> عرض التقرير
+            </a>
+        </div>
+    </div>
 </div>
 
 @push('scripts')

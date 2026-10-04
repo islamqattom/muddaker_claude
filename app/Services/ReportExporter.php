@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exports\AttendanceReportExport;
+use App\Exports\HimmaReportExport;
 use App\Exports\RecitationReportExport;
 use App\Exports\SupervisorMissingExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -277,6 +278,86 @@ class ReportExporter
             'print' => $this->printView($meta['title'], $headers, $rows, $statsForExport, $meta['subtitle'], $payload['breakdown'] ?? []),
             default => $this->aggregatePdf($payload, $meta),
         };
+    }
+
+    /**
+     * Export a "يوم الهمة" report (overview / day / student). The payload is
+     * format-agnostic: a list of Arabic-labelled stats plus one or more tables.
+     */
+    public function exportHimma(string $format, array $payload, array $meta)
+    {
+        $title    = $meta['title'] ?? 'تقرير يوم الهمة';
+        $subtitle = $meta['subtitle'] ?? null;
+        $stats    = $payload['stats'] ?? [];
+        $tables   = $payload['tables'] ?? [];
+        $filename = ($meta['filename'] ?? 'himma-report') . '-' . now()->format('Ymd-His');
+
+        return match ($format) {
+            'excel', 'xlsx' => Excel::download(
+                new HimmaReportExport($title, $stats, $tables, $subtitle),
+                $filename . '.xlsx'
+            ),
+            default => $this->himmaPdf($title, $subtitle, $stats, $tables),
+        };
+    }
+
+    protected function himmaPdf(string $title, ?string $subtitle, array $stats, array $tables)
+    {
+        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->setRTL(true);
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        $pdf->SetMargins(10, 10, 10);
+        $pdf->SetAutoPageBreak(true, 10);
+        $pdf->AddPage();
+        $pdf->SetFont('aealarabiya', '', 12);
+
+        $centerName = config('app.center_name', 'مركز التسميع');
+        $pdf->SetFontSize(16);
+        $pdf->Cell(0, 8, $centerName, 0, true, 'C', 0);
+        $pdf->SetFontSize(18);
+        $pdf->Cell(0, 10, $title, 0, true, 'C', 0);
+        if ($subtitle) {
+            $pdf->SetFontSize(12);
+            $pdf->Cell(0, 8, $subtitle, 0, true, 'C', 0);
+        }
+        $pdf->Ln(5);
+
+        if (!empty($stats)) {
+            $pdf->writeHTML(
+                $this->pdfStatsTable($stats, '#182B48', ['#182B48', '#d4a030', '#27ae60', '#e74c3c', '#f39c12', '#2980b9']),
+                true, false, false, false, 'C'
+            );
+            $pdf->Ln(8);
+        }
+
+        foreach ($tables as $table) {
+            if (!empty($table['title'])) {
+                $pdf->SetFontSize(14);
+                $pdf->Cell(0, 8, $table['title'], 0, true, 'C', 0);
+                $pdf->SetFontSize(12);
+            }
+
+            $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
+            foreach ($table['headers'] as $header) {
+                $html .= '<th align="center">' . htmlspecialchars((string) $header, ENT_QUOTES, 'UTF-8') . '</th>';
+            }
+            $html .= '</tr>';
+
+            foreach ($table['rows'] as $row) {
+                $html .= '<tr>';
+                foreach ($row as $cell) {
+                    $html .= '<td align="center">' . htmlspecialchars((string) $cell, ENT_QUOTES, 'UTF-8') . '</td>';
+                }
+                $html .= '</tr>';
+            }
+            $html .= '</table>';
+
+            $pdf->writeHTML($html, true, false, false, false, '');
+            $pdf->Ln(5);
+        }
+
+        return $this->pdfDownload($pdf, $this->pdfFilename($title, null, null));
     }
 
     public function exportStudentPdf($student, $sessions, $attendances, $sessionStats, $attendanceStats, $fromDate, $toDate, array $dayStats = [])
