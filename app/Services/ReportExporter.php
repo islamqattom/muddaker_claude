@@ -153,8 +153,8 @@ class ReportExporter
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('نواقص المشرفين', $headers, $exportRows, $statsForExport, $subtitle),
-            'pdf'   => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate, $filename),
-            default => $this->supervisorMissingPdf($exportRows, $stats, $fromDate, $toDate, $filename),
+            'pdf'   => $this->supervisorMissingPdf($exportRows, $statsForExport, $fromDate, $toDate, $filename),
+            default => $this->supervisorMissingPdf($exportRows, $statsForExport, $fromDate, $toDate, $filename),
         };
     }
 

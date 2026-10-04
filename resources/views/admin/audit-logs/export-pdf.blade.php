@@ -35,13 +35,31 @@
                 <th>IP</th>
             </tr>
         </thead>
+        @php
+            $roleLabels = [
+                'admin' => 'مدير',
+                'supervisor' => 'مشرف',
+                'student' => 'طالب',
+                'parent' => 'ولي أمر',
+            ];
+            $modelLabels = [
+                'Student' => 'طالب',
+                'User' => 'مستخدم',
+                'Supervisor' => 'مشرف',
+                'ParentProfile' => 'ولي أمر',
+                'Level' => 'مستوى',
+                'Attendance' => 'حضور',
+                'RecitationSession' => 'جلسة تسميع',
+                'Warning' => 'إنذار',
+            ];
+        @endphp
         <tbody>
             @foreach($logs as $log)
             <tr>
                 <td>{{ $log->id }}</td>
                 <td>{{ $log->created_at?->format('d/m/Y H:i') }}</td>
                 <td>{{ $log->user?->name ?? '-' }}</td>
-                <td>{{ $log->role }}</td>
+                <td>{{ $roleLabels[$log->role] ?? $log->role }}</td>
                 <td>
                     @switch($log->action)
                         @case('created') <span class="badge badge-success">إنشاء</span> @break
@@ -54,7 +72,8 @@
                 </td>
                 <td>
                     @if($log->model_type)
-                        {{ class_basename($log->model_type) }}
+                        @php $modelName = class_basename($log->model_type); @endphp
+                        {{ $modelLabels[$modelName] ?? $modelName }}
                         @if($log->model_id)
                             #{{ $log->model_id }}
                         @endif
