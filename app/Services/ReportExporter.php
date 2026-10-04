@@ -46,7 +46,7 @@ class ReportExporter
                 $filename . '.xlsx'
             ),
             'print' => $this->printView('تقرير التسميع', $headers, $rows, $statsForExport, $subtitle),
-            default => $this->recitationPdf($sessions, $stats, $fromDate, $toDate, $period),
+            default => $this->recitationPdf($sessions, $stats, $fromDate, $toDate, $period, $summary),
         };
     }
 
@@ -89,9 +89,9 @@ class ReportExporter
         };
     }
 
-    public function exportRecitationPdf($sessions, $stats, $fromDate, $toDate)
+    public function exportRecitationPdf($sessions, $stats, $fromDate, $toDate, array $summary = [])
     {
-        return $this->recitationPdf($sessions, $stats, $fromDate, $toDate);
+        return $this->recitationPdf($sessions, $stats, $fromDate, $toDate, null, $summary);
     }
 
     public function exportAttendancePdf($attendances, $stats, $fromDate, $toDate)
@@ -587,7 +587,7 @@ class ReportExporter
         return response()->view('admin.reports.print', compact('title', 'headers', 'rows', 'stats', 'subtitle', 'breakdown'));
     }
 
-    protected function recitationPdf($sessions, $stats, $fromDate, $toDate, ?string $period = null)
+    protected function recitationPdf($sessions, $stats, $fromDate, $toDate, ?string $period = null, array $summary = [])
     {
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->setRTL(true);
@@ -607,11 +607,23 @@ class ReportExporter
         $pdf->Cell(0, 8, 'الفترة: ' . ($fromDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'الكل'), 0, true, 'C', 0);
         $pdf->Ln(5);
 
-        $pdf->writeHTML($this->pdfStatsTable($stats, '#182B48', ['#28a745', '#dc3545', '#ffc107']), true, false, false, false, 'C');
+        $pdf->writeHTML($this->pdfStatsTable($this->recitationStatsLabels($stats), '#182B48', ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1']), true, false, false, false, 'C');
         $pdf->Ln(8);
 
+        if (!empty($summary)) {
+            $pdf->SetFontSize(14);
+            $pdf->Cell(0, 8, 'ملخص الطلاب', 0, true, 'C', 0);
+            $pdf->SetFontSize(12);
+            $pdf->writeHTML($this->recitationSummaryTablePdf($summary), true, false, false, false, 'C');
+            $pdf->Ln(8);
+        }
+
+        $pdf->SetFontSize(14);
+        $pdf->Cell(0, 8, 'تفاصيل الجلسات', 0, true, 'C', 0);
+        $pdf->SetFontSize(12);
+
         $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
-        foreach (['#', 'الطالب', 'المشرف', 'الجزء', 'الصفحات', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'] as $h) {
+        foreach (['#', 'الطالب', 'المشرف', 'النوع', 'الجزء', 'الصفحات', 'الدرجة', 'الحالة', 'التاريخ', 'اليوم'] as $h) {
             $html .= '<th align="center">' . $h . '</th>';
         }
         $html .= '</tr>';
@@ -631,8 +643,9 @@ class ReportExporter
             };
             $html .= '<tr>
                 <td align="center">' . $i++ . '</td>
-                <td>' . ($s->student->user->name ?? '-') . '</td>
-                <td>' . ($s->supervisor->name ?? '-') . '</td>
+                <td>' . htmlspecialchars((string) ($s->student->user->name ?? '-'), ENT_QUOTES, 'UTF-8') . '</td>
+                <td>' . htmlspecialchars((string) ($s->supervisor->name ?? '-'), ENT_QUOTES, 'UTF-8') . '</td>
+                <td align="center">' . htmlspecialchars((string) $s->type_label, ENT_QUOTES, 'UTF-8') . '</td>
                 <td align="center">' . $part . '</td>
                 <td align="center">' . $pages . '</td>
                 <td align="center">' . $score . '</td>
@@ -678,7 +691,7 @@ class ReportExporter
         $pdf->Cell(0, 8, 'الفترة: ' . ($fromDate ? $fromDate->format('Y/m/d') . ' - ' . $toDate->format('Y/m/d') : 'الكل'), 0, true, 'C', 0);
         $pdf->Ln(5);
 
-        $pdf->writeHTML($this->pdfStatsTable($stats, '#059669', ['#28a745', '#dc3545', '#ffc107', '#17a2b8']), true, false, false, false, 'C');
+        $pdf->writeHTML($this->pdfStatsTable($this->attendanceStatsLabels($stats), '#059669', ['#28a745', '#dc3545', '#ffc107', '#17a2b8']), true, false, false, false, 'C');
         $pdf->Ln(8);
 
         $html = '<table border="1" cellpadding="4"><tr bgcolor="#182B48" color="white">';
@@ -954,6 +967,79 @@ class ReportExporter
 
             $html .= '<br/>';
         }
+
+        return $html;
+    }
+
+    /**
+     * Map raw recitation stats keys to Arabic labels for the PDF summary box.
+     */
+    protected function recitationStatsLabels(array $stats): array
+    {
+        return [
+            'الإجمالي'    => $stats['total'] ?? 0,
+            'ناجح'        => $stats['passed'] ?? 0,
+            'راسب'        => $stats['failed'] ?? 0,
+            'جارٍ'        => $stats['in_progress'] ?? 0,
+            'نسبة النجاح' => ($stats['pass_rate'] ?? 0) . '%',
+            'المتوسط'     => ($stats['avg_score'] ?? 0) . '%',
+            'الأخطاء'     => $stats['total_errors'] ?? 0,
+            'الترددات'    => $stats['total_hesitations'] ?? 0,
+            'الصفحات'     => $stats['total_pages'] ?? 0,
+        ];
+    }
+
+    /**
+     * Map raw attendance stats keys to Arabic labels for the PDF summary box.
+     */
+    protected function attendanceStatsLabels(array $stats): array
+    {
+        return [
+            'الإجمالي'    => $stats['total'] ?? 0,
+            'حاضر'        => $stats['present'] ?? 0,
+            'متأخر'       => $stats['late'] ?? 0,
+            'غائب'        => $stats['absent'] ?? 0,
+            'معذور'       => $stats['excused'] ?? 0,
+            'نسبة الحضور' => ($stats['attendance_rate'] ?? 0) . '%',
+        ];
+    }
+
+    /**
+     * Arabic student-summary table for the recitation PDF, mirroring the
+     * on-screen "ملخص الطلاب" table (including the not-recited days).
+     */
+    protected function recitationSummaryTablePdf(array $summary): string
+    {
+        $headers = [
+            'الطالب', 'الجلسات', 'عدد الجلسات المفترض', 'نسبة النجاح', 'ناجح',
+            'راسب', 'لم يكمل', 'أيام لم يسمع بها', 'الصفحات', 'نسبة أيام التسميع',
+        ];
+
+        $html = '<table border="1" cellpadding="3"><tr bgcolor="#182B48" color="white">';
+        foreach ($headers as $header) {
+            $html .= '<th align="center">' . $header . '</th>';
+        }
+        $html .= '</tr>';
+
+        foreach ($summary as $row) {
+            $rate = $row['rec_days_rate'] ?? null;
+            $expected = $row['expected_sessions'] ?? null;
+
+            $html .= '<tr>'
+                . '<td align="right">' . htmlspecialchars((string) ($row['name'] ?? '—'), ENT_QUOTES, 'UTF-8') . '</td>'
+                . '<td align="center">' . ($row['sessions'] ?? 0) . '</td>'
+                . '<td align="center">' . (is_null($expected) ? '—' : $expected) . '</td>'
+                . '<td align="center">' . ($row['pass_rate'] ?? 0) . '%</td>'
+                . '<td align="center">' . ($row['passed'] ?? 0) . '</td>'
+                . '<td align="center">' . ($row['fail_days'] ?? 0) . '</td>'
+                . '<td align="center">' . ($row['incomplete'] ?? 0) . '</td>'
+                . '<td align="center">' . ($row['not_recite_days'] ?? 0) . '</td>'
+                . '<td align="center">' . ($row['pages'] ?? 0) . '</td>'
+                . '<td align="center">' . (is_null($rate) ? '—' : $rate . '%') . '</td>'
+                . '</tr>';
+        }
+
+        $html .= '</table>';
 
         return $html;
     }

@@ -61,7 +61,7 @@ class ReportController extends Controller
 
         if ($export = $request->export) {
             return $this->exporter->exportRecitation(
-                $export, $data['allSessions'], $data['stats'], $data['fromDate'], $data['toDate'], $data['period'], $data['summary']
+                $export, $data['fullSessions'], $data['stats'], $data['fromDate'], $data['toDate'], $data['period'], $data['summary']
             );
         }
 

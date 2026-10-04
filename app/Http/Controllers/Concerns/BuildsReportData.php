@@ -52,6 +52,7 @@ trait BuildsReportData
         return array_merge([
             'sessions'          => $sessions,
             'allSessions'       => $allSessions,
+            'fullSessions'      => $fullSessions,
             'stats'             => $this->reports->recitationStats($allSessions),
             'trend'             => $this->reports->recitationDailyTrend($allSessions),
             'top'               => $this->reports->topStudents($allSessions, 5),
