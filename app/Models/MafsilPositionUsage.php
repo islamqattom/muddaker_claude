@@ -15,11 +15,14 @@ class MafsilPositionUsage extends Model
         'difficulty',
         'mafsil_position_id',
         'supervisor_id',
+        'student_id',
+        'completed_at',
     ];
 
     protected $casts = [
         'juz_number' => 'integer',
         'difficulty' => 'integer',
+        'completed_at' => 'datetime',
     ];
 
     public function mafsilPosition(): BelongsTo
@@ -30,5 +33,15 @@ class MafsilPositionUsage extends Model
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->whereNull('completed_at');
     }
 }

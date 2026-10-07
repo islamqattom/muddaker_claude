@@ -279,6 +279,7 @@ Route::prefix('supervisor')->name('supervisor.')->middleware(['auth', 'role:supe
         Route::get('/recitation', [Supervisor\RecitationController::class, 'recitation'])->name('recitation');
         Route::get('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil');
         Route::post('/mafsil', [Supervisor\RecitationController::class, 'mafsil'])->name('mafsil.post');
+        Route::get('/mafsil/show', [Supervisor\RecitationController::class, 'mafsilShow'])->name('mafsil.show');
         Route::post('/save', [Supervisor\RecitationController::class, 'saveSession'])->name('save');
         Route::post('/save-incomplete', [Supervisor\RecitationController::class, 'saveIncomplete'])->name('saveIncomplete');
         Route::post('/save-failed-continue', [Supervisor\RecitationController::class, 'saveFailedContinue'])->name('saveFailedContinue');

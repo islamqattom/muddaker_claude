@@ -1783,6 +1783,205 @@
 .rec-session .ayahs-content .amiri-text .ayah-marker { color: var(--gold); font-weight: bold; margin: 0 4px; }
 .rec-session .ayahs-content .surah-header { text-align: center; font-family: 'Amiri', serif; font-size: 20px; font-weight: 800; color: var(--navy); margin: 16px 0; padding: 10px; background: var(--gold-soft); border-radius: 8px; }
 
+/* Ayahs modal: content + thin scoring rail */
+.rec-session .ayahs-modal-layout {
+    display: flex;
+    align-items: stretch;
+    height: min(72vh, 640px);
+}
+.rec-session .ayahs-modal-layout .ayahs-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+.rec-session .ayahs-scoring-tab {
+    flex: 0 0 88px;
+    width: 88px;
+    background: #f8fafc;
+    border-inline-start: 1px solid #eef0f3;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+.rec-session .ayahs-tab-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eef0f3;
+}
+.rec-session .ayahs-tab-block.errors { color: var(--danger); }
+.rec-session .ayahs-tab-block.hesitations { color: #b45309; }
+.rec-session .ayahs-tab-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.rec-session .ayahs-tab-block.errors .ayahs-tab-label { color: var(--danger); }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-label { color: #b45309; }
+.rec-session .ayahs-tab-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.rec-session .ayahs-tab-value {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--navy);
+    font-feature-settings: "tnum";
+}
+.rec-session .ayahs-tab-btn {
+    width: 26px;
+    height: 24px;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.rec-session .ayahs-tab-btn:active { transform: scale(0.92); }
+.rec-session .ayahs-tab-block.errors .ayahs-tab-btn { background: var(--danger); }
+.rec-session .ayahs-tab-block.errors .ayahs-tab-btn:hover { background: #b91c1c; }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-btn { background: var(--warning); }
+.rec-session .ayahs-tab-block.hesitations .ayahs-tab-btn:hover { background: #d97706; }
+.rec-session .ayahs-tab-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    background: var(--gold-soft);
+    border: 1px solid rgba(212, 160, 48, 0.25);
+    margin-top: auto;
+}
+.rec-session .ayahs-tab-score .ayahs-tab-value { color: #b45309; }
+
+@media (max-width: 576px) {
+    .rec-session .ayahs-modal-layout {
+        flex-direction: column;
+        height: min(82vh, 680px);
+    }
+    .rec-session .ayahs-scoring-tab {
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-inline-start: none;
+        border-top: 1px solid #eef0f3;
+        padding: 8px 10px;
+        overflow: visible;
+    }
+    .rec-session .ayahs-tab-block {
+        flex: 1 1 calc(50% - 8px);
+        flex-direction: row;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 8px;
+        margin: 0;
+    }
+    .rec-session .ayahs-tab-score {
+        flex: 1 1 100%;
+        flex-direction: row;
+        justify-content: center;
+        gap: 8px;
+        padding: 6px 8px;
+        margin: 0;
+    }
+    .rec-session .ayahs-tab-controls { flex-direction: row; }
+    .rec-session .ayahs-tab-btn { width: 24px; height: 22px; }
+    .rec-session .ayahs-tab-value { font-size: 13px; }
+
+    /* Ayahs modal: full-screen sheet (overrides modal-lg) */
+    .rec-session #ayahsModal .modal-dialog.modal-ayahs {
+        max-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        margin: 0;
+        border-radius: 0;
+    }
+    .rec-session #ayahsModal .modal-content {
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+    }
+    .rec-session #ayahsModal .modal-header,
+    .rec-session #ayahsModal .modal-footer { flex-shrink: 0; }
+    .rec-session #ayahsModal .modal-body { padding: 0; overflow: hidden; flex: 1 1 auto; min-height: 0; }
+
+    /* Ayahs layout: scoring rail sits in modal-footer (set by JS) */
+    .rec-session .ayahs-modal-layout {
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
+    .rec-session .ayahs-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .rec-session .ayahs-modal-footer {
+        display: flex !important;
+        flex-direction: column;
+        padding: 8px 10px !important;
+        background: #f8fafc;
+        border-top: 1px solid #eef0f3;
+    }
+    .rec-session .ayahs-scoring-tab {
+        flex: 0 0 auto;
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+    }
+    .rec-session .ayahs-tab-block {
+        flex: 1 1 calc(50% - 4px);
+        flex-direction: row;
+        gap: 6px;
+        padding: 4px 8px;
+    }
+    .rec-session .ayahs-tab-score {
+        flex: 1 1 100%;
+        flex-direction: row;
+        gap: 6px;
+        padding: 6px 10px;
+        margin: 0;
+    }
+
+    /* Modal footer: allow button wrap so close isn't clipped */
+    .rec-session #ayahsModal .modal-footer { flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+}
+
 /* =========================
    WARNING ALERT
    ========================= */
@@ -1982,15 +2181,16 @@
                 <i class="fas fa-info-circle"></i>
                 <div class="alert-content">
                     اختر <strong>{{ $partsCount }} أجزاء</strong> من المصحف، ثم حدد توزيع صعوبة المواضع لكل جزء
-                    (<strong>3 مواضع</strong> لكل جزء، مجموع السهل + المتوسط + الصعب = 3).
+                    (<strong>{{ $positionsPerPart }} مواضع</strong> لكل جزء، مجموع السهل + المتوسط + الصعب = {{ $positionsPerPart }}).
                 </div>
             </div>
 
-            <form id="partSelectionForm" method="POST" action="{{ route('public.recitation.mafsil.post', ['student_name' => $studentName ?? ($student->user->name ?? ''), 'mahd_name' => $mahdName ?? '', 'mafsil_type' => $mafsilType, 'error_score' => $errorScore ?? 3, 'hesitation_score' => $hesitationScore ?? 0.33, 'fail_score' => $failScore ?? 60, 'session_date' => $sessionDate ?? request('session_date', date('Y-m-d'))]) }}">
+            <form id="partSelectionForm" method="POST" action="{{ route('public.recitation.mafsil.post', ['student_name' => $studentName ?? ($student->user->name ?? ''), 'mahd_name' => $mahdName ?? '', 'mafsil_type' => $mafsilType, 'positions_per_part' => $positionsPerPart, 'error_score' => $errorScore ?? 3, 'hesitation_score' => $hesitationScore ?? 0.33, 'fail_score' => $failScore ?? 60, 'session_date' => $sessionDate ?? request('session_date', date('Y-m-d'))]) }}">
                 @csrf
                 <input type="hidden" name="student_name" value="{{ $studentName ?? ($student->user->name ?? '') }}">
                 <input type="hidden" name="mahd_name" value="{{ $mahdName ?? '' }}">
                 <input type="hidden" name="mafsil_type" value="{{ $mafsilType }}">
+                <input type="hidden" name="positions_per_part" value="{{ $positionsPerPart }}">
                 <input type="hidden" name="error_score" value="{{ $errorScore ?? 3 }}">
                 <input type="hidden" name="hesitation_score" value="{{ $hesitationScore ?? 0.33 }}">
                 <input type="hidden" name="fail_score" value="{{ $failScore ?? 60 }}">
@@ -2054,7 +2254,7 @@
                         <div class="distribution-header">
                             <div class="header-icon"><i class="fas fa-sliders-h"></i></div>
                             <div class="header-text">
-                                <h6>توزيع المواضيع (3 مواضع لكل جزء)</h6>
+                                <h6>توزيع المواضيع ({{ $positionsPerPart }} مواضع لكل جزء)</h6>
                                 <p>حدد عدد المواضيع السهلة والمتوسطة والصعبة لكل جزء</p>
                             </div>
                         </div>
@@ -2083,6 +2283,12 @@
     @push('scripts')
     <script>
     const requiredParts = {{ $partsCount }};
+    const positionsPerPart = {{ $positionsPerPart }};
+    const defaultDistribution = [
+        Math.floor(positionsPerPart / 3) + (positionsPerPart % 3 > 0 ? 1 : 0),
+        Math.floor(positionsPerPart / 3) + (positionsPerPart % 3 > 1 ? 1 : 0),
+        Math.floor(positionsPerPart / 3),
+    ];
 
     document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.part-checkbox');
@@ -2141,7 +2347,7 @@
                                     <label class="counter-label">سهل</label>
                                     <div class="counter-box">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 1, -1)">−</button>
-                                        <input type="number" name="difficulty[${partNumber}][1]" value="1" min="0" max="3"
+                                        <input type="number" name="difficulty[${partNumber}][1]" value="${defaultDistribution[0]}" min="0" max="${positionsPerPart}"
                                                class="difficulty-input" data-part="${partNumber}" data-difficulty="1"
                                                oninput="validateDistribution()">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 1, 1)">+</button>
@@ -2151,7 +2357,7 @@
                                     <label class="counter-label">متوسط</label>
                                     <div class="counter-box">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 2, -1)">−</button>
-                                        <input type="number" name="difficulty[${partNumber}][2]" value="1" min="0" max="3"
+                                        <input type="number" name="difficulty[${partNumber}][2]" value="${defaultDistribution[1]}" min="0" max="${positionsPerPart}"
                                                class="difficulty-input" data-part="${partNumber}" data-difficulty="2"
                                                oninput="validateDistribution()">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 2, 1)">+</button>
@@ -2161,7 +2367,7 @@
                                     <label class="counter-label">صعب</label>
                                     <div class="counter-box">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 3, -1)">−</button>
-                                        <input type="number" name="difficulty[${partNumber}][3]" value="1" min="0" max="3"
+                                        <input type="number" name="difficulty[${partNumber}][3]" value="${defaultDistribution[2]}" min="0" max="${positionsPerPart}"
                                                class="difficulty-input" data-part="${partNumber}" data-difficulty="3"
                                                oninput="validateDistribution()">
                                         <button type="button" class="counter-btn" onclick="adjustDifficulty('${partNumber}', 3, 1)">+</button>
@@ -2170,7 +2376,7 @@
                             </div>
                             <div class="distribution-status invalid" data-status="${partNumber}">
                                 <i class="fas fa-exclamation-circle"></i>
-                                المجموع: <span class="part-total" data-part="${partNumber}">3</span> / 3
+                                المجموع: <span class="part-total" data-part="${partNumber}">${positionsPerPart}</span> / ${positionsPerPart}
                             </div>
                         </div>
                     `;
@@ -2237,7 +2443,7 @@
             const input = document.querySelector(`.difficulty-input[data-part="${partNumber}"][data-difficulty="${difficulty}"]`);
             if (!input) return;
             let val = parseInt(input.value || 0) + delta;
-            val = Math.max(0, Math.min(3, val));
+            val = Math.max(0, Math.min(positionsPerPart, val));
             input.value = val;
             validateDistribution();
         };
@@ -2263,20 +2469,20 @@
             const statusEl = document.querySelector(`.distribution-status[data-status="${partNumber}"]`);
             const cardEl = document.querySelector(`.distribution-card[data-part="${partNumber}"]`);
             if (statusEl) {
-                if (total === 3) {
+                if (total === positionsPerPart) {
                     statusEl.className = 'distribution-status valid';
-                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> المجموع: <span class="part-total" data-part="' + partNumber + '">3</span> / 3';
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> المجموع: <span class="part-total" data-part="' + partNumber + '">' + positionsPerPart + '</span> / ' + positionsPerPart;
                 } else {
                     statusEl.className = 'distribution-status invalid';
-                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> المجموع: <span class="part-total" data-part="' + partNumber + '">' + total + '</span> / 3';
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> المجموع: <span class="part-total" data-part="' + partNumber + '">' + total + '</span> / ' + positionsPerPart;
                 }
             }
 
             if (cardEl) {
-                cardEl.classList.toggle('complete', total === 3);
+                cardEl.classList.toggle('complete', total === positionsPerPart);
             }
 
-            if (total !== 3) {
+            if (total !== positionsPerPart) {
                 allValid = false;
             }
         });
@@ -2400,7 +2606,7 @@
                         </div>
                         @if(!$isPlaceholder)
                         <button type="button" class="btn-view-ayahs"
-                                onclick="showPositionAyahs({{ $mafsilPosition->id }})" title="عرض الآيات بالرسم العثماني">
+                                onclick="showPositionAyahs({{ $mafsilPosition->id }}, {{ $partIndex }}, {{ $posIndex }})" title="عرض الآيات بالرسم العثماني">
                             <i class="fas fa-eye"></i>
                         </button>
                         @endif
@@ -2534,7 +2740,7 @@
         </div>
 
         <div class="d-flex flex-wrap gap-3 justify-content-between mt-4 mb-0">
-            <a href="{{ route('public.recitation.mafsil', ['student_name' => $studentName ?? ($student->user->name ?? ''), 'mahd_name' => $mahdName ?? '', 'mafsil_type' => $mafsilType, 'error_score' => $errorScore ?? 3, 'hesitation_score' => $hesitationScore ?? 0.33, 'fail_score' => $failScore ?? 60, 'session_date' => $sessionDate ?? request('session_date', date('Y-m-d'))]) }}" class="btn-outline-modern">
+            <a href="{{ route('public.recitation.mafsil', ['student_name' => $studentName ?? ($student->user->name ?? ''), 'mahd_name' => $mahdName ?? '', 'mafsil_type' => $mafsilType, 'positions_per_part' => $positionsPerPart, 'error_score' => $errorScore ?? 3, 'hesitation_score' => $hesitationScore ?? 0.33, 'fail_score' => $failScore ?? 60, 'session_date' => $sessionDate ?? request('session_date', date('Y-m-d'))]) }}" class="btn-outline-modern">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
             <div class="d-flex gap-3 flex-wrap">
@@ -2575,7 +2781,7 @@
 
     {{-- ==================== AYAHS MODAL ==================== --}}
     <div class="modal fade" id="ayahsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-ayahs">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
@@ -2584,15 +2790,40 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body ayahs-modal-body">
-                    <div id="ayahsModalContent" class="ayahs-content">
-                        <div class="d-flex justify-content-center align-items-center h-100 py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">جاري التحميل...</span>
+                <div class="modal-body ayahs-modal-body p-0">
+                    <div class="ayahs-modal-layout">
+                        <div id="ayahsModalContent" class="ayahs-content">
+                            <div class="d-flex justify-content-center align-items-center h-100 py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">جاري التحميل...</span>
+                                </div>
                             </div>
                         </div>
+                        <aside class="ayahs-scoring-tab">
+                            <div class="ayahs-tab-block errors">
+                                <span class="ayahs-tab-label"><i class="fas fa-times-circle"></i> أخطاء</span>
+                                <div class="ayahs-tab-controls">
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('errors', 1)" aria-label="زيادة الأخطاء"><i class="fas fa-plus"></i></button>
+                                    <span class="ayahs-tab-value" id="ayahsTabErrors">0</span>
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('errors', -1)" aria-label="إنقاص الأخطاء"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="ayahs-tab-block hesitations">
+                                <span class="ayahs-tab-label"><i class="fas fa-question-circle"></i> ترددات</span>
+                                <div class="ayahs-tab-controls">
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('hesitations', 1)" aria-label="زيادة الترددات"><i class="fas fa-plus"></i></button>
+                                    <span class="ayahs-tab-value" id="ayahsTabHes">0</span>
+                                    <button type="button" class="ayahs-tab-btn" onclick="ayahsAdjustStat('hesitations', -1)" aria-label="إنقاص الترددات"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="ayahs-tab-score">
+                                <span class="ayahs-tab-label">العلامة</span>
+                                <span class="ayahs-tab-value" id="ayahsTabScore">100.0%</span>
+                            </div>
+                        </aside>
                     </div>
                 </div>
+                <div class="modal-footer ayahs-modal-footer p-0" id="ayahsModalFooter" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -2661,7 +2892,36 @@ let initialFailedRecordSaved = false;
 
 const RING_CIRCUMFERENCE = 2 * Math.PI * 52; // ~326.7
 
-function showPositionAyahs(mafsilPositionId) {
+let ayahsContext = { partIndex: null, posIndex: null };
+
+const ayahsAside = document.querySelector('#ayahsModal .ayahs-scoring-tab');
+const ayahsFooter = document.getElementById('ayahsModalFooter');
+const ayahsLayout = document.querySelector('#ayahsModal .ayahs-modal-layout');
+
+function placeAyahsRail() {
+    if (!ayahsAside || !ayahsFooter || !ayahsLayout) return;
+    const isPhone = window.matchMedia('(max-width: 576px)').matches;
+    if (isPhone) {
+        if (ayahsAside.parentElement !== ayahsFooter) {
+            ayahsFooter.appendChild(ayahsAside);
+            ayahsFooter.style.display = '';
+        }
+    } else {
+        if (ayahsAside.parentElement !== ayahsLayout) {
+            ayahsLayout.appendChild(ayahsAside);
+            ayahsFooter.style.display = 'none';
+        }
+    }
+}
+
+placeAyahsRail();
+window.matchMedia('(max-width: 576px)').addEventListener('change', placeAyahsRail);
+document.getElementById('ayahsModal')?.addEventListener('show.bs.modal', placeAyahsRail);
+
+function showPositionAyahs(mafsilPositionId, partIndex, posIndex) {
+    ayahsContext = { partIndex: partIndex, posIndex: posIndex };
+    ayahsSyncTab();
+
     const modal = new bootstrap.Modal(document.getElementById('ayahsModal'));
     const contentEl = document.getElementById('ayahsModalContent');
 
@@ -2689,6 +2949,34 @@ function showPositionAyahs(mafsilPositionId) {
             contentEl.innerHTML = '<p class="text-danger text-center py-5">حدث خطأ أثناء تحميل الآيات</p>';
             console.error('Error loading ayahs:', error);
         });
+}
+
+function ayahsAdjustStat(kind, delta) {
+    const { partIndex, posIndex } = ayahsContext;
+    if (partIndex === null || posIndex === null) return;
+
+    const id = (kind === 'errors' ? 'errors-' : 'hesitations-') + partIndex + '-' + posIndex;
+    if (!document.getElementById(id)) return;
+
+    adjustMafsil(id, delta, partIndex, posIndex);
+    ayahsSyncTab();
+}
+
+function ayahsSyncTab() {
+    const { partIndex, posIndex } = ayahsContext;
+    if (partIndex === null || posIndex === null) return;
+
+    const errorsInput = document.getElementById('errors-' + partIndex + '-' + posIndex);
+    const hesInput = document.getElementById('hesitations-' + partIndex + '-' + posIndex);
+    const scoreEl = document.getElementById('part-score-' + partIndex + '-' + posIndex);
+
+    const errorsEl = document.getElementById('ayahsTabErrors');
+    const hesEl = document.getElementById('ayahsTabHes');
+    const scoreTabEl = document.getElementById('ayahsTabScore');
+
+    if (errorsEl) errorsEl.textContent = errorsInput ? (parseInt(errorsInput.value) || 0) : 0;
+    if (hesEl) hesEl.textContent = hesInput ? (parseInt(hesInput.value) || 0) : 0;
+    if (scoreTabEl) scoreTabEl.textContent = scoreEl ? scoreEl.textContent : '—';
 }
 
 const positionsPerPartByIndex = {

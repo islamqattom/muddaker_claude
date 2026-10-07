@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Supervisor;
 use App\Http\Controllers\Controller;
 use App\Models\Ayah;
 use App\Models\MafsilPosition;
-use App\Models\MafsilPositionUsage;
 use App\Models\QuranPart;
 use App\Models\RecitationPage;
 use App\Models\RecitationSession;
@@ -13,6 +12,7 @@ use App\Models\RecitationTajweedError;
 use App\Models\Student;
 use App\Models\SupervisorAlert;
 use App\Models\TajweedRuleDefinition;
+use App\Services\MafsilPositionSelector;
 use App\Services\NotificationService;
 use App\Services\RecitationAlertService;
 use Carbon\Carbon;
@@ -44,6 +44,11 @@ class RecitationController extends Controller
     ];
 
     private const MAFSIL_MAX_SCORE = 100;
+
+    private function mafsilSelector(): MafsilPositionSelector
+    {
+        return new MafsilPositionSelector();
+    }
 
     /**
      * Calculate total errors and hesitations from pages array
@@ -278,8 +283,8 @@ class RecitationController extends Controller
         // Get all 30 parts for selection
         $allParts = QuranPart::orderBy('part_number')->get();
 
-        // Check if parts have been selected (POST request)
-        if ($request->isMethod('post') || $request->has('selected_parts')) {
+        // Check if parts have been selected (POST request only)
+        if ($request->isMethod('post')) {
             $selectedParts = $request->input('selected_parts', []);
 
             // Validate selected parts count
@@ -290,12 +295,10 @@ class RecitationController extends Controller
             // Ensure all selected parts are integers to prevent SQL injection
             $selectedParts = array_map('intval', $selectedParts);
 
-            // Validate selected parts exist using a safe query
+            // Validate selected parts exist using a safe query (always ascending by part)
             $parts = QuranPart::whereIn('part_number', $selectedParts)
                 ->get()
-                ->sortBy(function ($part) use ($selectedParts) {
-                    return array_search($part->part_number, $selectedParts);
-                })
+                ->sortBy('part_number')
                 ->values();
 
             if ($parts->count() != $partsCount) {
@@ -309,15 +312,36 @@ class RecitationController extends Controller
                 return back()->withErrors(['difficulty' => 'توزيع المواضيع غير صالح. يجب أن يكون المجموع 3 لكل جزء.']);
             }
 
-            $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution);
-            $this->recordMafsilPositionUsage($mafsilPositions);
-            $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
-                ->get(['id', 'name', 'category']);
+            $byPart = $this->mafsilSelector()
+                ->selectAndRecord($selectedParts, $validatedDistribution, $student->id, Auth::id());
 
-            // Parts selected - show scoring form
-            $selectionMode = false; // Show scoring form
+            // Drop older mafsil:* session keys for this student to keep the session small.
+            foreach ($request->session()->all() as $k => $v) {
+                if (is_string($k) && str_starts_with($k, 'mafsil:')
+                    && is_array($v)
+                    && (int) ($v['student_id'] ?? 0) === (int) $student->id) {
+                    $request->session()->forget($k);
+                }
+            }
 
-            return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions', 'tajweedRules'));
+            $sessionKey = 'mafsil:'.bin2hex(random_bytes(8));
+            $request->session()->put($sessionKey, [
+                'student_id'  => (int) $student->id,
+                'mafsil_type' => (int) $mafsilType,
+                'created_at'  => now()->toIso8601String(),
+                'part_positions' => collect($byPart)->map(function ($positions) {
+                    return $positions->map(fn ($p) => [
+                        'id'         => (int) $p->id,
+                        'difficulty' => (int) ($p->difficulty ?? 0),
+                    ])->all();
+                })->all(),
+            ]);
+
+            return redirect()->route('supervisor.recitation.mafsil.show', [
+                'student_id'  => $student->id,
+                'mafsil_type' => $mafsilType,
+                'k'           => $sessionKey,
+            ]);
         }
 
         // No parts selected yet - show selection UI
@@ -327,6 +351,101 @@ class RecitationController extends Controller
         $selectionMode = true; // Show part selection UI
 
         return view('supervisor.recitation.mafsil', compact('student', 'mafsilType', 'maxScore', 'parts', 'partsCount', 'passingPercentage', 'allParts', 'selectionMode', 'mafsilPositions', 'tajweedRules'));
+    }
+
+    /**
+     * Render the scoring form for an existing selection. Never calls the selector;
+     * uses a stored session key (k=…) to render the same picks across refreshes.
+     */
+    public function mafsilShow(Request $request)
+    {
+        $request->validate([
+            'student_id'  => 'required|exists:students,id',
+            'mafsil_type' => 'required|in:3,6,10,15,20,25,30',
+            'k'           => 'required|string',
+        ]);
+
+        $key = $request->input('k');
+        $payload = $request->session()->get($key);
+
+        if (!$payload
+            || (int) $payload['student_id']  !== (int) $request->student_id
+            || (int) $payload['mafsil_type'] !== (int) $request->mafsil_type) {
+            return redirect()
+                ->route('supervisor.recitation.mafsil', [
+                    'student_id'  => $request->student_id,
+                    'mafsil_type' => $request->mafsil_type,
+                ])
+                ->withErrors(['session' => 'انتهت صلاحية الجلسة. أعد اختيار الأجزاء.']);
+        }
+
+        $student = Student::with('level')->where('supervisor_id', Auth::id())
+            ->findOrFail($request->student_id);
+        $mafsilType = (int) $request->mafsil_type;
+        $maxScore = self::MAFSIL_MAX_SCORE;
+        $passingPercentage = RecitationSession::getMafsilPassingPercentage($mafsilType);
+        $allParts = QuranPart::orderBy('part_number')->get();
+        $partsCount = $mafsilType;
+
+        $selectedPartNumbers = array_keys($payload['part_positions']);
+        sort($selectedPartNumbers);
+        $parts = QuranPart::whereIn('part_number', $selectedPartNumbers)
+            ->get()
+            ->sortBy('part_number')
+            ->values();
+
+        $allIds = collect($payload['part_positions'])->flatten(1)->pluck('id')->all();
+        $realIds = array_values(array_filter($allIds, fn ($id) => $id > 0));
+        $realPositions = MafsilPosition::whereIn('id', $realIds)
+            ->with(['startAyah.surah', 'endAyah.surah'])
+            ->get()
+            ->keyBy('id');
+
+        $mafsilPositions = collect($payload['part_positions'])->map(
+            function (array $rows) use ($realPositions) {
+                $positions = [];
+                foreach ($rows as $row) {
+                    $id = (int) $row['id'];
+                    $difficulty = (int) ($row['difficulty'] ?? 0);
+                    if ($id > 0 && $realPositions->has($id)) {
+                        $positions[] = $realPositions->get($id);
+                    } elseif ($id < 0) {
+                        $positions[] = $this->rebuildPlaceholder($id, $difficulty);
+                    }
+                }
+                return collect($positions);
+            }
+        );
+
+        $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
+            ->get(['id', 'name', 'category']);
+
+        $selectionMode = false;
+
+        return view('supervisor.recitation.mafsil', compact(
+            'student', 'mafsilType', 'maxScore', 'parts',
+            'passingPercentage', 'allParts', 'selectionMode',
+            'mafsilPositions', 'tajweedRules', 'partsCount'
+        ));
+    }
+
+    /**
+     * Re-create a placeholder MafsilPosition row from its synthetic negative id
+     * and the difficulty recorded in the session payload.
+     */
+    private function rebuildPlaceholder(int $id, int $difficulty): MafsilPosition
+    {
+        $p = new MafsilPosition();
+        $p->id = $id;
+        $p->juz_number = (int) (abs($id) / 100);
+        $p->position_number = abs($id) % 100;
+        $p->list_order = $p->position_number;
+        $p->start_ayah_id = null;
+        $p->end_ayah_id = null;
+        $p->difficulty = $difficulty > 0 ? $difficulty : 2;
+        $p->notes = null;
+        $p->exists = false;
+        return $p;
     }
 
     /**
@@ -358,122 +477,6 @@ class RecitationController extends Controller
         }
 
         return $validated;
-    }
-
-    /**
-     * Randomly select mafsil positions for each part based on difficulty distribution.
-     * A position is excluded if it was already selected in the current usage cycle
-     * for its part and difficulty. When all positions of a difficulty have been used,
-     * the cycle resets so coverage starts over.
-     */
-    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution): \Illuminate\Support\Collection
-    {
-        $allPositions = MafsilPosition::with(['startAyah.surah', 'endAyah.surah'])
-            ->whereIn('juz_number', $selectedParts)
-            ->get()
-            ->groupBy(['juz_number', 'difficulty']);
-
-        $selectedPositions = collect();
-
-        foreach ($selectedParts as $partNumber) {
-            $distribution = $validatedDistribution[$partNumber];
-            $partSelected = collect();
-
-            foreach ([1, 2, 3] as $difficulty) {
-                $needed = $distribution[$difficulty];
-                if ($needed === 0) {
-                    continue;
-                }
-
-                $available = $allPositions->get($partNumber, collect())->get($difficulty, collect());
-
-                if ($available->count() < $needed) {
-                    $partSelected = $partSelected->merge(
-                        $this->buildPlaceholderPositions($partNumber, $needed, $difficulty, count($partSelected))
-                    );
-                    continue;
-                }
-
-                $usedIds = MafsilPositionUsage::where('juz_number', $partNumber)
-                    ->where('difficulty', $difficulty)
-                    ->pluck('mafsil_position_id')
-                    ->map(fn ($id) => (int) $id)
-                    ->all();
-
-                $unused = $available->whereNotIn('id', $usedIds);
-
-                // If not enough unused positions remain, the cycle is complete: reset it.
-                if ($unused->count() < $needed) {
-                    MafsilPositionUsage::where('juz_number', $partNumber)
-                        ->where('difficulty', $difficulty)
-                        ->delete();
-
-                    $unused = $available;
-                }
-
-                $partSelected = $partSelected->merge($unused->shuffle()->take($needed));
-            }
-
-            if ($partSelected->isEmpty()) {
-                $partSelected = $this->buildPlaceholderPositions($partNumber, 3, 0, 0);
-            }
-
-            $selectedPositions = $selectedPositions->merge(
-                $partSelected->shuffle()->sortBy('list_order')->values()
-            );
-        }
-
-        return $selectedPositions->groupBy('juz_number');
-    }
-
-    /**
-     * Record that the selected real mafsil positions have been used in the current cycle.
-     */
-    private function recordMafsilPositionUsage(\Illuminate\Support\Collection $mafsilPositions): void
-    {
-        $records = [];
-
-        foreach ($mafsilPositions as $partNumber => $positions) {
-            foreach ($positions as $position) {
-                if ($position->id > 0 && $position->start_ayah_id) {
-                    $records[] = [
-                        'juz_number' => $partNumber,
-                        'difficulty' => $position->difficulty,
-                        'mafsil_position_id' => $position->id,
-                        'supervisor_id' => Auth::id(),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-            }
-        }
-
-        if (! empty($records)) {
-            MafsilPositionUsage::insert($records);
-        }
-    }
-
-    /**
-     * Build placeholder MafsilPosition rows for a part when no real positions exist.
-     */
-    private function buildPlaceholderPositions(int $partNumber, int $count, int $difficulty, int $startOrder): \Illuminate\Support\Collection
-    {
-        $placeholders = collect();
-        for ($i = 0; $i < $count; $i++) {
-            $position = new MafsilPosition();
-            $position->id = -1 * (($partNumber * 100) + $startOrder + $i + 1);
-            $position->juz_number = $partNumber;
-            $position->position_number = $startOrder + $i + 1;
-            $position->list_order = $startOrder + $i + 1;
-            $position->start_ayah_id = null;
-            $position->end_ayah_id = null;
-            $position->difficulty = $difficulty > 0 ? $difficulty : 2;
-            $position->notes = null;
-            $position->exists = false;
-            $placeholders->push($position);
-        }
-
-        return $placeholders;
     }
 
     /**

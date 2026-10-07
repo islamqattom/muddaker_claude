@@ -135,9 +135,7 @@ class MafsilController extends Controller
 
             $parts = QuranPart::whereIn('part_number', $selectedParts)
                 ->get()
-                ->sortBy(function ($part) use ($selectedParts) {
-                    return array_search($part->part_number, $selectedParts);
-                })
+                ->sortBy('part_number')
                 ->values();
 
             if ($parts->count() != $partsCount) {
@@ -151,7 +149,11 @@ class MafsilController extends Controller
                 return back()->withErrors(['difficulty' => 'توزيع المواضيع غير صالح. يجب أن يكون المجموع '.$positionsPerPart.' لكل جزء.'])->withInput();
             }
 
-            $mafsilPositions = $this->selectRandomMafsilPositions($selectedParts, $validatedDistribution, $positionsPerPart);
+            $mafsilPositions = (new \App\Services\MafsilPositionSelector())->select(
+                $selectedParts,
+                $validatedDistribution,
+                null
+            );
             $tajweedRules = TajweedRuleDefinition::orderBy('category')->orderBy('order')
                 ->get(['id', 'name', 'category']);
 
@@ -202,70 +204,6 @@ class MafsilController extends Controller
         }
 
         return $validated;
-    }
-
-    private function selectRandomMafsilPositions(array $selectedParts, array $validatedDistribution, int $positionsPerPart = 3): \Illuminate\Support\Collection
-    {
-        $allPositions = MafsilPosition::with(['startAyah.surah', 'endAyah.surah'])
-            ->whereIn('juz_number', $selectedParts)
-            ->get()
-            ->groupBy(['juz_number', 'difficulty']);
-
-        $selectedPositions = collect();
-
-        foreach ($selectedParts as $partNumber) {
-            $distribution = $validatedDistribution[$partNumber];
-            $partSelected = collect();
-
-            foreach ([1, 2, 3] as $difficulty) {
-                $needed = $distribution[$difficulty];
-                if ($needed === 0) {
-                    continue;
-                }
-
-                $available = $allPositions->get($partNumber, collect())->get($difficulty, collect());
-
-                if ($available->count() < $needed) {
-                    $partSelected = $partSelected->merge(
-                        $this->buildPlaceholderPositions($partNumber, $needed, $difficulty, count($partSelected))
-                    );
-                    continue;
-                }
-
-                $shuffled = $available->shuffle();
-                $partSelected = $partSelected->merge($shuffled->take($needed));
-            }
-
-            if ($partSelected->isEmpty()) {
-                $partSelected = $this->buildPlaceholderPositions($partNumber, $positionsPerPart, 0, 0);
-            }
-
-            $selectedPositions = $selectedPositions->merge(
-                $partSelected->shuffle()->sortBy('list_order')->values()
-            );
-        }
-
-        return $selectedPositions->groupBy('juz_number');
-    }
-
-    private function buildPlaceholderPositions(int $partNumber, int $count, int $difficulty, int $startOrder): \Illuminate\Support\Collection
-    {
-        $placeholders = collect();
-        for ($i = 0; $i < $count; $i++) {
-            $position = new MafsilPosition;
-            $position->id = -1 * (($partNumber * 100) + $startOrder + $i + 1);
-            $position->juz_number = $partNumber;
-            $position->position_number = $startOrder + $i + 1;
-            $position->list_order = $startOrder + $i + 1;
-            $position->start_ayah_id = null;
-            $position->end_ayah_id = null;
-            $position->difficulty = $difficulty > 0 ? $difficulty : 2;
-            $position->notes = null;
-            $position->exists = false;
-            $placeholders->push($position);
-        }
-
-        return $placeholders;
     }
 
     public function getMafsilPositionAyahs(MafsilPosition $mafsilPosition)
