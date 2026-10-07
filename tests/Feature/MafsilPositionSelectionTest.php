@@ -129,6 +129,32 @@ class MafsilPositionSelectionTest extends TestCase
         return false;
     }
 
+    private function rangesConflict(MafsilPosition $a, MafsilPosition $b): bool
+    {
+        if ($a->start_ayah_id === null || $a->end_ayah_id === null
+            || $b->start_ayah_id === null || $b->end_ayah_id === null) {
+            return false;
+        }
+
+        return (int) $a->start_ayah_id <= (int) $b->end_ayah_id + 1
+            && (int) $b->start_ayah_id <= (int) $a->end_ayah_id + 1;
+    }
+
+    private function anyOverlapPair(\Illuminate\Support\Collection $picks): bool
+    {
+        foreach ($picks as $a) {
+            foreach ($picks as $b) {
+                if ($a->id === $b->id) {
+                    continue;
+                }
+                if ($this->rangesConflict($a, $b)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public function test_no_adjacent_picks_in_200_runs(): void
     {
         $ayahs = $this->seedSurahWithAyahs(90);
@@ -240,6 +266,149 @@ class MafsilPositionSelectionTest extends TestCase
 
         $this->assertSame(0, $exact, 'the boundary-sharing pair must never co-occur');
         $this->assertSame(0, $adjacentRuns, 'no run may contain any adjacent pair');
+    }
+
+    public function test_overlapping_50_59_and_52_59_never_co_occur(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(90);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // Exact shape of the reported bug: same part, far-apart list_order, so
+        // only the hard ayah-range constraint can prevent co-occurrence.
+        $a = $this->makePosition(1, 2, $aid(50), $aid(59), 3);
+        $b = $this->makePosition(1, 3, $aid(52), $aid(59), 18);
+
+        $selector = new MafsilPositionSelector();
+        $dist = [1 => [1 => 0, 2 => 1, 3 => 1]];
+
+        $co = 0;
+        for ($i = 0; $i < 50; $i++) {
+            $ids = $selector->select([1], $dist, null)->get(1)->pluck('id')->all();
+            if (in_array($a->id, $ids, true) && in_array($b->id, $ids, true)) {
+                $co++;
+            }
+        }
+
+        $this->assertSame(0, $co, 'overlapping ranges 50-59 and 52-59 must never co-occur');
+    }
+
+    public function test_overlapping_82_89_and_86_92_never_co_occur(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(120);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // Same difficulty, far-apart list_order (reported bug shape).
+        $a = $this->makePosition(3, 3, $aid(82), $aid(89), 13);
+        $b = $this->makePosition(3, 3, $aid(86), $aid(92), 31);
+
+        $selector = new MafsilPositionSelector();
+        $dist = [3 => [1 => 0, 2 => 0, 3 => 2]];
+
+        $co = 0;
+        for ($i = 0; $i < 50; $i++) {
+            $ids = $selector->select([3], $dist, null)->get(3)->pluck('id')->all();
+            if (in_array($a->id, $ids, true) && in_array($b->id, $ids, true)) {
+                $co++;
+            }
+        }
+
+        $this->assertSame(0, $co, 'overlapping ranges 82-89 and 86-92 must never co-occur');
+    }
+
+    public function test_shared_boundary_ayah_never_co_occur_as_last_resort(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(20);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // Only these two real positions exist, so the second one can only be
+        // filled by Phase 3 (the adjacent fallback). A: 1-5, B: 5-9 share ayah 5.
+        $a = $this->makePosition(1, 3, $aid(1), $aid(5), 1);
+        $b = $this->makePosition(1, 3, $aid(5), $aid(9), 30);
+
+        $selector = new MafsilPositionSelector();
+        $co = 0;
+        for ($i = 0; $i < 50; $i++) {
+            $ids = $selector->select([1], [1 => [1 => 0, 2 => 0, 3 => 2]], null)
+                ->get(1)->pluck('id')->all();
+            if (in_array($a->id, $ids, true) && in_array($b->id, $ids, true)) {
+                $co++;
+            }
+        }
+
+        $this->assertSame(0, $co, 'a shared boundary ayah counts as overlapping');
+    }
+
+    public function test_touching_ranges_never_co_occur_as_last_resort(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(20);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // A: 1-5, B: 6-9 touch (gap == 1) and must be treated as conflicting.
+        $a = $this->makePosition(1, 3, $aid(1), $aid(5), 1);
+        $b = $this->makePosition(1, 3, $aid(6), $aid(9), 30);
+
+        $selector = new MafsilPositionSelector();
+        $co = 0;
+        for ($i = 0; $i < 50; $i++) {
+            $ids = $selector->select([1], [1 => [1 => 0, 2 => 0, 3 => 2]], null)
+                ->get(1)->pluck('id')->all();
+            if (in_array($a->id, $ids, true) && in_array($b->id, $ids, true)) {
+                $co++;
+            }
+        }
+
+        $this->assertSame(0, $co, 'touching ranges must never co-occur');
+    }
+
+    public function test_only_overlapping_pool_returns_fewer_real_positions(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(20);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // Exactly two real candidates, overlapping. Requesting 2 must never
+        // return both; the placeholder (null ayah) may fill the remainder.
+        $this->makePosition(1, 3, $aid(1), $aid(5), 1);
+        $this->makePosition(1, 3, $aid(3), $aid(8), 30);
+
+        $selector = new MafsilPositionSelector();
+        for ($i = 0; $i < 50; $i++) {
+            $picks = $selector->select([1], [1 => [1 => 0, 2 => 0, 3 => 2]], null)->get(1);
+            $real = $picks->filter(fn ($p) => $p->id > 0);
+
+            $this->assertLessThan(2, $real->count(), 'must not return both overlapping real positions');
+            $this->assertFalse($this->anyOverlapPair($picks), 'no returned pair may overlap');
+        }
+    }
+
+    public function test_large_random_selection_has_no_overlapping_pair(): void
+    {
+        $ayahs = $this->seedSurahWithAyahs(200);
+        $aid = fn (int $n) => $ayahs[$n]->id;
+
+        // Part 1 pool.
+        $this->makePosition(1, 3, $aid(1), $aid(10), 1);
+        $this->makePosition(1, 3, $aid(21), $aid(30), 2);
+        $this->makePosition(1, 3, $aid(41), $aid(50), 3);
+        $this->makePosition(1, 3, $aid(61), $aid(70), 4);
+        $this->makePosition(1, 3, $aid(81), $aid(90), 5);
+
+        // Part 2 pool, deliberately overlapping part 1's ranges (cross-part).
+        $this->makePosition(2, 3, $aid(45), $aid(55), 1);
+        $this->makePosition(2, 3, $aid(66), $aid(75), 2);
+        $this->makePosition(2, 3, $aid(6), $aid(15), 3);
+        $this->makePosition(2, 3, $aid(86), $aid(95), 4);
+        $this->makePosition(2, 3, $aid(101), $aid(110), 5);
+
+        $selector = new MafsilPositionSelector();
+        $dist = [1 => [1 => 0, 2 => 0, 3 => 3], 2 => [1 => 0, 2 => 0, 3 => 3]];
+
+        for ($i = 0; $i < 50; $i++) {
+            $all = $selector->select([1, 2], $dist, null)->flatten();
+            $this->assertFalse(
+                $this->anyOverlapPair($all),
+                'no pair of returned positions may overlap across all parts'
+            );
+        }
     }
 
     public function test_two_students_have_independent_cycles(): void

@@ -97,6 +97,10 @@ class MafsilPositionSelector
         $pendingRows = [];
         $byPart = collect();
 
+        // Selection-wide picks, used to enforce the hard ayah-range constraint
+        // across every part (not just within a part).
+        $selectionPicked = collect();
+
         foreach ($parts as $partNumber) {
             $partSelected = $this->pickForPart(
                 $partNumber,
@@ -105,9 +109,12 @@ class MafsilPositionSelector
                 $studentId,
                 $supervisorId,
                 $globalCounts,
+                $selectionPicked,
                 $pendingRows,
                 $recordUsage
             );
+
+            $selectionPicked = $selectionPicked->merge($partSelected);
 
             $byPart->put(
                 $partNumber,
@@ -157,6 +164,7 @@ class MafsilPositionSelector
      * @param Collection<int,Collection<int,MafsilPosition>> $allPositions
      * @param array<int,int> $distForPart [1=>n, 2=>n, 3=>n]
      * @param array<int,int> $globalCounts
+     * @param Collection<int,MafsilPosition> $selectionPicked picks from other parts already in this selection
      * @param array<int,array<string,mixed>> $pendingRows by-ref collector
      */
     private function pickForPart(
@@ -166,6 +174,7 @@ class MafsilPositionSelector
         ?int $studentId,
         ?int $supervisorId,
         array $globalCounts,
+        Collection $selectionPicked,
         array &$pendingRows,
         bool $recordUsage
     ): Collection {
@@ -204,7 +213,7 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
 
             // Phase 1: unused + non-adjacent. Greedy one-at-a-time so adjacency among the
             // positions chosen in this step is enforced, with retries on fresh shuffles.
-            $chosen = $this->greedyNonAdjacent($unused, $picked, $need, $globalCounts);
+            $chosen = $this->greedyNonAdjacent($unused, $picked, $need, $globalCounts, $selectionPicked);
             $picked = $picked->merge($chosen);
             $need -= $chosen->count();
 
@@ -225,7 +234,7 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
             $fresh = collect();
             if ($cycleClosed && $need > 0) {
                 $phase2Candidates = $cand->reject(fn ($p) => $picked->contains(fn ($q) => $q->id === $p->id));
-                $fresh = $this->greedyNonAdjacent($phase2Candidates, $picked, $need, $globalCounts);
+                $fresh = $this->greedyNonAdjacent($phase2Candidates, $picked, $need, $globalCounts, $selectionPicked);
                 $picked = $picked->merge($fresh);
                 $need -= $fresh->count();
             }
@@ -234,15 +243,22 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
 // Fill from USED non-adjacent positions without recording.
             if (!$cycleClosed && $need > 0 && $remainingUnused > 0) {
                 $usedCandidates = $used->reject(fn ($p) => $picked->contains(fn ($q) => $q->id === $p->id));
-                $usedFills = $this->greedyNonAdjacent($usedCandidates, $picked, $need, $globalCounts);
+                $usedFills = $this->greedyNonAdjacent($usedCandidates, $picked, $need, $globalCounts, $selectionPicked);
                 $picked = $picked->merge($usedFills);
                 $need -= $usedFills->count();
                 // not recorded
             }
 
-            // Phase 3: adjacent (last resort before placeholders).
+            // Phase 3: adjacent (last resort before placeholders). The hard
+            // ayah-range constraint still applies here: overlapping/touching
+            // candidates are never picked, even as a fallback. This may return
+            // fewer than $need.
             if ($need > 0) {
-                $adjacent = $cand->reject(fn ($p) => $picked->contains(fn ($q) => $q->id === $p->id))->shuffle();
+                $blockers = $picked->merge($selectionPicked);
+                $adjacent = $cand
+                    ->reject(fn ($p) => $picked->contains(fn ($q) => $q->id === $p->id))
+                    ->reject(fn ($p) => $blockers->contains(fn ($q) => $this->rangesConflict($p, $q)))
+                    ->shuffle();
                 $adjacentPicks = $adjacent->take($need)->values();
                 $picked = $picked->merge($adjacentPicks);
                 $need -= $adjacentPicks->count();
@@ -290,6 +306,26 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
         return $picked;
     }
 
+    /**
+     * Hard constraint: two positions must never overlap or touch in ayahs,
+     * using the global (sequential) ayah ids. Touching (gap == 1) is treated
+     * as conflicting, as is a shared boundary ayah (gap == 0).
+     *
+     *   a.start <= b.end + 1  AND  b.start <= a.end + 1
+     *
+     * Positions with a null start/end ayah (placeholders) are exempt.
+     */
+    private function rangesConflict(MafsilPosition $a, MafsilPosition $b): bool
+    {
+        if ($a->start_ayah_id === null || $a->end_ayah_id === null
+            || $b->start_ayah_id === null || $b->end_ayah_id === null) {
+            return false;
+        }
+
+        return (int) $a->start_ayah_id <= (int) $b->end_ayah_id + 1
+            && (int) $b->start_ayah_id <= (int) $a->end_ayah_id + 1;
+    }
+
     private function isAdjacent(MafsilPosition $a, MafsilPosition $b): bool
     {
         if ($a->list_order > 0 && $b->list_order > 0
@@ -327,21 +363,24 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
 
     /**
      * Pick up to $need candidates that are non-adjacent to each other and to
-     * everything already in $picked. The order is shuffled then stable-sorted by
-     * ascending global usage count (random tie-break). A single greedy pass can
-     * get blocked by chance (e.g. picking a middle position that blocks both
-     * neighbours), so retry with fresh shuffles and keep the best result.
+     * everything already in $picked, and that do not conflict (overlap/touch)
+     * with any pick from other parts in $globalPicked. The order is shuffled
+     * then stable-sorted by ascending global usage count (random tie-break). A
+     * single greedy pass can get blocked by chance (e.g. picking a middle
+     * position that blocks both neighbours), so retry with fresh shuffles and
+     * keep the best result.
      */
     private function greedyNonAdjacent(
         Collection $candidates,
         Collection $picked,
         int $need,
-        array $globalCounts
+        array $globalCounts,
+        Collection $globalPicked
     ): Collection {
         $best = collect();
 
         for ($attempt = 0; $attempt < 20; $attempt++) {
-            $attemptPicks = $this->greedyAttempt($candidates, $picked, $need, $globalCounts);
+            $attemptPicks = $this->greedyAttempt($candidates, $picked, $need, $globalCounts, $globalPicked);
 
             if ($attemptPicks->count() > $best->count()) {
                 $best = $attemptPicks;
@@ -358,7 +397,8 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
         Collection $candidates,
         Collection $picked,
         int $need,
-        array $globalCounts
+        array $globalCounts,
+        Collection $globalPicked
     ): Collection {
         $ordered = $this->shuffleThenStableSortByGlobalCount($candidates, $globalCounts);
 
@@ -369,19 +409,28 @@ $unused = $cand->reject(fn ($p) => in_array($p->id, $activeIds, true));
             if ($chosen->count() >= $need) {
                 break;
             }
-            if ($acc->contains(fn ($p) => $p->id === $cand->id)) {
+            if ($acc->contains(fn ($p) => $p->id === $cand->id)
+                || $globalPicked->contains(fn ($p) => $p->id === $cand->id)) {
                 continue;
             }
 
-            $adjacent = false;
+            $conflict = false;
             foreach ($acc as $p) {
-                if ($this->isAdjacent($p, $cand)) {
-                    $adjacent = true;
+                if ($this->isAdjacent($p, $cand) || $this->rangesConflict($p, $cand)) {
+                    $conflict = true;
                     break;
                 }
             }
+            if (! $conflict) {
+                foreach ($globalPicked as $p) {
+                    if ($this->rangesConflict($p, $cand)) {
+                        $conflict = true;
+                        break;
+                    }
+                }
+            }
 
-            if (! $adjacent) {
+            if (! $conflict) {
                 $chosen->push($cand);
                 $acc->push($cand);
             }
