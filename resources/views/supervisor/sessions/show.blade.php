@@ -200,6 +200,8 @@
     display: inline-flex; align-items: center; gap: 8px;
     padding: 3px 10px; border-radius: 7px;
     font-size: 11.5px; font-weight: 600;
+    width: auto; align-self: auto; flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .session-detail .color-indicator.excellent { background: rgba(39,174,96,0.15); color: var(--success); }

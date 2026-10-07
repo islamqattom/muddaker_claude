@@ -451,6 +451,8 @@
                                 <td>
                                     @if($session->type === 'not_recitate')
                                         <span class="text-muted">—</span>
+                                    @elseif($session->type === 'mafsil')
+                                        <span class="part-badge">{{ $session->tested_part_numbers->count() }}</span>
                                     @elseif($session->parts_label !== '-')
                                         <span class="part-badge">{{ $session->parts_label }}</span>
                                     @else
