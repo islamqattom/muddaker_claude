@@ -40,24 +40,27 @@ class MissedRecitationService
         // runRange() from the admin diagnostics page.
         $lookbackDays = (int) config('recitation.auto_lookback_days', 7);
 
-        return $this->runWindow($now, $now->copy()->subDays($lookbackDays), $now);
+        return $this->runWindow($now, $now->copy()->subDays($lookbackDays), $now, true);
     }
 
     /**
      * Process eligible attendance records within an explicit date range.
      * Used by the admin backfill (preview + confirm) for older periods.
      *
+     * Manual runs may include the current day, so the "day must have ended"
+     * gate is skipped: the admin explicitly reviews and approves the list.
+     *
      * @return array{created:int, skipped:int, cleaned:int}
      */
     public function runRange(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): array
     {
-        return $this->runWindow($now, $from, $to);
+        return $this->runWindow($now, $from, $to, false);
     }
 
     /**
      * @return array{created:int, skipped:int, cleaned:int}
      */
-    private function runWindow(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to): array
+    private function runWindow(CarbonInterface $now, CarbonInterface $from, CarbonInterface $to, bool $requireDayEnded = true): array
     {
         $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
 
@@ -83,7 +86,7 @@ class MissedRecitationService
         $skipped = 0;
 
         foreach ($candidates as $attendance) {
-            if (! $this->shouldCreateForAttendance($attendance, $now)) {
+            if (! $this->shouldCreateForAttendance($attendance, $now, $requireDayEnded)) {
                 $skipped++;
 
                 continue;
@@ -112,7 +115,7 @@ class MissedRecitationService
             ->where('date', '>=', $from->toDateString())
             ->where('date', '<=', $to->toDateString())
             ->get()
-            ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now))
+            ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now, false))
             ->count();
     }
 
@@ -148,7 +151,7 @@ class MissedRecitationService
 
         foreach ($attendances as $date => $dayAttendances) {
             $willCreate = $dayAttendances
-                ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now));
+                ->filter(fn (Attendance $attendance) => $this->shouldCreateForAttendance($attendance, $now, false));
 
             if ($willCreate->isEmpty()) {
                 continue;
@@ -215,14 +218,17 @@ class MissedRecitationService
 
     /**
      * Whether the attendance record satisfies all rule conditions.
+     *
+     * When $requireDayEnded is false (manual preview/backfill) the current day
+     * is eligible too, so same-day records can be reviewed and approved.
      */
-    public function shouldCreateForAttendance(Attendance $attendance, CarbonInterface $now): bool
+    public function shouldCreateForAttendance(Attendance $attendance, CarbonInterface $now, bool $requireDayEnded = true): bool
     {
         if (! $this->isRequiredAttendanceDay($attendance)) {
             return false;
         }
 
-        if (! $this->hasAttendanceDayEnded($attendance, $now)) {
+        if ($requireDayEnded && ! $this->hasAttendanceDayEnded($attendance, $now)) {
             return false;
         }
 

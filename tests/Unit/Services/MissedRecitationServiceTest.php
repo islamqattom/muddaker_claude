@@ -310,4 +310,30 @@ class MissedRecitationServiceTest extends TestCase
         // The breakdown total must match the plain counter.
         $this->assertSame($details['total'], $this->service->previewRange($now, $from, $to));
     }
+
+    public function test_manual_preview_and_range_include_the_same_day(): void
+    {
+        // Saturday, still the same day; the student is present with no session.
+        $attendance = $this->attendance('2026-01-03', 'present', '2026-01-03 07:00:00');
+
+        $now = Carbon::parse('2026-01-03 10:00:00');
+        $from = Carbon::parse('2026-01-03');
+        $to = Carbon::parse('2026-01-03');
+
+        // Manual preview shows the same-day record.
+        $details = $this->service->previewRangeDetails($now, $from, $to);
+        $this->assertSame(1, $details['total']);
+        $this->assertSame(1, $this->service->previewRange($now, $from, $to));
+
+        // Manual backfill (admin approval) creates it on the same day.
+        $result = $this->service->runRange($now, $from, $to);
+        $this->assertSame(1, $result['created']);
+        $this->assertDatabaseHas('recitation_sessions', [
+            'student_id' => $attendance->student_id,
+            'session_date' => '2026-01-03',
+            'type' => RecitationSession::TYPE_NOT_RECITE,
+            'attendance_id' => $attendance->id,
+            'auto_generated' => true,
+        ]);
+    }
 }
