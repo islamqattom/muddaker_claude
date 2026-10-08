@@ -237,5 +237,24 @@ class ReportController extends Controller
             'configuredAttendanceDays'  => $payload['configured_attendance_days'],
         ]);
     }
+
+    /**
+     * JSON detail for one (supervisor, day) row of the supervisor-missing
+     * report: the supervisor's students with their session/attendance status.
+     */
+    public function supervisorMissingDetails(Request $request)
+    {
+        $validated = $request->validate([
+            'supervisor_id' => 'required|integer|exists:users,id',
+            'date'          => 'required|date',
+        ]);
+
+        $details = $this->reports->supervisorMissingDayDetails(
+            (int) $validated['supervisor_id'],
+            Carbon::parse($validated['date'])
+        );
+
+        return response()->json($details);
+    }
 }
 

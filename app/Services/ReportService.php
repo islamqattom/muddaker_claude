@@ -1434,4 +1434,86 @@ class ReportService
             ),
         ];
     }
+
+    /**
+     * Per-student breakdown for one supervisor on one day: which students have
+     * a recitation session and/or attendance recorded, used by the
+     * supervisor-missing report row detail modal.
+     */
+    public function supervisorMissingDayDetails(int $supervisorId, Carbon $date): array
+    {
+        $requiredSessionDays = SettingsServiceProvider::carbonDaysForDayNames(
+            config('app.recitation_days', SettingsServiceProvider::DEFAULT_RECITATION_DAYS)
+        );
+        $requiredAttendanceDays = SettingsServiceProvider::carbonDaysForDayNames(
+            config('app.work_days', SettingsServiceProvider::DEFAULT_WORK_DAYS)
+        );
+
+        $sessionExpected    = in_array($date->dayOfWeek, $requiredSessionDays, true);
+        $attendanceExpected = in_array($date->dayOfWeek, $requiredAttendanceDays, true);
+        $dateStr            = $date->toDateString();
+
+        $supervisor = User::where('role', 'supervisor')
+            ->where('id', $supervisorId)
+            ->first(['id', 'name']);
+
+        $students = Student::active()
+            ->where('supervisor_id', $supervisorId)
+            ->with('user')
+            ->get()
+            ->sortBy(fn ($s) => $s->user->name ?? '')
+            ->values();
+
+        $sessions = RecitationSession::query()
+            ->where('supervisor_id', $supervisorId)
+            ->where('auto_generated', false)
+            ->whereDate('session_date', $dateStr)
+            ->get()
+            ->groupBy('student_id');
+
+        $attendances = Attendance::query()
+            ->where('supervisor_id', $supervisorId)
+            ->whereDate('date', $dateStr)
+            ->get()
+            ->keyBy('student_id');
+
+        $isHoliday = Attendance::query()
+            ->where('supervisor_id', $supervisorId)
+            ->where('status', 'holiday')
+            ->whereDate('date', $dateStr)
+            ->exists();
+
+        $studentRows = $students->map(function ($student) use ($sessions, $attendances) {
+            $studentSessions = $sessions->get($student->id);
+            $session         = $studentSessions?->first();
+            $attendance      = $attendances->get($student->id);
+
+            return [
+                'id'                   => $student->id,
+                'name'                 => $student->user->name ?? '—',
+                'student_number'       => $student->student_number,
+                'session_recorded'     => $session !== null,
+                'session_type_label'   => $session?->type_label,
+                'session_status_label' => $session?->status_label,
+                'session_status'       => $session?->status,
+                'attendance_recorded'  => $attendance !== null,
+                'attendance_status_label' => $attendance?->status_label,
+                'attendance_status'    => $attendance?->status,
+            ];
+        })->values();
+
+        return [
+            'supervisor_id'       => $supervisorId,
+            'supervisor_name'     => $supervisor->name ?? '—',
+            'date'                => $dateStr,
+            'day_name'            => SettingsServiceProvider::arabicDayName((int) $date->dayOfWeek),
+            'session_expected'    => $sessionExpected,
+            'attendance_expected' => $attendanceExpected,
+            'session_missing'     => $sessionExpected && $sessions->isEmpty(),
+            'attendance_missing'  => $attendanceExpected && $attendances->isEmpty(),
+            'is_holiday'          => $isHoliday,
+            'students'            => $studentRows,
+            'students_count'      => $studentRows->count(),
+        ];
+    }
 }
