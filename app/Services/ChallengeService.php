@@ -318,7 +318,7 @@ class ChallengeService
             ->unique()
             ->toArray();
 
-        return Student::with('user', 'level')
+        return Student::active()->with('user', 'level')
             ->where('id', '!=', $student->id)
             ->whereNotIn('id', $recentOpponentIds)
             ->orderBy('current_streak', 'desc')

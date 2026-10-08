@@ -66,7 +66,7 @@ class LeaderboardService
      */
     public function buildLeaderboard(string $period, string $type): Collection
     {
-        $students = Student::with('user', 'level')->get()->keyBy('id');
+        $students = Student::active()->with('user', 'level')->get()->keyBy('id');
         [$startDate, $endDate] = $this->getPeriodRange($period);
 
         $scores = match ($type) {

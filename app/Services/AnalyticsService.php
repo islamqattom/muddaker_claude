@@ -111,7 +111,7 @@ class AnalyticsService
         $now = Carbon::now();
         $monthStart = $now->copy()->startOfMonth();
 
-        $studentsCount = Student::where('supervisor_id', $supervisorId)->count();
+        $studentsCount = Student::where('supervisor_id', $supervisorId)->active()->count();
 
         $sessionsThisMonth = RecitationSession::where('supervisor_id', $supervisorId)
             ->where('session_date', '>=', $monthStart->toDateString())
@@ -125,7 +125,7 @@ class AnalyticsService
         $decidedCount = $passedCount + $failedCount;
         $passRate = $decidedCount > 0 ? round(($passedCount / $decidedCount) * 100, 1) : 0.0;
 
-        $studentIds = Student::where('supervisor_id', $supervisorId)->pluck('id');
+        $studentIds = Student::where('supervisor_id', $supervisorId)->active()->pluck('id');
         $attendanceRows = Attendance::whereIn('student_id', $studentIds)
             ->where('date', '>=', $monthStart->toDateString())
             ->get();

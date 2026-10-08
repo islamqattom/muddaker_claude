@@ -16,7 +16,9 @@ class ReportController extends Controller {
 
     public function index() {
         $parent = Auth::user()->parentProfile()->with('students.user', 'students.level', 'students.supervisor')->first();
-        $students = $parent->students;
+        $students = $parent->students
+            ->filter(fn ($student) => optional($student->user)->is_active)
+            ->values();
 
         // Get filter parameters
         $studentId = request('student_id');

@@ -15,9 +15,9 @@ class DashboardController extends Controller
         \App\Support\MissedRecitationSync::run();
 
         $stats = [
-            'total_students' => Student::count(),
-            'total_supervisors' => User::where('role', 'supervisor')->count(),
-            'total_parents' => User::where('role', 'parent')->count(),
+            'total_students' => Student::active()->count(),
+            'total_supervisors' => User::where('role', 'supervisor')->where('is_active', true)->count(),
+            'total_parents' => User::where('role', 'parent')->where('is_active', true)->count(),
             'today_present' => Attendance::where('date', today())->where('status', 'present')->count(),
             'today_absent' => Attendance::where('date', today())->where('status', 'absent')->count(),
             'today_late' => Attendance::where('date', today())->where('status', 'late')->count(),

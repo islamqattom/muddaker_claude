@@ -16,7 +16,9 @@ class DashboardController extends Controller
 
         $user = Auth::user();
         $parentProfile = $user->parentProfile()->with('students.user', 'students.level')->firstOrFail();
-        $students = $parentProfile->students;
+        $students = $parentProfile->students
+            ->filter(fn ($student) => optional($student->user)->is_active)
+            ->values();
 
         $studentsData = [];
         foreach ($students as $student) {
@@ -57,7 +59,9 @@ class DashboardController extends Controller
         $parentProfile = $user->parentProfile;
 
         // Verify this parent has access to this student
-        $student = $parentProfile->students()->with(['user', 'level', 'supervisor'])->findOrFail($studentId);
+        $student = $parentProfile->students()
+            ->whereHas('user', fn ($q) => $q->where('is_active', true))
+            ->with(['user', 'level', 'supervisor'])->findOrFail($studentId);
 
         $fromDate = request('from_date') ? Carbon::parse(request('from_date')) : Carbon::now()->startOfMonth();
         $toDate = request('to_date') ? Carbon::parse(request('to_date')) : Carbon::now();

@@ -26,7 +26,7 @@ class ReportController extends Controller
 
         // Cumulative headline numbers (not tied to the selected period).
         $totals = [
-            'total_students' => Student::count(),
+            'total_students' => Student::active()->count(),
         ];
 
         // Selected period (default: current month), resolved through the
@@ -45,7 +45,7 @@ class ReportController extends Controller
         $trend       = $this->reports->recitationDailyTrend($sessions);
         $topStudents = $this->reports->topStudents($sessions, 5);
 
-        $students = Student::with('user')->orderedByName()->limit(500)->get()
+        $students = Student::active()->with('user')->orderedByName()->limit(500)->get()
             ->sortBy(fn ($s) => $s->user->name ?? '')
             ->values();
 
@@ -103,7 +103,7 @@ class ReportController extends Controller
      */
     public function studentsReport(Request $request)
     {
-        $allStudents = Student::with('user', 'level')
+        $allStudents = Student::active()->with('user', 'level')
             ->get()
             ->sortBy(fn ($s) => $s->user->name ?? '')
             ->values();

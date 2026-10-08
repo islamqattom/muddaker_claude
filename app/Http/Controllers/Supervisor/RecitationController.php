@@ -1083,6 +1083,10 @@ class RecitationController extends Controller
     protected function notifyParentOnSession(RecitationSession $session): void
     {
         $student = $session->student;
+        if (! $student || ! optional($student->user)->is_active) {
+            return;
+        }
+
         $parent = $student->parents()->first();
         if (! $parent || ! $parent->user) {
             return;
@@ -1117,6 +1121,10 @@ class RecitationController extends Controller
     protected function notifyStudentOnSession(RecitationSession $session): void
     {
         $student = $session->student;
+        if (! $student || ! optional($student->user)->is_active) {
+            return;
+        }
+
         if (! $student->user) {
             return;
         }

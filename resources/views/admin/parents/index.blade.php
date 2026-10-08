@@ -172,12 +172,14 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
                             <th>البريد الإلكتروني</th>
                             <th>صلة القرابة</th>
                             <th>عدد الطلاب</th>
+                            <th>الحالة</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($parents as $index => $parent)
-                        <tr>
+                        @php $isActive = (bool) $parent->is_active; @endphp
+                        <tr class="{{ $isActive ? '' : 'row-inactive' }}">
                             <td class="index-cell">{{ $parents->firstItem() + $index }}</td>
                             <td>
                                 <div class="user-cell">
@@ -221,6 +223,13 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
                                 @endif
                             </td>
                             <td>
+                                @if($isActive)
+                                    <span class="badge-status active"><i class="fas fa-circle-check"></i>مفعّل</span>
+                                @else
+                                    <span class="badge-status inactive"><i class="fas fa-circle-pause"></i>معطّل</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="action-buttons">
                                     <a href="{{ route('admin.parents.show', $parent->id) }}" class="action-btn-islamic view" title="عرض">
                                         <i class="fas fa-eye"></i>
@@ -228,6 +237,13 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
                                     <a href="{{ route('admin.parents.edit', $parent->id) }}" class="action-btn-islamic edit" title="تعديل">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    <form action="{{ route('admin.parents.toggleActive', $parent->id) }}" method="POST" class="d-inline"
+                                          @if($isActive) onsubmit="return confirm('تعطيل حساب هذا ولي الأمر؟ سيتم منعه من الدخول واستبعاده من التقارير والإحصائيات.')" @endif>
+                                        @csrf
+                                        <button type="submit" class="action-btn-islamic {{ $isActive ? 'deactivate' : 'activate' }}" title="{{ $isActive ? 'تعطيل' : 'تفعيل' }}">
+                                            <i class="fas fa-{{ $isActive ? 'ban' : 'check' }}"></i>
+                                        </button>
+                                    </form>
                                     <form action="{{ route('admin.parents.destroy', $parent->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا ولي الأمر؟')">
                                         @csrf
                                         @method('DELETE')
@@ -563,6 +579,10 @@ $parentsMothers = $parents->filter(function($p) { return $p->parentProfile && $p
 .action-btn-islamic.edit:hover { background: #d4a030; color: #fff; transform: scale(1.05); }
 .action-btn-islamic.delete { background: rgba(192,57,43,0.1); color: #c0392b; }
 .action-btn-islamic.delete:hover { background: #c0392b; color: #fff; transform: scale(1.05); }
+.action-btn-islamic.activate { background: rgba(39,174,96,0.1); color: #27ae60; }
+.action-btn-islamic.activate:hover { background: #27ae60; color: #fff; transform: scale(1.05); }
+.action-btn-islamic.deactivate { background: rgba(230,126,34,0.1); color: #e67e22; }
+.action-btn-islamic.deactivate:hover { background: #e67e22; color: #fff; transform: scale(1.05); }
 .table-footer .pagination { margin: 0; gap: 4px; }
 .table-footer .page-link {
     padding: 6px 11px;

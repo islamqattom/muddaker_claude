@@ -340,7 +340,7 @@ class HimmaReportService
      */
     public function studentOptions(?int $supervisorUserId = null): Collection
     {
-        $query = Student::with('user')->orderBy('id');
+        $query = Student::active()->with('user')->orderBy('id');
 
         if ($supervisorUserId) {
             $query->where('supervisor_id', $supervisorUserId);

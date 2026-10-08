@@ -118,4 +118,23 @@ class ParentController extends Controller {
         return redirect()->route('admin.parents.index')->with('success', 'تم التحديث');
     }
     public function destroy($id) { User::findOrFail($id)->delete(); return redirect()->route('admin.parents.index')->with('success','تم الحذف'); }
+
+    public function toggleActive($id)
+    {
+        $parent = User::where('role', 'parent')->findOrFail($id);
+        $parent->update(['is_active' => ! $parent->is_active]);
+
+        Log::info('Parent account toggled', [
+            'admin_id' => auth()->id(),
+            'user_id' => $parent->id,
+            'is_active' => $parent->is_active,
+        ]);
+
+        app(\App\Services\LeaderboardService::class)->clearCache();
+
+        return back()->with(
+            'success',
+            $parent->is_active ? 'تم تفعيل حساب ولي الأمر.' : 'تم تعطيل حساب ولي الأمر.'
+        );
+    }
 }

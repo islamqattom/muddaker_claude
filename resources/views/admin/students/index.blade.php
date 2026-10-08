@@ -105,12 +105,14 @@
                         <th>المشرف</th>
                         <th>الهاتف</th>
                         <th>تاريخ التسجيل</th>
+                        <th>الحالة</th>
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($students as $index => $student)
-                    <tr>
+                    @php $isActive = (bool) optional($student->user)->is_active; @endphp
+                    <tr class="{{ $isActive ? '' : 'row-inactive' }}">
                         <td class="row-num">{{ $students->firstItem() + $index }}</td>
                         <td>
                             <div class="user-info-cell">
@@ -135,6 +137,13 @@
                         <td class="phone-cell">{{ $student->phone ?? $student->user->phone ?? '-' }}</td>
                         <td class="date-cell">{{ $student->enrollment_date?->format('d/m/Y') ?? '-' }}</td>
                         <td>
+                            @if($isActive)
+                                <span class="badge-status active"><i class="fas fa-circle-check"></i>مفعّل</span>
+                            @else
+                                <span class="badge-status inactive"><i class="fas fa-circle-pause"></i>معطّل</span>
+                            @endif
+                        </td>
+                        <td>
                             <div class="action-buttons">
                                 <a href="{{ route('admin.students.show', $student->id) }}" class="action-btn view" title="عرض">
                                     <i class="fas fa-eye"></i>
@@ -142,6 +151,15 @@
                                 <a href="{{ route('admin.students.edit', $student->id) }}" class="action-btn edit" title="تعديل">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                @if($student->user)
+                                    <form action="{{ route('admin.students.toggleActive', $student->id) }}" method="POST" class="d-inline"
+                                          @if($isActive) onsubmit="return confirm('تعطيل حساب هذا الطالب؟ سيتم منعه من الدخول واستبعاده من التقارير والإحصائيات.')" @endif>
+                                        @csrf
+                                        <button type="submit" class="action-btn {{ $isActive ? 'deactivate' : 'activate' }}" title="{{ $isActive ? 'تعطيل' : 'تفعيل' }}">
+                                            <i class="fas fa-{{ $isActive ? 'ban' : 'check' }}"></i>
+                                        </button>
+                                    </form>
+                                @endif
                                 <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الطالب؟')">
                                     @csrf
                                     @method('DELETE')

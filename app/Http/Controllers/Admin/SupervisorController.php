@@ -157,4 +157,23 @@ class SupervisorController extends Controller
         return redirect()->route('admin.supervisors.index')->with('success', 'تم التحديث');
     }
     public function destroy($id) { User::findOrFail($id)->delete(); return redirect()->route('admin.supervisors.index')->with('success','تم الحذف'); }
+
+    public function toggleActive($id)
+    {
+        $supervisor = User::where('role', 'supervisor')->findOrFail($id);
+        $supervisor->update(['is_active' => ! $supervisor->is_active]);
+
+        Log::info('Supervisor account toggled', [
+            'admin_id' => auth()->id(),
+            'user_id' => $supervisor->id,
+            'is_active' => $supervisor->is_active,
+        ]);
+
+        app(\App\Services\LeaderboardService::class)->clearCache();
+
+        return back()->with(
+            'success',
+            $supervisor->is_active ? 'تم تفعيل حساب المشرف.' : 'تم تعطيل حساب المشرف.'
+        );
+    }
 }

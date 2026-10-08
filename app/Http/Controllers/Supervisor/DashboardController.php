@@ -23,18 +23,18 @@ class DashboardController extends Controller
                 ->get();
 
             $stats = [
-                'total_students' => $students->count(),
+                'total_students' => Student::where('supervisor_id', $supervisorId)->active()->count(),
                 'today_present' => $todayAttendance->where('status', 'present')->count(),
                 'today_absent' => $todayAttendance->where('status', 'absent')->count(),
                 'today_late' => $todayAttendance->where('status', 'late')->count(),
-                'today_sessions' => RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
+                'today_sessions' => RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn($u) => $u->where('is_active', true)))
                     ->whereDate('session_date', today())->count(),
-                'this_week_sessions' => RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
+                'this_week_sessions' => RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn($u) => $u->where('is_active', true)))
                     ->whereBetween('session_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count(),
                 'attendance_recorded' => $todayAttendance->count() > 0,
             ];
 
-            $recentSessions = RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId))
+            $recentSessions = RecitationSession::whereHas('student', fn($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn($u) => $u->where('is_active', true)))
                 ->with(['student.user', 'part'])
                 ->latest()
                 ->take(8)

@@ -77,6 +77,7 @@ class MissedRecitationService
         // records are handled too. Whether a given day has actually ended is
         // checked per record below.
         $candidates = Attendance::query()
+            ->with('student.user')
             ->whereIn('status', $attendedStatuses)
             ->where('date', '>=', $from->toDateString())
             ->where('date', '<=', $to->toDateString())
@@ -111,6 +112,7 @@ class MissedRecitationService
         $attendedStatuses = (array) config('recitation.attendance_statuses', ['present', 'late']);
 
         return Attendance::query()
+            ->with('student.user')
             ->whereIn('status', $attendedStatuses)
             ->where('date', '>=', $from->toDateString())
             ->where('date', '<=', $to->toDateString())
@@ -225,6 +227,13 @@ class MissedRecitationService
     public function shouldCreateForAttendance(Attendance $attendance, CarbonInterface $now, bool $requireDayEnded = true): bool
     {
         if (! $this->isRequiredAttendanceDay($attendance)) {
+            return false;
+        }
+
+        // Deactivated/sample students are skipped entirely (automatic scan,
+        // manual preview and admin backfill).
+        $student = $attendance->student;
+        if (! $student || ! optional($student->user)->is_active) {
             return false;
         }
 

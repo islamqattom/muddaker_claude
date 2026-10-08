@@ -42,6 +42,9 @@
                                 <a href="{{ route($studentRouteName, $row['student_id']) }}" class="rpt-student">
                                     <span class="rpt-student-avatar"><i class="fas fa-user-graduate"></i></span>
                                     {{ $row['name'] }}
+                                    @if(!($row['is_active'] ?? true))
+                                        <span class="badge-inactive" title="حساب معطّل">(معطّل)</span>
+                                    @endif
                                 </a>
                             </td>
                             @if($showRec)

@@ -174,6 +174,25 @@ class Student extends Model
             ->select('students.*');
     }
 
+    /**
+     * Only students whose linked user account is active. Used to keep
+     * deactivated/sample students out of current statistics, report
+     * dropdowns, leaderboards and reminders. Historical report data is
+     * intentionally NOT filtered so past totals stay reproducible.
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereHas('user', fn ($q) => $q->where('is_active', true));
+    }
+
+    /**
+     * Whether the student's linked user account is active.
+     */
+    public function getIsActiveAttribute(): bool
+    {
+        return (bool) optional($this->user)->is_active;
+    }
+
     public function getAttendanceRateAttribute(): float
     {
         $total = $this->attendances()->count();

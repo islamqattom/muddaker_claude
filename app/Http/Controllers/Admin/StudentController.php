@@ -208,7 +208,6 @@ class StudentController extends Controller
                 'address' => $request->address,
                 'enrollment_date' => $request->enrollment_date,
                 'notes' => $request->notes,
-                'is_active' => $request->boolean('is_active'),
                 'fee_category_id' => $request->fee_category_id,
             ]);
 
@@ -221,6 +220,31 @@ class StudentController extends Controller
 
         return redirect()->route('admin.students.show', $student)
             ->with('success', 'تم تحديث بيانات الطالب بنجاح');
+    }
+
+    public function toggleActive(Student $student)
+    {
+        $user = $student->user;
+
+        if (! $user) {
+            return back()->with('error', 'لا يوجد حساب مستخدم مرتبط بهذا الطالب.');
+        }
+
+        $user->update(['is_active' => ! $user->is_active]);
+
+        Log::info('Student account toggled', [
+            'admin_id' => auth()->id(),
+            'student_id' => $student->id,
+            'user_id' => $user->id,
+            'is_active' => $user->is_active,
+        ]);
+
+        app(\App\Services\LeaderboardService::class)->clearCache();
+
+        return back()->with(
+            'success',
+            $user->is_active ? 'تم تفعيل حساب الطالب.' : 'تم تعطيل حساب الطالب.'
+        );
     }
 
     public function destroy(Student $student)

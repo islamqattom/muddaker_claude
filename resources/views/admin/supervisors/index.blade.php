@@ -42,14 +42,22 @@
 @else
     <div class="supervisors-grid">
         @foreach($supervisors as $supervisor)
-        <div class="supervisor-card">
+        @php $isActive = (bool) $supervisor->is_active; @endphp
+        <div class="supervisor-card {{ $isActive ? '' : 'card-inactive' }}">
             <div class="supervisor-header-card">
                 <div class="supervisor-avatar-card">
                     <i class="fas fa-user-tie"></i>
                 </div>
                 <div class="supervisor-info-card">
                     <h5>{{ $supervisor->name }}</h5>
-                    <span class="role-tag">مشرف</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="role-tag">مشرف</span>
+                        @if($isActive)
+                            <span class="badge-status active"><i class="fas fa-circle-check"></i>مفعّل</span>
+                        @else
+                            <span class="badge-status inactive"><i class="fas fa-circle-pause"></i>معطّل</span>
+                        @endif
+                    </div>
                 </div>
                 <div class="student-count-badge">
                     <i class="fas fa-users"></i>
@@ -89,6 +97,14 @@
                     <i class="fas fa-edit"></i>
                     <span>تعديل</span>
                 </a>
+                <form action="{{ route('admin.supervisors.toggleActive', $supervisor->id) }}" method="POST" class="d-inline"
+                      style="flex:1;" @if($isActive) onsubmit="return confirm('تعطيل حساب هذا المشرف؟ سيتم منعه من الدخول واستبعاده من التقارير والإحصائيات.')" @endif>
+                    @csrf
+                    <button type="submit" class="action-btn-card {{ $isActive ? 'deactivate' : 'activate' }}" style="width:100%;">
+                        <i class="fas fa-{{ $isActive ? 'ban' : 'check' }}"></i>
+                        <span>{{ $isActive ? 'تعطيل' : 'تفعيل' }}</span>
+                    </button>
+                </form>
                 <form action="{{ route('admin.supervisors.destroy', $supervisor->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المشرف؟')">
                     @csrf
                     @method('DELETE')
@@ -215,6 +231,11 @@
 .action-btn-card.edit:hover { background: #f39c12; color: #fff; }
 .action-btn-card.delete { background: rgba(192, 57, 43, 0.12); color: #c0392b; }
 .action-btn-card.delete:hover { background: #c0392b; color: #fff; }
+.action-btn-card.activate { background: rgba(39, 174, 96, 0.12); color: #27ae60; }
+.action-btn-card.activate:hover { background: #27ae60; color: #fff; }
+.action-btn-card.deactivate { background: rgba(230, 126, 34, 0.12); color: #e67e22; }
+.action-btn-card.deactivate:hover { background: #e67e22; color: #fff; }
+.card-inactive { opacity: .6; }
 .pagination-container { display: flex; justify-content: center; }
 </style>
 

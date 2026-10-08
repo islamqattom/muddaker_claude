@@ -28,7 +28,7 @@
     <div class="rpt-header-content">
         <div class="rpt-header-icon"><i class="fas fa-user-graduate"></i></div>
         <div class="rpt-header-text">
-            <h4>{{ $student->user->name }}</h4>
+            <h4>{{ $student->user->name }} <x-inactive-badge :user="$student->user" /></h4>
             <p>{{ $student->level->name ?? '—' }} • {{ $student->student_number }}</p>
         </div>
     </div>

@@ -186,6 +186,7 @@
                             <a href="{{ route($studentRouteName, $a->student_id) }}" class="rpt-student">
                                 <span class="rpt-student-avatar"><i class="fas fa-user-graduate"></i></span>
                                 {{ $a->student->user->name ?? '—' }}
+                                <x-inactive-badge :user="$a->student->user ?? null" />
                             </a>
                         </td>
                         <td data-sort-value="{{ $a->supervisor->name ?? '' }}" style="font-weight:600;color:var(--primary);">{{ $a->supervisor->name ?? '—' }}</td>

@@ -1108,6 +1108,7 @@ class ReportService
             $rows[$studentId] = array_merge([
                 'student_id' => $studentId,
                 'name'       => $group->first()?->student?->user?->name ?? '—',
+                'is_active'  => (bool) ($group->first()?->student?->user?->is_active ?? false),
                 'sessions'   => $total + $inProgress,
                 'passed'     => $passCnt,
                 'incomplete' => $group->where('status', RecitationSession::STATUS_INCOMPLETE)->count(),
@@ -1144,6 +1145,7 @@ class ReportService
                 $rows[$studentId] = array_merge([
                     'student_id' => $studentId,
                     'name'       => $group->first()?->student?->user?->name ?? '—',
+                    'is_active'  => (bool) ($group->first()?->student?->user?->is_active ?? false),
                     'sessions'   => 0,
                     'passed'     => 0,
                     'incomplete' => 0,
@@ -1298,11 +1300,12 @@ class ReportService
     {
         $supervisors = Supervisor::with('user')
             ->join('users', 'supervisors.user_id', '=', 'users.id')
+            ->where('users.is_active', true)
             ->orderBy('users.name')
             ->select('supervisors.*')
             ->get();
 
-        $studentsQuery = Student::with('user')->orderedByName();
+        $studentsQuery = Student::active()->with('user')->orderedByName();
         if ($supervisorScopeUserId) {
             $studentsQuery->where('supervisor_id', $supervisorScopeUserId);
         } elseif ($request->supervisor_id) {

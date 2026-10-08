@@ -26,13 +26,13 @@ class ReportController extends Controller
         \App\Support\MissedRecitationSync::run();
 
         $supervisorId = Auth::id();
-        $students = Student::where('supervisor_id', $supervisorId)->with('user')->orderedByName()->get();
+        $students = Student::where('supervisor_id', $supervisorId)->active()->with('user')->orderedByName()->get();
 
         $monthStart = Carbon::now()->startOfMonth();
         $monthEnd = Carbon::now()->endOfMonth();
 
         $monthSessions = $this->reports->actualRecitationSessions(
-            RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
+            RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn ($u) => $u->where('is_active', true)))
                 ->whereBetween('session_date', [$monthStart, $monthEnd])->get()
         );
         $monthStats = $this->reports->recitationStats($monthSessions);
@@ -46,13 +46,13 @@ class ReportController extends Controller
 
         $stats = [
             'total_students' => $students->count(),
-            'total_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))
+            'total_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn ($u) => $u->where('is_active', true)))
                 ->where('type', '!=', RecitationSession::TYPE_NOT_RECITE)
                 ->where('status', '!=', RecitationSession::STATUS_NOT_RECITE)
                 ->count(),
-            'passed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->where('status', 'passed')->count(),
-            'failed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count(),
-            'avg_score' => round((float) RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId))->whereNotNull('final_score')->avg('final_score') ?? 0, 1),
+            'passed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn ($u) => $u->where('is_active', true)))->where('status', 'passed')->count(),
+            'failed_sessions' => RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn ($u) => $u->where('is_active', true)))->whereIn('status', ['failed', 'failed_continued', 'incomplete'])->count(),
+            'avg_score' => round((float) RecitationSession::whereHas('student', fn ($q) => $q->where('supervisor_id', $supervisorId)->whereHas('user', fn ($u) => $u->where('is_active', true)))->whereNotNull('final_score')->avg('final_score') ?? 0, 1),
         ];
 
         return view('supervisor.reports.index', compact(

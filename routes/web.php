@@ -98,12 +98,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Students
     Route::resource('students', Admin\StudentController::class);
     Route::get('/students/list', [Admin\StudentController::class, 'listForBilling'])->name('students.list');
+    Route::post('/students/{student}/toggle-active', [Admin\StudentController::class, 'toggleActive'])->name('students.toggleActive');
 
     // Supervisors
     Route::resource('supervisors', Admin\SupervisorController::class);
+    Route::post('/supervisors/{supervisor}/toggle-active', [Admin\SupervisorController::class, 'toggleActive'])->name('supervisors.toggleActive');
 
     // Parents
     Route::resource('parents', Admin\ParentController::class);
+    Route::post('/parents/{parent}/toggle-active', [Admin\ParentController::class, 'toggleActive'])->name('parents.toggleActive');
 
     // Levels
     Route::resource('levels', Admin\LevelController::class);

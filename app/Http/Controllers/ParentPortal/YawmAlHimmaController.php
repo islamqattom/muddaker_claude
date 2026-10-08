@@ -16,7 +16,9 @@ class YawmAlHimmaController extends Controller
             abort(403, 'لا يوجد ملف ولي أمر مرتبط بهذا الحساب');
         }
 
-        $studentIds = $parent->students()->pluck('students.id');
+        $studentIds = $parent->students()
+            ->whereHas('user', fn ($q) => $q->where('is_active', true))
+            ->pluck('students.id');
 
         $query = YawmAlHimmaSession::with('student.user')
             ->whereIn('student_id', $studentIds)
@@ -39,7 +41,9 @@ class YawmAlHimmaController extends Controller
                 ->count(),
         ];
 
-        $children = $parent->students()->with('user')->get();
+        $children = $parent->students()
+            ->whereHas('user', fn ($q) => $q->where('is_active', true))
+            ->with('user')->get();
 
         return view('parent.yawm-al-himma.index', compact('sessions', 'stats', 'children'));
     }
@@ -51,7 +55,9 @@ class YawmAlHimmaController extends Controller
             abort(403);
         }
 
-        $studentIds = $parent->students()->pluck('students.id');
+        $studentIds = $parent->students()
+            ->whereHas('user', fn ($q) => $q->where('is_active', true))
+            ->pluck('students.id');
         if (! $studentIds->contains($session->student_id)) {
             abort(403);
         }

@@ -61,7 +61,7 @@ class AttendanceReminderService
             ->get();
 
         foreach ($supervisors as $supervisor) {
-            $studentIds = Student::where('supervisor_id', $supervisor->id)->pluck('id');
+            $studentIds = Student::where('supervisor_id', $supervisor->id)->active()->pluck('id');
 
             if ($studentIds->isEmpty()) {
                 continue;

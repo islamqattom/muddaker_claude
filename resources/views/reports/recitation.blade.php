@@ -223,6 +223,7 @@
                             <a href="{{ route($studentRouteName, $session->student_id) }}" class="rpt-student">
                                 <span class="rpt-student-avatar"><i class="fas fa-user-graduate"></i></span>
                                 {{ $session->student->user->name ?? '—' }}
+                                <x-inactive-badge :user="$session->student->user ?? null" />
                             </a>
                         </td>
                         <td data-sort-value="{{ $session->supervisor->name ?? '' }}" style="font-weight:600;color:var(--primary);">{{ $session->supervisor->name ?? '—' }}</td>

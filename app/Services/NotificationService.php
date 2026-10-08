@@ -43,6 +43,10 @@ class NotificationService
         ?User $sender = null,
         array $extra = []
     ): ?Notification {
+        if (! $user->is_active) {
+            return null;
+        }
+
         $notification = $this->insertNotification(
             [$user->id],
             $type,
@@ -78,6 +82,15 @@ class NotificationService
         ?User $sender = null,
         array $extra = []
     ): void {
+        if (empty($userIds)) {
+            return;
+        }
+
+        $userIds = User::whereIn('id', $userIds)
+            ->where('is_active', true)
+            ->pluck('id')
+            ->all();
+
         if (empty($userIds)) {
             return;
         }
