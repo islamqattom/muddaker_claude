@@ -5,5 +5,12 @@
     "The due date field is required.": "حقل تاريخ الاستحقاق مطلوب",
     "The due time field must match the format H:i.": "يجب أن يطابق وقت البدء الصيغة H:i",
     "The end time field must match the format H:i.": "يجب أن يطابق وقت النهاية الصيغة H:i",
-    "The due date field must be a valid date.": "يجب أن يكون تاريخ الاستحقاق تاريخاً صحيحاً"
+    "The due date field must be a valid date.": "يجب أن يكون تاريخ الاستحقاق تاريخاً صحيحاً",
+    "saturday": "السبت",
+    "sunday": "الأحد",
+    "monday": "الإثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة"
 }
