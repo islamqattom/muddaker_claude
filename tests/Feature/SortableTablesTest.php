@@ -2,13 +2,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\CreatesApplication;
 
-class SortableTablesTest extends BaseTestCase
+class SortableTablesTest extends \Tests\TestCase
 {
-    use CreatesApplication;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

@@ -11,14 +11,13 @@ use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Tests\CreatesApplication;
 
-class PortalWrittenReportTest extends BaseTestCase
+class PortalWrittenReportTest extends \Tests\TestCase
 {
-    use CreatesApplication;
+    use RefreshDatabase;
 
     private int $supervisorId;
     private int $seq = 0;

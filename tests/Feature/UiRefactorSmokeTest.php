@@ -6,13 +6,12 @@ use App\Models\Student;
 use App\Models\Supervisor;
 use App\Models\ParentProfile;
 use App\Models\Level;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\CreatesApplication;
 
-class UiRefactorSmokeTest extends BaseTestCase
+class UiRefactorSmokeTest extends \Tests\TestCase
 {
-    use CreatesApplication;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {

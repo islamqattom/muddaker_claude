@@ -9,13 +9,12 @@ use App\Models\RecitationSession;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\CreatesApplication;
 
-class AdminStudentReportTest extends BaseTestCase
+class AdminStudentReportTest extends \Tests\TestCase
 {
-    use CreatesApplication;
+    use RefreshDatabase;
 
     private int $supervisorId;
     private int $seedSeq = 0;
