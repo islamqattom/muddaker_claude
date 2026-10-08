@@ -222,7 +222,7 @@ class StudentController extends Controller
             ->with('success', 'تم تحديث بيانات الطالب بنجاح');
     }
 
-    public function toggleActive(Student $student)
+    public function toggleActive(Student $student, \App\Services\ParentActivationService $parentActivation)
     {
         $user = $student->user;
 
@@ -230,21 +230,25 @@ class StudentController extends Controller
             return back()->with('error', 'لا يوجد حساب مستخدم مرتبط بهذا الطالب.');
         }
 
-        $user->update(['is_active' => ! $user->is_active]);
+        $active = ! $user->is_active;
+
+        $result = $parentActivation->setStudentActive($student, $active, auth()->id());
 
         Log::info('Student account toggled', [
             'admin_id' => auth()->id(),
             'student_id' => $student->id,
             'user_id' => $user->id,
-            'is_active' => $user->is_active,
+            'is_active' => $active,
         ]);
 
         app(\App\Services\LeaderboardService::class)->clearCache();
 
-        return back()->with(
-            'success',
-            $user->is_active ? 'تم تفعيل حساب الطالب.' : 'تم تعطيل حساب الطالب.'
-        );
+        $message = $active ? 'تم تفعيل حساب الطالب.' : 'تم تعطيل حساب الطالب.';
+        foreach ($parentActivation->flashMessages($result['events']) as $parentMessage) {
+            $message .= ' ' . $parentMessage;
+        }
+
+        return back()->with('success', $message);
     }
 
     public function destroy(Student $student)

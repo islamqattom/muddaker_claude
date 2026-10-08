@@ -129,7 +129,8 @@ class UserActivationTest extends TestCase
 
         session()->start();
         $this->actingAs($admin);
-        $response = app(\App\Http\Controllers\Admin\StudentController::class)->toggleActive($orphan);
+        $response = app(\App\Http\Controllers\Admin\StudentController::class)
+            ->toggleActive($orphan, app(\App\Services\ParentActivationService::class));
 
         $this->assertTrue($response->isRedirect());
         $this->assertSame('لا يوجد حساب مستخدم مرتبط بهذا الطالب.', session('error'));

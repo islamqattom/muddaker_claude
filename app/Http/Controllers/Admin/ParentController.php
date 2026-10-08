@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\{User, ParentProfile, Student};
+use App\Services\ParentActivationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class ParentController extends Controller {
     public function index() { $parents = User::where('role','parent')->with('parentProfile.students')->latest()->paginate(20); return view('admin.parents.index', compact('parents')); }
     public function create() { $students = Student::with('user')->get(); return view('admin.parents.create', compact('students')); }
-    public function store(Request $request) {
+    public function store(Request $request, ParentActivationService $parentActivation) {
         $request->validate([
             'name'=>'required',
             'username'=>'required|string|min:3|max:30|regex:/^[a-zA-Z0-9_]+$/|unique:users,username',
@@ -36,7 +37,7 @@ class ParentController extends Controller {
             }
         }
 
-        DB::transaction(function() use ($request, $avatarPath) {
+        $events = DB::transaction(function() use ($request, $avatarPath, $parentActivation) {
             $user = User::create([
                 'name'=>$request->name,
                 'username'=>$request->username,
@@ -48,8 +49,16 @@ class ParentController extends Controller {
             ]);
             $parent = ParentProfile::create(['user_id'=>$user->id,'relationship'=>$request->relationship??'father']);
             if ($request->student_ids) { $parent->students()->attach($request->student_ids); }
+            $event = $parentActivation->syncParentStatus($parent, auth()->id());
+            return $event ? [$event] : [];
         });
-        return redirect()->route('admin.parents.index')->with('success','تم إضافة ولي الأمر');
+
+        $message = 'تم إضافة ولي الأمر';
+        foreach ($parentActivation->flashMessages($events) as $parentMessage) {
+            $message .= ' ' . $parentMessage;
+        }
+
+        return redirect()->route('admin.parents.index')->with('success', $message);
     }
     public function show($id) { $parent = User::where('role','parent')->with('parentProfile.students.user')->findOrFail($id); return view('admin.parents.show',compact('parent')); }
     public function edit($id) { $parent = User::where('role','parent')->with('parentProfile')->findOrFail($id); $students = Student::with('user')->get(); return view('admin.parents.edit',compact('parent','students')); }
@@ -122,7 +131,10 @@ class ParentController extends Controller {
     public function toggleActive($id)
     {
         $parent = User::where('role', 'parent')->findOrFail($id);
-        $parent->update(['is_active' => ! $parent->is_active]);
+        $parent->update([
+            'is_active' => ! $parent->is_active,
+            'deactivated_by_system' => false,
+        ]);
 
         Log::info('Parent account toggled', [
             'admin_id' => auth()->id(),

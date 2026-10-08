@@ -14,6 +14,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'username', 'email', 'phone', 'password', 'role', 'avatar', 'is_active',
+        'deactivated_by_system',
     ];
 
     protected $hidden = [
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_active' => 'boolean',
+        'deactivated_by_system' => 'boolean',
     ];
 
     public function student()
