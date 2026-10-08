@@ -7,13 +7,12 @@ use App\Models\Supervisor;
 use App\Models\ParentProfile;
 use App\Models\Level;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\CreatesApplication;
 
-class ReportRoutesSmokeTest extends BaseTestCase
+class ReportRoutesSmokeTest extends \Tests\TestCase
 {
-    use CreatesApplication;
+    use RefreshDatabase;
 
     protected function setUp(): void
     {
